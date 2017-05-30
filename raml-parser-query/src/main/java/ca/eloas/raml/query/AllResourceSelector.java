@@ -4,6 +4,8 @@ import com.google.common.collect.FluentIterable;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.resources.Resource;
 
+import java.util.List;
+
 import static com.google.common.collect.FluentIterable.from;
 
 /**
@@ -15,8 +17,9 @@ public class AllResourceSelector implements Selector<Resource> {
     @Override
     public FluentIterable<Resource> fromApi(Api api) {
 
-        FluentIterable<Resource> fi = from(api.resources());
-        for (Resource resource : api.resources()) {
+        List<Resource> topResources = api.resources();
+        FluentIterable<Resource> fi = from(topResources);
+        for (Resource resource : topResources) {
             fi = fi.append(fromResource(resource));
         }
 
@@ -25,8 +28,9 @@ public class AllResourceSelector implements Selector<Resource> {
 
     @Override
     public FluentIterable<Resource> fromResource(Resource topResource) {
-        FluentIterable<Resource> fi = from(topResource.resources());
-        for (Resource resource : topResource.resources()) {
+        List<Resource> resources = topResource.resources();
+        FluentIterable<Resource> fi = from(resources);
+        for (Resource resource : resources) {
             fi = fi.append(fromResource(resource));
         }
 

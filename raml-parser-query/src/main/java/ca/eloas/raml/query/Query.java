@@ -16,7 +16,7 @@ import java.util.List;
  * Created by Jean-Philippe Belanger on 4/19/17.
  * Just potential zeroes and ones
  */
-public class Query<B> {
+public class Query {
 
     private QueryBase queryBase;
 
@@ -28,14 +28,14 @@ public class Query<B> {
     /*
      *  Starting points
      */
-    public static Query<Api> from(Api api) {
+    public static Query from(Api api) {
 
-        return new Query<>(Augmenter.augment(ApiQueryBase.class, api));
+        return new Query(Augmenter.augment(ApiQueryBase.class, api));
     }
 
-    public static Query<Resource> from(Resource resource) {
+    public static Query from(Resource resource) {
 
-        return new Query<>(Augmenter.augment(ResourceQueryBase.class, resource));
+        return new Query(Augmenter.augment(ResourceQueryBase.class, resource));
     }
 
 
