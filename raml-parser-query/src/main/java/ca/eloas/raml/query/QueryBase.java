@@ -8,5 +8,5 @@ import com.google.common.collect.FluentIterable;
  */
 public interface QueryBase {
 
-   <B> FluentIterable<B> queryFor(Target<B> target);
+   <B> FluentIterable<B> queryFor(Selector<B> selector);
 }

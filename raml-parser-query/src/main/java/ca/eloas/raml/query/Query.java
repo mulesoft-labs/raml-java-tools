@@ -26,7 +26,7 @@ public class Query<B> {
     }
 
     /*
-    Starting points
+     *  Starting points
      */
     public static Query<Api> from(Api api) {
 
@@ -39,9 +39,9 @@ public class Query<B> {
     }
 
 
-    public<T> FluentIterable<T> select(Target<T> target) {
+    public<T> FluentIterable<T> select(Selector<T> selector) {
 
-        return queryBase.queryFor(target);
+        return queryBase.queryFor(selector);
     }
 
     public static void main(String[] args) {
@@ -55,11 +55,10 @@ public class Query<B> {
         } else {
             Api api = ramlModelResult.getApiV10();
 
-            List<Resource> tr = from(api).select(Targets.allResources()).toList();
+            List<Resource> tr = from(api).select(Selectors.allResources()).toList();
             for (Resource resource : tr) {
                 System.err.println(resource.resourcePath());
             }
-
         }
     }
 

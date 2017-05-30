@@ -10,7 +10,7 @@ import static com.google.common.collect.FluentIterable.from;
  * Created by Jean-Philippe Belanger on 4/28/17.
  * Just potential zeroes and ones
  */
-public class AllResourceTarget implements Target<Resource> {
+public class AllResourceSelector implements Selector<Resource> {
 
     @Override
     public FluentIterable<Resource> fromApi(Api api) {

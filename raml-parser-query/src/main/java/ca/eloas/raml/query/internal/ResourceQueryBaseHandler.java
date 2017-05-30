@@ -1,7 +1,7 @@
 package ca.eloas.raml.query.internal;
 
 import ca.eloas.raml.query.QueryBase;
-import ca.eloas.raml.query.Target;
+import ca.eloas.raml.query.Selector;
 import com.google.common.collect.FluentIterable;
 import org.raml.v2.api.model.v10.resources.Resource;
 
@@ -19,8 +19,8 @@ public class ResourceQueryBaseHandler implements QueryBase {
     }
 
     @Override
-    public <B> FluentIterable<B> queryFor(Target<B> target) {
-        return target.fromResource(resource);
+    public <B> FluentIterable<B> queryFor(Selector<B> selector) {
+        return selector.fromResource(resource);
     }
 
 }
