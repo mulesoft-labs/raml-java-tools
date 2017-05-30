@@ -8,6 +8,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>raml-parser-query</module>
+        <module>raml-simple-emitter</module>
         <module>test-utils</module>
     </modules>
     <build>
