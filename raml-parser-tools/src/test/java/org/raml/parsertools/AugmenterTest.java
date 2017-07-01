@@ -8,8 +8,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by Jean-Philippe Belanger on 4/20/17.
  * Just potential zeroes and ones
@@ -21,7 +19,7 @@ public class AugmenterTest  extends UnitTest {
         String getName();
     }
 
-    @Extend(handler = BooHandler.class)
+    @Extension(handler = BooHandler.class)
     public interface Boo extends Foo {
 
         String getBibi();
@@ -42,6 +40,35 @@ public class AugmenterTest  extends UnitTest {
         }
     }
 
+    @ExtensionFactory(factory = Factory.class)
+    public interface AugmentedNode extends Foo {
+
+        int visit();
+    }
+
+    public interface SubFoo extends Foo {
+
+        int subbing();
+    }
+
+    public static class SubFooHandler  {
+
+    }
+
+    public static class Factory implements AugmentationExtensionFactory {
+
+        @Override
+        public Object create(Object object) {
+
+            throw new RuntimeException("argh");
+        }
+
+        public Object create(SubFoo delegate) {
+
+            return new SubFooHandler();
+        }
+    }
+
     @Test
     public void simple() throws Exception {
 
@@ -57,7 +84,21 @@ public class AugmenterTest  extends UnitTest {
         Assert.assertEquals("HandledBibi", b.getBibi());
         Assert.assertEquals("getName", b.getName());
         Assert.assertEquals("toString", b.toString());
+    }
 
+    @Test
+    public void factory() throws Exception {
+
+        SubFoo subFoo = (SubFoo) Proxy.newProxyInstance(AugmenterTest.class.getClassLoader(), new Class[] {SubFoo.class}, new InvocationHandler() {
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+
+                return method.getName();
+            }
+        });
+        AugmentedNode b = Augmenter.augment(AugmentedNode.class, subFoo);
+
+        Assert.assertEquals("toString", b.toString());
 
     }
 }
