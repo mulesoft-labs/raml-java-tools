@@ -1,5 +1,6 @@
 package org.raml.simpleemitter;
 
+import org.raml.parsertools.Augmenter;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.internal.impl.commons.nodes.RamlDocumentNode;
 import org.raml.yagi.framework.model.NodeModel;
@@ -24,14 +25,25 @@ public class EmissionHandler implements RamlEmitter {
     }
 
     @Override
-    public void emit(Writer w) throws IOException {
+    public void emit(final Writer w) throws IOException {
 
         RamlDocumentNode n = (RamlDocumentNode) nodeModel.getNode();
         w.write("#%RAML 1.0\n");
+
         for (Node node : n.getChildren()) {
-            KeyValueNode kvn = (KeyValueNode) node;
-            w.write(kvn.getKey().toString() + ":");
-            w.write(kvn.getValue().toString() + "\n");
+
+            VisitableNode v = Augmenter.augment(VisitableNode.class, node);
+            v.visit(new NodeVisitor() {
+                @Override
+                public void visit(KeyValueNode node) {
+                    try {
+                        w.write(node.getKey().toString() + ":\n");
+                        w.flush();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
 
         w.flush();

@@ -41,7 +41,7 @@ public class AugmenterTest  extends UnitTest {
     }
 
     @ExtensionFactory(factory = Factory.class)
-    public interface AugmentedNode extends Foo {
+    public interface AugmentedNode  {
 
         int visit();
     }
@@ -51,8 +51,20 @@ public class AugmenterTest  extends UnitTest {
         int subbing();
     }
 
-    public static class SubFooHandler  {
+    public static class SubFooHandler implements AugmentedNode {
 
+
+        private SubFoo delegate;
+
+        public SubFooHandler(SubFoo delegate) {
+
+            this.delegate = delegate;
+        }
+
+        @Override
+        public int visit() {
+            return 0;
+        }
     }
 
     public static class Factory implements AugmentationExtensionFactory {
@@ -65,7 +77,7 @@ public class AugmenterTest  extends UnitTest {
 
         public Object create(SubFoo delegate) {
 
-            return new SubFooHandler();
+            return new SubFooHandler(delegate);
         }
     }
 
