@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.*;
 
 /**
  * Created by Jean-Philippe Belanger on 4/20/17.
@@ -79,11 +80,36 @@ public class Augmenter {
         return factory;
     }
 
-    private static Object findFactoryMethod(Object delegate, AugmentationExtensionFactory factory) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        try {
-            return factory.getClass().getDeclaredMethod("create", delegate.getClass().getInterfaces()[0]).invoke(factory, delegate);
-        } catch (NoSuchMethodException e) {
-            return factory.create(delegate);
+    private static Set<Class<?>> findAllImplementedInterfaces(Class<?> bottomClass) {
+
+        Set<Class<?>> classes = new LinkedHashSet<>(Arrays.asList(bottomClass.getInterfaces()));
+
+        Set<Class<?>> newClasses = new HashSet<>();
+        for (Class<?> aClass : classes) {
+
+            Set<Class<?>> higherClasses = findAllImplementedInterfaces(aClass);
+            newClasses.addAll(higherClasses);
         }
+
+        if ( bottomClass.getSuperclass() != null ) {
+            newClasses.addAll(findAllImplementedInterfaces(bottomClass.getSuperclass()));
+        }
+        classes.addAll(newClasses);
+        return classes;
+    }
+
+    private static Object findFactoryMethod(Object delegate, AugmentationExtensionFactory factory) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+
+        Set<Class<?>> classes = findAllImplementedInterfaces(delegate.getClass());
+        for (Class<?> aClass : classes) {
+
+            try {
+                return factory.getClass().getDeclaredMethod("create", aClass).invoke(factory, delegate);
+            } catch (NoSuchMethodException e) {
+            }
+        }
+
+        return factory.create(delegate);
+
     }
 }
