@@ -80,7 +80,7 @@ annotationTypes:
     example: 2
   ready:
     type: nil
-    description: markes a resource as ready
+    description: markes a method as ready
     allowedTargets: Resource
   javaClassName:
     type: string
@@ -103,9 +103,9 @@ securitySchemes:
       OAuth 1.0 continues to be supported for all API requests, but OAuth 2.0 is now preferred.
     type: OAuth 1.0
     settings:
-      requestTokenUri: https://api.mysampleapi.com/1/oauth/request_token
-      authorizationUri: https://api.mysampleapi.com/1/oauth/authorize
-      tokenCredentialsUri: https://api.mysampleapi.com/1/oauth/access_token
+      requestTokenUri: https://method.mysampleapi.com/1/oauth/request_token
+      authorizationUri: https://method.mysampleapi.com/1/oauth/authorize
+      tokenCredentialsUri: https://method.mysampleapi.com/1/oauth/access_token
       signatures: [ 'HMAC-SHA1', 'PLAINTEXT' ]
   oauth_2_0:
     description: |
@@ -136,7 +136,7 @@ securitySchemes:
               timestamp...). Unfortunately, re-authenticating the user won't help here.
     settings:
       authorizationUri: https://www.dropbox.com/1/oauth2/authorize
-      accessTokenUri: https://api.dropbox.com/1/oauth2/token
+      accessTokenUri: https://method.dropbox.com/1/oauth2/token
       authorizationGrants: [ authorization_code, implicit, 'urn:ietf:params:oauth:grant-type:saml2-bearer' ]
   custom_scheme:
     description: |
@@ -158,9 +158,9 @@ securedBy: custom_scheme
 
 uses:
   SongsLib: libraries/songs-library.raml
-  ApiLib: libraries/api-library.raml
+  ApiLib: libraries/method-library.raml
 
-/api:
+/method:
   get:
     queryString:
       properties:

@@ -1,12 +1,13 @@
 package org.raml.simpleemitter;
 
+
 import org.raml.parsertools.ExtensionFactory;
-import org.raml.yagi.framework.nodes.KeyValueNode;
 
 /**
  * Created. There, you have it.
  */
-public interface NodeVisitor {
+@ExtensionFactory(factory = ApiAugmentationFactory.class)
+public interface Visitable {
 
-    void visit(KeyValueNode node);
+    void visit(ApiVisitor v);
 }
