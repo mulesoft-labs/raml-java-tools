@@ -3,13 +3,18 @@ package org.raml.simpleemitter.nodes;
 import org.raml.parsertools.Augmenter;
 import org.raml.simpleemitter.ApiVisitor;
 import org.raml.simpleemitter.Visitable;
+import org.raml.simpleemitter.api.ModifiableMethod;
+import org.raml.simpleemitter.api.ModifiableResource;
+import org.raml.simpleemitter.api.ModifiableResponse;
 import org.raml.v2.api.model.v10.bodies.Response;
 import org.raml.v2.api.model.v10.methods.Method;
+
+import java.util.List;
 
 /**
  * Created. There, you have it.
  */
-public class VisitableMethod implements Visitable {
+public class VisitableMethod extends Helper implements Visitable {
     final private Method method;
 
     public VisitableMethod(Method method) {
@@ -19,13 +24,11 @@ public class VisitableMethod implements Visitable {
     @Override
     public void visit(ApiVisitor v) {
 
-        v.visit(method);
+        v.visit(Augmenter.augment(ModifiableMethod.class, method));
+    }
 
-        for (Response response : method.responses()) {
+    public List<Response> responses() {
 
-            Visitable augResource = Augmenter.augment(Visitable.class, response);
-            augResource.visit(v);
-        }
-
+        return toModifiable(method.responses(), ModifiableResponse.class);
     }
 }

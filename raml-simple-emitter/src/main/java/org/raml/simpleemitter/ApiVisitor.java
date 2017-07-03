@@ -1,6 +1,7 @@
 package org.raml.simpleemitter;
 
 import org.raml.parsertools.ExtensionFactory;
+import org.raml.simpleemitter.api.*;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.bodies.Response;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
@@ -15,12 +16,14 @@ import java.io.IOException;
  */
 public interface ApiVisitor {
 
-    void startBlock();
-    void endBlock();
+    void visit(ModifiableApi node);
+    void visit(ModifiableResource resource);
+    void visit(ModifiableTypeDeclaration typeDeclaration);
+    void visit(ModifiableMethod method);
+    void visit(ModifiableResponse response);
+    void visit(ModifiableObjectTypeDeclaration motd);
 
-    void visit(Api node);
-    void visit(Resource resource);
-    void visit(TypeDeclaration typeDeclaration);
-    void visit(Method method);
-    void visit(Response response);
+    void visit(ModifiableStringTypeDeclaration std);
+
+    void visit(ModifiableIntegerTypeDeclaration motd);
 }
