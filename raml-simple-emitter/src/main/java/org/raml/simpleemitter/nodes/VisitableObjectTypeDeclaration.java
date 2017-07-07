@@ -11,7 +11,9 @@ import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import java.util.List;
 
 /**
- * Created. There, you have it.
+ * Created. There, you have it. (
+ * (NamedTypeExpressionNode)((java.util.ArrayList)((KeyValueNodeImpl)((java.util.ArrayList)((TypeDeclarationNode)((java.util.ArrayList)((KeyValueNodeImpl)((ObjectTypeDeclaration)((SimpleProxy)this.h)
+ * .delegate).node).children).get(1)).children).get(0)).children).get(1)).refNode
  */
 public class VisitableObjectTypeDeclaration extends Helper implements Visitable {
     private ObjectTypeDeclaration declaration;

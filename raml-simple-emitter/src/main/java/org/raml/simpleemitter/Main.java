@@ -34,7 +34,7 @@ public class Main {
         {
             Api api = ramlModelResult.getApiV10();
             System.err.println(api);
-            Emitter emitter = new Emitter();
+            AnotherEmitter emitter = new AnotherEmitter();
             emitter.emit(api);
 
         }
