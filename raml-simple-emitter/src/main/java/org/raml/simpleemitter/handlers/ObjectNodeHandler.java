@@ -28,15 +28,18 @@ public class ObjectNodeHandler extends NodeHandler<ObjectNode> {
     @Override
     public void handleSafely(ObjectNode node, YamlEmitter emitter) {
 
+        for (Node child : node.getChildren()) {
 
-        String scalar = isScalar(node.getChildren().get(0));
-        if ( scalar != null ) {
+            String scalar = isScalar(node.getChildren().get(0));
+            if ( scalar != null ) {
 
-            System.err.println(": " + scalar);
-        } else {
+                System.err.println(": " + scalar);
+            } else {
 
-            handlerList.handle(node.getChildren().get(0), emitter);
+                handlerList.handle(child, emitter);
+            }
         }
+
 
     }
 

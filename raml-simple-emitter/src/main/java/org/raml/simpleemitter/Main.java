@@ -19,7 +19,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        URL url = Main.class.getResource("example.raml");
+        URL url = Main.class.getResource("example2.raml");
         Reader reader = new InputStreamReader(url.openStream());
 
         RamlModelResult ramlModelResult = new RamlModelBuilder().buildApi(reader, url.getFile());

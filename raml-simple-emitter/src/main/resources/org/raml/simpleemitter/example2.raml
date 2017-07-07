@@ -1,0 +1,38 @@
+#%RAML 1.0
+title:
+    value: "API with Library"
+version:
+    value: "1"
+types:
+    Player:
+        type: "object"
+        properties:
+            firstName:
+                type: "string"
+                displayName:
+                    value: "firstName"
+            lastName:
+                type: "string"
+                displayName:
+                    value: "lastName"
+            age:
+                type: "integer"
+                displayName:
+                    value: "age"
+        displayName:
+            value: "Player"
+/test:
+    get:
+        responses:
+            200:
+                body:
+                    application/xml:
+                        type: "Player"
+                        displayName:
+                            value: "application/xml"
+                displayName:
+                    value: "200"
+        displayName:
+            value: "get"
+    displayName:
+        value: "/test"
