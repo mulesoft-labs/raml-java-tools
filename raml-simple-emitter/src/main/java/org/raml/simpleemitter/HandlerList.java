@@ -1,9 +1,6 @@
 package org.raml.simpleemitter;
 
-import org.raml.simpleemitter.handlers.DefaultNodeHandler;
-import org.raml.simpleemitter.handlers.KeyValueNodeHandler;
-import org.raml.simpleemitter.handlers.ObjectNodeHandler;
-import org.raml.simpleemitter.handlers.TypeDeclarationNodeHandler;
+import org.raml.simpleemitter.handlers.*;
 import org.raml.yagi.framework.nodes.Node;
 
 import java.io.IOException;
@@ -18,10 +15,13 @@ public class HandlerList {
 
     private final List<NodeHandler<? extends Node >> nodeList = new ArrayList<>();
     {
+
         nodeList.add(new TypeDeclarationNodeHandler(this));
         nodeList.add(new KeyValueNodeHandler(this));
         nodeList.add(new ObjectNodeHandler(this));
-
+        nodeList.add(new ArrayNodeHandler(this));
+        nodeList.add(new NullNodeHandler(this));
+        nodeList.add(new ReferenceNodeHandler(this));
         nodeList.add(new DefaultNodeHandler());
     }
 
