@@ -18,8 +18,9 @@ public class DefaultNodeHandler extends NodeHandler<Node> {
     }
 
     @Override
-    public void handleSafely(Node node, YamlEmitter emitter) {
+    public boolean handleSafely(Node node, YamlEmitter emitter) {
 
         System.err.println("not handled: " + node.getClass() + ", " + Arrays.asList(node.getClass().getInterfaces()));
+        return true;
     }
 }

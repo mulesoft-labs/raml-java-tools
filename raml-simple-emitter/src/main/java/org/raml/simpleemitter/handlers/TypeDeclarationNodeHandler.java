@@ -5,8 +5,6 @@ import org.raml.simpleemitter.NodeHandler;
 import org.raml.simpleemitter.YamlEmitter;
 import org.raml.v2.internal.impl.commons.nodes.TypeDeclarationNode;
 import org.raml.yagi.framework.nodes.Node;
-import org.raml.yagi.framework.nodes.ObjectNode;
-import org.raml.yagi.framework.nodes.SimpleTypeNode;
 
 /**
  * Created. There, you have it.
@@ -27,7 +25,7 @@ public class TypeDeclarationNodeHandler extends NodeHandler<TypeDeclarationNode>
     }
 
     @Override
-    public void handleSafely(TypeDeclarationNode node, YamlEmitter emitter) {
+    public boolean handleSafely(TypeDeclarationNode node, YamlEmitter emitter) {
 
 
         for (Node child : node.getChildren()) {
@@ -35,7 +33,7 @@ public class TypeDeclarationNodeHandler extends NodeHandler<TypeDeclarationNode>
             handlerList.handle(child, emitter);
         }
 
-
+        return true;
     }
 
 }

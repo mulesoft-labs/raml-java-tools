@@ -1,13 +1,11 @@
 package org.raml.simpleemitter.handlers;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
 import org.raml.simpleemitter.HandlerList;
 import org.raml.simpleemitter.NodeHandler;
 import org.raml.simpleemitter.YamlEmitter;
 import org.raml.yagi.framework.nodes.ArrayNode;
 import org.raml.yagi.framework.nodes.Node;
-import org.raml.yagi.framework.nodes.ObjectNode;
 import org.raml.yagi.framework.nodes.SimpleTypeNode;
 
 import java.io.IOException;
@@ -33,7 +31,7 @@ public class ArrayNodeHandler extends NodeHandler<ArrayNode> {
     }
 
     @Override
-    public void handleSafely(ArrayNode node, YamlEmitter emitter) throws IOException {
+    public boolean handleSafely(ArrayNode node, YamlEmitter emitter) throws IOException {
 
 
         List<String> buf = new ArrayList<>();
@@ -48,6 +46,7 @@ public class ArrayNodeHandler extends NodeHandler<ArrayNode> {
             }
         }
         emitter.write("[" + Joiner.on(",").join(buf) + "]");
+        return true;
     }
 
     private String isScalar(Node node) {

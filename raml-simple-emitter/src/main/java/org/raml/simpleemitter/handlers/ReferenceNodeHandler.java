@@ -4,7 +4,6 @@ import org.raml.simpleemitter.HandlerList;
 import org.raml.simpleemitter.NodeHandler;
 import org.raml.simpleemitter.YamlEmitter;
 import org.raml.yagi.framework.nodes.Node;
-import org.raml.yagi.framework.nodes.NullNode;
 import org.raml.yagi.framework.nodes.ReferenceNode;
 import org.raml.yagi.framework.nodes.SimpleTypeNode;
 
@@ -29,10 +28,11 @@ public class ReferenceNodeHandler extends NodeHandler<ReferenceNode> {
     }
 
     @Override
-    public void handleSafely(ReferenceNode node, YamlEmitter emitter) throws IOException {
+    public boolean handleSafely(ReferenceNode node, YamlEmitter emitter) throws IOException {
 
 
         emitter.write(node.getRefName());
+        return true;
     }
 
     private String isScalar(Node node) {

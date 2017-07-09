@@ -28,7 +28,7 @@ public class KeyValueNodeHandler extends NodeHandler<KeyValueNode> {
     }
 
     @Override
-    public void handleSafely(KeyValueNode node, YamlEmitter emitter) throws IOException {
+    public boolean handleSafely(KeyValueNode node, YamlEmitter emitter) throws IOException {
 
         String scalar = isScalar(node.getValue());
         if ( scalar != null ) {
@@ -40,6 +40,7 @@ public class KeyValueNodeHandler extends NodeHandler<KeyValueNode> {
             handlerList.handle(node.getValue(), emitter.indent());
         }
 
+        return true;
     }
 
     private String isScalar(Node node) {
