@@ -31,7 +31,7 @@ public class NullNodeHandler extends NodeHandler<NullNode> {
     public boolean handleSafely(NullNode node, YamlEmitter emitter) throws IOException {
 
 
-        emitter.write("value: null");
+        emitter.writeTag("value: null");
         return true;
     }
 

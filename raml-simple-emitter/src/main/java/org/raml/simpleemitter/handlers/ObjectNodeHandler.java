@@ -12,40 +12,16 @@ import java.util.Collections;
 /**
  * Created. There, you have it.
  */
-public class ObjectNodeHandler extends NodeHandler<ObjectNode> {
+public class ObjectNodeHandler extends SubclassedNodeHandler<ObjectNode> {
 
 
     private final HandlerList handlerList;
-    private final HandlerList subclassHandlerList;
 
 
     public ObjectNodeHandler(HandlerList handlerList) {
 
+        super(ObjectNode.class, new HandlerList(Collections.<NodeHandler<? extends Node>>singletonList(new TypeDeclarationNodeHandler(handlerList))));
         this.handlerList = handlerList;
-        this.subclassHandlerList = new HandlerList(Collections.<NodeHandler<? extends Node>>singletonList(new TypeDeclarationNodeHandler(handlerList)));
-    }
-
-    @Override
-    public boolean handles(Node node) {
-
-
-        if ( subclassHandlerList.handles(node) ) {
-            return true;
-        } else {
-
-            return node instanceof ObjectNode;
-        }
-    }
-
-    @Override
-    public boolean handle(Node node, YamlEmitter emitter) {
-
-        if ( ! subclassHandlerList.handle(node, emitter) ) {
-            return true;
-        } else {
-
-            return handleSafely((ObjectNode) node, emitter);
-        }
     }
 
     @Override

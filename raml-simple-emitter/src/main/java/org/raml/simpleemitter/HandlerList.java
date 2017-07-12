@@ -25,7 +25,10 @@ public class HandlerList extends NodeHandler<Node> {
 
     public HandlerList() {
         handlerList = new ArrayList<>();
-        handlerList.add(new TypeDeclarationNodeHandler(this));
+
+      //  handlerList.add(new TypeDeclarationNodeHandler(this));
+        handlerList.add(new TypeExpressionNodeHandler(this));
+        handlerList.add(new SimpleTypeNodeHandler());
         handlerList.add(new KeyValueNodeHandler(this));
         handlerList.add(new ObjectNodeHandler(this));
         handlerList.add(new ArrayNodeHandler(this));
@@ -48,17 +51,14 @@ public class HandlerList extends NodeHandler<Node> {
     @Override
     public boolean handleSafely(final Node node, YamlEmitter emitter) throws IOException {
 
-        Optional<NodeHandler<?>> handler =  FluentIterable.from(handlerList).firstMatch(new Predicate<NodeHandler<? extends Node>>() {
+        Optional<NodeHandler<?>> handler = FluentIterable.from(handlerList).firstMatch(new Predicate<NodeHandler<? extends Node>>() {
             @Override
             public boolean apply(@Nullable NodeHandler<? extends Node> nodeHandler) {
                 return nodeHandler.handles(node);
             }
         });
 
-        if ( handler.isPresent()) {
-            handler.get().handle(node, emitter);
-        }
+        return handler.isPresent() && handler.get().handle(node, emitter);
 
-        return true;
     }
 }

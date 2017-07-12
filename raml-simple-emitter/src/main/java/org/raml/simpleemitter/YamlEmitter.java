@@ -3,6 +3,10 @@ package org.raml.simpleemitter;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import org.raml.v2.api.model.v10.system.types.MarkdownString;
 import org.raml.v2.api.model.v10.system.types.StatusCodeString;
+import org.raml.v2.internal.impl.commons.nodes.TypeExpressionNode;
+import org.raml.yagi.framework.nodes.AbstractStringNode;
+import org.raml.yagi.framework.nodes.SimpleTypeNode;
+import org.raml.yagi.framework.nodes.StringNode;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -36,63 +40,47 @@ public class YamlEmitter {
         return new YamlEmitter(writer, indent + 1);
     }
 
-    public void write(String tag, String value) throws IOException {
-
-        if ( value != null ) {
-            writer.write(SPACES.substring(0, indent *depth) + tag + ": \"" + value + "\"\n");
-        }
-        writer.flush();
-    }
-
-    public void write(String tag, Integer value) throws IOException {
-
-        if ( value != null ) {
-            writer.write(SPACES.substring(0, indent*depth) + tag + ": " + value + "\n");
-        }
-        writer.flush();
-    }
-
-    public void write(String tag) throws IOException {
+    public void writeTag(String tag) throws IOException {
 
         writer.write(SPACES.substring(0, indent*depth) + tag + ":\n");
         writer.flush();
     }
 
-    public void write(String tag, MarkdownString description) throws IOException {
+    public void writeOneLine(String tag) throws IOException {
 
-        if ( description != null ) {
-
-            writer.write(SPACES.substring(0, indent*depth) + tag + ":\"" + description.value() + "\"");
-        }
-    }
-
-    public void write(StatusCodeString code) throws IOException {
-
-        writer.write(SPACES.substring(0, indent*depth) + code.value() + ":\n");
+        writer.write(SPACES.substring(0, indent*depth) + tag + ": ");
         writer.flush();
     }
 
-    public void write(String tag, Boolean requiredValue) throws IOException {
+    private void writeNaked(String tag) throws IOException {
 
-        if ( requiredValue != null ) {
+        writer.write(tag + "\n");
+        writer.flush();
+    }
 
-            writer.write(SPACES.substring(0, indent*depth) + tag + ": " + requiredValue + "\n");
+    private void writeQuoted(String tag) throws IOException {
+
+        writer.write("\"" + tag + "\"\n");
+        writer.flush();
+    }
+
+    public void writeValue(SimpleTypeNode<?> node) throws IOException {
+
+        if ( node instanceof StringNode) {
+            writeQuoted(node.getLiteralValue());
+        } else {
+            writeNaked(node.getLiteralValue());
         }
     }
 
-    public void write(String tag, Double requiredValue) throws IOException {
+    public void writeValue(TypeExpressionNode node) throws IOException {
 
-        if ( requiredValue != null ) {
-
-            writer.write(SPACES.substring(0, indent*depth) + tag + ": " + requiredValue + "\n");
-        }
+        writeQuoted(node.getTypeExpressionText());
     }
 
-    public void write(String s, List<?> list) throws IOException {
+    /* temp */
+    public void write(String s) throws IOException {
 
-        if ( list.size() > 0 ) {
-
-            write(s);
-        }
+        writeQuoted(s);
     }
 }

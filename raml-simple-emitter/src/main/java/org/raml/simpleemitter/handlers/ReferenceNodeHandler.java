@@ -31,7 +31,7 @@ public class ReferenceNodeHandler extends NodeHandler<ReferenceNode> {
     public boolean handleSafely(ReferenceNode node, YamlEmitter emitter) throws IOException {
 
 
-        emitter.write(node.getRefName());
+        emitter.writeTag(node.getRefName());
         return true;
     }
 
