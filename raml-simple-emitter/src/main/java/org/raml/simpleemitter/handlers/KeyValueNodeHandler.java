@@ -33,7 +33,7 @@ public class KeyValueNodeHandler extends NodeHandler<KeyValueNode> {
         String scalar = isScalar(node.getValue());
         if ( scalar != null ) {
 
-            emitter.writeOneLine(node.getKey().toString());
+            emitter.writeTag(node.getKey().toString());
             handlerList.handle(node.getValue(), emitter);
 
         } else {

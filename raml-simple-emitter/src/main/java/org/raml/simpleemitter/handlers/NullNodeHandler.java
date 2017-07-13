@@ -31,21 +31,9 @@ public class NullNodeHandler extends NodeHandler<NullNode> {
     public boolean handleSafely(NullNode node, YamlEmitter emitter) throws IOException {
 
 
-        emitter.writeTag("value: null");
+        /* TODO need better method call */
+        emitter.write("value: null");
         return true;
-    }
-
-    private String isScalar(Node node) {
-
-        if ( node instanceof SimpleTypeNode) {
-
-            return ((SimpleTypeNode<?>)node).getLiteralValue();
-        } else {
-
-            return null;
-        }
-
-
     }
 
 }

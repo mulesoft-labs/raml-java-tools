@@ -1,5 +1,6 @@
 package org.raml.simpleemitter;
 
+import com.google.common.base.Joiner;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import org.raml.v2.api.model.v10.system.types.MarkdownString;
 import org.raml.v2.api.model.v10.system.types.StatusCodeString;
@@ -42,14 +43,13 @@ public class YamlEmitter {
 
     public void writeTag(String tag) throws IOException {
 
-        writer.write(SPACES.substring(0, indent*depth) + tag + ":\n");
+        writer.write("\n" + indentationString(indent) + tag + ": ");
         writer.flush();
     }
 
-    public void writeOneLine(String tag) throws IOException {
 
-        writer.write(SPACES.substring(0, indent*depth) + tag + ": ");
-        writer.flush();
+    private static String indentationString(int indent) {
+        return SPACES.substring(0, indent*depth);
     }
 
     private void writeNaked(String tag) throws IOException {
@@ -58,9 +58,17 @@ public class YamlEmitter {
         writer.flush();
     }
 
-    private void writeQuoted(String tag) throws IOException {
+    private void writeQuoted(String value) throws IOException {
 
-        writer.write("\"" + tag + "\"\n");
+        if (value.contains("\n")) {
+
+            writer.write("|\n");
+            writer.write(indentationString(indent + 1));
+            String[] str = value.split("\n");
+            writer.write(Joiner.on("\n" + indentationString(indent + 1)).join(str));
+        } else {
+            writer.write("\"" + value + "\"");
+        }
         writer.flush();
     }
 
