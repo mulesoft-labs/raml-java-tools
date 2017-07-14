@@ -23,7 +23,7 @@ public class YamlEmitter {
 
     private final static String SPACES = "                                                                     ";
     private final Writer writer;
-    private  final int indent;
+    private final int indent;
 
     public YamlEmitter() {
         this(new OutputStreamWriter(System.out), 0);
@@ -41,6 +41,37 @@ public class YamlEmitter {
         return new YamlEmitter(writer, indent + 1);
     }
 
+
+    // TODO: Fix this by getting the bullet in the emitter.  Maybe pullng out the class ?
+    public YamlEmitter bulletListArray() {
+
+        return new YamlEmitter(writer, indent + 1) {
+
+            boolean firstwrite = true;
+            public void writeTag(String tag) throws IOException {
+
+                if ( firstwrite ) {
+                    writer.write( tag + ": ");
+                    firstwrite = false;
+                } else {
+
+                    writer.write(
+                            "\n" + indentationString(indent)+ tag + ": ");
+                }
+                writer.flush();
+            }
+
+            @Override
+            protected String indentationString(int indent) {
+                if ( firstwrite ) {
+                    return super.indentationString(indent);
+                } else {
+                    return "  " + super.indentationString(indent);
+                }
+            }
+        };
+    }
+
     public void writeTag(String tag) throws IOException {
 
         writer.write("\n" + indentationString(indent) + tag + ": ");
@@ -48,8 +79,8 @@ public class YamlEmitter {
     }
 
 
-    private static String indentationString(int indent) {
-        return SPACES.substring(0, indent*depth);
+    protected String indentationString(int indent) {
+        return SPACES.substring(0, indent * depth);
     }
 
     private void writeNaked(String tag) throws IOException {
@@ -74,7 +105,7 @@ public class YamlEmitter {
 
     public void writeValue(SimpleTypeNode<?> node) throws IOException {
 
-        if ( node instanceof StringNode) {
+        if (node instanceof StringNode) {
             writeQuoted(node.getLiteralValue());
         } else {
             writeNaked(node.getLiteralValue());
@@ -92,7 +123,13 @@ public class YamlEmitter {
         writeQuoted(s);
     }
 
-    public void writeNullValue() throws IOException {
-        writer.write("null");
+    public void writeSyntaxElement(String s) throws IOException {
+
+        writer.write(s);
+        writer.flush();
+    }
+
+    public void writeIndent() throws IOException {
+        writer.write(indentationString(indent));
     }
 }

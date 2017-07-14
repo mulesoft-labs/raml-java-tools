@@ -1,6 +1,7 @@
 package org.raml.simpleemitter.handlers;
 
-import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 import org.raml.simpleemitter.HandlerList;
 import org.raml.simpleemitter.NodeHandler;
 import org.raml.simpleemitter.YamlEmitter;
@@ -8,8 +9,8 @@ import org.raml.yagi.framework.nodes.ArrayNode;
 import org.raml.yagi.framework.nodes.Node;
 import org.raml.yagi.framework.nodes.SimpleTypeNode;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,30 +35,39 @@ public class ArrayNodeHandler extends NodeHandler<ArrayNode> {
     public boolean handleSafely(ArrayNode node, YamlEmitter emitter) throws IOException {
 
 
-        List<String> buf = new ArrayList<>();
-        for (Node child : node.getChildren()) {
-            String value = isScalar(child);
-            if ( value != null ){
+        List<Node> children = node.getChildren();
+        if ( childrenAreAllScalarTypes(children)) {
+            emitter.writeSyntaxElement("[");
+            for (int a = 0; a < children.size(); a++) {
 
-                buf.add(value);
-            } else {
+                handlerList.handle(children.get(a), emitter);
+                if (a < children.size() - 1) {
+                    emitter.writeSyntaxElement(",");
+                }
+            }
+            emitter.writeSyntaxElement("]");
+        } else {
 
-                buf.add("whatevs");
+            YamlEmitter indented = emitter.indent();
+            for (int a = 0; a < children.size(); a++) {
+
+                indented.writeSyntaxElement("\n");
+                indented.writeIndent();
+                indented.writeSyntaxElement("- ");
+                handlerList.handle(children.get(a), indented.bulletListArray());
+                //indented.writeSyntaxElement("\n");
             }
         }
-     //   emitter.write("[" + Joiner.on(",").join(buf) + "]");
+
         return true;
     }
 
-    private String isScalar(Node node) {
-
-        if ( node instanceof SimpleTypeNode) {
-
-            return ((SimpleTypeNode<?>)node).getLiteralValue();
-        } else {
-
-            return null;
-        }
+    private boolean childrenAreAllScalarTypes(List<Node> children) {
+        return FluentIterable.from(children).allMatch(new Predicate<Node>() {
+            @Override
+            public boolean apply(@Nullable Node node) {
+                return node instanceof SimpleTypeNode;
+            }
+        });
     }
-
 }

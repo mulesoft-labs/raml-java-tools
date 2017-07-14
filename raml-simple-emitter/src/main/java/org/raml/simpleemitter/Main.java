@@ -18,7 +18,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-       // URL url = Main.class.getResource("api.raml");
+        //URL url = Main.class.getResource("api.raml");
         URL url = Main.class.getResource("fun.raml");
 
         Reader reader = new InputStreamReader(url.openStream());
