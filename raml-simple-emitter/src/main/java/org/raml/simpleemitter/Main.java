@@ -7,7 +7,6 @@ import org.raml.v2.api.model.common.ValidationResult;
 import org.raml.v2.api.model.v10.api.Api;
 
 
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
@@ -19,7 +18,9 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        URL url = Main.class.getResource("api.raml");
+       // URL url = Main.class.getResource("api.raml");
+        URL url = Main.class.getResource("fun.raml");
+
         Reader reader = new InputStreamReader(url.openStream());
 
         RamlModelResult ramlModelResult = new RamlModelBuilder().buildApi(reader, url.getFile());
@@ -27,7 +28,7 @@ public class Main {
         {
             for (ValidationResult validationResult : ramlModelResult.getValidationResults())
             {
-                System.err.println(validationResult.getMessage());
+                System.err.println(validationResult);
             }
         }
         else

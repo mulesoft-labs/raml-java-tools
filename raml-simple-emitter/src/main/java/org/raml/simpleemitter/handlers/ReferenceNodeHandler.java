@@ -30,19 +30,7 @@ public class ReferenceNodeHandler extends NodeHandler<ReferenceNode> {
     @Override
     public boolean handleSafely(ReferenceNode node, YamlEmitter emitter) throws IOException {
 
-        emitter.write(node.getRefName());
+        emitter.writeObjectValue(node.getRefName());
         return true;
     }
-
-    private String isScalar(Node node) {
-
-        if ( node instanceof SimpleTypeNode) {
-
-            return ((SimpleTypeNode<?>)node).getLiteralValue();
-        } else {
-
-            return null;
-        }
-    }
-
 }

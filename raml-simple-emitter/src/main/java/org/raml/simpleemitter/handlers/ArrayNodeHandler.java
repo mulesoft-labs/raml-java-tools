@@ -45,7 +45,7 @@ public class ArrayNodeHandler extends NodeHandler<ArrayNode> {
                 buf.add("whatevs");
             }
         }
-        emitter.write("[" + Joiner.on(",").join(buf) + "]");
+     //   emitter.write("[" + Joiner.on(",").join(buf) + "]");
         return true;
     }
 

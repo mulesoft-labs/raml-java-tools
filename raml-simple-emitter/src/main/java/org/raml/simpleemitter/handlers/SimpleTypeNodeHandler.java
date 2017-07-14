@@ -27,7 +27,6 @@ public class SimpleTypeNodeHandler extends NodeHandler<SimpleTypeNode<?>> {
     @Override
     public boolean handleSafely(SimpleTypeNode<?> node, YamlEmitter emitter) throws IOException {
 
-
         emitter.writeValue(node);
         return true;
     }

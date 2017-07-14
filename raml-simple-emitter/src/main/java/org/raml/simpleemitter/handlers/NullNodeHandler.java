@@ -32,7 +32,7 @@ public class NullNodeHandler extends NodeHandler<NullNode> {
 
 
         /* TODO need better method call */
-        emitter.write("value: null");
+      //  emitter.writeNullValue();
         return true;
     }
 

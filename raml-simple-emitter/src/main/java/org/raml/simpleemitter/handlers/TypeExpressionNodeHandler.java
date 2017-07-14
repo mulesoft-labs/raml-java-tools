@@ -32,7 +32,7 @@ public class TypeExpressionNodeHandler extends SubclassedNodeHandler<TypeExpress
     @Override
     public boolean handleSafely(TypeExpressionNode node, YamlEmitter emitter) throws IOException {
 
-        emitter.writeValue(node);
+        emitter.writeObjectValue(node.getTypeExpressionText());
         return true;
     }
 }

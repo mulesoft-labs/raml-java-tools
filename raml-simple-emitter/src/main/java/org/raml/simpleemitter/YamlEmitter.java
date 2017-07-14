@@ -54,7 +54,7 @@ public class YamlEmitter {
 
     private void writeNaked(String tag) throws IOException {
 
-        writer.write(tag + "\n");
+        writer.write(tag);
         writer.flush();
     }
 
@@ -81,14 +81,18 @@ public class YamlEmitter {
         }
     }
 
-    public void writeValue(TypeExpressionNode node) throws IOException {
+    public void writeObjectValue(String value) throws IOException {
 
-        writeQuoted(node.getTypeExpressionText());
+        write(value);
     }
 
     /* temp */
-    public void write(String s) throws IOException {
+    private void write(String s) throws IOException {
 
         writeQuoted(s);
+    }
+
+    public void writeNullValue() throws IOException {
+        writer.write("null");
     }
 }
