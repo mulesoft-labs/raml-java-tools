@@ -20,6 +20,7 @@ import java.io.Reader;
 import java.net.URL;
 import java.util.List;
 
+import static org.raml.builder.MethodBuilder.method;
 import static org.raml.builder.NodeBuilders.key;
 import static org.raml.builder.ResourceBuilder.resource;
 import static org.raml.v2.api.model.v10.RamlFragment.Default;
@@ -38,15 +39,11 @@ public class Main {
         Reader reader = new InputStreamReader(url.openStream());
 
         RamlModelResult ramlModelResult = new RamlModelBuilder().buildApi(reader, url.getFile());
-        if (ramlModelResult.hasErrors())
-        {
-            for (ValidationResult validationResult : ramlModelResult.getValidationResults())
-            {
+        if (ramlModelResult.hasErrors()) {
+            for (ValidationResult validationResult : ramlModelResult.getValidationResults()) {
                 System.err.println(validationResult);
             }
-        }
-        else
-        {
+        } else {
             Api api = ramlModelResult.getApiV10();
 
             AnotherEmitter emitter = new AnotherEmitter();
@@ -55,8 +52,13 @@ public class Main {
 
             Resource r = resource("/yes").with(
 
-                key("displayName", "I'm happy")
-
+                    key("displayName", "I'm happy"),
+                    resource("/no").with(
+                            key("displayName", "I'm happy"),
+                            method("get").with(
+                                    key("description", "Hello")
+                            )
+                    )
             ).build();
             Modification.add(api, r);
 
@@ -68,7 +70,7 @@ public class Main {
             for (ErrorNode error : errors) {
                 System.err.println("error: " + error.getErrorMessage());
             }
-            if ( errors.size() == 0 ) {
+            if (errors.size() == 0) {
                 emitter.emit(api);
             }
         }
