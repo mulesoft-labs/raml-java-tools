@@ -1,7 +1,7 @@
 #%RAML 1.0
 title: World Music API
 description: This is an example of a music API.
-version: v1
+#version: v1
 baseUri:
   value: http://{environment}.musicapi.com/{version}
   (rediractable): true
@@ -160,7 +160,9 @@ uses:
   SongsLib: libraries/songs-library.raml
   ApiLib: libraries/api-library.raml
 
+/fun:
 /method:
+  displayName: Hallo
   get:
     queryString:
       properties:
