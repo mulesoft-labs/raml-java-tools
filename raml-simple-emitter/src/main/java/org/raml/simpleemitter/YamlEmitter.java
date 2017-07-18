@@ -21,7 +21,6 @@ public class YamlEmitter {
 
     private static final int depth = 4;
 
-    private final static String SPACES = "                                                                     ";
     private final Writer writer;
     private final int indent;
 
@@ -78,9 +77,11 @@ public class YamlEmitter {
         writer.flush();
     }
 
+    //String.format("%0" + n + "d", 0).replace("0",s)
 
     protected String indentationString(int indent) {
-        return SPACES.substring(0, indent * depth);
+
+        return new String(new char[indent * depth]).replace("\0", " ");
     }
 
     private void writeNaked(String tag) throws IOException {
