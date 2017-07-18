@@ -3,6 +3,12 @@ package org.raml.builder;
 import org.raml.v2.api.model.v10.resources.Resource;
 import org.raml.yagi.framework.model.*;
 import org.raml.yagi.framework.nodes.*;
+import org.raml.yagi.framework.nodes.snakeyaml.SYIntegerNode;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Created. There, you have it.
@@ -10,11 +16,15 @@ import org.raml.yagi.framework.nodes.*;
 public class KeyValueNodeBuilder<T, B extends KeyValueNodeBuilder> implements NodeBuilder {
     static final ModelBindingConfiguration binding = new DefaultModelBindingConfiguration();
 
-    private String name;
-    private NodeBuilder[] builders;
+    private String id;
+    private NodeBuilder[] builders = new NodeBuilder[0];
 
-    public KeyValueNodeBuilder(String name) {
-        this.name = name;
+    protected KeyValueNodeBuilder(String name) {
+        this.id = name;
+    }
+
+    protected KeyValueNodeBuilder(Long value) {
+        this.id = value.toString();
     }
 
     public B with(NodeBuilder... builders) {
@@ -23,13 +33,13 @@ public class KeyValueNodeBuilder<T, B extends KeyValueNodeBuilder> implements No
         return (B) this;
     }
 
-    public Node buildNode() {
+    public KeyValueNode buildNode() {
         ObjectNode value = new ObjectNodeImpl();
         for (NodeBuilder builder : builders) {
             value.addChild(builder.buildNode());
         }
 
-        return new KeyValueNodeImpl(new StringNodeImpl(name), value);
+        return new KeyValueNodeImpl(new StringNodeImpl(id), value);
     }
 
     public T build(Class<T> cls, Node node) {

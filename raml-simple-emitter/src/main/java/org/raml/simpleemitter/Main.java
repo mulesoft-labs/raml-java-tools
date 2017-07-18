@@ -22,7 +22,9 @@ import java.util.List;
 
 import static org.raml.builder.MethodBuilder.method;
 import static org.raml.builder.NodeBuilders.key;
+import static org.raml.builder.RamlDocumentBuilder.document;
 import static org.raml.builder.ResourceBuilder.resource;
+import static org.raml.builder.ResponseBuilder.response;
 import static org.raml.v2.api.model.v10.RamlFragment.Default;
 import static org.raml.v2.internal.impl.commons.RamlVersion.RAML_10;
 
@@ -44,23 +46,26 @@ public class Main {
                 System.err.println(validationResult);
             }
         } else {
-            Api api = ramlModelResult.getApiV10();
+//            Api api = ramlModelResult.getApiV10();
 
             AnotherEmitter emitter = new AnotherEmitter();
+//
+//            api = Modification.set(api, "version", "v123");
 
-            api = Modification.set(api, "version", "v123");
-
-            Resource r = resource("/yes").with(
-
-                    key("displayName", "I'm happy"),
-                    resource("/no").with(
-                            key("displayName", "I'm happy"),
-                            method("get").with(
-                                    key("description", "Hello")
-                            )
-                    )
-            ).build();
-            Modification.add(api, r);
+            Api api = document().with(
+                    key("title", "Hello!"),
+                    resource("/yes")
+                            .with(
+                                    key("displayName", "I'm happy"),
+                                    resource("/no").with(
+                                            key("displayName", "I'm happy"),
+                                            method("get").with(
+                                                    key("description", "Hello")
+                                            ).withResponse(response(200))
+                                    )
+                            )).build();
+            //      Resource r =
+            //      Modification.add(api, r);
 
             final GrammarPhase grammarPhase = new GrammarPhase(RamlHeader.getFragmentRule(new RamlHeader(RAML_10, Default).getFragment()));
             Node node = ((NodeModel) api).getNode();
@@ -73,6 +78,9 @@ public class Main {
             if (errors.size() == 0) {
                 emitter.emit(api);
             }
+
+            System.out.println();
+            System.out.println(api.title().value() + ", " + api.resources());
         }
     }
 }
