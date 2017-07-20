@@ -7,6 +7,7 @@ import org.raml.yagi.framework.nodes.Node;
 import org.raml.yagi.framework.nodes.ObjectNode;
 import org.raml.yagi.framework.nodes.SimpleTypeNode;
 
+import java.io.IOException;
 import java.util.Collections;
 
 /**
@@ -25,14 +26,14 @@ public class ObjectNodeHandler extends SubclassedNodeHandler<ObjectNode> {
     }
 
     @Override
-    public boolean handleSafely(ObjectNode node, YamlEmitter emitter) {
+    public boolean handleSafely(ObjectNode node, YamlEmitter emitter) throws IOException {
 
         for (Node child : node.getChildren()) {
 
             String scalar = isScalar(node.getChildren().get(0));
             if ( scalar != null ) {
 
-                System.err.println(": " + scalar);
+                emitter.writeObjectValue(scalar);
             } else {
 
                 handlerList.handle(child, emitter);

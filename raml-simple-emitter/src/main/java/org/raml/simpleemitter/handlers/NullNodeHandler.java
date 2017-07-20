@@ -15,10 +15,7 @@ import java.io.IOException;
 public class NullNodeHandler extends NodeHandler<NullNode> {
 
 
-    private final HandlerList handlerList;
-
-    public NullNodeHandler(HandlerList handlerList) {
-        this.handlerList = handlerList;
+    public NullNodeHandler() {
     }
 
     @Override

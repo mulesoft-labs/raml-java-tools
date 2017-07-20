@@ -32,8 +32,8 @@ public class HandlerList extends NodeHandler<Node> {
         handlerList.add(new KeyValueNodeHandler(this));
         handlerList.add(new ObjectNodeHandler(this));
         handlerList.add(new ArrayNodeHandler(this));
-        handlerList.add(new NullNodeHandler(this));
-        handlerList.add(new ReferenceNodeHandler(this));
+        handlerList.add(new NullNodeHandler());
+        handlerList.add(new ReferenceNodeHandler());
         handlerList.add(new DefaultNodeHandler());
     }
 

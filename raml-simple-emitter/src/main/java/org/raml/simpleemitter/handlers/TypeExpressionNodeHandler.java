@@ -17,12 +17,8 @@ import java.util.List;
  */
 public class TypeExpressionNodeHandler extends SubclassedNodeHandler<TypeExpressionNode> {
 
-
-    private final HandlerList handlerList;
-
     public TypeExpressionNodeHandler(HandlerList handlerList) {
         super(TypeExpressionNode.class, new HandlerList(Collections.<NodeHandler<? extends Node>>singletonList(new TypeDeclarationNodeHandler(handlerList))));
-        this.handlerList = handlerList;
     }
 
     @Override

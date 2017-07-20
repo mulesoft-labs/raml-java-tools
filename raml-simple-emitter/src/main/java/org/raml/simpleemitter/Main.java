@@ -43,12 +43,13 @@ public class Main {
                 System.err.println(validationResult);
             }
         } else {
-//            Api api = ramlModelResult.getApiV10();
+            Api api = ramlModelResult.getApiV10();
 
             Emitter emitter = new Emitter();
 //
 //            api = Modification.set(api, "version", "v123");
 
+/*
             Api api = document().with(
                     key("title", "Hello!"),
                     resource("/yes")
@@ -61,6 +62,7 @@ public class Main {
                                             ).withResponse(response(200))
                                     )
                             )).build();
+*/
             //      Resource r =
             //      Modification.add(api, r);
 

@@ -15,12 +15,6 @@ import java.io.IOException;
 public class ReferenceNodeHandler extends NodeHandler<ReferenceNode> {
 
 
-    private final HandlerList handlerList;
-
-    public ReferenceNodeHandler(HandlerList handlerList) {
-        this.handlerList = handlerList;
-    }
-
     @Override
     public boolean handles(Node node) {
 
