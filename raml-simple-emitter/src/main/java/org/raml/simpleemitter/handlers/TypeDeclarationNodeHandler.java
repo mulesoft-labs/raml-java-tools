@@ -6,6 +6,8 @@ import org.raml.simpleemitter.YamlEmitter;
 import org.raml.v2.internal.impl.commons.nodes.TypeDeclarationNode;
 import org.raml.yagi.framework.nodes.Node;
 
+import java.io.IOException;
+
 /**
  * Created. There, you have it.
  */
@@ -25,7 +27,7 @@ public class TypeDeclarationNodeHandler extends NodeHandler<TypeDeclarationNode>
     }
 
     @Override
-    public boolean handleSafely(TypeDeclarationNode node, YamlEmitter emitter) {
+    public boolean handleSafely(TypeDeclarationNode node, YamlEmitter emitter) throws IOException {
 
 
         for (Node child : node.getChildren()) {

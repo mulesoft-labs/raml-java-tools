@@ -49,13 +49,12 @@ public class ArrayNodeHandler extends NodeHandler<ArrayNode> {
         } else {
 
             YamlEmitter indented = emitter.indent();
-            for (int a = 0; a < children.size(); a++) {
+            for (Node child : children) {
 
                 indented.writeSyntaxElement("\n");
                 indented.writeIndent();
                 indented.writeSyntaxElement("- ");
-                handlerList.handle(children.get(a), indented.bulletListArray());
-                //indented.writeSyntaxElement("\n");
+                handlerList.handle(child, indented.bulletListArray());
             }
         }
 

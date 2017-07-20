@@ -11,14 +11,10 @@ abstract public class NodeHandler<K extends Node> {
 
     public abstract boolean handles(Node node);
 
-    public boolean handle(Node node, YamlEmitter emitter) {
+    public boolean handle(Node node, YamlEmitter emitter) throws IOException {
 
-        try {
-            K safeNode = (K) node;
-            return handleSafely(safeNode, emitter);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        K safeNode = (K) node;
+        return handleSafely(safeNode, emitter);
     }
 
     public abstract boolean handleSafely(K node, YamlEmitter emitter) throws IOException;

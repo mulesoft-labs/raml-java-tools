@@ -4,6 +4,7 @@ import org.raml.v2.api.model.v10.api.Api;
 import org.raml.yagi.framework.model.NodeModel;
 import org.raml.yagi.framework.nodes.Node;
 
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
@@ -12,21 +13,34 @@ import java.io.Writer;
  */
 public class Emitter {
 
-    private HandlerList list = new HandlerList();
+    final private HandlerList list;
 
-    public void emit(Api api) {
+    public Emitter(HandlerList list) {
+        this.list = list;
+    }
+
+    public Emitter() {
+
+        list = new HandlerList();
+    }
+
+    public void emit(Api api) throws IOException {
 
         emit(api, new OutputStreamWriter(System.out));
     }
 
-    public void emit(Api api, Writer w) {
+    public void emit(Api api, Writer w) throws IOException {
 
         NodeModel model = (NodeModel) api;
         Node node = model.getNode();
 
         for (Node o : node.getChildren()) {
 
-            list.handle(o, new YamlEmitter(w, 0));
+            list.handle(o, createEmitter(w));
         }
+    }
+
+    protected YamlEmitter createEmitter(Writer w) {
+        return new YamlEmitter(w, 0);
     }
 }
