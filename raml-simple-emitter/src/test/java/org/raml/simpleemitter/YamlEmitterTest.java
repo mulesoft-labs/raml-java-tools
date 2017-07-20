@@ -6,6 +6,7 @@ import org.raml.testutils.UnitTest;
 import org.raml.v2.internal.impl.commons.nodes.TypeExpressionNode;
 import org.raml.yagi.framework.nodes.SimpleTypeNode;
 import org.raml.yagi.framework.nodes.StringNode;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.StringWriter;
 import java.io.Writer;
@@ -40,6 +41,28 @@ public class YamlEmitterTest extends UnitTest {
         emitter.writeValue(stringNode);
 
         assertEquals("|\n    hello\n    man", writer.toString());
+    }
+
+    @Test
+    public void bulletListEmitter() throws Exception {
+
+        YamlEmitter e = new YamlEmitter(writer, 0);
+        YamlEmitter bullet = e.bulletListArray();
+        bullet.writeTag("foo");
+        bullet.writeTag("bar");
+
+        assertEquals("foo: \n  bar: ", writer.toString());
+    }
+
+    @Test
+    public void bulletListEmitterWithString() throws Exception {
+
+        YamlEmitter e = new YamlEmitter(writer, 0);
+        YamlEmitter bullet = e.bulletListArray();
+        bullet.writeTag("tag");
+        bullet.writeObjectValue("foo\nbar");
+
+        assertEquals("tag: |\n          foo\n          bar", writer.toString());
     }
 
 }
