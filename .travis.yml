@@ -16,7 +16,7 @@ deploy:
         script: mvn deploy --settings ~/settings.xml -DskipTests -B -U
         skip_cleanup: true
         on:
-            repo: mulesoft-labs/raml-for-jax-rs
+            repo: mulesoft-labs/raml-java-tools
             all_branches: true
             condition: $TRAVIS_BRANCH =~ ^(master|release/[0-9]+.[0-9]+.[0-9]+)$
     -
@@ -26,5 +26,5 @@ deploy:
             - mvn clean deploy --settings ~/settings.xml -DskipTests=true -B -U
         skip_cleanup: true
         on:
-            repo: mulesoft-labs/raml-for-jax-rs
+            repo: mulesoft-labs/raml-java-tools
             tags: true
