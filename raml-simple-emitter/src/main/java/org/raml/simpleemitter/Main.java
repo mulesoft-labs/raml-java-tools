@@ -1,6 +1,7 @@
 package org.raml.simpleemitter;
 
 
+import org.raml.builder.AnnotationTypeBuilder;
 import org.raml.v2.api.RamlModelBuilder;
 import org.raml.v2.api.RamlModelResult;
 import org.raml.v2.api.model.common.ValidationResult;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import static org.raml.builder.MethodBuilder.method;
 import static org.raml.builder.NodeBuilders.key;
+import static org.raml.builder.NodeBuilders.property;
 import static org.raml.builder.RamlDocumentBuilder.document;
 import static org.raml.builder.ResourceBuilder.resource;
 import static org.raml.builder.ResponseBuilder.response;
@@ -43,14 +45,18 @@ public class Main {
                 System.err.println(validationResult);
             }
         } else {
-            Api api = ramlModelResult.getApiV10();
+//            Api api = ramlModelResult.getApiV10();
 
             Emitter emitter = new Emitter();
 //
 //            api = Modification.set(api, "version", "v123");
 
-/*
-            Api api = document().with(
+
+            Api api = document()
+                    .withAnnotationTypes(
+                            AnnotationTypeBuilder.annotationType("Foo").withProperty(property("time", "date"))
+                    )
+                    .with(
                     key("title", "Hello!"),
                     resource("/yes")
                             .with(
@@ -62,7 +68,7 @@ public class Main {
                                             ).withResponse(response(200))
                                     )
                             )).build();
-*/
+
             //      Resource r =
             //      Modification.add(api, r);
 

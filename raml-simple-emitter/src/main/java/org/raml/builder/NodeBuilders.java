@@ -18,4 +18,15 @@ public class NodeBuilders {
             }
         };
     }
+
+    public static NodeBuilder property(final String key, final String value) {
+
+        return new NodeBuilder() {
+            @Override
+            public Node buildNode() {
+                return new KeyValueNodeImpl(new StringNodeImpl(key), new StringNodeImpl(value));
+            }
+        };
+    }
+
 }
