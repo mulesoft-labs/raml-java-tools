@@ -7,12 +7,17 @@ import org.raml.yagi.framework.model.NodeModel;
 import org.raml.yagi.framework.model.NodeModelFactory;
 import org.raml.yagi.framework.nodes.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created. There, you have it.
  */
 public class MethodBuilder extends KeyValueNodeBuilder<Method, MethodBuilder>  {
 
-    private ObjectNodeImpl responses = new ObjectNodeImpl();
+    private List<ResponseBuilder> responses = new ArrayList<>();
+    private List<BodyBuilder> bodies = new ArrayList<>();
 
     private MethodBuilder(String name) {
         super(name);
@@ -23,9 +28,15 @@ public class MethodBuilder extends KeyValueNodeBuilder<Method, MethodBuilder>  {
         return new MethodBuilder(name);
     }
 
-    public MethodBuilder withResponse(ResponseBuilder response) {
+    public MethodBuilder withResponses(ResponseBuilder... response) {
 
-        responses.addChild(response.buildNode());
+        responses.addAll(Arrays.asList(response));
+        return this;
+    }
+
+    public MethodBuilder withBodies(BodyBuilder... builder) {
+
+        this.bodies.addAll(Arrays.asList(builder));
         return this;
     }
 
@@ -33,9 +44,31 @@ public class MethodBuilder extends KeyValueNodeBuilder<Method, MethodBuilder>  {
     @Override
     public KeyValueNode buildNode() {
         KeyValueNode node =  super.buildNode();
-        KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("responses"), responses);
-        node.getValue().addChild(kvn);
+
+        if ( ! responses.isEmpty()) {
+            ObjectNodeImpl responsesValueNode = new ObjectNodeImpl();
+            KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("responses"), responsesValueNode);
+
+            for (ResponseBuilder response : responses) {
+
+                responsesValueNode.addChild(response.buildNode());
+            }
+
+            node.getValue().addChild(kvn);
+        }
+
+        if ( ! bodies.isEmpty()) {
+            ObjectNodeImpl bodyValueNode = new ObjectNodeImpl();
+            KeyValueNodeImpl bkvn = new KeyValueNodeImpl(new StringNodeImpl("body"), bodyValueNode);
+            node.getValue().addChild(bkvn);
+
+            for (BodyBuilder body : bodies) {
+                bodyValueNode.addChild(body.buildNode());
+            }
+        }
+
         return node;
+
     }
 
     public Method build() {

@@ -2,6 +2,8 @@ package org.raml.simpleemitter;
 
 
 import org.raml.builder.AnnotationTypeBuilder;
+import org.raml.builder.BodyBuilder;
+import org.raml.builder.TypeBuilder;
 import org.raml.v2.api.RamlModelBuilder;
 import org.raml.v2.api.RamlModelResult;
 import org.raml.v2.api.model.common.ValidationResult;
@@ -57,17 +59,20 @@ public class Main {
                             AnnotationTypeBuilder.annotationType("Foo").withProperty(property("time", "date"))
                     )
                     .with(
-                    key("title", "Hello!"),
-                    resource("/yes")
-                            .with(
-                                    key("displayName", "I'm happy"),
-                                    resource("/no").with(
+                            key("title", "Hello!"),
+                            resource("/yes")
+                                    .with(
                                             key("displayName", "I'm happy"),
-                                            method("get").with(
-                                                    key("description", "Hello")
-                                            ).withResponse(response(200))
-                                    )
-                            )).build();
+                                            resource("/no").with(
+                                                    key("displayName", "I'm happy"),
+                                                    method("get")
+                                                            .with(key("description", "Hello"))
+                                                            .withBodies(
+                                                                    BodyBuilder.body("application/json")
+                                                                            .withTypes(TypeBuilder.type("string"))
+                                                            ).withResponses(response(200))
+                                            )
+                                    )).build();
 
             //      Resource r =
             //      Modification.add(api, r);

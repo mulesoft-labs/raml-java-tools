@@ -18,7 +18,7 @@ import java.util.List;
 public class RamlDocumentBuilder implements NodeBuilder {
 
     private static final ModelBindingConfiguration binding = new DefaultModelBindingConfiguration();
-    private NodeBuilder[] builders = new NodeBuilder[0];
+    private List<NodeBuilder> builders = new ArrayList<>();
 
     private List<AnnotationTypeBuilder> annotationTypeBuilders = new ArrayList<>();
 
@@ -48,7 +48,7 @@ public class RamlDocumentBuilder implements NodeBuilder {
 
     public RamlDocumentBuilder with(NodeBuilder... builders) {
 
-        this.builders = builders;
+        this.builders.addAll(Arrays.asList(builders));
         return this;
     }
 
