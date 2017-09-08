@@ -37,7 +37,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
         URL url = Main.class.getResource("api.raml");
-        //URL url = Main.class.getResource("fun.raml");
+       // URL url = Main.class.getResource("fun.raml");
 
         Reader reader = new InputStreamReader(url.openStream());
 
@@ -47,7 +47,7 @@ public class Main {
                 System.err.println(validationResult);
             }
         } else {
-//            Api api = ramlModelResult.getApiV10();
+            Api apiRead = ramlModelResult.getApiV10();
 
             Emitter emitter = new Emitter();
 //
@@ -60,19 +60,18 @@ public class Main {
                     )
                     .with(
                             key("title", "Hello!"),
-                            resource("/yes")
-                                    .with(
-                                            key("displayName", "I'm happy"),
-                                            resource("/no").with(
-                                                    key("displayName", "I'm happy"),
-                                                    method("get")
-                                                            .with(key("description", "Hello"))
-                                                            .withBodies(
-                                                                    BodyBuilder.body("application/json")
-                                                                            .withTypes(TypeBuilder.type("string"))
-                                                            ).withResponses(response(200))
+                                resource("/no").with(
+                                        key("displayName", "I'm happy"),
+                                        method("get")
+                                                .with(key("description", "Hello"))
+                                                .withBodies(
+                                                        BodyBuilder.body("application/json")
+                                                                .ofType(TypeBuilder.type("object")
+                                                                        .withProperty(property("foo", "string"))
+                                                                )
+                                                ).withResponses(response(200))
                                             )
-                                    )).build();
+                                    ).build();
 
             //      Resource r =
             //      Modification.add(api, r);

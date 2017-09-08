@@ -1,6 +1,5 @@
 package org.raml.builder;
 
-import org.raml.v2.api.model.v10.bodies.Response;
 import org.raml.yagi.framework.nodes.KeyValueNode;
 import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
 import org.raml.yagi.framework.nodes.ObjectNodeImpl;
@@ -13,7 +12,7 @@ import java.util.List;
 /**
  * Created. There, you have it.
  */
-public class ResponseBuilder extends KeyValueNodeBuilder<Response, ResponseBuilder> implements NodeBuilder {
+public class ResponseBuilder extends KeyValueNodeBuilder<ResponseBuilder> implements NodeBuilder {
 
     private List<BodyBuilder> bodies = new ArrayList<>();
 
@@ -32,10 +31,6 @@ public class ResponseBuilder extends KeyValueNodeBuilder<Response, ResponseBuild
         return this;
     }
 
-    public Response build() {
-
-        return super.build(Response.class, buildNode());
-    }
 
     @Override
     public KeyValueNode buildNode() {

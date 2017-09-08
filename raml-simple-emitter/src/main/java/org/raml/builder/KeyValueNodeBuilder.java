@@ -13,8 +13,7 @@ import java.util.List;
 /**
  * Created. There, you have it.
  */
-public class KeyValueNodeBuilder<T, B extends KeyValueNodeBuilder> implements NodeBuilder {
-    static final ModelBindingConfiguration binding = new DefaultModelBindingConfiguration();
+public class KeyValueNodeBuilder<B extends KeyValueNodeBuilder> implements NodeBuilder {
 
     private String id;
     private NodeBuilder[] builders = new NodeBuilder[0];
@@ -33,8 +32,12 @@ public class KeyValueNodeBuilder<T, B extends KeyValueNodeBuilder> implements No
         return (B) this;
     }
 
+    protected Node createValueNode() {
+
+        return new ObjectNodeImpl();
+    }
     public KeyValueNode buildNode() {
-        ObjectNode value = new ObjectNodeImpl();
+        Node value = createValueNode();
         for (NodeBuilder builder : builders) {
             value.addChild(builder.buildNode());
         }
@@ -42,10 +45,4 @@ public class KeyValueNodeBuilder<T, B extends KeyValueNodeBuilder> implements No
         return new KeyValueNodeImpl(new StringNodeImpl(id), value);
     }
 
-    public T build(Class<T> cls, Node node) {
-
-        NodeModelFactory fac = binding.bindingOf(Resource.class);
-        NodeModel model = fac.create(node);
-        return  ModelProxyBuilder.createModel(cls, model, binding);
-    }
 }

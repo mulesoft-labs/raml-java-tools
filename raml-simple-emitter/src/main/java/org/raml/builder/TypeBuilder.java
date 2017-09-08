@@ -1,11 +1,7 @@
 package org.raml.builder;
 
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import org.raml.v2.internal.impl.commons.nodes.TypeDeclarationNode;
-import org.raml.yagi.framework.nodes.KeyValueNode;
-import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
-import org.raml.yagi.framework.nodes.ObjectNodeImpl;
-import org.raml.yagi.framework.nodes.StringNodeImpl;
+import org.raml.yagi.framework.nodes.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,12 +10,13 @@ import java.util.List;
 /**
  * Created. There, you have it.
  */
-public class TypeBuilder extends KeyValueNodeBuilder<TypeDeclaration, AnnotationBuilder> implements NodeBuilder {
+public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeBuilder {
 
     private List<NodeBuilder> properties = new ArrayList<>();
+    public String name;
 
     private TypeBuilder(String name) {
-        super(name);
+        this.name = name;
     }
 
     static public TypeBuilder type(String name) {
@@ -28,17 +25,19 @@ public class TypeBuilder extends KeyValueNodeBuilder<TypeDeclaration, Annotation
     }
 
     @Override
-    public KeyValueNode buildNode() {
+    public ObjectNode buildNode() {
 
-        KeyValueNode node = super.buildNode();
+        TypeDeclarationNode node = new TypeDeclarationNode();
+        node.addChild(new KeyValueNodeImpl(new StringNodeImpl("type"), new StringNodeImpl(name)));
 
-        ObjectNodeImpl valueNode = new ObjectNodeImpl();
-        KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("properties"), valueNode);
-        node.getValue().addChild(kvn);
+        if ( ! properties.isEmpty() ) {
 
-        for (NodeBuilder property : properties) {
+            KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("properties"), new ObjectNodeImpl());
+            for (NodeBuilder property : properties) {
+                kvn.getValue().addChild(property.buildNode());
+            }
 
-            valueNode.addChild(property.buildNode());
+            node.addChild(kvn);
         }
 
         return node;
@@ -50,8 +49,5 @@ public class TypeBuilder extends KeyValueNodeBuilder<TypeDeclaration, Annotation
         return this;
     }
 
-    public TypeDeclaration build() {
 
-        return super.build(TypeDeclaration.class, buildNode());
-    }
 }

@@ -1,6 +1,5 @@
 package org.raml.builder;
 
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import org.raml.yagi.framework.nodes.*;
 
 import java.util.ArrayList;
@@ -10,7 +9,7 @@ import java.util.List;
 /**
  * Created. There, you have it.
  */
-public class AnnotationTypeBuilder extends KeyValueNodeBuilder<TypeDeclaration, AnnotationBuilder> implements NodeBuilder {
+public class AnnotationTypeBuilder extends KeyValueNodeBuilder<AnnotationBuilder> implements NodeBuilder {
 
     private List<NodeBuilder> properties = new ArrayList<>();
 
@@ -46,8 +45,4 @@ public class AnnotationTypeBuilder extends KeyValueNodeBuilder<TypeDeclaration, 
         return this;
     }
 
-    public TypeDeclaration build() {
-
-        return super.build(TypeDeclaration.class, buildNode());
-    }
 }

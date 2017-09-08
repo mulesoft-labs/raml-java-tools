@@ -1,10 +1,5 @@
 package org.raml.builder;
 
-import org.raml.v2.api.model.v10.methods.Method;
-import org.raml.v2.api.model.v10.resources.Resource;
-import org.raml.yagi.framework.model.ModelProxyBuilder;
-import org.raml.yagi.framework.model.NodeModel;
-import org.raml.yagi.framework.model.NodeModelFactory;
 import org.raml.yagi.framework.nodes.*;
 
 import java.util.ArrayList;
@@ -14,7 +9,7 @@ import java.util.List;
 /**
  * Created. There, you have it.
  */
-public class MethodBuilder extends KeyValueNodeBuilder<Method, MethodBuilder>  {
+public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder>  {
 
     private List<ResponseBuilder> responses = new ArrayList<>();
     private List<BodyBuilder> bodies = new ArrayList<>();
@@ -69,10 +64,5 @@ public class MethodBuilder extends KeyValueNodeBuilder<Method, MethodBuilder>  {
 
         return node;
 
-    }
-
-    public Method build() {
-
-        return super.build(Method.class, buildNode());
     }
 }
