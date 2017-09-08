@@ -7,6 +7,8 @@ import org.raml.yagi.framework.nodes.snakeyaml.SYIntegerNode;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,7 +18,7 @@ import java.util.List;
 public class KeyValueNodeBuilder<B extends KeyValueNodeBuilder> implements NodeBuilder {
 
     private String id;
-    private NodeBuilder[] builders = new NodeBuilder[0];
+    private List<NodeBuilder> builders = new ArrayList<>();
 
     protected KeyValueNodeBuilder(String name) {
         this.id = name;
@@ -28,7 +30,7 @@ public class KeyValueNodeBuilder<B extends KeyValueNodeBuilder> implements NodeB
 
     public B with(NodeBuilder... builders) {
 
-        this.builders = builders;
+        this.builders.addAll(Arrays.asList(builders));
         return (B) this;
     }
 
