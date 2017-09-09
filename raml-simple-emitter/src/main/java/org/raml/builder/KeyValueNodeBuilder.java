@@ -1,15 +1,9 @@
 package org.raml.builder;
 
-import org.raml.v2.api.model.v10.resources.Resource;
-import org.raml.yagi.framework.model.*;
 import org.raml.yagi.framework.nodes.*;
-import org.raml.yagi.framework.nodes.snakeyaml.SYIntegerNode;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -38,13 +32,19 @@ public class KeyValueNodeBuilder<B extends KeyValueNodeBuilder> implements NodeB
 
         return new ObjectNodeImpl();
     }
+
+    protected StringNodeImpl createKeyNode(String id) {
+        return new StringNodeImpl(id);
+    }
+
     public KeyValueNode buildNode() {
         Node value = createValueNode();
         for (NodeBuilder builder : builders) {
             value.addChild(builder.buildNode());
         }
 
-        return new KeyValueNodeImpl(new StringNodeImpl(id), value);
+        return new KeyValueNodeImpl(createKeyNode(id), value);
     }
+
 
 }

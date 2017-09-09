@@ -1,10 +1,7 @@
 package org.raml.simpleemitter;
 
 
-import org.raml.builder.AnnotationTypeBuilder;
-import org.raml.builder.BodyBuilder;
-import org.raml.builder.TypeBuilder;
-import org.raml.builder.TypeDeclarationBuilder;
+import org.raml.builder.*;
 import org.raml.v2.api.RamlModelBuilder;
 import org.raml.v2.api.RamlModelResult;
 import org.raml.v2.api.model.common.ValidationResult;
@@ -68,6 +65,7 @@ public class Main {
                                 resource("/no").with(
                                         key("displayName", "I'm happy"),
                                         method("get")
+                                                .withAnnotations(AnnotationBuilder.annotation("All").withProperties(AnnotationPropertyBuilder.property("doodoo", "v1", "v1")))
                                                 .with(key("description", "Hello"))
                                                 .withBodies(
                                                         BodyBuilder.body("application/json")

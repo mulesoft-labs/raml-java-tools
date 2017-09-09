@@ -9,10 +9,11 @@ import java.util.List;
 /**
  * Created. There, you have it.
  */
-public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder>  {
+public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder> implements AnnotableBuilder<MethodBuilder> {
 
     private List<ResponseBuilder> responses = new ArrayList<>();
     private List<BodyBuilder> bodies = new ArrayList<>();
+    private List<AnnotationBuilder> annotations = new ArrayList<>();
 
     private MethodBuilder(String name) {
         super(name);
@@ -35,6 +36,12 @@ public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder>  {
         return this;
     }
 
+    @Override
+    public MethodBuilder withAnnotations(AnnotationBuilder... builders) {
+
+        this.annotations.addAll(Arrays.asList(builders));
+        return this;
+    }
 
     @Override
     public KeyValueNode buildNode() {
@@ -50,6 +57,13 @@ public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder>  {
             }
 
             node.getValue().addChild(kvn);
+        }
+
+        if ( ! annotations.isEmpty() ) {
+
+            for (AnnotationBuilder annotation : annotations) {
+                node.getValue().addChild(annotation.buildNode());
+            }
         }
 
         if ( ! bodies.isEmpty()) {
