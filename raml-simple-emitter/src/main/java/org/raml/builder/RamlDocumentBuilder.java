@@ -21,6 +21,8 @@ public class RamlDocumentBuilder implements NodeBuilder {
     private List<NodeBuilder> builders = new ArrayList<>();
 
     private List<AnnotationTypeBuilder> annotationTypeBuilders = new ArrayList<>();
+    private List<TypeDeclarationBuilder> typeDeclarationBuilders = new ArrayList<>();
+
 
     RamlDocumentBuilder() {
 
@@ -34,13 +36,22 @@ public class RamlDocumentBuilder implements NodeBuilder {
             n.addChild(builder.buildNode());
         }
 
-        ObjectNodeImpl valueNode = new ObjectNodeImpl();
-        KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("annotationTypes"), valueNode);
-        n.addChild(kvn);
+        ObjectNodeImpl annotationTypeNode = new ObjectNodeImpl();
+        KeyValueNodeImpl atKvn = new KeyValueNodeImpl(new StringNodeImpl("annotationTypes"), annotationTypeNode);
+        n.addChild(atKvn);
 
         for (AnnotationTypeBuilder annotationTypeBuilder : annotationTypeBuilders) {
 
-            valueNode.addChild(annotationTypeBuilder.buildNode());
+            annotationTypeNode.addChild(annotationTypeBuilder.buildNode());
+        }
+
+        ObjectNodeImpl typesNode = new ObjectNodeImpl();
+        KeyValueNodeImpl typesKvn = new KeyValueNodeImpl(new StringNodeImpl("types"), typesNode);
+        n.addChild(typesKvn);
+
+        for (TypeDeclarationBuilder typeDeclarationBuilder : typeDeclarationBuilders) {
+
+            typesNode.addChild(typeDeclarationBuilder.buildNode());
         }
 
         return n;
@@ -57,7 +68,12 @@ public class RamlDocumentBuilder implements NodeBuilder {
         return this;
     }
 
-    public Api build() {
+    public RamlDocumentBuilder withTypes(TypeDeclarationBuilder... typeBuilders) {
+        this.typeDeclarationBuilders.addAll(Arrays.asList(typeBuilders));
+        return this;
+    }
+
+    public Api buildModel() {
 
         NodeModelFactory fac = binding.bindingOf(Api.class);
         Node node = buildNode();
