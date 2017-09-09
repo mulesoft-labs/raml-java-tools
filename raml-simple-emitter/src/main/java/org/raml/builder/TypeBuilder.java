@@ -13,9 +13,11 @@ import static org.raml.builder.NodeBuilders.property;
 /**
  * Created. There, you have it.
  */
-public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeBuilder {
+public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeBuilder, AnnotableBuilder<TypeBuilder> {
 
     private List<NodeBuilder> properties = new ArrayList<>();
+    private List<AnnotationBuilder> annotations = new ArrayList<>();
+
     public String[] types;
     private String description;
     private String[] enumValues;
@@ -42,6 +44,13 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
     static public TypeBuilder type(String... types) {
 
         return new TypeBuilder(types);
+    }
+
+    @Override
+    public TypeBuilder withAnnotations(AnnotationBuilder... builders) {
+
+        this.annotations.addAll(Arrays.asList(builders));
+        return this;
     }
 
     @Override
@@ -72,6 +81,13 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
             node.addChild(arrayProperty("enumValues", enumValues).buildNode());
         }
 
+        if ( ! annotations.isEmpty() ) {
+
+            for (AnnotationBuilder annotation : annotations) {
+                node.addChild(annotation.buildNode());
+            }
+        }
+
         if ( ! properties.isEmpty() ) {
 
             KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("properties"), new ObjectNodeImpl());
@@ -85,7 +101,7 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
         return node;
     }
 
-    public TypeBuilder withProperty(NodeBuilder... properties) {
+    public TypeBuilder withProperty(TypePropertyBuilder... properties) {
 
         this.properties.addAll(Arrays.asList(properties));
         return this;

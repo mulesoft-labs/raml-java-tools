@@ -54,7 +54,7 @@ public class Main {
 
             Api api = document()
                     .withTypes(
-                            TypeDeclarationBuilder.typeDeclaration("Foo").ofType(TypeBuilder.type("object")),
+                            TypeDeclarationBuilder.typeDeclaration("Foo").ofType(TypeBuilder.type("object").withAnnotations(AnnotationBuilder.annotation("AHHH"))),
                             TypeDeclarationBuilder.typeDeclaration("Goo").ofType(TypeBuilder.type("object"))
                     )
                     .withAnnotationTypes(
@@ -70,7 +70,7 @@ public class Main {
                                                 .withBodies(
                                                         BodyBuilder.body("application/json")
                                                                 .ofType(TypeBuilder.type("Foo","Goo")
-                                                                        .withProperty(property("foo", "string"))
+                                                                        .withProperty(TypePropertyBuilder.property("foo", "string"))
                                                                 )
                                                 ).withResponses(response(200))
                                             )
