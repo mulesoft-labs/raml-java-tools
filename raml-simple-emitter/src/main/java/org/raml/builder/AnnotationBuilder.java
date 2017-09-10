@@ -1,7 +1,6 @@
 package org.raml.builder;
 
 import org.raml.yagi.framework.nodes.KeyValueNode;
-import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
 import org.raml.yagi.framework.nodes.StringNodeImpl;
 
 import java.util.ArrayList;
@@ -13,7 +12,7 @@ import java.util.List;
  */
 public class AnnotationBuilder extends KeyValueNodeBuilder<AnnotationBuilder> implements NodeBuilder {
 
-    private List<AnnotationPropertyBuilder> properties = new ArrayList<>();
+    private List<PropertyValueBuilder> properties = new ArrayList<>();
 
     private AnnotationBuilder(String name) {
         super(name);
@@ -30,7 +29,7 @@ public class AnnotationBuilder extends KeyValueNodeBuilder<AnnotationBuilder> im
     }
 
 
-    public AnnotationBuilder withProperties(AnnotationPropertyBuilder...builders) {
+    public AnnotationBuilder withProperties(PropertyValueBuilder...builders) {
 
         this.properties.addAll(Arrays.asList(builders));
         return this;
@@ -40,7 +39,7 @@ public class AnnotationBuilder extends KeyValueNodeBuilder<AnnotationBuilder> im
     public KeyValueNode buildNode() {
 
         KeyValueNode k = super.buildNode();
-        for (AnnotationPropertyBuilder property : properties) {
+        for (PropertyValueBuilder property : properties) {
             k.getValue().addChild(property.buildNode());
         }
 

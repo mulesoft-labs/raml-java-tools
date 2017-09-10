@@ -18,7 +18,8 @@ import static org.raml.builder.NodeBuilders.property;
  */
 public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeBuilder, AnnotableBuilder<TypeBuilder> {
 
-    private List<NodeBuilder> properties = new ArrayList<>();
+    private List<TypePropertyBuilder> properties = new ArrayList<>();
+    private List<ExamplesBuilder> examples = new ArrayList<>();
     private List<AnnotationBuilder> annotations = new ArrayList<>();
 
     public String[] types;
@@ -53,6 +54,32 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
     public TypeBuilder withAnnotations(AnnotationBuilder... builders) {
 
         this.annotations.addAll(Arrays.asList(builders));
+        return this;
+    }
+
+
+
+    public TypeBuilder withProperty(TypePropertyBuilder... properties) {
+
+        this.properties.addAll(Arrays.asList(properties));
+        return this;
+    }
+
+    public TypeBuilder withExamples(ExamplesBuilder... properties) {
+
+        this.examples.addAll(Arrays.asList(properties));
+        return this;
+    }
+
+    public TypeBuilder description(String description) {
+
+        this.description = description;
+        return this;
+    }
+
+    public TypeBuilder enumValues(String... enumValues) {
+
+        this.enumValues = enumValues;
         return this;
     }
 
@@ -101,25 +128,17 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
             node.addChild(kvn);
         }
 
+        if ( ! examples.isEmpty() ) {
+
+            KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("examples"), new ObjectNodeImpl());
+            for (ExamplesBuilder example : examples) {
+                kvn.getValue().addChild(example.buildNode());
+            }
+
+            node.addChild(kvn);
+        }
+
         return node;
-    }
-
-    public TypeBuilder withProperty(TypePropertyBuilder... properties) {
-
-        this.properties.addAll(Arrays.asList(properties));
-        return this;
-    }
-
-    public TypeBuilder description(String description) {
-
-        this.description = description;
-        return this;
-    }
-
-    public TypeBuilder enumValues(String... enumValues) {
-
-        this.enumValues = enumValues;
-        return this;
     }
 
 }

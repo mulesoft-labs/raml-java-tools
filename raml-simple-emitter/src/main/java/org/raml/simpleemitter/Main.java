@@ -33,7 +33,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-       // URL url = Main.class.getResource("api.raml");
+        // URL url = Main.class.getResource("api.raml");
         URL url = Main.class.getResource("fun.raml");
 
         Reader reader = new InputStreamReader(url.openStream());
@@ -53,7 +53,13 @@ public class Main {
 
             Api api = document()
                     .withTypes(
-                            TypeDeclarationBuilder.typeDeclaration("Foo").ofType(TypeBuilder.type("object").withAnnotations(AnnotationBuilder.annotation("AHHH"))),
+                            TypeDeclarationBuilder.typeDeclaration("Foo").ofType(
+                                    TypeBuilder.type("object")
+                                            .withAnnotations(AnnotationBuilder.annotation("AHHH"))
+                                            .withExamples(ExamplesBuilder.example("Mommy")
+                                                    .withPropertyValues(
+                                                            PropertyValueBuilder.property("moo").withPropertyValue(
+                                                                    PropertyValueBuilder.property("hallo", "none"))))),
                             TypeDeclarationBuilder.typeDeclaration("Goo").ofType(TypeBuilder.type("object"))
                     )
                     .withAnnotationTypes(
@@ -61,20 +67,20 @@ public class Main {
                     )
                     .with(
                             key("title", "Hello!"),
-                                resource("/no").with(
-                                        key("displayName", "I'm happy"),
-                                        method("get")
-                                                .withQueryParameter(ParameterBuilder.parameter("apaaa").ofType("integer").withFacets(FacetBuilder.facet("minimum").value("44")))
-                                                .withAnnotations(AnnotationBuilder.annotation("All").withProperties(AnnotationPropertyBuilder.property("doodoo", "v1", "v1")))
-                                                .with(key("description", "Hello"))
-                                                .withBodies(
-                                                        BodyBuilder.body("application/json")
-                                                                .ofType(TypeBuilder.type("Foo","Goo")
-                                                                        .withProperty(TypePropertyBuilder.property("foo", "string"))
-                                                                )
-                                                ).withResponses(response(200))
-                                            )
-                                    ).buildModel();
+                            resource("/no").with(
+                                    key("displayName", "I'm happy"),
+                                    method("get")
+                                            .withQueryParameter(ParameterBuilder.parameter("apaaa").ofType("integer").withFacets(FacetBuilder.facet("minimum").value("44")))
+                                            .withAnnotations(AnnotationBuilder.annotation("All").withProperties(PropertyValueBuilder.property("doodoo", "v1", "v1")))
+                                            .with(key("description", "Hello"))
+                                            .withBodies(
+                                                    BodyBuilder.body("application/json")
+                                                            .ofType(TypeBuilder.type("Foo", "Goo")
+                                                                    .withProperty(TypePropertyBuilder.property("foo", "string"))
+                                                            )
+                                            ).withResponses(response(200))
+                            )
+                    ).buildModel();
 
             //      Resource r =
             //      Modification.add(api, r);
