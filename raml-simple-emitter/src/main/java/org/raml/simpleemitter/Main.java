@@ -12,7 +12,6 @@ import org.raml.yagi.framework.nodes.ErrorNode;
 import org.raml.yagi.framework.nodes.Node;
 import org.raml.yagi.framework.phase.GrammarPhase;
 
-
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
@@ -65,6 +64,7 @@ public class Main {
                                 resource("/no").with(
                                         key("displayName", "I'm happy"),
                                         method("get")
+                                                .withQueryParameter(ParameterBuilder.parameter("apaaa").ofType("integer").withFacets(FacetBuilder.facet("minimum").value("44")))
                                                 .withAnnotations(AnnotationBuilder.annotation("All").withProperties(AnnotationPropertyBuilder.property("doodoo", "v1", "v1")))
                                                 .with(key("description", "Hello"))
                                                 .withBodies(

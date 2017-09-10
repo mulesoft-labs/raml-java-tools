@@ -1,6 +1,9 @@
 package org.raml.builder;
 
-import org.raml.yagi.framework.nodes.*;
+import org.raml.yagi.framework.nodes.KeyValueNode;
+import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
+import org.raml.yagi.framework.nodes.ObjectNodeImpl;
+import org.raml.yagi.framework.nodes.StringNodeImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +17,9 @@ public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder> implements
     private List<ResponseBuilder> responses = new ArrayList<>();
     private List<BodyBuilder> bodies = new ArrayList<>();
     private List<AnnotationBuilder> annotations = new ArrayList<>();
+    private List<ParameterBuilder> queryParameters = new ArrayList<>();
+    private List<ParameterBuilder> headerParameters = new ArrayList<>();
+
 
     private MethodBuilder(String name) {
         super(name);
@@ -36,6 +42,18 @@ public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder> implements
         return this;
     }
 
+    public MethodBuilder withQueryParameter(ParameterBuilder... builder) {
+
+        this.queryParameters.addAll(Arrays.asList(builder));
+        return this;
+    }
+
+    public MethodBuilder withHeaderParameters(ParameterBuilder... builder) {
+
+        this.headerParameters.addAll(Arrays.asList(builder));
+        return this;
+    }
+
     @Override
     public MethodBuilder withAnnotations(AnnotationBuilder... builders) {
 
@@ -54,6 +72,30 @@ public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder> implements
             for (ResponseBuilder response : responses) {
 
                 responsesValueNode.addChild(response.buildNode());
+            }
+
+            node.getValue().addChild(kvn);
+        }
+
+        if ( ! queryParameters.isEmpty()) {
+            ObjectNodeImpl responsesValueNode = new ObjectNodeImpl();
+            KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("queryParameters"), responsesValueNode);
+
+            for (ParameterBuilder quertParameter : queryParameters) {
+
+                responsesValueNode.addChild(quertParameter.buildNode());
+            }
+
+            node.getValue().addChild(kvn);
+        }
+
+        if ( ! headerParameters.isEmpty()) {
+            ObjectNodeImpl responsesValueNode = new ObjectNodeImpl();
+            KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("headers"), responsesValueNode);
+
+            for (ParameterBuilder quertParameter : headerParameters) {
+
+                responsesValueNode.addChild(quertParameter.buildNode());
             }
 
             node.getValue().addChild(kvn);

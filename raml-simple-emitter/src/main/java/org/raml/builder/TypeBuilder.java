@@ -1,7 +1,10 @@
 package org.raml.builder;
 
 import org.raml.v2.internal.impl.commons.nodes.TypeDeclarationNode;
-import org.raml.yagi.framework.nodes.*;
+import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
+import org.raml.yagi.framework.nodes.ObjectNode;
+import org.raml.yagi.framework.nodes.ObjectNodeImpl;
+import org.raml.yagi.framework.nodes.StringNodeImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,7 +81,7 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
 
         if ( enumValues != null ) {
 
-            node.addChild(arrayProperty("enumValues", enumValues).buildNode());
+            node.addChild(arrayProperty("enum", enumValues).buildNode());
         }
 
         if ( ! annotations.isEmpty() ) {
