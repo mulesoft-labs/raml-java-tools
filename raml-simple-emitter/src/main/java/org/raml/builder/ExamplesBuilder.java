@@ -52,7 +52,7 @@ public class ExamplesBuilder extends KeyValueNodeBuilder<ExamplesBuilder> implem
 
         if ( ! propertyValues.isEmpty() ) {
 
-            KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("values"), new ObjectNodeImpl());
+            KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("value"), new ObjectNodeImpl());
             for (PropertyValueBuilder example : propertyValues) {
                 kvn.getValue().addChild(example.buildNode());
             }
