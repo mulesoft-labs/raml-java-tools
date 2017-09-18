@@ -1,6 +1,7 @@
 package org.raml.builder;
 
-import org.raml.yagi.framework.nodes.*;
+import org.raml.yagi.framework.nodes.ObjectNode;
+import org.raml.yagi.framework.nodes.ObjectNodeImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;

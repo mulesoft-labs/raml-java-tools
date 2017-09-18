@@ -31,6 +31,7 @@ public class Emitter {
 
     public void emit(Api api, Writer w) throws IOException {
 
+        w.write("#%RAML 1.0");
         NodeModel model = (NodeModel) api;
         Node node = model.getNode();
 

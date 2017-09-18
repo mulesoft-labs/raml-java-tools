@@ -4,8 +4,6 @@ import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
 import org.raml.yagi.framework.nodes.Node;
 import org.raml.yagi.framework.nodes.StringNodeImpl;
 
-import java.util.Collection;
-
 /**
  * Created. There, you have it.
  */

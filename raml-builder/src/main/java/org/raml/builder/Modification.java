@@ -2,7 +2,6 @@ package org.raml.builder;
 
 import org.raml.yagi.framework.model.NodeModel;
 import org.raml.yagi.framework.nodes.*;
-import org.raml.yagi.framework.nodes.snakeyaml.SYStringNode;
 
 /**
  * Created. There, you have it.
