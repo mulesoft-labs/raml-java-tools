@@ -14,6 +14,8 @@ import org.raml.yagi.framework.phase.GrammarPhase;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.List;
 
@@ -44,34 +46,27 @@ public class Main {
                 System.err.println(validationResult);
             }
         } else {
-            Api apiRead = ramlModelResult.getApiV10();
-
-            Emitter emitter = new Emitter();
-//
-//            api = Modification.set(api, "version", "v123");
-
 
             Api api = document()
+                    .baseUri("http:fun.com/fun")
+                    .title("Hello!")
+                    .version("1.0beta6")
                     .withTypes(
                             TypeDeclarationBuilder.typeDeclaration("Foo").ofType(
                                     TypeBuilder.type("object")
-                                            .withAnnotations(AnnotationBuilder.annotation("AHHH"))
-                                            .withExamples(ExamplesBuilder.example("Mommy")
-                                                    .withPropertyValues(
-                                                            PropertyValueBuilder.property("moo").withPropertyValue(
-                                                                    PropertyValueBuilder.property("hallo", "none"))))),
+                                            .withAnnotations(AnnotationBuilder.annotation("Foo").withProperties(PropertyValueBuilder.property("time", "2022-02-02")))
+                                            ),
                             TypeDeclarationBuilder.typeDeclaration("Goo").ofType(TypeBuilder.type("object"))
                     )
                     .withAnnotationTypes(
-                            AnnotationTypeBuilder.annotationType("Foo").withProperty(property("time", "date"))
+                            AnnotationTypeBuilder.annotationType("Foo").withProperty(property("time", "date-only"))
                     )
-                    .with(
-                            key("title", "Hello!"),
+                    .withResources(
                             resource("/no").with(
                                     key("displayName", "I'm happy"),
                                     method("get")
-                                            .withQueryParameter(ParameterBuilder.parameter("apaaa").ofType("integer").withFacets(FacetBuilder.facet("minimum").value("44")))
-                                            .withAnnotations(AnnotationBuilder.annotation("All").withProperties(PropertyValueBuilder.property("doodoo", "v1", "v1")))
+                                            .withQueryParameter(ParameterBuilder.parameter("apaaa").ofType("integer").withFacets(FacetBuilder.facet("minimum").value(44)))
+                                            .withAnnotations(AnnotationBuilder.annotation("Foo").withProperties(PropertyValueBuilder.property("time", "2022-02-02")))
                                             .with(key("description", "Hello"))
                                             .withBodies(
                                                     BodyBuilder.body("application/json")
@@ -93,12 +88,25 @@ public class Main {
             for (ErrorNode error : errors) {
                 System.err.println("error: " + error.getErrorMessage());
             }
+            System.err.println();
             if (errors.size() == 0) {
+                Emitter emitter = new Emitter();
                 emitter.emit(api);
+
+                StringWriter writer = new StringWriter();
+                emitter.emit(api, writer);
+
+                RamlModelResult re_read = new RamlModelBuilder().buildApi(new StringReader(writer.toString()),  ".");
+                if (ramlModelResult.hasErrors()) {
+                    for (ValidationResult validationResult : re_read.getValidationResults()) {
+                        System.err.println(validationResult);
+                    }
+                }
+
             }
 
-            System.out.println();
-            System.out.println(api.title().value() + ", " + api.resources());
+
+
         }
     }
 }

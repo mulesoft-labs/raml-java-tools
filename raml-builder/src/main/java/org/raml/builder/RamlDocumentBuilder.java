@@ -3,10 +3,7 @@ package org.raml.builder;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.internal.impl.commons.nodes.RamlDocumentNode;
 import org.raml.yagi.framework.model.*;
-import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
-import org.raml.yagi.framework.nodes.Node;
-import org.raml.yagi.framework.nodes.ObjectNodeImpl;
-import org.raml.yagi.framework.nodes.StringNodeImpl;
+import org.raml.yagi.framework.nodes.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +19,10 @@ public class RamlDocumentBuilder implements NodeBuilder {
 
     private List<AnnotationTypeBuilder> annotationTypeBuilders = new ArrayList<>();
     private List<TypeDeclarationBuilder> typeDeclarationBuilders = new ArrayList<>();
+    private List<ResourceBuilder> resourceBuilders = new ArrayList<>();
+    private String baseUri;
+    private String title;
+    private String version;
 
 
     RamlDocumentBuilder() {
@@ -31,14 +32,23 @@ public class RamlDocumentBuilder implements NodeBuilder {
     @Override
     public Node buildNode() {
 
-        Node n = new RamlDocumentNode();
+        Node documentNode = new RamlDocumentNode();
         for (NodeBuilder builder : builders) {
-            n.addChild(builder.buildNode());
+            documentNode.addChild(builder.buildNode());
         }
+
+        KeyValueNode baseUriNode = new KeyValueNodeImpl(new StringNodeImpl("baseUri"), new StringNodeImpl(baseUri));
+        documentNode.addChild(baseUriNode);
+
+        KeyValueNode titleNode = new KeyValueNodeImpl(new StringNodeImpl("title"), new StringNodeImpl(title));
+        documentNode.addChild(titleNode);
+
+        KeyValueNode version = new KeyValueNodeImpl(new StringNodeImpl("version"), new StringNodeImpl(this.version));
+        documentNode.addChild(version);
 
         ObjectNodeImpl annotationTypeNode = new ObjectNodeImpl();
         KeyValueNodeImpl atKvn = new KeyValueNodeImpl(new StringNodeImpl("annotationTypes"), annotationTypeNode);
-        n.addChild(atKvn);
+        documentNode.addChild(atKvn);
 
         for (AnnotationTypeBuilder annotationTypeBuilder : annotationTypeBuilders) {
 
@@ -47,14 +57,20 @@ public class RamlDocumentBuilder implements NodeBuilder {
 
         ObjectNodeImpl typesNode = new ObjectNodeImpl();
         KeyValueNodeImpl typesKvn = new KeyValueNodeImpl(new StringNodeImpl("types"), typesNode);
-        n.addChild(typesKvn);
+        documentNode.addChild(typesKvn);
 
         for (TypeDeclarationBuilder typeDeclarationBuilder : typeDeclarationBuilders) {
 
             typesNode.addChild(typeDeclarationBuilder.buildNode());
         }
 
-        return n;
+        for (ResourceBuilder resourceBuilder : resourceBuilders) {
+
+            documentNode.addChild(resourceBuilder.buildNode());
+        }
+
+
+        return documentNode;
     }
 
     public RamlDocumentBuilder with(NodeBuilder... builders) {
@@ -73,6 +89,11 @@ public class RamlDocumentBuilder implements NodeBuilder {
         return this;
     }
 
+    public RamlDocumentBuilder withResources(ResourceBuilder... resourceBuilders) {
+        this.resourceBuilders.addAll(Arrays.asList(resourceBuilders));
+        return this;
+    }
+
     public Api buildModel() {
 
         NodeModelFactory fac = binding.bindingOf(Api.class);
@@ -85,5 +106,22 @@ public class RamlDocumentBuilder implements NodeBuilder {
     public static RamlDocumentBuilder document() {
 
         return new RamlDocumentBuilder();
+    }
+
+    public RamlDocumentBuilder baseUri(String baseUri) {
+
+        this.baseUri = baseUri;
+        return this;
+    }
+
+    public RamlDocumentBuilder title(String title) {
+
+        this.title = title;
+        return this;
+    }
+
+    public RamlDocumentBuilder version(String version) {
+        this.version = version;
+        return this;
     }
 }
