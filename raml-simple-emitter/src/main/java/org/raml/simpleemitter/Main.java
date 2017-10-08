@@ -62,8 +62,10 @@ public class Main {
                             AnnotationTypeBuilder.annotationType("Foo").withProperty(property("time", "date-only"))
                     )
                     .withResources(
-                            resource("/no").with(
-                                    key("displayName", "I'm happy"),
+                            resource("/no")
+                                    .description("fooo!!!")
+                                    .displayName("Mama!!!")
+                                    .with(
                                     method("get")
                                             .withQueryParameter(ParameterBuilder.parameter("apaaa").ofType("integer").withFacets(FacetBuilder.facet("minimum").value(44)))
                                             .withAnnotations(AnnotationBuilder.annotation("Foo").withProperties(PropertyValueBuilder.property("time", "2022-02-02")))
@@ -106,7 +108,21 @@ public class Main {
             }
 
 
-
+            ResourceBuilder rb = resource("/no")
+                    .description("fooo!!!")
+                    .displayName("Mama!!!")
+                    .with(
+                            method("get")
+                                    .withQueryParameter(ParameterBuilder.parameter("apaaa").ofType("integer").withFacets(FacetBuilder.facet("minimum").value(44)))
+                                    .withAnnotations(AnnotationBuilder.annotation("Foo").withProperties(PropertyValueBuilder.property("time", "2022-02-02")))
+                                    .with(key("description", "Hello"))
+                                    .withBodies(
+                                            BodyBuilder.body("application/json")
+                                                    .ofType(TypeBuilder.type("Foo", "Goo")
+                                                            .withProperty(TypePropertyBuilder.property("foo", "string"))
+                                                    )
+                                    ).withResponses(response(200))
+                    );
         }
     }
 }

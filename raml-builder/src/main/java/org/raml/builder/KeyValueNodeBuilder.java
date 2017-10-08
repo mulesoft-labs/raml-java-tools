@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class KeyValueNodeBuilder<B extends KeyValueNodeBuilder> implements NodeBuilder {
 
-    private String id;
+    final private String id;
     private List<NodeBuilder> builders = new ArrayList<>();
 
     protected KeyValueNodeBuilder(String name) {
@@ -46,5 +46,8 @@ public class KeyValueNodeBuilder<B extends KeyValueNodeBuilder> implements NodeB
         return new KeyValueNodeImpl(createKeyNode(id), value);
     }
 
+    public String id() {
 
+        return id;
+    }
 }

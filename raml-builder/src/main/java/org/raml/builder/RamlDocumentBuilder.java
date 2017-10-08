@@ -23,6 +23,7 @@ public class RamlDocumentBuilder implements NodeBuilder {
     private String baseUri;
     private String title;
     private String version;
+    private String mediaType;
 
 
     RamlDocumentBuilder() {
@@ -40,11 +41,18 @@ public class RamlDocumentBuilder implements NodeBuilder {
         KeyValueNode baseUriNode = new KeyValueNodeImpl(new StringNodeImpl("baseUri"), new StringNodeImpl(baseUri));
         documentNode.addChild(baseUriNode);
 
-        KeyValueNode titleNode = new KeyValueNodeImpl(new StringNodeImpl("title"), new StringNodeImpl(title));
-        documentNode.addChild(titleNode);
+        if( title != null ) {
+            KeyValueNode titleNode = new KeyValueNodeImpl(new StringNodeImpl("title"), new StringNodeImpl(title));
+            documentNode.addChild(titleNode);
+        }
 
         KeyValueNode version = new KeyValueNodeImpl(new StringNodeImpl("version"), new StringNodeImpl(this.version));
         documentNode.addChild(version);
+
+        if ( mediaType != null ) {
+            KeyValueNode mediaType = new KeyValueNodeImpl(new StringNodeImpl("mediaType"), new StringNodeImpl(this.mediaType));
+            documentNode.addChild(mediaType);
+        }
 
         ObjectNodeImpl annotationTypeNode = new ObjectNodeImpl();
         KeyValueNodeImpl atKvn = new KeyValueNodeImpl(new StringNodeImpl("annotationTypes"), annotationTypeNode);
@@ -122,6 +130,12 @@ public class RamlDocumentBuilder implements NodeBuilder {
 
     public RamlDocumentBuilder version(String version) {
         this.version = version;
+        return this;
+    }
+
+    public RamlDocumentBuilder mediaType(String mediaType) {
+
+        this.mediaType = mediaType;
         return this;
     }
 }
