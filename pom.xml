@@ -18,6 +18,16 @@
                 <artifactId>junit</artifactId>
                 <version>4.12</version>
             </dependency>
+            <dependency>
+                <groupId>org.raml</groupId>
+                <artifactId>raml-parser-2</artifactId>
+                <version>1.0.11</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-core</artifactId>
+                <version>1.3</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <packaging>pom</packaging>
@@ -27,6 +37,7 @@
         <module>raml-builder</module>
         <module>test-utils</module>
         <module>raml-parser-tools</module>
+        <module>pojo-to-raml</module>
     </modules>
     <build>
         <plugins>
