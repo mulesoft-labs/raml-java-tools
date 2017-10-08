@@ -1,4 +1,6 @@
-package org.raml.pojotoraml.field;
+package org.raml.pojotoraml;
+
+import org.raml.pojotoraml.field.SubFun;
 
 import java.util.List;
 
@@ -11,4 +13,5 @@ public class Fun {
     int two;
     SubFun sub;
     List<String> listOfStrings;
+    List<SubFun> listOfSubs;
 }

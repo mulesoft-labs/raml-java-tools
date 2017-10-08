@@ -6,6 +6,7 @@ import org.raml.v2.api.RamlModelBuilder;
 import org.raml.v2.api.RamlModelResult;
 import org.raml.v2.api.model.common.ValidationResult;
 import org.raml.v2.api.model.v10.api.Api;
+import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import org.raml.v2.internal.impl.commons.RamlHeader;
 import org.raml.yagi.framework.model.NodeModel;
 import org.raml.yagi.framework.nodes.ErrorNode;
@@ -104,6 +105,9 @@ public class Main {
                         System.err.println(validationResult);
                     }
                 }
+
+                TypeDeclaration td = re_read.getApiV10().types().get(0);
+                td.name();
 
             }
 

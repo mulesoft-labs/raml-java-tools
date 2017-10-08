@@ -18,6 +18,6 @@ package org.raml.pojotoraml.types;
 public interface RamlType {
 
   String getRamlSyntax();
-//  boolean isScalar();
-//  List<? extends Class<?>> consequentTypes();
+  boolean isScalar();
+  Class<?> type();
 }

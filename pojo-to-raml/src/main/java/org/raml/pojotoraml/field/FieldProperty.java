@@ -3,6 +3,7 @@ package org.raml.pojotoraml.field;
 import org.raml.pojotoraml.Property;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 
 /**
  * Created. There, you have it.
@@ -20,7 +21,7 @@ class FieldProperty implements Property {
     }
 
     @Override
-    public Class<?> type() {
-        return field.getType();
+    public Type type() {
+        return field.getGenericType();
     }
 }

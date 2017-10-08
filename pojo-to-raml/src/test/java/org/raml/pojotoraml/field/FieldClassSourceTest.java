@@ -2,6 +2,7 @@ package org.raml.pojotoraml.field;
 
 
 import org.junit.Test;
+import org.raml.pojotoraml.Fun;
 import org.raml.pojotoraml.Property;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public class FieldClassSourceTest {
 
         FieldClassParser source = new FieldClassParser(Fun.class);
         List<Property> props =  source.properties();
-        assertEquals(3, props.size());
+        assertEquals(5, props.size());
         assertEquals("one", props.get(0).name());
         assertEquals(String.class, props.get(0).type());
 
@@ -34,6 +35,12 @@ public class FieldClassSourceTest {
 
         assertEquals("sub", props.get(2).name());
         assertEquals(SubFun.class, props.get(2).type());
+
+        assertEquals("listOfStrings", props.get(3).name());
+        assertEquals("java.util.List<java.lang.String>", props.get(3).type().toString());
+
+        assertEquals("listOfSubs", props.get(4).name());
+        assertEquals("java.util.List<org.raml.pojotoraml.field.SubFun>", props.get(4).type().toString());
     }
 
 }

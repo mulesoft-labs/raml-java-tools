@@ -68,17 +68,16 @@ public enum ScalarType implements RamlType {
     return ramlSyntax;
   }
 
-/*
+
   @Override
   public boolean isScalar() {
     return true;
   }
 
   @Override
-  public List<Class<?>> consequentTypes() {
-    return Collections.emptyList();
+  public Class<?> type() {
+    return (Class<?>) correspondingJavaTypes.iterator().next();
   }
-*/
 
 
   public static Optional<RamlType> fromType(Type type) {
