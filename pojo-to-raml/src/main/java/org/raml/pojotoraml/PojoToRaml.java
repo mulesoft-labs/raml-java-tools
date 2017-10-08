@@ -38,9 +38,16 @@ public class PojoToRaml {
                 builder.withProperty(adjuster.adjustProperty(typePropertyBuilder));
             } else {
 
+
                 ClassParser subParser = parser.parseDependentClass(property.type());
-                RamlType subRamlType = handleSingleType(subParser, adjuster);
-                TypePropertyBuilder typePropertyBuilder = TypePropertyBuilder.property(property.name(), subRamlType.getRamlSyntax());
+
+                final String subSimpleName = adjuster.adjustTypeName(property.type().getSimpleName(), parser);
+                if ( ! builtTypes.containsKey(subSimpleName)) {
+
+                    handleSingleType(subParser, adjuster);
+                }
+
+                TypePropertyBuilder typePropertyBuilder = TypePropertyBuilder.property(property.name(), subSimpleName);
                 builder.withProperty(adjuster.adjustProperty(typePropertyBuilder));
             }
         }

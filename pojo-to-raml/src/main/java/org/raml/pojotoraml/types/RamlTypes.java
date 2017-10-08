@@ -15,16 +15,13 @@
  */
 package org.raml.pojotoraml.types;
 
-import com.google.common.base.Optional;
-
 import java.lang.reflect.Type;
 
 public class RamlTypes {
 
-  public static Optional<? extends RamlType> fromType(Type type) {
+  public static RamlType fromType(Type type) {
 
-    return ScalarType.fromType(type);
+
+    return null;
   }
-
-
 }
