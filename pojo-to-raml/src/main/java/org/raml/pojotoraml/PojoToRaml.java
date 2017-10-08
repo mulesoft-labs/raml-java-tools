@@ -23,7 +23,7 @@ public class PojoToRaml {
         return builtTypes;
     }
 
-    protected RamlType handleSingleType(ClassParser parser, RamlAdjuster adjuster) {
+    private RamlType handleSingleType(ClassParser parser, RamlAdjuster adjuster) {
         final String simpleName = adjuster.adjustTypeName(parser.underlyingClass().getSimpleName(), parser);
         TypeBuilder builder = TypeBuilder.type(simpleName);
         builder = adjuster.adjustType(builder);

@@ -25,12 +25,15 @@ public class FieldClassSourceTest {
 
         FieldClassParser source = new FieldClassParser(Fun.class);
         List<Property> props =  source.properties();
-        assertEquals(2, props.size());
+        assertEquals(3, props.size());
         assertEquals("one", props.get(0).name());
         assertEquals(String.class, props.get(0).type());
 
         assertEquals("two", props.get(1).name());
         assertEquals(int.class, props.get(1).type());
+
+        assertEquals("sub", props.get(2).name());
+        assertEquals(SubFun.class, props.get(2).type());
     }
 
 }
