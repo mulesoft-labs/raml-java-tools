@@ -9,4 +9,5 @@ public interface ClassParser {
 
     Class<?> underlyingClass();
     List<Property> properties();
+    ClassParser parseDependentClass(Class<?> type);
 }

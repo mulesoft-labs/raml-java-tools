@@ -37,4 +37,9 @@ public class FieldClassParser implements ClassParser {
         }
         return props;
     }
+
+    @Override
+    public ClassParser parseDependentClass(Class<?> type) {
+        return new FieldClassParser(type);
+    }
 }

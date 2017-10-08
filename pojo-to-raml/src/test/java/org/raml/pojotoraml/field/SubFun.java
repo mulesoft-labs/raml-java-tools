@@ -3,9 +3,7 @@ package org.raml.pojotoraml.field;
 /**
  * Created. There, you have it.
  */
-public class Fun {
+public class SubFun {
 
-    String one;
-    int two;
-    SubFun sub;
+    int happy;
 }

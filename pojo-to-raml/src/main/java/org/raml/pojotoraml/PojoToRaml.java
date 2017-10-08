@@ -18,7 +18,13 @@ public class PojoToRaml {
 
     public Map<String, TypeBuilder> pojoToRamlTypeBuilder(ClassParser parser, RamlAdjuster adjuster) {
 
-        String simpleName = adjuster.adjustTypeName(parser.underlyingClass().getSimpleName(), parser);
+        handleSingleType(parser, adjuster);
+
+        return builtTypes;
+    }
+
+    protected RamlType handleSingleType(ClassParser parser, RamlAdjuster adjuster) {
+        final String simpleName = adjuster.adjustTypeName(parser.underlyingClass().getSimpleName(), parser);
         TypeBuilder builder = TypeBuilder.type(simpleName);
         builder = adjuster.adjustType(builder);
         builtTypes.put(simpleName, builder);
@@ -30,13 +36,20 @@ public class PojoToRaml {
             if ( ramlType.isPresent() ) {
                 TypePropertyBuilder typePropertyBuilder = TypePropertyBuilder.property(property.name(), ramlType.get().getRamlSyntax());
                 builder.withProperty(adjuster.adjustProperty(typePropertyBuilder));
+            } else {
+
+                ClassParser subParser = parser.parseDependentClass(property.type());
+                RamlType subRamlType = handleSingleType(subParser, adjuster);
+                TypePropertyBuilder typePropertyBuilder = TypePropertyBuilder.property(property.name(), subRamlType.getRamlSyntax());
+                builder.withProperty(adjuster.adjustProperty(typePropertyBuilder));
             }
         }
 
-        return builtTypes;
-    }
-
-    private RamlType buildType() {
-
+        return new RamlType() {
+            @Override
+            public String getRamlSyntax() {
+                return simpleName;
+            }
+        };
     }
 }
