@@ -1,10 +1,7 @@
 package org.raml.pojotoraml;
 
-import com.google.common.base.Function;
-import com.google.common.collect.FluentIterable;
 import org.junit.Test;
 import org.raml.builder.RamlDocumentBuilder;
-import org.raml.builder.TypeBuilder;
 import org.raml.builder.TypeDeclarationBuilder;
 import org.raml.pojotoraml.field.FieldClassParser;
 import org.raml.v2.api.loader.ResourceLoader;
@@ -26,10 +23,8 @@ import org.raml.yagi.framework.phase.GrammarPhase;
 import org.raml.yagi.framework.phase.Phase;
 import org.raml.yagi.framework.phase.TransformationPhase;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.raml.v2.api.model.v10.RamlFragment.Default;
@@ -43,23 +38,14 @@ public class PojoToRamlTest {
     public void pojoToRamlTypeBuilder() throws Exception {
 
         PojoToRaml pojoToRaml = new PojoToRaml();
-        Map<String, TypeBuilder> types =  pojoToRaml.pojoToRamlTypeBuilder(new FieldClassParser(Fun.class), RamlAdjuster.NULL_ADJUSTER);
-
-        TypeDeclarationBuilder[] typeDeclarationBuilders = FluentIterable.from(types.entrySet()).transform(new Function<Map.Entry<String,TypeBuilder>, TypeDeclarationBuilder>() {
-            @Nullable
-            @Override
-            public TypeDeclarationBuilder apply(@Nullable Map.Entry<String, TypeBuilder> entry) {
-
-                return TypeDeclarationBuilder.typeDeclaration(entry.getKey()).ofType(entry.getValue());
-            }
-        }).toArray(TypeDeclarationBuilder.class);
+        Result types =  pojoToRaml.pojoToRamlTypeBuilder(new FieldClassParser(Fun.class), RamlAdjuster.NULL_ADJUSTER);
 
         RamlDocumentBuilder ramlDocumentBuilder = RamlDocumentBuilder
                 .document()
                 .baseUri("http://google.com")
                 .title("hello")
                 .version("1")
-                .withTypes(typeDeclarationBuilders);
+                .withTypes(types.allTypes().toArray(new TypeDeclarationBuilder[0]));
 
         Api api = ramlDocumentBuilder.buildModel();
 

@@ -1,8 +1,8 @@
 package org.raml.pojotoraml;
 
 import org.raml.builder.TypeBuilder;
+import org.raml.builder.TypeDeclarationBuilder;
 import org.raml.builder.TypePropertyBuilder;
-import org.raml.pojotoraml.types.ComposedRamlType;
 import org.raml.pojotoraml.types.RamlType;
 import org.raml.pojotoraml.types.RamlTypeFactory;
 
@@ -15,20 +15,21 @@ import java.util.Map;
  */
 public class PojoToRaml {
 
-    private Map<String, TypeBuilder> builtTypes = new HashMap<>();
 
-    public Map<String, TypeBuilder> pojoToRamlTypeBuilder(ClassParser parser, RamlAdjuster adjuster) {
+    public Result pojoToRamlTypeBuilder(ClassParser parser, RamlAdjuster adjuster) {
 
-        handleSingleType(parser, adjuster);
-
-        return builtTypes;
+        Map<String, TypeDeclarationBuilder> dependentTypes = new HashMap<>();
+        TypeDeclarationBuilder builder = handleSingleType(parser, adjuster, dependentTypes);
+        dependentTypes.remove(builder.id());
+        return new Result(builder, dependentTypes);
     }
 
-    private RamlType handleSingleType(ClassParser parser, RamlAdjuster adjuster) {
+    private TypeDeclarationBuilder handleSingleType(ClassParser parser, RamlAdjuster adjuster, Map<String, TypeDeclarationBuilder> builtTypes) {
         final String simpleName = adjuster.adjustTypeName(parser.underlyingClass().getSimpleName(), parser);
         TypeBuilder builder = TypeBuilder.type("object");
         builder = adjuster.adjustType(builder);
-        builtTypes.put(simpleName, builder);
+        TypeDeclarationBuilder typeDeclaration = TypeDeclarationBuilder.typeDeclaration(simpleName).ofType(builder);
+        builtTypes.put(simpleName, typeDeclaration);
 
         for (Property property : parser.properties()) {
 
@@ -44,14 +45,14 @@ public class PojoToRaml {
                     final String subSimpleName = adjuster.adjustTypeName(ramlType.type().getSimpleName(), parser);
                     if ( ! builtTypes.containsKey(subSimpleName)) {
 
-                        handleSingleType(subParser, adjuster);
+                        handleSingleType(subParser, adjuster, builtTypes);
                     }
                     TypePropertyBuilder typePropertyBuilder = TypePropertyBuilder.property(property.name(), ramlType.getRamlSyntax());
                     builder.withProperty(adjuster.adjustProperty(typePropertyBuilder));
             }
         }
 
-        return ComposedRamlType.forClass(parser.underlyingClass(), simpleName);
+        return typeDeclaration;
     }
 
     private RamlType exploreTypeForProperty(ClassParser parser, Type type, RamlAdjuster adjuster) {
