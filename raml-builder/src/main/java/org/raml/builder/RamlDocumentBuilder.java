@@ -1,6 +1,10 @@
 package org.raml.builder;
 
 import org.raml.v2.api.model.v10.api.Api;
+import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
+import org.raml.v2.internal.impl.commons.model.DefaultModelElement;
+import org.raml.v2.internal.impl.commons.model.StringType;
+import org.raml.v2.internal.impl.commons.model.factory.TypeDeclarationModelFactory;
 import org.raml.v2.internal.impl.commons.nodes.RamlDocumentNode;
 import org.raml.yagi.framework.model.*;
 import org.raml.yagi.framework.nodes.*;
@@ -9,12 +13,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.raml.v2.api.RamlModelBuilder.MODEL_PACKAGE;
+
 /**
  * Created. There, you have it.
  */
 public class RamlDocumentBuilder implements NodeBuilder {
 
-    private static final ModelBindingConfiguration binding = new DefaultModelBindingConfiguration();
+    private static final ModelBindingConfiguration binding = createV10Binding();
     private List<NodeBuilder> builders = new ArrayList<>();
 
     private List<AnnotationTypeBuilder> annotationTypeBuilders = new ArrayList<>();
@@ -110,6 +116,18 @@ public class RamlDocumentBuilder implements NodeBuilder {
         return  ModelProxyBuilder.createModel(Api.class, model, binding);
     }
 
+    static private ModelBindingConfiguration createV10Binding()
+    {
+        final DefaultModelBindingConfiguration bindingConfiguration = new DefaultModelBindingConfiguration();
+        bindingConfiguration.bindPackage(MODEL_PACKAGE);
+        // Bind all StringTypes to the StringType implementation they are only marker interfaces
+        bindingConfiguration.bind(org.raml.v2.api.model.v10.system.types.StringType.class, StringType.class);
+        bindingConfiguration.bind(org.raml.v2.api.model.v10.system.types.ValueType.class, StringType.class);
+        bindingConfiguration.defaultTo(DefaultModelElement.class);
+        bindingConfiguration.bind(TypeDeclaration.class, new TypeDeclarationModelFactory());
+        bindingConfiguration.reverseBindPackage("org.raml.v2.api.model.v10.datamodel");
+        return bindingConfiguration;
+    }
 
     public static RamlDocumentBuilder document() {
 

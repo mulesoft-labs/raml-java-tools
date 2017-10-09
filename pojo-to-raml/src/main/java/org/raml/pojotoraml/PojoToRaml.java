@@ -26,7 +26,7 @@ public class PojoToRaml {
 
     private RamlType handleSingleType(ClassParser parser, RamlAdjuster adjuster) {
         final String simpleName = adjuster.adjustTypeName(parser.underlyingClass().getSimpleName(), parser);
-        TypeBuilder builder = TypeBuilder.type(simpleName);
+        TypeBuilder builder = TypeBuilder.type("object");
         builder = adjuster.adjustType(builder);
         builtTypes.put(simpleName, builder);
 
