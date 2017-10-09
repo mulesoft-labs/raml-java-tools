@@ -1,8 +1,6 @@
 package org.raml.builder;
 
 import org.raml.yagi.framework.nodes.KeyValueNode;
-import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
-import org.raml.yagi.framework.nodes.StringNodeImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,10 +39,7 @@ public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
 
         KeyValueNode node = super.buildNode();
 
-        if ( type != null ) {
-
-            node.getValue().addChild(new KeyValueNodeImpl(new StringNodeImpl("type"), new StringNodeImpl(type)));
-        }
+        addProperty(node.getValue(), "type", type);
 
         if ( ! facets.isEmpty() ) {
 

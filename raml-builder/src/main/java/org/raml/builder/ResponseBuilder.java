@@ -45,10 +45,7 @@ public class ResponseBuilder extends KeyValueNodeBuilder<ResponseBuilder> implem
     public KeyValueNode buildNode() {
         KeyValueNode node =  super.buildNode();
 
-        if ( description != null ) {
-
-            node.getValue().addChild(new KeyValueNodeImpl(new StringNodeImpl("description"), new StringNodeImpl(description)));
-        }
+        addProperty(node.getValue(), "descrption", description);
 
         if ( ! bodies.isEmpty()) {
             ObjectNodeImpl valueNode = new ObjectNodeImpl();

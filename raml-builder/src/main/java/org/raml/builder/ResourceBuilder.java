@@ -1,10 +1,6 @@
 package org.raml.builder;
 
-import org.raml.v2.internal.impl.commons.nodes.ResourceNode;
 import org.raml.yagi.framework.nodes.KeyValueNode;
-import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
-import org.raml.yagi.framework.nodes.ObjectNodeImpl;
-import org.raml.yagi.framework.nodes.StringNodeImpl;
 
 /**
  * Created. There, you have it.
@@ -26,15 +22,10 @@ public class ResourceBuilder extends KeyValueNodeBuilder<ResourceBuilder> implem
     @Override
     public KeyValueNode buildNode() {
 
-        KeyValueNode resourceNode = new ResourceNode();
-        resourceNode.addChild(new StringNodeImpl("/foo"));
-        resourceNode.addChild(new ObjectNodeImpl());
+        KeyValueNode resourceNode = super.buildNode();
 
-        KeyValueNode baseUriNode = new KeyValueNodeImpl(new StringNodeImpl("displayName"), new StringNodeImpl(displayName));
-        resourceNode.getValue().addChild(baseUriNode);
-
-        KeyValueNode description = new KeyValueNodeImpl(new StringNodeImpl("description"), new StringNodeImpl(this.description));
-        resourceNode.getValue().addChild(description);
+        addProperty(resourceNode.getValue(), "displayName", displayName);
+        addProperty(resourceNode.getValue(), "description", description);
 
         return resourceNode;
     }

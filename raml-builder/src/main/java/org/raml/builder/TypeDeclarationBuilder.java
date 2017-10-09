@@ -7,12 +7,10 @@ import org.raml.yagi.framework.nodes.Node;
  */
 public class TypeDeclarationBuilder extends KeyValueNodeBuilder<TypeDeclarationBuilder> implements NodeBuilder {
 
-    private final String name;
     private TypeBuilder types = null;
 
     private TypeDeclarationBuilder(String name) {
         super(name);
-        this.name = name;
     }
 
     static public TypeDeclarationBuilder typeDeclaration(String name) {

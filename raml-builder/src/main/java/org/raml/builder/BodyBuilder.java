@@ -7,12 +7,10 @@ import org.raml.yagi.framework.nodes.Node;
  */
 public class BodyBuilder extends KeyValueNodeBuilder<BodyBuilder> implements NodeBuilder {
 
-    private final String name;
     private TypeBuilder types = null;
 
     private BodyBuilder(String name) {
         super(name);
-        this.name = name;
     }
 
     static public BodyBuilder body(String type) {

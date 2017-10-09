@@ -50,4 +50,12 @@ public class KeyValueNodeBuilder<B extends KeyValueNodeBuilder> implements NodeB
 
         return id;
     }
+
+    public void addProperty(Node valueNode, String name, String value) {
+
+        if ( value != null ) {
+            KeyValueNode baseUriNode = new KeyValueNodeImpl(new StringNodeImpl(name), new StringNodeImpl(value));
+            valueNode.addChild(baseUriNode);
+        }
+    }
 }
