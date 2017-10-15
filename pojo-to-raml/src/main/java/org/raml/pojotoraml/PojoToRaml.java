@@ -15,11 +15,20 @@ import java.util.Map;
  */
 public class PojoToRaml {
 
+    private final  Map<String, TypeDeclarationBuilder> builtTypes = new HashMap<>();
+    private final ClassParserFactory classParserFactory;
+    private final RamlAdjuster adjuster;
 
-    public Result pojoToRamlTypeBuilder(ClassParser parser, RamlAdjuster adjuster) {
+    public PojoToRaml(ClassParserFactory parser, RamlAdjuster adjuster) {
+        this.classParserFactory = parser;
+        this.adjuster = adjuster;
+    }
+
+    public Result pojoToRamlTypeBuilder(Class<?> clazz) {
 
         Map<String, TypeDeclarationBuilder> dependentTypes = new HashMap<>();
-        TypeDeclarationBuilder builder = handleSingleType(parser, adjuster, dependentTypes);
+        TypeDeclarationBuilder builder = handleSingleType(classParserFactory.createParser(clazz), adjuster, dependentTypes);
+        builtTypes.putAll(dependentTypes);
         dependentTypes.remove(builder.id());
         return new Result(builder, dependentTypes);
     }
@@ -55,8 +64,17 @@ public class PojoToRaml {
         return typeDeclaration;
     }
 
+    public Map<String, TypeDeclarationBuilder> getBuiltTypes() {
+        return builtTypes;
+    }
+
     private RamlType exploreTypeForProperty(ClassParser parser, Type type, RamlAdjuster adjuster) {
 
         return RamlTypeFactory.forType(type, parser, adjuster);
+    }
+
+    public static TypeBuilder ramlStringType() {
+
+        return TypeBuilder.type("string");
     }
 }

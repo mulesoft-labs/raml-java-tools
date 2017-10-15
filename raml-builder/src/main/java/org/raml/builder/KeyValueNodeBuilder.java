@@ -58,4 +58,21 @@ public class KeyValueNodeBuilder<B extends KeyValueNodeBuilder> implements NodeB
             valueNode.addChild(baseUriNode);
         }
     }
+
+    public void addProperty(Node valueNode, String name, Boolean value) {
+
+        if ( value != null ) {
+            KeyValueNode baseUriNode = new KeyValueNodeImpl(new StringNodeImpl(name), new BooleanNode(value));
+            valueNode.addChild(baseUriNode);
+        }
+    }
+
+    public void addProperty(Node valueNode, String name, Long value) {
+
+        if ( value != null ) {
+            KeyValueNode baseUriNode = new KeyValueNodeImpl(new StringNodeImpl(name), new NumberNode(value));
+            valueNode.addChild(baseUriNode);
+        }
+    }
+
 }

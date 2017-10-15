@@ -37,8 +37,8 @@ public class PojoToRamlTest {
     @Test
     public void pojoToRamlTypeBuilder() throws Exception {
 
-        PojoToRaml pojoToRaml = new PojoToRaml();
-        Result types =  pojoToRaml.pojoToRamlTypeBuilder(new FieldClassParser(Fun.class), RamlAdjuster.NULL_ADJUSTER);
+        PojoToRaml pojoToRaml = new PojoToRaml(FieldClassParser.factory(), RamlAdjuster.NULL_ADJUSTER);
+        Result types =  pojoToRaml.pojoToRamlTypeBuilder(Fun.class);
 
         RamlDocumentBuilder ramlDocumentBuilder = RamlDocumentBuilder
                 .document()

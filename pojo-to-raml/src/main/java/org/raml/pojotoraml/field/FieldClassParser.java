@@ -1,6 +1,7 @@
 package org.raml.pojotoraml.field;
 
 import org.raml.pojotoraml.ClassParser;
+import org.raml.pojotoraml.ClassParserFactory;
 import org.raml.pojotoraml.Property;
 
 import java.lang.reflect.Field;
@@ -15,7 +16,7 @@ public class FieldClassParser implements ClassParser {
 
     private final Class<?> classSource;
 
-    public FieldClassParser(Class<?> classSource) {
+    FieldClassParser(Class<?> classSource) {
         this.classSource = classSource;
     }
 
@@ -41,5 +42,19 @@ public class FieldClassParser implements ClassParser {
     @Override
     public ClassParser parseDependentClass(Class<?> type) {
         return new FieldClassParser(type);
+    }
+
+    public static FieldClassParser extractFieldsFrom(Class<?> classSource) {
+
+        return new FieldClassParser(classSource);
+    }
+
+    public static ClassParserFactory factory() {
+        return new ClassParserFactory() {
+            @Override
+            public ClassParser createParser(Class<?> clazz) {
+                return new FieldClassParser(clazz);
+            }
+        };
     }
 }

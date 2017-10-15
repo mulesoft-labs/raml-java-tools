@@ -12,7 +12,10 @@ import java.util.List;
 public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
 
     private String type;
+    private String displayName;
+    private String description;
     private List<FacetBuilder> facets = new ArrayList<>();
+    private Boolean required;
 
     public ParameterBuilder(String name) {
         super(name);
@@ -40,6 +43,9 @@ public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
         KeyValueNode node = super.buildNode();
 
         addProperty(node.getValue(), "type", type);
+        addProperty(node.getValue(), "displayName", displayName);
+        addProperty(node.getValue(), "description", description);
+        addProperty(node.getValue(), "required", required);
 
         if ( ! facets.isEmpty() ) {
 
@@ -47,6 +53,26 @@ public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
                 node.getValue().addChild(facet.buildNode());
             }
         }
+
+
         return node;
+    }
+
+    public ParameterBuilder displayName(String displayName) {
+
+        this.displayName = displayName;
+        return this;
+    }
+
+    public ParameterBuilder description(String description) {
+
+        this.description = description;
+        return this;
+    }
+
+    public ParameterBuilder required(boolean required) {
+
+        this.required = required;
+        return this;
     }
 }

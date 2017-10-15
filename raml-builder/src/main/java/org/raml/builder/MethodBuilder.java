@@ -19,6 +19,7 @@ public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder> implements
     private List<AnnotationBuilder> annotations = new ArrayList<>();
     private List<ParameterBuilder> queryParameters = new ArrayList<>();
     private List<ParameterBuilder> headerParameters = new ArrayList<>();
+    private String description;
 
 
     private MethodBuilder(String name) {
@@ -64,6 +65,8 @@ public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder> implements
     @Override
     public KeyValueNode buildNode() {
         KeyValueNode node =  super.buildNode();
+
+        addProperty(node.getValue(), "description", description);
 
         if ( ! responses.isEmpty()) {
             ObjectNodeImpl responsesValueNode = new ObjectNodeImpl();
@@ -120,5 +123,10 @@ public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder> implements
 
         return node;
 
+    }
+
+    public MethodBuilder description(String description) {
+        this.description = description;
+        return this;
     }
 }
