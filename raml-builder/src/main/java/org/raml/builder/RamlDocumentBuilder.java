@@ -7,7 +7,10 @@ import org.raml.v2.internal.impl.commons.model.StringType;
 import org.raml.v2.internal.impl.commons.model.factory.TypeDeclarationModelFactory;
 import org.raml.v2.internal.impl.commons.nodes.RamlDocumentNode;
 import org.raml.yagi.framework.model.*;
-import org.raml.yagi.framework.nodes.*;
+import org.raml.yagi.framework.nodes.KeyValueNode;
+import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
+import org.raml.yagi.framework.nodes.Node;
+import org.raml.yagi.framework.nodes.StringNodeImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,9 +26,9 @@ public class RamlDocumentBuilder implements NodeBuilder {
     private static final ModelBindingConfiguration binding = createV10Binding();
     private List<NodeBuilder> builders = new ArrayList<>();
 
-    private List<AnnotationTypeBuilder> annotationTypeBuilders = new ArrayList<>();
-    private List<TypeDeclarationBuilder> typeDeclarationBuilders = new ArrayList<>();
-    private List<ResourceBuilder> resourceBuilders = new ArrayList<>();
+    private KeyValueNodeBuilderMap<KeyValueNodeBuilder> annotationTypeBuilders = KeyValueNodeBuilderMap.createMap();
+    private KeyValueNodeBuilderMap<KeyValueNodeBuilder> typeDeclarationBuilders = KeyValueNodeBuilderMap.createMap();
+    private KeyValueNodeBuilderMap<ResourceBuilder> resourceBuilders = KeyValueNodeBuilderMap.createMap();
     private String baseUri;
     private String title;
     private String version;
@@ -60,28 +63,9 @@ public class RamlDocumentBuilder implements NodeBuilder {
             documentNode.addChild(mediaType);
         }
 
-        ObjectNodeImpl annotationTypeNode = new ObjectNodeImpl();
-        KeyValueNodeImpl atKvn = new KeyValueNodeImpl(new StringNodeImpl("annotationTypes"), annotationTypeNode);
-        documentNode.addChild(atKvn);
-
-        for (AnnotationTypeBuilder annotationTypeBuilder : annotationTypeBuilders) {
-
-            annotationTypeNode.addChild(annotationTypeBuilder.buildNode());
-        }
-
-        ObjectNodeImpl typesNode = new ObjectNodeImpl();
-        KeyValueNodeImpl typesKvn = new KeyValueNodeImpl(new StringNodeImpl("types"), typesNode);
-        documentNode.addChild(typesKvn);
-
-        for (TypeDeclarationBuilder typeDeclarationBuilder : typeDeclarationBuilders) {
-
-            typesNode.addChild(typeDeclarationBuilder.buildNode());
-        }
-
-        for (ResourceBuilder resourceBuilder : resourceBuilders) {
-
-            documentNode.addChild(resourceBuilder.buildNode());
-        }
+        annotationTypeBuilders.addAllToNamedNode("annotationTypes", documentNode);
+        typeDeclarationBuilders.addAllToNamedNode("types", documentNode);
+        resourceBuilders.addToParent(documentNode);
 
 
         return documentNode;
@@ -94,17 +78,17 @@ public class RamlDocumentBuilder implements NodeBuilder {
     }
 
     public RamlDocumentBuilder withAnnotationTypes(AnnotationTypeBuilder... annotationTypeBuilders) {
-        this.annotationTypeBuilders.addAll(Arrays.asList(annotationTypeBuilders));
+        this.annotationTypeBuilders.addAll(annotationTypeBuilders);
         return this;
     }
 
     public RamlDocumentBuilder withTypes(TypeDeclarationBuilder... typeBuilders) {
-        this.typeDeclarationBuilders.addAll(Arrays.asList(typeBuilders));
+        this.typeDeclarationBuilders.addAll(typeBuilders);
         return this;
     }
 
     public RamlDocumentBuilder withResources(ResourceBuilder... resourceBuilders) {
-        this.resourceBuilders.addAll(Arrays.asList(resourceBuilders));
+        this.resourceBuilders.addAll(resourceBuilders);
         return this;
     }
 
