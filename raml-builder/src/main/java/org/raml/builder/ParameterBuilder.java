@@ -17,7 +17,7 @@ public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
     private List<FacetBuilder> facets = new ArrayList<>();
     private Boolean required;
 
-    public ParameterBuilder(String name) {
+    private ParameterBuilder(String name) {
         super(name);
     }
 
