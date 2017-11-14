@@ -41,6 +41,7 @@ public class HandlerList extends NodeHandler<Node> {
     public boolean handles(final Node node) {
 
         return FluentIterable.from(handlerList).anyMatch(new Predicate<NodeHandler<? extends Node>>() {
+
             @Override
             public boolean apply(@Nullable NodeHandler<? extends Node> nodeHandler) {
                 return nodeHandler.handles(node);

@@ -33,12 +33,12 @@ import static org.raml.v2.internal.impl.commons.RamlVersion.RAML_10;
 /**
  * Created. There, you have it.
  */
-public class PojoToRamlTest {
+public class PojoToRamlImplTest {
     @Test
     public void pojoToRamlTypeBuilder() throws Exception {
 
-        PojoToRaml pojoToRaml = new PojoToRaml(FieldClassParser.factory(), RamlAdjuster.NULL_ADJUSTER);
-        Result types =  pojoToRaml.pojoToRamlTypeBuilder(Fun.class);
+        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), RamlAdjuster.NULL_ADJUSTER);
+        Result types =  pojoToRaml.classToRaml(Fun.class);
 
         RamlDocumentBuilder ramlDocumentBuilder = RamlDocumentBuilder
                 .document()

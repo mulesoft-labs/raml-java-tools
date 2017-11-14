@@ -10,8 +10,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>pojo-to-raml</artifactId>
-
+    <artifactId>raml-to-pojo</artifactId>
 
     <dependencies>
         <dependency>
@@ -19,23 +18,8 @@
             <artifactId>raml-parser-2</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.raml</groupId>
-            <artifactId>raml-builder</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.raml</groupId>
-            <artifactId>raml-simple-emitter</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -47,5 +31,10 @@
             <artifactId>test-utils</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>com.squareup</groupId>
+            <artifactId>javapoet</artifactId>
+        </dependency>
+        
     </dependencies>
 </project>

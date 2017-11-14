@@ -1,6 +1,8 @@
 package org.raml.builder;
 
+import org.raml.v2.internal.impl.commons.nodes.TypeDeclarationNode;
 import org.raml.yagi.framework.nodes.KeyValueNode;
+import org.raml.yagi.framework.nodes.Node;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +37,11 @@ public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
     public ParameterBuilder withFacets(FacetBuilder... builders) {
         this.facets.addAll(Arrays.asList(builders));
         return this;
+    }
+
+    @Override
+    protected Node createValueNode() {
+        return new TypeDeclarationNode();
     }
 
     @Override
@@ -74,5 +81,9 @@ public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
 
         this.required = required;
         return this;
+    }
+
+    public boolean required() {
+        return required;
     }
 }

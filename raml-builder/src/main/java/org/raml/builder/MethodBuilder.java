@@ -1,9 +1,7 @@
 package org.raml.builder;
 
-import org.raml.yagi.framework.nodes.KeyValueNode;
-import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
-import org.raml.yagi.framework.nodes.ObjectNodeImpl;
-import org.raml.yagi.framework.nodes.StringNodeImpl;
+import org.raml.v2.api.model.v10.methods.Method;
+import org.raml.yagi.framework.nodes.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +10,7 @@ import java.util.List;
 /**
  * Created. There, you have it.
  */
-public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder> implements AnnotableBuilder<MethodBuilder> {
+public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder> implements AnnotableBuilder<MethodBuilder>, ModelBuilder<Method> {
 
     private List<ResponseBuilder> responses = new ArrayList<>();
     private List<BodyBuilder> bodies = new ArrayList<>();
@@ -62,6 +60,11 @@ public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder> implements
         return this;
     }
 
+ //   @Override
+ //   protected KeyValueNode createContainerNode() {
+ //       return new MethodNode();
+  //  }
+
     @Override
     public KeyValueNode buildNode() {
         KeyValueNode node =  super.buildNode();
@@ -84,9 +87,9 @@ public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder> implements
             ObjectNodeImpl responsesValueNode = new ObjectNodeImpl();
             KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("queryParameters"), responsesValueNode);
 
-            for (ParameterBuilder quertParameter : queryParameters) {
+            for (ParameterBuilder queryParameter : queryParameters) {
 
-                responsesValueNode.addChild(quertParameter.buildNode());
+                responsesValueNode.addChild(queryParameter.buildNode());
             }
 
             node.getValue().addChild(kvn);
@@ -125,8 +128,21 @@ public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder> implements
 
     }
 
+    @Override
+    public Method buildModel() {
+
+        Node node = buildNode();
+
+        return Util.buildModel(binding, node, Method.class);
+    }
+
     public MethodBuilder description(String description) {
         this.description = description;
         return this;
+    }
+
+    public static void main(String[] args) {
+        Method m = MethodBuilder.method("foo").description("hello").buildModel();
+        System.err.println(m.description().value());
     }
 }

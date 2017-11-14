@@ -33,6 +33,16 @@
                 <artifactId>mockito-core</artifactId>
                 <version>2.8.47</version>
             </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>18.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup</groupId>
+                <artifactId>javapoet</artifactId>
+                <version>1.7.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <packaging>pom</packaging>
@@ -43,6 +53,7 @@
         <module>test-utils</module>
         <module>raml-parser-tools</module>
         <module>pojo-to-raml</module>
+        <module>raml-to-pojo</module>
     </modules>
     <build>
         <plugins>

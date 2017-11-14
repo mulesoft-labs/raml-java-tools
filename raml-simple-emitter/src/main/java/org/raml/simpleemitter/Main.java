@@ -17,7 +17,6 @@ import java.io.StringWriter;
 import java.util.List;
 
 import static org.raml.builder.MethodBuilder.method;
-import static org.raml.builder.NodeBuilders.key;
 import static org.raml.builder.NodeBuilders.property;
 import static org.raml.builder.RamlDocumentBuilder.document;
 import static org.raml.builder.ResourceBuilder.resource;
@@ -52,9 +51,9 @@ public class Main {
                                 .displayName("Mama!!!")
                                 .with(
                                         method("get")
+                                                .description("fooofooofooo")
                                                 .withQueryParameter(ParameterBuilder.parameter("apaaa").ofType("integer").withFacets(FacetBuilder.facet("minimum").value(44)))
                                                 .withAnnotations(AnnotationBuilder.annotation("Foo").withProperties(PropertyValueBuilder.property("time", "2022-02-02")))
-                                                .with(key("description", "Hello"))
                                                 .withBodies(
                                                         BodyBuilder.body("application/json")
                                                                 .ofType(TypeBuilder.type("Foo", "Goo")

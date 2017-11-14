@@ -21,7 +21,7 @@ import static org.raml.v2.api.RamlModelBuilder.MODEL_PACKAGE;
 /**
  * Created. There, you have it.
  */
-public class RamlDocumentBuilder implements NodeBuilder {
+public class RamlDocumentBuilder implements NodeBuilder, ModelBuilder<Api> {
 
     private static final ModelBindingConfiguration binding = createV10Binding();
     private List<NodeBuilder> builders = new ArrayList<>();

@@ -43,12 +43,31 @@ public class KeyValueNodeBuilder<B extends KeyValueNodeBuilder> implements NodeB
             value.addChild(builder.buildNode());
         }
 
-        return new KeyValueNodeImpl(createKeyNode(id), value);
+        KeyValueNode container = createContainerNode();
+        container.addChild(createKeyNode(id));
+        container.addChild(value);
+        return container;
+    }
+
+    protected KeyValueNode createContainerNode() {
+
+        return new KeyValueNodeImpl();
     }
 
     public String id() {
 
         return id;
+    }
+
+    public void addValueProperty(Node valueNode, String name, String value) {
+
+        if ( value != null ) {
+            ObjectNodeImpl valueHolder = new ObjectNodeImpl();
+            addProperty(valueHolder, "value", value);
+
+            KeyValueNode baseUriNode = new KeyValueNodeImpl(new StringNodeImpl(name), valueHolder);
+            valueNode.addChild(baseUriNode);
+        }
     }
 
     public void addProperty(Node valueNode, String name, String value) {
