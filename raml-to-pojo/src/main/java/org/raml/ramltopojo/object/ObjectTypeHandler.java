@@ -1,6 +1,6 @@
 package org.raml.ramltopojo.object;
 
-import com.squareup.javapoet.TypeSpec;
+import org.raml.ramltopojo.CreationResult;
 import org.raml.ramltopojo.TypeHandler;
 
 /**
@@ -9,7 +9,7 @@ import org.raml.ramltopojo.TypeHandler;
 public class ObjectTypeHandler implements TypeHandler {
 
     @Override
-    public TypeSpec create() {
+    public CreationResult create() {
         return null;
     }
 }

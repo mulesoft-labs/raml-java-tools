@@ -1,6 +1,5 @@
 package org.raml.ramltopojo;
 
-import com.squareup.javapoet.TypeSpec;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 /**
@@ -11,7 +10,7 @@ public class RamlToPojoImpl implements RamlToPojo {
     public ResultingPojos buildPojos(TypeDeclaration typeDeclaration) {
 
         TypeHandler handler = TypeDeclarationType.fromRamlParser(typeDeclaration);
-        TypeSpec spec = handler.create();
+        CreationResult spec = handler.create();
         return null;
     }
 }
