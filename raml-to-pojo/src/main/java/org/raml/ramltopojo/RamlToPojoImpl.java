@@ -9,7 +9,7 @@ public class RamlToPojoImpl implements RamlToPojo {
     @Override
     public ResultingPojos buildPojos(TypeDeclaration typeDeclaration) {
 
-        TypeHandler handler = TypeDeclarationType.fromRamlParser(typeDeclaration);
+        TypeHandler handler = TypeDeclarationType.typeHandler(typeDeclaration);
         CreationResult spec = handler.create();
         return null;
     }

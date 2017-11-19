@@ -17,6 +17,7 @@ package org.raml.testutils.matchers;
 
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.TypeName;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 
@@ -32,6 +33,17 @@ public class MethodSpecMatchers {
       @Override
       protected String featureValueOf(MethodSpec actual) {
         return actual.name;
+      }
+    };
+  }
+
+  public static<K extends TypeName> Matcher<MethodSpec> returnType(Matcher<K> match) {
+
+    return new FeatureMatcher<MethodSpec, K>(match, "return type", "return type") {
+
+      @Override
+      protected K featureValueOf(MethodSpec actual) {
+        return (K)actual.returnType;
       }
     };
   }

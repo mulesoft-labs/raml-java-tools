@@ -25,5 +25,10 @@
             <groupId>com.squareup</groupId>
             <artifactId>javapoet</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <version>1.3</version>
+        </dependency>
     </dependencies>
 </project>

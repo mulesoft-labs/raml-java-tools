@@ -1,9 +1,14 @@
 package org.raml.ramltopojo;
 
 import com.google.common.collect.ImmutableMap;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.enumeration.EnumerationTypeHandler;
 import org.raml.v2.api.model.v10.datamodel.*;
 
+import java.io.File;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -46,11 +51,21 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         public TypeHandler create(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
+
+        @Override
+        public TypeName asJavaPoetType() {
+            return null;
+        }
     },
     ENUMERATION {
         @Override
         public TypeHandler create(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
+        }
+
+        @Override
+        public TypeName asJavaPoetType() {
+            return null;
         }
     },
     ARRAY {
@@ -59,6 +74,10 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
+        @Override
+        public TypeName asJavaPoetType() {
+            return null;
+        }
     },
     UNION {
         @Override
@@ -66,6 +85,10 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
+        @Override
+        public TypeName asJavaPoetType() {
+            return null;
+        }
     },
     INTEGER {
         @Override
@@ -73,11 +96,20 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
+        @Override
+        public TypeName asJavaPoetType() {
+            return TypeName.INT;
+        }
     },
     BOOLEAN {
         @Override
         public TypeHandler create(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
+        }
+
+        @Override
+        public TypeName asJavaPoetType() {
+            return TypeName.BOOLEAN;
         }
 
     },
@@ -87,6 +119,10 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
+        @Override
+        public TypeName asJavaPoetType() {
+            return ClassName.get(Date.class);
+        }
     },
     DATETIME {
         @Override
@@ -94,6 +130,10 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
+        @Override
+        public TypeName asJavaPoetType() {
+            return ClassName.get(Date.class);
+        }
     },
     TIME_ONLY {
         @Override
@@ -101,6 +141,10 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
+        @Override
+        public TypeName asJavaPoetType() {
+            return ClassName.get(Date.class);
+        }
     },
     DATETIME_ONLY {
         @Override
@@ -108,6 +152,10 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
+        @Override
+        public TypeName asJavaPoetType() {
+            return ClassName.get(Date.class);
+        }
     },
     NUMBER {
         @Override
@@ -115,18 +163,27 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
+        @Override
+        public TypeName asJavaPoetType() {
+            return ClassName.get(BigDecimal.class);
+        }
     },
     STRING {
         @Override
         public TypeHandler create(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
 
             StringTypeDeclaration declaration = (StringTypeDeclaration) typeDeclaration;
-            if ( declaration.enumValues().isEmpty() ) {
+            if ( ! declaration.enumValues().isEmpty() ) {
                 return new EnumerationTypeHandler(declaration);
             } else {
 
                 throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
             }
+        }
+
+        @Override
+        public TypeName asJavaPoetType() {
+            return ClassName.get(String.class);
         }
     },
     ANY {
@@ -135,6 +192,10 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
+        @Override
+        public TypeName asJavaPoetType() {
+            return ClassName.get(Object.class);
+        }
     },
     FILE {
         @Override
@@ -142,17 +203,21 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
+        @Override
+        public TypeName asJavaPoetType() {
+            return ClassName.get(File.class);
+        }
     };
+
+    public abstract TypeName asJavaPoetType();
 
     private static Map<Class, TypeDeclarationType> scalarToType = ImmutableMap.<Class, TypeDeclarationType>builder()
             .put(ObjectTypeDeclaration.class, OBJECT)
             .put(ArrayTypeDeclaration.class, ARRAY)
             .put(UnionTypeDeclaration.class, UNION)
             .put(DateTimeOnlyTypeDeclaration.class, DATETIME_ONLY)
-            .put(TimeOnlyTypeDeclaration.class, TIME_ONLY)
             .put(IntegerTypeDeclaration.class, INTEGER)
             .put(BooleanTypeDeclaration.class, BOOLEAN)
-            .put(DateTimeOnlyTypeDeclaration.class, DATETIME_ONLY)
             .put(TimeOnlyTypeDeclaration.class, TIME_ONLY)
             .put(DateTimeTypeDeclaration.class, DATETIME)
             .put(DateTypeDeclaration.class, DATE)
@@ -162,12 +227,16 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
             .put(AnyTypeDeclaration.class, ANY)
             .build();
 
-    public static TypeHandler fromRamlParser(TypeDeclaration typeDeclaration) {
+    public static TypeHandler typeHandler(TypeDeclaration typeDeclaration) {
 
-        TypeDeclarationType typeDeclarationType = scalarToType.get(typeDeclaration.getClass());
+        TypeDeclarationType typeDeclarationType = scalarToType.get(typeDeclaration.getClass().getInterfaces()[0]);
 
         return typeDeclarationType.create(typeDeclarationType, typeDeclaration);
     }
 
+    public static TypeDeclarationType declarationType(TypeDeclaration typeDeclaration) {
+
+        return scalarToType.get(typeDeclaration.getClass().getInterfaces()[0]);
+    }
 
 }
