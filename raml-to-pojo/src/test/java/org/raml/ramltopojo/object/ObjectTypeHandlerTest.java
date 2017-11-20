@@ -3,6 +3,7 @@ package org.raml.ramltopojo.object;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.ParameterizedTypeName;
 import org.junit.Test;
 import org.raml.ramltopojo.CreationResult;
 import org.raml.v2.api.model.v10.api.Api;
@@ -26,7 +27,7 @@ import static org.raml.testutils.matchers.TypeSpecMatchers.*;
  */
 public class ObjectTypeHandlerTest {
     @Test
-    public void create() throws Exception {
+    public void simplest() throws Exception {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("simplest-type.raml"));
         ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
@@ -59,6 +60,43 @@ public class ObjectTypeHandlerTest {
 
         System.err.println(r.getInterface().toString());
         System.err.println(r.getImplementation().toString());
+    }
+
+    @Test
+    public void simplestContainingSimpleArray() throws Exception {
+
+        Api api = RamlLoader.load(this.getClass().getResourceAsStream("simplest-containing-simple-array.raml"));
+        ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
+
+        CreationResult r = handler.create();
+        System.err.println(r.getInterface().toString());
+        System.err.println(r.getImplementation().toString());
+
+        assertThat(r.getInterface(), is(allOf(
+                name(equalTo("Foo")),
+                methods(contains(
+                        allOf(methodName(equalTo("getNames")), returnType(equalTo(ParameterizedTypeName.get(List.class, String.class)))),
+                        allOf(methodName(equalTo("setNames")), parameters(contains(type(equalTo(ParameterizedTypeName.get(List.class, String.class)))))),
+                        allOf(methodName(equalTo("getAges")), returnType(equalTo(ParameterizedTypeName.get(List.class, Integer.class)))),
+                        allOf(methodName(equalTo("setAges")), parameters(contains(type(equalTo(ParameterizedTypeName.get(List.class, Integer.class))))))
+                ))
+        )));
+
+
+
+        assertThat(r.getImplementation().get(), is(allOf(
+                name(equalTo("FooImpl")),
+                fields(contains(
+                        allOf(fieldName(equalTo("names")), fieldType(equalTo(ParameterizedTypeName.get(List.class, String.class)))),
+                        allOf(fieldName(equalTo("ages")), fieldType(equalTo(ParameterizedTypeName.get(List.class, Integer.class))))
+                )),
+                methods(contains(
+                        allOf(methodName(equalTo("getNames")), returnType(equalTo(ParameterizedTypeName.get(List.class, String.class)))),
+                        allOf(methodName(equalTo("setNames")), parameters(contains(type(equalTo(ParameterizedTypeName.get(List.class, String.class)))))),
+                        allOf(methodName(equalTo("getAges")), returnType(equalTo(ParameterizedTypeName.get(List.class, Integer.class)))),
+                        allOf(methodName(equalTo("setAges")), parameters(contains(type(equalTo(ParameterizedTypeName.get(List.class, Integer.class))))))
+                ))
+        )));
     }
 
     private ObjectTypeDeclaration findTypes(final String name, List<TypeDeclaration> types) {

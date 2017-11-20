@@ -107,6 +107,6 @@ public class ObjectTypeHandler implements TypeHandler {
 
     private TypeName findType(TypeDeclaration type) {
 
-        return TypeDeclarationType.declarationType(type).asJavaPoetType();
+        return TypeDeclarationType.javaType(type);
     }
 }
