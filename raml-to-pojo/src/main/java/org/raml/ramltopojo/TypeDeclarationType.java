@@ -5,6 +5,7 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.enumeration.EnumerationTypeHandler;
+import org.raml.ramltopojo.object.ObjectTypeHandler;
 import org.raml.v2.api.model.v10.datamodel.*;
 
 import java.io.File;
@@ -51,12 +52,13 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
     OBJECT {
         @Override
         public TypeHandler create(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
+            return new ObjectTypeHandler((ObjectTypeDeclaration) typeDeclaration);
         }
 
         @Override
-        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration) {
-            return null;
+        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
+            CreationResult result = generationContext.findCreatedType(originalTypeDeclaration);
+            return ClassName.bestGuess(result.getInterface().name);
         }
     },
     ENUMERATION {
@@ -66,7 +68,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         }
 
         @Override
-        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration) {
+        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return null;
         }
     },
@@ -77,11 +79,10 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         }
 
         @Override
-        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration) {
+        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
 
             ArrayTypeDeclaration arrayTypeDeclaration = (ArrayTypeDeclaration) originalTypeDeclaration;
-            arrayTypeDeclaration.items();
-            return ParameterizedTypeName.get(ClassName.get(List.class), TypeDeclarationType.javaType(arrayTypeDeclaration.items()).box());
+            return ParameterizedTypeName.get(ClassName.get(List.class), TypeDeclarationType.javaType(arrayTypeDeclaration.items(), generationContext).box());
         }
     },
     UNION {
@@ -91,7 +92,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         }
 
         @Override
-        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration) {
+        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return null;
         }
     },
@@ -102,7 +103,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         }
 
         @Override
-        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration) {
+        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return TypeName.INT;
         }
     },
@@ -113,7 +114,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         }
 
         @Override
-        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration) {
+        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return TypeName.BOOLEAN;
         }
 
@@ -125,7 +126,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         }
 
         @Override
-        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration) {
+        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return ClassName.get(Date.class);
         }
     },
@@ -136,7 +137,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         }
 
         @Override
-        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration) {
+        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return ClassName.get(Date.class);
         }
     },
@@ -147,7 +148,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         }
 
         @Override
-        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration) {
+        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return ClassName.get(Date.class);
         }
     },
@@ -158,7 +159,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         }
 
         @Override
-        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration) {
+        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return ClassName.get(Date.class);
         }
     },
@@ -169,7 +170,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         }
 
         @Override
-        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration) {
+        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return ClassName.get(BigDecimal.class);
         }
     },
@@ -187,7 +188,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         }
 
         @Override
-        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration) {
+        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return ClassName.get(String.class);
         }
     },
@@ -198,7 +199,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         }
 
         @Override
-        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration) {
+        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return ClassName.get(Object.class);
         }
     },
@@ -209,12 +210,12 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         }
 
         @Override
-        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration) {
+        public TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return ClassName.get(File.class);
         }
     };
 
-    public abstract TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration);
+    public abstract TypeName asJavaPoetType(TypeDeclaration originalTypeDeclaration, GenerationContext generationContext);
 
     private static Map<Class, TypeDeclarationType> scalarToType = ImmutableMap.<Class, TypeDeclarationType>builder()
             .put(ObjectTypeDeclaration.class, OBJECT)
@@ -239,9 +240,9 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         return typeDeclarationType.create(typeDeclarationType, typeDeclaration);
     }
 
-    public static TypeName javaType(TypeDeclaration typeDeclaration) {
+    public static TypeName javaType(TypeDeclaration typeDeclaration, GenerationContext generationContext) {
 
-        return scalarToType.get(typeDeclaration.getClass().getInterfaces()[0]).asJavaPoetType(typeDeclaration);
+        return scalarToType.get(typeDeclaration.getClass().getInterfaces()[0]).asJavaPoetType(typeDeclaration, generationContext);
     }
 
 }

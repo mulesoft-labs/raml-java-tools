@@ -4,6 +4,7 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.raml.ramltopojo.CreationResult;
+import org.raml.ramltopojo.GenerationContextImpl;
 import org.raml.testutils.UnitTest;
 import org.raml.testutils.matchers.FieldSpecMatchers;
 import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
@@ -32,7 +33,7 @@ public class EnumerationTypeHandlerTest extends UnitTest {
         when(declaration.enumValues()).thenReturn(Arrays.asList("one", "two", "three"));
 
         EnumerationTypeHandler handler = new EnumerationTypeHandler(declaration);
-        CreationResult result = handler.create();
+        CreationResult result = handler.create(new GenerationContextImpl());
 
         assertThat(result.getInterface(), allOf(
                 name(equalTo("Days")),

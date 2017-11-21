@@ -10,7 +10,7 @@ public class RamlToPojoImpl implements RamlToPojo {
     public ResultingPojos buildPojos(TypeDeclaration typeDeclaration) {
 
         TypeHandler handler = TypeDeclarationType.typeHandler(typeDeclaration);
-        CreationResult spec = handler.create();
+        CreationResult spec = handler.create(new GenerationContextImpl(TypeFetcher.NULL_FETCHER));
         return null;
     }
 }

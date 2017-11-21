@@ -1,10 +1,7 @@
 package org.raml.ramltopojo.object;
 
 import com.squareup.javapoet.*;
-import org.raml.ramltopojo.CreationResult;
-import org.raml.ramltopojo.Names;
-import org.raml.ramltopojo.TypeDeclarationType;
-import org.raml.ramltopojo.TypeHandler;
+import org.raml.ramltopojo.*;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
@@ -22,17 +19,17 @@ public class ObjectTypeHandler implements TypeHandler {
     }
 
     @Override
-    public CreationResult create() {
+    public CreationResult create(GenerationContext generationContext) {
 
         // I need to create an interface and an implementation.
 
-        TypeSpec interfaceSpec = createInterface();
-        TypeSpec implementationSpec = createImplementation(interfaceSpec);
+        TypeSpec interfaceSpec = createInterface(generationContext);
+        TypeSpec implementationSpec = createImplementation(interfaceSpec, generationContext);
 
         return CreationResult.forType(interfaceSpec, implementationSpec);
     }
 
-    private TypeSpec createImplementation(TypeSpec interfaceSpec) {
+    private TypeSpec createImplementation(TypeSpec interfaceSpec, GenerationContext generationContext) {
 
         ClassName className = ClassName.get("", Names.typeName(objectTypeDeclaration.name(), "Impl"));
         TypeSpec.Builder typeSpec = TypeSpec
@@ -42,7 +39,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
         for (TypeDeclaration declaration : objectTypeDeclaration.properties()) {
 
-            TypeName tn = findType(declaration);
+            TypeName tn = findType(declaration, generationContext);
 
             FieldSpec.Builder field = FieldSpec.builder(tn, Names.variableName(declaration.name())).addModifiers(Modifier.PRIVATE);
             typeSpec.addField(field.build());
@@ -62,7 +59,7 @@ public class ObjectTypeHandler implements TypeHandler {
         return typeSpec.build();
     }
 
-    private TypeSpec createInterface() {
+    private TypeSpec createInterface(GenerationContext generationContext) {
 
         ClassName interf = ClassName.get("", Names.typeName(objectTypeDeclaration.name()));
         TypeSpec.Builder typeSpec = TypeSpec
@@ -71,7 +68,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
         for (TypeDeclaration declaration : objectTypeDeclaration.properties()) {
 
-            TypeName tn = findType(declaration);
+            TypeName tn = findType(declaration, generationContext);
             MethodSpec.Builder getter = MethodSpec.methodBuilder(Names.methodName("get", declaration.name()))
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                     .returns(tn);
@@ -105,8 +102,8 @@ public class ObjectTypeHandler implements TypeHandler {
 
     }
 
-    private TypeName findType(TypeDeclaration type) {
+    private TypeName findType(TypeDeclaration type, GenerationContext generationContext) {
 
-        return TypeDeclarationType.javaType(type);
+        return TypeDeclarationType.javaType(type, generationContext);
     }
 }

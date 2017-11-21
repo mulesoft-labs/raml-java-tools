@@ -1,4 +1,4 @@
-package org.raml.ramltopojo.object;
+package org.raml.ramltopojo;
 
 import org.raml.v2.api.RamlModelBuilder;
 import org.raml.v2.api.RamlModelResult;
