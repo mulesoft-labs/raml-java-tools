@@ -2,8 +2,7 @@ package org.raml.ramltopojo;
 
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created. There, you have it.
@@ -11,7 +10,7 @@ import java.util.Map;
 public class GenerationContextImpl implements GenerationContext {
 
     private final TypeFetcher typeFetcher;
-    private final Map<String, CreationResult> knownTypes = new HashMap<>();
+    private final ConcurrentHashMap<String, CreationResult> knownTypes = new ConcurrentHashMap<>();
 
     public GenerationContextImpl() {
         this(TypeFetcher.NULL_FETCHER);
@@ -22,15 +21,17 @@ public class GenerationContextImpl implements GenerationContext {
     }
 
     @Override
-    public CreationResult findCreatedType(TypeDeclaration ramlType) {
+    public CreationResult findCreatedType(String typeName, TypeDeclaration ramlType) {
 
-        if ( knownTypes.containsKey(ramlType.name()) ) {
+        if ( knownTypes.containsKey(typeName) ) {
 
-            return knownTypes.get(ramlType.name());
+            return knownTypes.get(typeName);
         } else {
 
-            TypeDeclaration typeDeclaration = typeFetcher.fetchType(ramlType.type());
-            return TypeDeclarationType.typeHandler(typeDeclaration).create(this);
+            TypeDeclaration typeDeclaration = typeFetcher.fetchType(typeName);
+            CreationResult result =  TypeDeclarationType.typeHandler(typeDeclaration).create(this);
+            knownTypes.put(typeName, result);
+            return result;
         }
     }
 }

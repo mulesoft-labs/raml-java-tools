@@ -34,12 +34,12 @@ public class ObjectTypeHandler implements TypeHandler {
         ClassName className = ClassName.get("", Names.typeName(objectTypeDeclaration.name(), "Impl"));
         TypeSpec.Builder typeSpec = TypeSpec
                 .classBuilder(className)
-                .superclass(ClassName.bestGuess(interfaceSpec.name))
+                .addSuperinterface(ClassName.bestGuess(interfaceSpec.name))
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT);
 
         for (TypeDeclaration declaration : objectTypeDeclaration.properties()) {
 
-            TypeName tn = findType(declaration, generationContext);
+            TypeName tn = findType(declaration.type(), declaration, generationContext);
 
             FieldSpec.Builder field = FieldSpec.builder(tn, Names.variableName(declaration.name())).addModifiers(Modifier.PRIVATE);
             typeSpec.addField(field.build());
@@ -68,7 +68,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
         for (TypeDeclaration declaration : objectTypeDeclaration.properties()) {
 
-            TypeName tn = findType(declaration, generationContext);
+            TypeName tn = findType(declaration.type(), declaration, generationContext);
             MethodSpec.Builder getter = MethodSpec.methodBuilder(Names.methodName("get", declaration.name()))
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                     .returns(tn);
@@ -102,8 +102,8 @@ public class ObjectTypeHandler implements TypeHandler {
 
     }
 
-    private TypeName findType(TypeDeclaration type, GenerationContext generationContext) {
+    private TypeName findType(String typeName, TypeDeclaration type, GenerationContext generationContext) {
 
-        return TypeDeclarationType.javaType(type, generationContext);
+        return TypeDeclarationType.javaType(typeName, type, generationContext);
     }
 }

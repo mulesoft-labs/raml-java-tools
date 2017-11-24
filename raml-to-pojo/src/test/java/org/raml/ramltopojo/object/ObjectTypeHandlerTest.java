@@ -21,6 +21,7 @@ import static org.raml.testutils.matchers.FieldSpecMatchers.fieldName;
 import static org.raml.testutils.matchers.FieldSpecMatchers.fieldType;
 import static org.raml.testutils.matchers.MethodSpecMatchers.*;
 import static org.raml.testutils.matchers.ParameterSpecMatchers.type;
+import static org.raml.testutils.matchers.TypeNameMatcher.typeName;
 import static org.raml.testutils.matchers.TypeSpecMatchers.*;
 
 /**
@@ -57,6 +58,9 @@ public class ObjectTypeHandlerTest {
                         allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get(String.class)))))),
                         allOf(methodName(equalTo("getAge")), returnType(equalTo(ClassName.INT))),
                         allOf(methodName(equalTo("setAge")), parameters(contains(type(equalTo(ClassName.INT)))))
+                )),
+                superInterfaces(contains(
+                   allOf(typeName(equalTo(ClassName.get("", "Foo"))))
                 ))
         )));
 
@@ -124,34 +128,31 @@ public class ObjectTypeHandlerTest {
             }
         }));
 
-/*
+        System.err.println(r.getInterface().toString());
+        System.err.println(r.getImplementation().toString());
+
         assertThat(r.getInterface(), is(allOf(
                 name(equalTo("Foo")),
                 methods(contains(
-                        allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get(String.class)))),
-                        allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get(String.class)))))),
-                        allOf(methodName(equalTo("getAge")), returnType(equalTo(ClassName.INT))),
-                        allOf(methodName(equalTo("setAge")), parameters(contains(type(equalTo(ClassName.INT)))))
+                        allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get("", "Composed")))),
+                        allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get("", "Composed"))))))
                 ))
         )));
 
         assertThat(r.getImplementation().get(), is(allOf(
                 name(equalTo("FooImpl")),
                 fields(contains(
-                        allOf(fieldName(equalTo("name")), fieldType(equalTo(ClassName.get(String.class)))),
-                        allOf(fieldName(equalTo("age")), fieldType(equalTo(ClassName.INT)))
+                        allOf(fieldName(equalTo("name")), fieldType(equalTo(ClassName.get("", "Composed"))))
                 )),
                 methods(contains(
-                        allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get(String.class)))),
-                        allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get(String.class)))))),
-                        allOf(methodName(equalTo("getAge")), returnType(equalTo(ClassName.INT))),
-                        allOf(methodName(equalTo("setAge")), parameters(contains(type(equalTo(ClassName.INT)))))
+                        allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get("", "Composed")))),
+                        allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get("", "Composed")))))))
                 ))
-        )));
+        ));
 
         System.err.println(r.getInterface().toString());
         System.err.println(r.getImplementation().toString());
-*/
+
     }
 
     private static ObjectTypeDeclaration findTypes(final String name, List<TypeDeclaration> types) {

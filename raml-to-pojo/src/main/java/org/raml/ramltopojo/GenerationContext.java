@@ -7,5 +7,5 @@ import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
  */
 public interface GenerationContext {
 
-    CreationResult findCreatedType(TypeDeclaration ramlType);
+    CreationResult findCreatedType(String typeName, TypeDeclaration ramlType);
 }
