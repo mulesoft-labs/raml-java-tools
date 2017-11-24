@@ -33,7 +33,7 @@ public class EnumerationTypeHandlerTest extends UnitTest {
         when(declaration.enumValues()).thenReturn(Arrays.asList("one", "two", "three"));
 
         EnumerationTypeHandler handler = new EnumerationTypeHandler(declaration);
-        CreationResult result = handler.create(new GenerationContextImpl());
+        CreationResult result = handler.create(new GenerationContextImpl(null));
 
         assertThat(result.getInterface(), allOf(
                 name(equalTo("Days")),

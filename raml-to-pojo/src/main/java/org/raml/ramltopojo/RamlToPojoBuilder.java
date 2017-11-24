@@ -29,13 +29,13 @@ public class RamlToPojoBuilder {
         return this;
     }
 
-    public RamlToPojoBuilder fetchTypesWith(TypeFetcher typeFetcher) {
+    public RamlToPojoBuilder fetchTypes(TypeFetcher typeFetcher) {
 
         this.typeFetcher = typeFetcher;
         return this;
     }
 
-    public RamlToPojoBuilder findTypesWith(TypeFinder typeFinder) {
+    public RamlToPojoBuilder findTypes(TypeFinder typeFinder) {
 
         this.typeFinder = typeFinder;
         return this;
@@ -43,7 +43,7 @@ public class RamlToPojoBuilder {
 
     public RamlToPojo build() {
 
-        return new RamlToPojoImpl(typeFinder, new GenerationContextImpl(typeFetcher, packageName));
+        return new RamlToPojoImpl(typeFinder, new GenerationContextImpl(api, typeFetcher, packageName));
     }
 
 

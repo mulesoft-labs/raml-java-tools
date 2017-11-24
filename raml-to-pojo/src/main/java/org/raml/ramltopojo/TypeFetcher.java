@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 /**
@@ -7,12 +8,5 @@ import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
  */
 public interface TypeFetcher {
 
-    TypeFetcher NULL_FETCHER = new TypeFetcher() {
-        @Override
-        public TypeDeclaration fetchType(String name) throws GenerationException {
-            throw new GenerationException("null fetcher can't fetch types");
-        }
-    };
-
-    TypeDeclaration fetchType(String name) throws GenerationException;
+    TypeDeclaration fetchType(Api api, String name) throws GenerationException;
 }

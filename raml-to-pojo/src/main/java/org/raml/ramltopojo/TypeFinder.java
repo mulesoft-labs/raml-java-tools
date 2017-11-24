@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 /**
@@ -7,5 +8,5 @@ import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
  */
 public interface TypeFinder {
 
-    Iterable<TypeDeclaration> findTypes();
+    Iterable<TypeDeclaration> findTypes(Api api);
 }

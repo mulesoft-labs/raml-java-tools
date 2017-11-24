@@ -9,7 +9,7 @@ public class RamlToPojoImpl implements RamlToPojo {
     private final TypeFinder typeFinder;
     private final GenerationContextImpl generationContext;
 
-    public RamlToPojoImpl(TypeFinder typeFinder, GenerationContextImpl generationContext) {
+    public RamlToPojoImpl( TypeFinder typeFinder, GenerationContextImpl generationContext) {
 
         this.typeFinder = typeFinder;
         this.generationContext = generationContext;
@@ -19,7 +19,7 @@ public class RamlToPojoImpl implements RamlToPojo {
     public ResultingPojos buildPojos() {
 
         ResultingPojos resultingPojos = new ResultingPojos(generationContext);
-        for (TypeDeclaration typeDeclaration : typeFinder.findTypes()) {
+        for (TypeDeclaration typeDeclaration : typeFinder.findTypes(generationContext.api())) {
 
             TypeHandler handler = TypeDeclarationType.typeHandler(typeDeclaration);
             CreationResult spec = handler.create(generationContext);

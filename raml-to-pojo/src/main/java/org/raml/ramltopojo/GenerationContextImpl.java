@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import java.io.IOException;
@@ -10,15 +11,17 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class GenerationContextImpl implements GenerationContext {
 
+    private final Api api;
     private final TypeFetcher typeFetcher;
     private final ConcurrentHashMap<String, CreationResult> knownTypes = new ConcurrentHashMap<>();
     private final String defaultPackage;
 
-    public GenerationContextImpl() {
-        this(TypeFetcher.NULL_FETCHER, "");
+    public GenerationContextImpl(Api api) {
+        this(api, TypeFetchers.NULL_FETCHER, "");
     }
 
-    public GenerationContextImpl(TypeFetcher typeFetcher, String defaultPackage) {
+    public GenerationContextImpl(Api api, TypeFetcher typeFetcher, String defaultPackage) {
+        this.api = api;
         this.typeFetcher = typeFetcher;
         this.defaultPackage = defaultPackage;
     }
@@ -31,7 +34,7 @@ public class GenerationContextImpl implements GenerationContext {
             return knownTypes.get(typeName);
         } else {
 
-            TypeDeclaration typeDeclaration = typeFetcher.fetchType(typeName);
+            TypeDeclaration typeDeclaration = typeFetcher.fetchType(api, typeName);
             CreationResult result =  TypeDeclarationType.typeHandler(typeDeclaration).create(this);
             knownTypes.put(typeName, result);
             return result;
@@ -49,5 +52,10 @@ public class GenerationContextImpl implements GenerationContext {
         for (CreationResult creationResult : knownTypes.values()) {
             creationResult.createType(rootDirectory);
         }
+    }
+
+    @Override
+    public Api api() {
+        return api;
     }
 }

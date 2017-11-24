@@ -35,7 +35,7 @@ public class ObjectTypeHandlerTest {
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("simplest-type.raml"));
         ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
 
-        CreationResult r = handler.create(new GenerationContextImpl());
+        CreationResult r = handler.create(new GenerationContextImpl(api));
 
         assertThat(r.getInterface(), is(allOf(
                 name(equalTo("Foo")),
@@ -74,7 +74,7 @@ public class ObjectTypeHandlerTest {
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("simplest-containing-simple-array.raml"));
         ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
 
-        CreationResult r = handler.create(new GenerationContextImpl());
+        CreationResult r = handler.create(new GenerationContextImpl(api));
         System.err.println(r.getInterface().toString());
         System.err.println(r.getImplementation().toString());
 
@@ -227,9 +227,9 @@ public class ObjectTypeHandlerTest {
     }
 
     protected GenerationContextImpl createGenerationContext(final Api api) {
-        return new GenerationContextImpl(new TypeFetcher() {
+        return new GenerationContextImpl(api, new TypeFetcher() {
             @Override
-            public TypeDeclaration fetchType(final String name) throws GenerationException {
+            public TypeDeclaration fetchType(Api api, final String name) throws GenerationException {
                 return FluentIterable.from(api.types()).firstMatch(new Predicate<TypeDeclaration>() {
                     @Override
                     public boolean apply(@Nullable TypeDeclaration input) {
