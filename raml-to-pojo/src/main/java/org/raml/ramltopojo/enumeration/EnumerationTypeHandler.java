@@ -45,6 +45,6 @@ public class EnumerationTypeHandler implements TypeHandler {
         }
 
 
-        return CreationResult.forEnumeration(enumBuilder.build());
+        return CreationResult.forEnumeration(generationContext.defaultPackage(), enumBuilder.build());
     }
 }

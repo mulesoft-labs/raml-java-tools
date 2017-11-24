@@ -6,11 +6,26 @@ import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
  * Created. There, you have it.
  */
 public class RamlToPojoImpl implements RamlToPojo {
-    @Override
-    public ResultingPojos buildPojos(TypeDeclaration typeDeclaration) {
+    private final TypeFinder typeFinder;
+    private final GenerationContextImpl generationContext;
 
-        TypeHandler handler = TypeDeclarationType.typeHandler(typeDeclaration);
-        CreationResult spec = handler.create(new GenerationContextImpl(TypeFetcher.NULL_FETCHER, "pojo.pack"));
-        return null;
+    public RamlToPojoImpl(TypeFinder typeFinder, GenerationContextImpl generationContext) {
+
+        this.typeFinder = typeFinder;
+        this.generationContext = generationContext;
+    }
+
+    @Override
+    public ResultingPojos buildPojos() {
+
+        ResultingPojos resultingPojos = new ResultingPojos(generationContext);
+        for (TypeDeclaration typeDeclaration : typeFinder.findTypes()) {
+
+            TypeHandler handler = TypeDeclarationType.typeHandler(typeDeclaration);
+            CreationResult spec = handler.create(generationContext);
+            resultingPojos.addNewResult(spec);
+        }
+
+        return resultingPojos;
     }
 }

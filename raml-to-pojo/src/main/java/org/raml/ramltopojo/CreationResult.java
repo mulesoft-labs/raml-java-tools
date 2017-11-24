@@ -1,8 +1,11 @@
 package org.raml.ramltopojo;
 
 import com.google.common.base.Optional;
+import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 /**
@@ -10,22 +13,24 @@ import java.util.ArrayList;
  */
 public class CreationResult {
 
+    private final String packageName;
     private final TypeSpec interf;
     private final TypeSpec impl;
 
     private final ArrayList<CreationResult> internalTypes = new ArrayList<>();
 
-    public static CreationResult forType(TypeSpec interf, TypeSpec impl) {
+    public static CreationResult forType(String packageName, TypeSpec interf, TypeSpec impl) {
 
-        return new CreationResult(interf, impl);
+        return new CreationResult(packageName, interf, impl);
     }
 
-    public static CreationResult forEnumeration(TypeSpec enumeration) {
+    public static CreationResult forEnumeration(String packageName, TypeSpec enumeration) {
 
-        return new CreationResult(enumeration, null);
+        return new CreationResult(packageName, enumeration, null);
     }
 
-    private CreationResult(TypeSpec interf, TypeSpec impl) {
+    private CreationResult(String packageName, TypeSpec interf, TypeSpec impl) {
+        this.packageName = packageName;
         this.interf = interf;
         this.impl = impl;
     }
@@ -41,5 +46,14 @@ public class CreationResult {
 
     public Optional<TypeSpec> getImplementation() {
         return Optional.fromNullable(impl);
+    }
+
+    public void createType(String rootDirectory) throws IOException {
+
+        JavaFile.builder(packageName, interf).skipJavaLangImports(true).build().writeTo(Paths.get(rootDirectory));
+        if ( impl != null ) {
+
+            JavaFile.builder(packageName, impl).skipJavaLangImports(true).build().writeTo(Paths.get(rootDirectory));
+        }
     }
 }

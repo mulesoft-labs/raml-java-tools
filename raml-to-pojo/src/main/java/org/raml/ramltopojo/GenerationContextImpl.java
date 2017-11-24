@@ -2,6 +2,7 @@ package org.raml.ramltopojo;
 
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
+import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -40,5 +41,13 @@ public class GenerationContextImpl implements GenerationContext {
     @Override
     public String defaultPackage() {
         return defaultPackage;
+    }
+
+    @Override
+    public void createTypes(String rootDirectory) throws IOException {
+
+        for (CreationResult creationResult : knownTypes.values()) {
+            creationResult.createType(rootDirectory);
+        }
     }
 }

@@ -26,7 +26,7 @@ public class ObjectTypeHandler implements TypeHandler {
         TypeSpec interfaceSpec = createInterface(generationContext);
         TypeSpec implementationSpec = createImplementation(interfaceSpec, generationContext);
 
-        return CreationResult.forType(interfaceSpec, implementationSpec);
+        return CreationResult.forType(generationContext.defaultPackage(), interfaceSpec, implementationSpec);
     }
 
     private TypeSpec createImplementation(TypeSpec interfaceSpec, GenerationContext generationContext) {
