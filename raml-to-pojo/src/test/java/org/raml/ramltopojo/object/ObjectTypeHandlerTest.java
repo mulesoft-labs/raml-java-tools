@@ -126,7 +126,7 @@ public class ObjectTypeHandlerTest {
                     }
                 });
             }
-        }));
+        }, "pojo.pack"));
 
         System.err.println(r.getInterface().toString());
         System.err.println(r.getImplementation().toString());
@@ -149,10 +149,6 @@ public class ObjectTypeHandlerTest {
                         allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get("", "Composed")))))))
                 ))
         ));
-
-        System.err.println(r.getInterface().toString());
-        System.err.println(r.getImplementation().toString());
-
     }
 
     private static ObjectTypeDeclaration findTypes(final String name, List<TypeDeclaration> types) {

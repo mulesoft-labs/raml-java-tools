@@ -31,7 +31,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
     private TypeSpec createImplementation(TypeSpec interfaceSpec, GenerationContext generationContext) {
 
-        ClassName className = ClassName.get("", Names.typeName(objectTypeDeclaration.name(), "Impl"));
+        ClassName className = ClassName.get(generationContext.defaultPackage(), Names.typeName(objectTypeDeclaration.name(), "Impl"));
         TypeSpec.Builder typeSpec = TypeSpec
                 .classBuilder(className)
                 .addSuperinterface(ClassName.bestGuess(interfaceSpec.name))
@@ -61,7 +61,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
     private TypeSpec createInterface(GenerationContext generationContext) {
 
-        ClassName interf = ClassName.get("", Names.typeName(objectTypeDeclaration.name()));
+        ClassName interf = ClassName.get(generationContext.defaultPackage(), Names.typeName(objectTypeDeclaration.name()));
         TypeSpec.Builder typeSpec = TypeSpec
                 .interfaceBuilder(interf)
                 .addModifiers(Modifier.PUBLIC);
@@ -99,7 +99,6 @@ public class ObjectTypeHandler implements TypeHandler {
 
 //        buildPropertiesForInterface(context, objectType, properties, typeSpec);
         return typeSpec.build();
-
     }
 
     private TypeName findType(String typeName, TypeDeclaration type, GenerationContext generationContext) {

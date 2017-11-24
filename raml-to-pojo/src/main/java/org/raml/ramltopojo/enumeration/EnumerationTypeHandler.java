@@ -6,6 +6,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.CreationResult;
 import org.raml.ramltopojo.GenerationContext;
+import org.raml.ramltopojo.Names;
 import org.raml.ramltopojo.TypeHandler;
 import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
 
@@ -28,7 +29,7 @@ public class EnumerationTypeHandler implements TypeHandler {
 
         FieldSpec.Builder field = FieldSpec.builder(ClassName.get(String.class), "name").addModifiers(Modifier.PRIVATE);
 
-        TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder(typeDeclaration.name())
+        TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder(ClassName.get(generationContext.defaultPackage(), Names.typeName(typeDeclaration.name())))
                 .addField(field.build())
                 .addModifiers(Modifier.PUBLIC)
                 .addMethod(

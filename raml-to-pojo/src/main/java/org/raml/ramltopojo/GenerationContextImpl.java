@@ -11,13 +11,15 @@ public class GenerationContextImpl implements GenerationContext {
 
     private final TypeFetcher typeFetcher;
     private final ConcurrentHashMap<String, CreationResult> knownTypes = new ConcurrentHashMap<>();
+    private final String defaultPackage;
 
     public GenerationContextImpl() {
-        this(TypeFetcher.NULL_FETCHER);
+        this(TypeFetcher.NULL_FETCHER, "");
     }
 
-    public GenerationContextImpl(TypeFetcher typeFetcher) {
+    public GenerationContextImpl(TypeFetcher typeFetcher, String defaultPackage) {
         this.typeFetcher = typeFetcher;
+        this.defaultPackage = defaultPackage;
     }
 
     @Override
@@ -33,5 +35,10 @@ public class GenerationContextImpl implements GenerationContext {
             knownTypes.put(typeName, result);
             return result;
         }
+    }
+
+    @Override
+    public String defaultPackage() {
+        return defaultPackage;
     }
 }
