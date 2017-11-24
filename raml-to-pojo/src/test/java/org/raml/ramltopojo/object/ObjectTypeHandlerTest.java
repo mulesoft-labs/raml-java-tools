@@ -54,8 +54,8 @@ public class ObjectTypeHandlerTest {
                         allOf(fieldName(equalTo("age")), fieldType(equalTo(ClassName.INT)))
                 )),
                 methods(contains(
-                        allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get(String.class)))),
-                        allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get(String.class)))))),
+                        allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get(String.class))), codeContent(equalTo("return this.name;\n"))),
+                        allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get(String.class))))), codeContent(equalTo("this.name = name;\n"))),
                         allOf(methodName(equalTo("getAge")), returnType(equalTo(ClassName.INT))),
                         allOf(methodName(equalTo("setAge")), parameters(contains(type(equalTo(ClassName.INT)))))
                 )),

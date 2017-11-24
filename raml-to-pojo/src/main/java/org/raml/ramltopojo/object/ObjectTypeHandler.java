@@ -35,7 +35,7 @@ public class ObjectTypeHandler implements TypeHandler {
         TypeSpec.Builder typeSpec = TypeSpec
                 .classBuilder(className)
                 .addSuperinterface(ClassName.bestGuess(interfaceSpec.name))
-                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT);
+                .addModifiers(Modifier.PUBLIC);
 
         for (TypeDeclaration declaration : objectTypeDeclaration.properties()) {
 
@@ -45,11 +45,13 @@ public class ObjectTypeHandler implements TypeHandler {
             typeSpec.addField(field.build());
 
             MethodSpec.Builder getter = MethodSpec.methodBuilder(Names.methodName("get", declaration.name()))
-                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                    .addModifiers(Modifier.PUBLIC)
+                    .addCode(CodeBlock.builder().addStatement("return this." + Names.variableName(declaration.name())).build())
                     .returns(tn);
 
             MethodSpec.Builder setter = MethodSpec.methodBuilder(Names.methodName("set", declaration.name()))
-                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                    .addModifiers(Modifier.PUBLIC)
+                    .addCode(CodeBlock.builder().addStatement("this." + Names.variableName(declaration.name()) + " = " + Names.variableName(declaration.name())).build())
                     .addParameter(tn, Names.variableName(declaration.name()));
 
             typeSpec.addMethod(getter.build());
