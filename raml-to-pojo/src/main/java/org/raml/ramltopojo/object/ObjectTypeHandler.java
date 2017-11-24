@@ -66,6 +66,23 @@ public class ObjectTypeHandler implements TypeHandler {
                 .interfaceBuilder(interf)
                 .addModifiers(Modifier.PUBLIC);
 
+        for (TypeDeclaration typeDeclaration : objectTypeDeclaration.parentTypes()) {
+
+            if (typeDeclaration instanceof ObjectTypeDeclaration) {
+
+                if (typeDeclaration.name().equals("object")) {
+                    continue;
+                }
+
+                TypeName inherits = findType(typeDeclaration.name(), typeDeclaration, generationContext);
+                typeSpec.addSuperinterface(inherits);
+            } else {
+
+                throw new GenerationException("ramltopojo does not support inheriting from "
+                        + Utils.declarationType(typeDeclaration) + " name: " + typeDeclaration.name() + " and " + typeDeclaration.type());
+            }
+        }
+
         for (TypeDeclaration declaration : objectTypeDeclaration.properties()) {
 
             TypeName tn = findType(declaration.type(), declaration, generationContext);
@@ -80,18 +97,6 @@ public class ObjectTypeHandler implements TypeHandler {
             typeSpec.addMethod(getter.build());
             typeSpec.addMethod(setter.build());
         }
-
-/*
-        for (GType parentType : parentTypes) {
-
-            if ("object".equals(parentType.name())) {
-
-                continue;
-            }
-
-            typeSpec.addSuperinterface(parentType.defaultJavaTypeName(context.getModelPackage()));
-        }
-*/
 
         if (typeSpec == null) {
             return null;

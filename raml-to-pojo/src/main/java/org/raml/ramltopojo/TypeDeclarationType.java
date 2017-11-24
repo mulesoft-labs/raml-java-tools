@@ -235,14 +235,14 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
 
     public static TypeHandler typeHandler(TypeDeclaration typeDeclaration) {
 
-        TypeDeclarationType typeDeclarationType = scalarToType.get(typeDeclaration.getClass().getInterfaces()[0]);
+        TypeDeclarationType typeDeclarationType = scalarToType.get(Utils.declarationType(typeDeclaration));
 
         return typeDeclarationType.create(typeDeclarationType, typeDeclaration);
     }
 
     public static TypeName javaType(String typeName, TypeDeclaration typeDeclaration, GenerationContext generationContext) {
 
-        return scalarToType.get(typeDeclaration.getClass().getInterfaces()[0]).asJavaPoetType(typeName, typeDeclaration, generationContext);
+        return scalarToType.get(Utils.declarationType(typeDeclaration)).asJavaPoetType(typeName, typeDeclaration, generationContext);
     }
 
 }

@@ -50,8 +50,8 @@ public class ObjectTypeHandlerTest {
         assertThat(r.getImplementation().get(), is(allOf(
                 name(equalTo("FooImpl")),
                 fields(contains(
-                   allOf(fieldName(equalTo("name")), fieldType(equalTo(ClassName.get(String.class)))),
-                   allOf(fieldName(equalTo("age")), fieldType(equalTo(ClassName.INT)))
+                        allOf(fieldName(equalTo("name")), fieldType(equalTo(ClassName.get(String.class)))),
+                        allOf(fieldName(equalTo("age")), fieldType(equalTo(ClassName.INT)))
                 )),
                 methods(contains(
                         allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get(String.class)))),
@@ -60,7 +60,7 @@ public class ObjectTypeHandlerTest {
                         allOf(methodName(equalTo("setAge")), parameters(contains(type(equalTo(ClassName.INT)))))
                 )),
                 superInterfaces(contains(
-                   allOf(typeName(equalTo(ClassName.get("", "Foo"))))
+                        allOf(typeName(equalTo(ClassName.get("", "Foo"))))
                 ))
         )));
 
@@ -89,7 +89,6 @@ public class ObjectTypeHandlerTest {
         )));
 
 
-
         assertThat(r.getImplementation().get(), is(allOf(
                 name(equalTo("FooImpl")),
                 fields(contains(
@@ -111,22 +110,7 @@ public class ObjectTypeHandlerTest {
         final Api api = RamlLoader.load(this.getClass().getResourceAsStream("using-composed-type.raml"));
         ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
 
-        CreationResult r = handler.create(new GenerationContextImpl(new TypeFetcher() {
-            @Override
-            public TypeDeclaration fetchType(final String name) throws GenerationException {
-                return FluentIterable.from(api.types()).firstMatch(new Predicate<TypeDeclaration>() {
-                    @Override
-                    public boolean apply(@Nullable TypeDeclaration input) {
-                        return input.name().equals(name);
-                    }
-                }).or(new Supplier<TypeDeclaration>() {
-                    @Override
-                    public TypeDeclaration get() {
-                        throw new GenerationException("type " + name + " not found");
-                    }
-                });
-            }
-        }, "pojo.pack"));
+        CreationResult r = handler.create(createGenerationContext(api));
 
         System.err.println(r.getInterface().toString());
         System.err.println(r.getImplementation().toString());
@@ -150,6 +134,117 @@ public class ObjectTypeHandlerTest {
                 ))
         ));
     }
+
+    @Test
+    public void simpleInheritance() throws Exception {
+
+        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inherited-type.raml"));
+        ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
+
+        CreationResult r = handler.create(createGenerationContext(api));
+
+        System.err.println(r.getInterface().toString());
+        System.err.println(r.getImplementation().toString());
+
+        assertThat(r.getInterface(), is(allOf(
+                name(equalTo("Foo")),
+                methods(containsInAnyOrder(
+                        allOf(methodName(equalTo("getAge")), returnType(equalTo(ClassName.INT))),
+                        allOf(methodName(equalTo("setAge")), parameters(contains(type(equalTo(ClassName.INT))))),
+                        allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get(String.class)))),
+                        allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get(String.class))))))
+                )),
+                superInterfaces(contains(
+                        allOf(typeName(equalTo(ClassName.get("", "Inherited"))))
+
+                )))));
+
+        assertThat(r.getImplementation().get(), is(allOf(
+                name(equalTo("FooImpl")),
+                fields(containsInAnyOrder(
+                        allOf(fieldName(equalTo("name")), fieldType(equalTo(ClassName.get(String.class)))),
+                        allOf(fieldName(equalTo("age")), fieldType(equalTo(ClassName.INT)))
+                )),
+                methods(containsInAnyOrder(
+                        allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get(String.class)))),
+                        allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get(String.class)))))),
+                        allOf(methodName(equalTo("getAge")), returnType(equalTo(ClassName.INT))),
+                        allOf(methodName(equalTo("setAge")), parameters(contains(type(equalTo(ClassName.INT)))))
+                )),
+                superInterfaces(contains(
+                        allOf(typeName(equalTo(ClassName.get("", "Foo"))))
+                ))
+        )));
+    }
+
+    @Test
+    public void multipleInheritance() throws Exception {
+
+        Api api = RamlLoader.load(this.getClass().getResourceAsStream("multiple-inheritance-type.raml"));
+        ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
+
+        CreationResult r = handler.create(createGenerationContext(api));
+
+        System.err.println(r.getInterface().toString());
+        System.err.println(r.getImplementation().toString());
+
+        assertThat(r.getInterface(), is(allOf(
+                name(equalTo("Foo")),
+                methods(containsInAnyOrder(
+                        allOf(methodName(equalTo("getLeft")), returnType(equalTo(ClassName.get(String.class)))),
+                        allOf(methodName(equalTo("setLeft")), parameters(contains(type(equalTo(ClassName.get(String.class)))))),
+                        allOf(methodName(equalTo("getRight")), returnType(equalTo(ClassName.get(String.class)))),
+                        allOf(methodName(equalTo("setRight")), parameters(contains(type(equalTo(ClassName.get(String.class)))))),
+                        allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get(String.class)))),
+                        allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get(String.class))))))
+                )),
+                superInterfaces(contains(
+                                typeName(equalTo(ClassName.get("", "Once"))),
+                                typeName(equalTo(ClassName.get("", "Twice")))
+                        )
+
+                ))));
+
+        assertThat(r.getImplementation().get(), is(allOf(
+                name(equalTo("FooImpl")),
+                fields(containsInAnyOrder(
+                        allOf(fieldName(equalTo("left")), fieldType(equalTo(ClassName.get(String.class)))),
+                        allOf(fieldName(equalTo("right")), fieldType(equalTo(ClassName.get(String.class)))),
+                        allOf(fieldName(equalTo("name")), fieldType(equalTo(ClassName.get(String.class))))
+                )),
+                methods(containsInAnyOrder(
+                        allOf(methodName(equalTo("getLeft")), returnType(equalTo(ClassName.get(String.class)))),
+                        allOf(methodName(equalTo("setLeft")), parameters(contains(type(equalTo(ClassName.get(String.class)))))),
+                        allOf(methodName(equalTo("getRight")), returnType(equalTo(ClassName.get(String.class)))),
+                        allOf(methodName(equalTo("setRight")), parameters(contains(type(equalTo(ClassName.get(String.class)))))),
+                        allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get(String.class)))),
+                        allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get(String.class))))))
+                )),
+                superInterfaces(contains(
+                        allOf(typeName(equalTo(ClassName.get("", "Foo"))))
+                ))
+        )));
+    }
+
+    protected GenerationContextImpl createGenerationContext(final Api api) {
+        return new GenerationContextImpl(new TypeFetcher() {
+            @Override
+            public TypeDeclaration fetchType(final String name) throws GenerationException {
+                return FluentIterable.from(api.types()).firstMatch(new Predicate<TypeDeclaration>() {
+                    @Override
+                    public boolean apply(@Nullable TypeDeclaration input) {
+                        return input.name().equals(name);
+                    }
+                }).or(new Supplier<TypeDeclaration>() {
+                    @Override
+                    public TypeDeclaration get() {
+                        throw new GenerationException("type " + name + " not found");
+                    }
+                });
+            }
+        }, "pojo.pack");
+    }
+
 
     private static ObjectTypeDeclaration findTypes(final String name, List<TypeDeclaration> types) {
         return (ObjectTypeDeclaration) FluentIterable.from(types).firstMatch(new Predicate<TypeDeclaration>() {
