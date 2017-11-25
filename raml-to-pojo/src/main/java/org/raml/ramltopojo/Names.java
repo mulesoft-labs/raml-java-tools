@@ -43,7 +43,6 @@ import static org.apache.commons.lang.math.NumberUtils.isDigits;
  */
 public class Names {
 
-  private static final String PATH_REPLACEMENT_TEMPLATE = "\\{[^}]+}";
   private static Pattern LEADING_UNDERSCORES = Pattern.compile("^_+");
 
   public static String typeName(String... name) {

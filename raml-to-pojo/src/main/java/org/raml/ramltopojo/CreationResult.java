@@ -29,7 +29,7 @@ public class CreationResult {
         return new CreationResult(packageName, enumeration, null);
     }
 
-    private CreationResult(String packageName, TypeSpec interf, TypeSpec impl) {
+    CreationResult(String packageName, TypeSpec interf, TypeSpec impl) {
         this.packageName = packageName;
         this.interf = interf;
         this.impl = impl;
@@ -50,10 +50,14 @@ public class CreationResult {
 
     public void createType(String rootDirectory) throws IOException {
 
-        JavaFile.builder(packageName, interf).skipJavaLangImports(true).build().writeTo(Paths.get(rootDirectory));
+        createJavaFile(packageName, interf, rootDirectory);
         if ( impl != null ) {
 
-            JavaFile.builder(packageName, impl).skipJavaLangImports(true).build().writeTo(Paths.get(rootDirectory));
+            createJavaFile(packageName, impl, rootDirectory);
         }
+    }
+
+    protected void createJavaFile(String packageName, TypeSpec typeSpec, String rootDirectory   ) throws IOException {
+        JavaFile.builder(packageName, typeSpec).skipJavaLangImports(true).build().writeTo(Paths.get(rootDirectory));
     }
 }
