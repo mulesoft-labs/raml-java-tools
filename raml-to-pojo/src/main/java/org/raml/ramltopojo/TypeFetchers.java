@@ -5,14 +5,11 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 import com.google.common.collect.FluentIterable;
 import org.raml.v2.api.model.v10.api.Api;
-import org.raml.v2.api.model.v10.api.Library;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Created. There, you have it.
@@ -64,7 +61,7 @@ public class TypeFetchers {
 
             @Override
             public TypeDeclaration fetchType(Api api, final String name) throws GenerationException {
-                return FluentIterable.from(Optional.fromNullable(foundInApi).or(goThroughLibraries(new ArrayList<TypeDeclaration>(), new HashSet<String>(), api.uses())))
+                return FluentIterable.from(Optional.fromNullable(foundInApi).or(Utils.goThroughLibraries(new ArrayList<TypeDeclaration>(), new HashSet<String>(), api.uses())))
                         .firstMatch(new Predicate<TypeDeclaration>() {
                             @Override
                             public boolean apply(@Nullable TypeDeclaration input) {
@@ -82,7 +79,7 @@ public class TypeFetchers {
 
             @Override
             public TypeDeclaration fetchType(Api api, final String name) throws GenerationException {
-                return FluentIterable.from(Optional.fromNullable(foundInApi).or(FluentIterable.from(api.types()).append(goThroughLibraries(new ArrayList<TypeDeclaration>(), new HashSet<String>(), api.uses()))))
+                return FluentIterable.from(Optional.fromNullable(foundInApi).or(FluentIterable.from(api.types()).append(Utils.goThroughLibraries(new ArrayList<TypeDeclaration>(), new HashSet<String>(), api.uses()))))
                         .firstMatch(new Predicate<TypeDeclaration>() {
                             @Override
                             public boolean apply(@Nullable TypeDeclaration input) {
@@ -94,24 +91,5 @@ public class TypeFetchers {
         };
     }
 
-    private static List<TypeDeclaration> goThroughLibraries(List<TypeDeclaration> foundTypes, Set<String> visitedLibraries, List<Library> libraries) {
-
-
-        for (Library library : libraries) {
-            if (visitedLibraries.contains(library.name())) {
-
-                continue;
-            } else {
-
-                visitedLibraries.add(library.name());
-            }
-
-            goThroughLibraries(foundTypes, visitedLibraries, library.uses());
-
-            foundTypes.addAll(library.types());
-        }
-
-        return foundTypes;
-    }
 
 }
