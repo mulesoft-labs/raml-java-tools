@@ -30,7 +30,7 @@ import static org.raml.testutils.matchers.TypeSpecMatchers.*;
  */
 public class UnionTypeHandlerTest {
     @Test
-    public void create() throws Exception {
+    public void simpleUnion() throws Exception {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("union-type.raml"));
         UnionTypeHandler handler = new UnionTypeHandler(findTypes("foo", api.types()));
@@ -73,6 +73,52 @@ public class UnionTypeHandlerTest {
         )));
     }
 
+
+    @Test
+    public void primitiveUnion() throws Exception {
+
+        Api api = RamlLoader.load(this.getClass().getResourceAsStream("union-primitive-type.raml"));
+        UnionTypeHandler handler = new UnionTypeHandler(findTypes("foo", api.types()));
+
+        CreationResult r = handler.create(new GenerationContextImpl(api, TypeFetchers.fromTypes(), "bar.pack"));
+
+        assertThat(r.getInterface(), is(allOf(
+                name(equalTo("Foo")),
+                methods(contains(
+                        allOf(methodName(equalTo("getInteger")), returnType(equalTo(ClassName.get(Integer.class)))),
+                        allOf(methodName(equalTo("isInteger")), returnType(equalTo(ClassName.get(Boolean.class).unbox()))),
+                        allOf(methodName(equalTo("getSecond")), returnType(equalTo(ClassName.get("", "Second")))),
+                        allOf(methodName(equalTo("isSecond")), returnType(equalTo(ClassName.get(Boolean.class).unbox())))
+                ))
+        )));
+
+
+        System.err.println(r.getInterface().toString());
+        System.err.println(r.getImplementation().toString());
+
+
+        assertThat(r.getImplementation().get(), is(allOf(
+                name(equalTo("FooImpl")),
+                fields(contains(
+                        allOf(fieldName(equalTo("anyType")), fieldType(equalTo(ClassName.get(Object.class))))
+                )),
+                methods(contains(
+                        allOf(methodName(equalTo("<init>"))),
+                        allOf(methodName(equalTo("<init>")), parameters(contains(type(equalTo(ClassName.get(Integer.class)))))),
+                        allOf(methodName(equalTo("getInteger")), returnType(equalTo(ClassName.get(Integer.class))), codeContent(equalTo(
+                                "if ( !(anyType instanceof  java.lang.Integer)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: java.lang.Integer\");\nreturn (java.lang.Integer) anyType;\n"))),
+                        allOf(methodName(equalTo("isInteger")), returnType(equalTo(ClassName.get(Boolean.class).unbox())), codeContent(equalTo("return anyType instanceof java.lang.Integer;\n"))),
+                        allOf(methodName(equalTo("<init>")), parameters(contains(type(equalTo(ClassName.get("", "Second")))))),
+                        allOf(methodName(equalTo("getSecond")), returnType(equalTo(ClassName.get("", "Second"))), codeContent(equalTo(
+                                "if ( !(anyType instanceof  Second)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: Second\");\nreturn (Second) anyType;\n"))),
+                        allOf(methodName(equalTo("isSecond")), returnType(equalTo(ClassName.get(Boolean.class).unbox())), codeContent(equalTo("return anyType instanceof Second;\n")))
+                )),
+                superInterfaces(contains(
+                        allOf(typeName(equalTo(ClassName.get("bar.pack", "Foo"))))
+                ))
+        )));
+
+    }
 
     private static UnionTypeDeclaration findTypes(final String name, List<TypeDeclaration> types) {
         return (UnionTypeDeclaration) FluentIterable.from(types).firstMatch(new Predicate<TypeDeclaration>() {

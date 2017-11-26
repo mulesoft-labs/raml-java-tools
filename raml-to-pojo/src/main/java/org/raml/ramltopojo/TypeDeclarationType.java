@@ -21,7 +21,7 @@ import java.util.Map;
 public enum TypeDeclarationType implements TypeHandlerFactory {
 
     /*
-     private static Map<Class, Class<?>> scalarToType = ImmutableMap.<Class, Class<?>>builder()
+     private static Map<Class, Class<?>> ramlToType = ImmutableMap.<Class, Class<?>>builder()
       .put(IntegerTypeDeclaration.class, int.class)
       .put(BooleanTypeDeclaration.class, boolean.class)
       .put(DateTimeOnlyTypeDeclaration.class, Date.class)
@@ -219,7 +219,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
 
     public abstract TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext);
 
-    private static Map<Class, TypeDeclarationType> scalarToType = ImmutableMap.<Class, TypeDeclarationType>builder()
+    private static Map<Class, TypeDeclarationType> ramlToType = ImmutableMap.<Class, TypeDeclarationType>builder()
             .put(ObjectTypeDeclaration.class, OBJECT)
             .put(ArrayTypeDeclaration.class, ARRAY)
             .put(UnionTypeDeclaration.class, UNION)
@@ -237,14 +237,14 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
 
     public static TypeHandler typeHandler(TypeDeclaration typeDeclaration) {
 
-        TypeDeclarationType typeDeclarationType = scalarToType.get(Utils.declarationType(typeDeclaration));
+        TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
 
         return typeDeclarationType.create(typeDeclarationType, typeDeclaration);
     }
 
     public static TypeName javaType(String typeName, TypeDeclaration typeDeclaration, GenerationContext generationContext) {
 
-        return scalarToType.get(Utils.declarationType(typeDeclaration)).asJavaPoetType(typeName, typeDeclaration, generationContext);
+        return ramlToType.get(Utils.declarationType(typeDeclaration)).asJavaPoetType(typeName, typeDeclaration, generationContext);
     }
 
 }

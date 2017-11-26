@@ -43,7 +43,7 @@ public class UnionTypeHandler implements TypeHandler {
 
         for (TypeDeclaration unitedType : union.of()) {
 
-            TypeName typeName = findType(unitedType.name(), unitedType, generationContext);
+            ClassName typeName = (ClassName) findType(unitedType.name(), unitedType, generationContext).box();
 
             String fieldName = Names.methodName(unitedType.name());
             typeSpec
@@ -54,15 +54,15 @@ public class UnionTypeHandler implements TypeHandler {
                                     .build())
                     .addMethod(
                             MethodSpec
-                                    .methodBuilder(Names.methodName("get", unitedType.name()))
+                                    .methodBuilder(Names.methodName("get", typeName.simpleName()))
                                     .addModifiers(Modifier.PUBLIC)
                                     .returns(typeName)
                                     .addStatement(
-                                            "if ( !(anyType instanceof  $T)) throw new $T(\"fetching wrong type out of the union: $T\")",
+                                            "if ( !(anyType instanceof  $T)) throw new $T(\"fetching wrong type out of the union: $L\")",
                                             typeName, IllegalStateException.class, typeName)
                                     .addStatement("return ($T) anyType", typeName).build())
                     .addMethod(
-                            MethodSpec.methodBuilder(Names.methodName("is", unitedType.name()))
+                            MethodSpec.methodBuilder(Names.methodName("is", typeName.simpleName()))
                                     .addStatement("return anyType instanceof $T", typeName)
                                     .addModifiers(Modifier.PUBLIC)
                                     .returns(TypeName.BOOLEAN).build()
@@ -76,16 +76,15 @@ public class UnionTypeHandler implements TypeHandler {
 
         for (TypeDeclaration unitedType : union.of()) {
 
-            TypeName typeName = findType(unitedType.name(), unitedType, generationContext);
-
+            ClassName typeName = (ClassName) findType(unitedType.name(), unitedType, generationContext).box();
             typeSpec
                     .addMethod(
                             MethodSpec
-                                    .methodBuilder(Names.methodName("get", unitedType.name()))
+                                    .methodBuilder(Names.methodName("get", typeName.simpleName()))
                                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                                     .returns(typeName).build())
                     .addMethod(
-                            MethodSpec.methodBuilder(Names.methodName("is", unitedType.name()))
+                            MethodSpec.methodBuilder(Names.methodName("is", typeName.simpleName()))
                                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                                     .returns(TypeName.BOOLEAN).build()
                     );

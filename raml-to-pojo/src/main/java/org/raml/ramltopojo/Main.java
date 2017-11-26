@@ -5,7 +5,7 @@ import org.raml.v2.api.RamlModelResult;
 import org.raml.v2.api.model.common.ValidationResult;
 import org.raml.v2.api.model.v10.api.Api;
 
-import java.io.InputStreamReader;
+import java.io.FileReader;
 
 import static org.raml.ramltopojo.TypeFetchers.fromAnywhere;
 import static org.raml.ramltopojo.TypeFinders.everyWhere;
@@ -19,7 +19,8 @@ public class Main {
 
         RamlModelResult ramlModelResult =
                 new RamlModelBuilder().buildApi(
-                        new InputStreamReader(Main.class.getResourceAsStream("/simple-api.raml")), ".");
+                        new FileReader("/Users/jpbelang/IdeaProjects/raml-java-tools/raml-to-pojo/src/test/resources/org/raml/ramltopojo/union/union-primitive-type.raml"),
+                        ".");
         if (ramlModelResult.hasErrors()) {
             for (ValidationResult validationResult : ramlModelResult.getValidationResults()) {
                 System.err.println(validationResult.getMessage());
@@ -33,6 +34,6 @@ public class Main {
                 .fetchTypes(fromAnywhere())
                 .findTypes(everyWhere()).build();
 
-        ramlToPojo.buildPojos().createAllTypes("/tmp/foo");
+        ramlToPojo.buildPojos().createAllTypes("/Users/jpbelang/IdeaProjects/raml-java-tools/garbage/src/main/java");
     }
 }
