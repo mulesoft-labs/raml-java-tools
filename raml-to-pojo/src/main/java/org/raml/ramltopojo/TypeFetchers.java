@@ -33,12 +33,7 @@ public class TypeFetchers {
             public TypeDeclaration fetchType(Api api, final String name) throws GenerationException {
 
                 return FluentIterable.from(Optional.fromNullable(foundInApi).or(api.types()))
-                        .firstMatch(new Predicate<TypeDeclaration>() {
-                            @Override
-                            public boolean apply(@Nullable TypeDeclaration input) {
-                                return name.equals(input.name());
-                            }
-                        }).or(fail(name));
+                        .firstMatch(namedPredicate(name)).or(fail(name));
             }
 
         };
@@ -62,12 +57,7 @@ public class TypeFetchers {
             @Override
             public TypeDeclaration fetchType(Api api, final String name) throws GenerationException {
                 return FluentIterable.from(Optional.fromNullable(foundInApi).or(Utils.goThroughLibraries(new ArrayList<TypeDeclaration>(), new HashSet<String>(), api.uses())))
-                        .firstMatch(new Predicate<TypeDeclaration>() {
-                            @Override
-                            public boolean apply(@Nullable TypeDeclaration input) {
-                                return name.equals(input.name());
-                            }
-                        }).or(fail(name));
+                        .firstMatch(namedPredicate(name)).or(fail(name));
             }
         };
     }
@@ -80,14 +70,18 @@ public class TypeFetchers {
             @Override
             public TypeDeclaration fetchType(Api api, final String name) throws GenerationException {
                 return FluentIterable.from(Optional.fromNullable(foundInApi).or(FluentIterable.from(api.types()).append(Utils.goThroughLibraries(new ArrayList<TypeDeclaration>(), new HashSet<String>(), api.uses()))))
-                        .firstMatch(new Predicate<TypeDeclaration>() {
-                            @Override
-                            public boolean apply(@Nullable TypeDeclaration input) {
-                                return name.equals(input.name());
-                            }
-                        }).or(fail(name));
+                        .firstMatch(namedPredicate(name)).or(fail(name));
             }
 
+        };
+    }
+
+    protected static Predicate<TypeDeclaration> namedPredicate(final String name) {
+        return new Predicate<TypeDeclaration>() {
+            @Override
+            public boolean apply(@Nullable TypeDeclaration input) {
+                return name.equals(input.name());
+            }
         };
     }
 
