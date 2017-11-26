@@ -6,6 +6,7 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.enumeration.EnumerationTypeHandler;
 import org.raml.ramltopojo.object.ObjectTypeHandler;
+import org.raml.ramltopojo.union.UnionTypeHandler;
 import org.raml.v2.api.model.v10.datamodel.*;
 
 import java.io.File;
@@ -88,7 +89,8 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
     UNION {
         @Override
         public TypeHandler create(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
+
+            return new UnionTypeHandler((UnionTypeDeclaration) typeDeclaration);
         }
 
         @Override
