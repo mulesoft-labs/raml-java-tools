@@ -17,8 +17,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.raml.testutils.matchers.FieldSpecMatchers.fieldName;
-import static org.raml.testutils.matchers.FieldSpecMatchers.fieldType;
+import static org.raml.testutils.matchers.FieldSpecMatchers.*;
 import static org.raml.testutils.matchers.MethodSpecMatchers.*;
 import static org.raml.testutils.matchers.ParameterSpecMatchers.type;
 import static org.raml.testutils.matchers.TypeNameMatcher.typeName;
@@ -175,6 +174,53 @@ public class ObjectTypeHandlerTest {
                         allOf(typeName(equalTo(ClassName.get("", "Foo"))))
                 ))
         )));
+    }
+
+    @Test
+    public void inheritanceWithDiscriminator() throws Exception {
+
+        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inheritance-with-discriminator-type.raml"));
+        ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
+
+        CreationResult r = handler.create(createGenerationContext(api));
+
+        System.err.println(r.getInterface().toString());
+        System.err.println(r.getImplementation().toString());
+
+
+        assertThat(r.getInterface(), is(allOf(
+                name(equalTo("Foo")),
+                methods(containsInAnyOrder(
+                        allOf(methodName(equalTo("getKind")), returnType(equalTo(ClassName.get(String.class)))),
+                        allOf(methodName(equalTo("getRight")), returnType(equalTo(ClassName.get(String.class)))),
+                        allOf(methodName(equalTo("setRight")), parameters(contains(type(equalTo(ClassName.get(String.class)))))),
+                        allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get(String.class)))),
+                        allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get(String.class))))))
+                )),
+                superInterfaces(contains(
+                        allOf(typeName(equalTo(ClassName.get("", "Once"))))
+
+                )))));
+
+        assertThat(r.getImplementation().get(), is(allOf(
+                name(equalTo("FooImpl")),
+                fields(containsInAnyOrder(
+                        allOf(fieldName(equalTo("kind")), fieldType(equalTo(ClassName.get(String.class))), initializer(equalTo("\"foo\""))),
+                        allOf(fieldName(equalTo("right")), fieldType(equalTo(ClassName.get(String.class)))),
+                        allOf(fieldName(equalTo("name")), fieldType(equalTo(ClassName.get(String.class))))
+                )),
+                methods(containsInAnyOrder(
+                        allOf(methodName(equalTo("getKind")), returnType(equalTo(ClassName.get(String.class)))),
+                        allOf(methodName(equalTo("getRight")), returnType(equalTo(ClassName.get(String.class)))),
+                        allOf(methodName(equalTo("setRight")), parameters(contains(type(equalTo(ClassName.get(String.class)))))),
+                        allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get(String.class)))),
+                        allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get(String.class))))))
+                )),
+                superInterfaces(contains(
+                        allOf(typeName(equalTo(ClassName.get("", "Foo"))))
+                ))
+        )));
+
     }
 
     @Test

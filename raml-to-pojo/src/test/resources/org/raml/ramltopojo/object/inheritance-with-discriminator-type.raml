@@ -4,13 +4,12 @@ version: v1
 baseUri: https://api.github.com
 types:
     once:
+      discriminator: kind
       properties:
+        kind: string
         right: string
-    twice:
-      properties:
-        left: string
     foo:
-        type: [once, twice]
+        type: once
         properties:
           name: string
 

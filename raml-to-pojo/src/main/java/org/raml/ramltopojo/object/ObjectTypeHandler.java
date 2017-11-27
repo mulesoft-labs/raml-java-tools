@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.object;
 
+import com.google.common.base.Optional;
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.*;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
@@ -37,25 +38,36 @@ public class ObjectTypeHandler implements TypeHandler {
                 .addSuperinterface(ClassName.bestGuess(interfaceSpec.name))
                 .addModifiers(Modifier.PUBLIC);
 
+        Optional<String> discriminator = Optional.fromNullable(objectTypeDeclaration.discriminator());
+
         for (TypeDeclaration declaration : objectTypeDeclaration.properties()) {
 
             TypeName tn = findType(declaration.type(), declaration, generationContext);
 
             FieldSpec.Builder field = FieldSpec.builder(tn, Names.variableName(declaration.name())).addModifiers(Modifier.PRIVATE);
+            if ( declaration.name().equals(discriminator.orNull())) {
+
+                field.addModifiers(Modifier.PRIVATE, Modifier.FINAL)
+                        .initializer(CodeBlock.builder().add("$S", objectTypeDeclaration.name()).build());
+
+            }
+
             typeSpec.addField(field.build());
 
-            MethodSpec.Builder getter = MethodSpec.methodBuilder(Names.methodName("get", declaration.name()))
+            typeSpec.addMethod(MethodSpec.methodBuilder(Names.methodName("get", declaration.name()))
                     .addModifiers(Modifier.PUBLIC)
                     .addCode(CodeBlock.builder().addStatement("return this." + Names.variableName(declaration.name())).build())
-                    .returns(tn);
+                    .returns(tn).build());
 
-            MethodSpec.Builder setter = MethodSpec.methodBuilder(Names.methodName("set", declaration.name()))
+            if ( declaration.name().equals(discriminator.orNull())) {
+
+                continue;
+            }
+
+            typeSpec.addMethod(MethodSpec.methodBuilder(Names.methodName("set", declaration.name()))
                     .addModifiers(Modifier.PUBLIC)
                     .addCode(CodeBlock.builder().addStatement("this." + Names.variableName(declaration.name()) + " = " + Names.variableName(declaration.name())).build())
-                    .addParameter(tn, Names.variableName(declaration.name()));
-
-            typeSpec.addMethod(getter.build());
-            typeSpec.addMethod(setter.build());
+                    .addParameter(tn, Names.variableName(declaration.name())).build());
         }
 
         return typeSpec.build();
@@ -67,6 +79,8 @@ public class ObjectTypeHandler implements TypeHandler {
         TypeSpec.Builder typeSpec = TypeSpec
                 .interfaceBuilder(interf)
                 .addModifiers(Modifier.PUBLIC);
+
+        Optional<String> discriminator = Optional.fromNullable(objectTypeDeclaration.discriminator());
 
         for (TypeDeclaration typeDeclaration : objectTypeDeclaration.parentTypes()) {
 
@@ -88,23 +102,21 @@ public class ObjectTypeHandler implements TypeHandler {
         for (TypeDeclaration declaration : objectTypeDeclaration.properties()) {
 
             TypeName tn = findType(declaration.type(), declaration, generationContext);
-            MethodSpec.Builder getter = MethodSpec.methodBuilder(Names.methodName("get", declaration.name()))
+            typeSpec.addMethod(MethodSpec.methodBuilder(Names.methodName("get", declaration.name()))
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                    .returns(tn);
+                    .returns(tn).build());
 
-            MethodSpec.Builder setter = MethodSpec.methodBuilder(Names.methodName("set", declaration.name()))
+            if ( declaration.name().equals(discriminator.orNull())) {
+
+                continue;
+            }
+
+            typeSpec.addMethod(MethodSpec.methodBuilder(Names.methodName("set", declaration.name()))
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                    .addParameter(tn, Names.variableName(declaration.name()));
+                    .addParameter(tn, Names.variableName(declaration.name())).build());
 
-            typeSpec.addMethod(getter.build());
-            typeSpec.addMethod(setter.build());
         }
 
-        if (typeSpec == null) {
-            return null;
-        }
-
-//        buildPropertiesForInterface(context, objectType, properties, typeSpec);
         return typeSpec.build();
     }
 
