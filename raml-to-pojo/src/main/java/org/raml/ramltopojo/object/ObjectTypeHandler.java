@@ -47,8 +47,9 @@ public class ObjectTypeHandler implements TypeHandler {
             FieldSpec.Builder field = FieldSpec.builder(tn, Names.variableName(declaration.name())).addModifiers(Modifier.PRIVATE);
             if ( declaration.name().equals(discriminator.orNull())) {
 
+                String discriminatorValue = Optional.fromNullable(objectTypeDeclaration.discriminatorValue()).or(objectTypeDeclaration.name());
                 field.addModifiers(Modifier.PRIVATE, Modifier.FINAL)
-                        .initializer(CodeBlock.builder().add("$S", objectTypeDeclaration.name()).build());
+                        .initializer(CodeBlock.builder().add("$S", discriminatorValue).build());
 
             }
 

@@ -224,6 +224,30 @@ public class ObjectTypeHandlerTest {
     }
 
     @Test
+    public void inheritanceWithDiscriminatorAndValue() throws Exception {
+
+        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inheritance-with-discriminatorvalue-type.raml"));
+        ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
+
+        CreationResult r = handler.create(createGenerationContext(api));
+
+        System.err.println(r.getInterface().toString());
+        System.err.println(r.getImplementation().toString());
+
+
+        assertThat(r.getImplementation().get(), is(allOf(
+                name(equalTo("FooImpl")),
+                fields(containsInAnyOrder(
+                        allOf(fieldName(equalTo("kind")), fieldType(equalTo(ClassName.get(String.class))), initializer(equalTo("\"myOwnValue\""))),
+                        allOf(fieldName(equalTo("right")), fieldType(equalTo(ClassName.get(String.class)))),
+                        allOf(fieldName(equalTo("name")), fieldType(equalTo(ClassName.get(String.class))))
+                ))
+        )));
+
+
+    }
+
+    @Test
     public void multipleInheritance() throws Exception {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("multiple-inheritance-type.raml"));
