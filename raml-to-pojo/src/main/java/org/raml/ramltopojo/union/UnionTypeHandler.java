@@ -2,6 +2,7 @@ package org.raml.ramltopojo.union;
 
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.*;
+import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 
@@ -43,7 +44,8 @@ public class UnionTypeHandler implements TypeHandler {
 
         for (TypeDeclaration unitedType : union.of()) {
 
-            ClassName typeName = (ClassName) findType(unitedType.name(), unitedType, generationContext).box();
+            TypeName typeName =  findType(unitedType.name(), unitedType, generationContext).box();
+            String shortened = shorten(typeName);
 
             String fieldName = Names.methodName(unitedType.name());
             typeSpec
@@ -54,7 +56,7 @@ public class UnionTypeHandler implements TypeHandler {
                                     .build())
                     .addMethod(
                             MethodSpec
-                                    .methodBuilder(Names.methodName("get", typeName.simpleName()))
+                                    .methodBuilder(Names.methodName("get", shortened))
                                     .addModifiers(Modifier.PUBLIC)
                                     .returns(typeName)
                                     .addStatement(
@@ -62,7 +64,7 @@ public class UnionTypeHandler implements TypeHandler {
                                             typeName, IllegalStateException.class, typeName)
                                     .addStatement("return ($T) anyType", typeName).build())
                     .addMethod(
-                            MethodSpec.methodBuilder(Names.methodName("is", typeName.simpleName()))
+                            MethodSpec.methodBuilder(Names.methodName("is", shortened))
                                     .addStatement("return anyType instanceof $T", typeName)
                                     .addModifiers(Modifier.PUBLIC)
                                     .returns(TypeName.BOOLEAN).build()
@@ -76,20 +78,38 @@ public class UnionTypeHandler implements TypeHandler {
 
         for (TypeDeclaration unitedType : union.of()) {
 
-            ClassName typeName = (ClassName) findType(unitedType.name(), unitedType, generationContext).box();
+            if ( unitedType instanceof ArrayTypeDeclaration ) {
+
+                throw new GenerationException("ramltopojo currently does not support arrays in unions");
+            }
+
+            TypeName typeName = findType(unitedType.name(), unitedType, generationContext).box();
+            String shortened = shorten(typeName);
+
             typeSpec
                     .addMethod(
                             MethodSpec
-                                    .methodBuilder(Names.methodName("get", typeName.simpleName()))
+                                    .methodBuilder(Names.methodName("get", shortened))
                                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                                     .returns(typeName).build())
                     .addMethod(
-                            MethodSpec.methodBuilder(Names.methodName("is", typeName.simpleName()))
+                            MethodSpec.methodBuilder(Names.methodName("is", shortened))
                                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                                     .returns(TypeName.BOOLEAN).build()
                     );
         }
         return typeSpec;
+    }
+
+    private String shorten(TypeName typeName) {
+
+        if ( ! (typeName instanceof ClassName) ) {
+
+            throw new GenerationException(typeName + toString() +  " cannot be shortened reasonably");
+        } else {
+
+            return ((ClassName)typeName).simpleName();
+        }
     }
 
     private TypeName findType(String typeName, TypeDeclaration type, GenerationContext generationContext) {

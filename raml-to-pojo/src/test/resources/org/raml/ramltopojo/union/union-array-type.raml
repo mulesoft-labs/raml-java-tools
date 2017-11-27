@@ -1,0 +1,10 @@
+#%RAML 1.0
+title: Hello World API
+version: v1
+baseUri: https://api.github.com
+types:
+    second:
+      properties:
+        area: string
+    foo:
+        type: string[]|second

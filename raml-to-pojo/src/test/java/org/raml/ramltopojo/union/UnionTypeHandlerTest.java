@@ -4,10 +4,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.squareup.javapoet.ClassName;
 import org.junit.Test;
-import org.raml.ramltopojo.CreationResult;
-import org.raml.ramltopojo.GenerationContextImpl;
-import org.raml.ramltopojo.RamlLoader;
-import org.raml.ramltopojo.TypeFetchers;
+import org.raml.ramltopojo.*;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
@@ -103,7 +100,7 @@ public class UnionTypeHandlerTest {
                         allOf(fieldName(equalTo("anyType")), fieldType(equalTo(ClassName.get(Object.class))))
                 )),
                 methods(contains(
-                        allOf(methodName(equalTo("<init>"))),
+                        methodName(equalTo("<init>")),
                         allOf(methodName(equalTo("<init>")), parameters(contains(type(equalTo(ClassName.get(Integer.class)))))),
                         allOf(methodName(equalTo("getInteger")), returnType(equalTo(ClassName.get(Integer.class))), codeContent(equalTo(
                                 "if ( !(anyType instanceof  java.lang.Integer)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: java.lang.Integer\");\nreturn (java.lang.Integer) anyType;\n"))),
@@ -118,6 +115,15 @@ public class UnionTypeHandlerTest {
                 ))
         )));
 
+    }
+
+    @Test(expected = GenerationException.class)
+    public void arrayUnion() throws Exception {
+
+        Api api = RamlLoader.load(this.getClass().getResourceAsStream("union-array-type.raml"));
+        UnionTypeHandler handler = new UnionTypeHandler(findTypes("foo", api.types()));
+
+        handler.create(new GenerationContextImpl(api, TypeFetchers.fromTypes(), "bar.pack"));
     }
 
     private static UnionTypeDeclaration findTypes(final String name, List<TypeDeclaration> types) {
