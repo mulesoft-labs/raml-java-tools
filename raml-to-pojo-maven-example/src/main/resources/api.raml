@@ -1,0 +1,16 @@
+#%RAML 1.0
+title: Hello World API
+version: v1
+baseUri: https://api.github.com
+types:
+    once:
+      discriminator: kind
+      properties:
+        kind: string
+        right: string
+    foo:
+        type: once
+        discriminatorValue: myOwnValue
+        properties:
+          name: string
+
