@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.object;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.raml.ramltopojo.CreationResult;
 import org.raml.ramltopojo.GenerationContextImpl;
@@ -13,7 +14,7 @@ import static org.raml.ramltopojo.RamlLoader.findTypes;
  */
 public class InternalTypesForObjectTest {
 
-    @Test
+    @Test @Ignore
     public void simplest() throws Exception {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-type.raml"));
