@@ -16,8 +16,8 @@ import java.util.Map;
 public class CreationResult {
 
     private final String packageName;
-    private final TypeSpec interf;
-    private final TypeSpec impl;
+    private TypeSpec interf;
+    private TypeSpec impl;
 
     private final Map<String, CreationResult> internalTypes = new HashMap<>();
 
@@ -53,6 +53,7 @@ public class CreationResult {
 
     public void createType(String rootDirectory) throws IOException {
 
+        createInlineType(this);
         createJavaFile(packageName, interf, rootDirectory, true);
 
         if ( impl != null ) {
@@ -64,19 +65,29 @@ public class CreationResult {
     protected void createJavaFile(String packageName, TypeSpec typeSpec, String rootDirectory, boolean interf ) throws IOException {
 
         TypeSpec.Builder builder = typeSpec.toBuilder();
-        for (CreationResult internalType : internalTypes.values()) {
+        JavaFile.builder(packageName, builder.build()).skipJavaLangImports(true).build().writeTo(Paths.get(rootDirectory));
+    }
 
-            if ( interf ) {
-                builder.addType(internalType.interf);
+    private static void createInlineType(CreationResult containingResult) {
+
+
+        for (CreationResult internalType: containingResult.internalTypes.values()) {
+
+            createInlineType(internalType);
+            containingResult.interf = containingResult.getInterface().toBuilder().addType(internalType.getInterface()).build();
+            if ( containingResult.getImplementation().isPresent()) {
+                if (internalType.getImplementation().isPresent() ) {
+                    containingResult.impl = containingResult.getImplementation().get().toBuilder().addType(
+                            internalType.getImplementation().get().toBuilder().
+                                    addModifiers(Modifier.STATIC).build()).build();
+                }
             } else {
-                if ( internalType.getImplementation().isPresent()) {
 
-                    builder.addType(internalType.impl.toBuilder().addModifiers(Modifier.STATIC).build());
+                if ( internalType.getImplementation().isPresent() ) {
+                    containingResult.interf = containingResult.getInterface().toBuilder().addType(internalType.getImplementation().get()).build();
                 }
             }
         }
-
-        JavaFile.builder(packageName, builder.build()).skipJavaLangImports(true).build().writeTo(Paths.get(rootDirectory));
     }
 
     public static class Builder {
