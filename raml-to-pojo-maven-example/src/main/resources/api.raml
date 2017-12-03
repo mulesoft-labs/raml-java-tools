@@ -3,14 +3,18 @@ title: Hello World API
 version: v1
 baseUri: https://api.github.com
 types:
-    once:
-      discriminator: kind
-      properties:
-        kind: string
-        right: string
+#    once:
+#      discriminator: kind
+#      properties:
+#        kind: string
+#        right: string
     foo:
-        type: once
+        type: object
         discriminatorValue: myOwnValue
         properties:
           name: string
+          goo:
+            type: object
+            properties:
+              glue: boolean
 

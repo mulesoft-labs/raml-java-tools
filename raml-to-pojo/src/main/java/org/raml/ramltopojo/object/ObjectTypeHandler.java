@@ -24,13 +24,16 @@ public class ObjectTypeHandler implements TypeHandler {
 
         // I need to create an interface and an implementation.
 
-        TypeSpec interfaceSpec = createInterface(generationContext);
-        TypeSpec implementationSpec = createImplementation(interfaceSpec, generationContext);
+        CreationResult.Builder builder = CreationResult.builder();
 
-        return CreationResult.forType(generationContext.defaultPackage(), interfaceSpec, implementationSpec);
+        TypeSpec interfaceSpec = createInterface(builder, generationContext);
+        TypeSpec implementationSpec = createImplementation(builder, interfaceSpec, generationContext);
+
+        builder.withInterface(interfaceSpec).withImplementation(implementationSpec);
+        return builder.build(generationContext);
     }
 
-    private TypeSpec createImplementation(TypeSpec interfaceSpec, GenerationContext generationContext) {
+    private TypeSpec createImplementation(CreationResult.Builder builder, TypeSpec interfaceSpec, GenerationContext generationContext) {
 
         ClassName className = ClassName.get(generationContext.defaultPackage(), Names.typeName(objectTypeDeclaration.name(), "Impl"));
         TypeSpec.Builder typeSpec = TypeSpec
@@ -42,7 +45,16 @@ public class ObjectTypeHandler implements TypeHandler {
 
         for (TypeDeclaration declaration : objectTypeDeclaration.properties()) {
 
-            TypeName tn = findType(declaration.type(), declaration, generationContext);
+            TypeName tn;
+            if ( TypeDeclarationType.isNewInlineType(declaration) ){
+
+                CreationResult cr = builder.internalTypes.get(declaration.name());
+                tn = ClassName.bestGuess(cr.getInterface().name);
+
+            }  else {
+
+                tn = findType(declaration.type(), declaration, generationContext);
+            }
 
             FieldSpec.Builder field = FieldSpec.builder(tn, Names.variableName(declaration.name())).addModifiers(Modifier.PRIVATE);
             if ( declaration.name().equals(discriminator.orNull())) {
@@ -74,12 +86,12 @@ public class ObjectTypeHandler implements TypeHandler {
         return typeSpec.build();
     }
 
-    private TypeSpec createInterface(GenerationContext generationContext) {
+    private TypeSpec createInterface(CreationResult.Builder builder, GenerationContext generationContext) {
 
         ClassName interf = ClassName.get(generationContext.defaultPackage(), Names.typeName(objectTypeDeclaration.name()));
         TypeSpec.Builder typeSpec = TypeSpec
                 .interfaceBuilder(interf)
-                .addModifiers(Modifier.PUBLIC);
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
         Optional<String> discriminator = Optional.fromNullable(objectTypeDeclaration.discriminator());
 
@@ -102,7 +114,18 @@ public class ObjectTypeHandler implements TypeHandler {
 
         for (TypeDeclaration declaration : objectTypeDeclaration.properties()) {
 
-            TypeName tn = findType(declaration.type(), declaration, generationContext);
+
+            TypeName tn;
+            if ( TypeDeclarationType.isNewInlineType(declaration) ){
+
+                CreationResult cr = TypeDeclarationType.typeHandler(declaration).create(generationContext);
+                builder.withInternalType(declaration.name(), cr);
+                tn = ClassName.bestGuess(cr.getInterface().name);
+            }  else {
+
+                tn = findType(declaration.type(), declaration, generationContext);
+            }
+
             typeSpec.addMethod(MethodSpec.methodBuilder(Names.methodName("get", declaration.name()))
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                     .returns(tn).build());

@@ -24,8 +24,7 @@ public class CreationResultTest extends UnitTest{
             TypeSpec[] specs = {interf, cls};
             int c = 0;
             @Override
-
-            protected void createJavaFile(String pack, TypeSpec spec, String root) {
+            protected void createJavaFile(String pack, TypeSpec spec, String root, boolean b) {
 
                 assertEquals("pack.me", pack);
                 assertEquals("/tmp/foo", root);
