@@ -73,4 +73,17 @@ public class TypeSpecMatchers {
       }
     };
   }
+
+  public static Matcher<TypeSpec> innerTypes(Matcher<Iterable<? extends TypeSpec>> typeMatcher) {
+
+    return new FeatureMatcher<TypeSpec, Iterable<? extends TypeSpec>>(typeMatcher, "inner type", "inner type") {
+
+      @Override
+      protected Iterable<? extends TypeSpec> featureValueOf(TypeSpec actual) {
+
+        return actual.typeSpecs;
+      }
+    };
+  }
+
 }

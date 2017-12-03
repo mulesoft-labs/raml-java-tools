@@ -90,6 +90,10 @@ public class CreationResult {
         }
     }
 
+    public CreationResult getInternalTypeForProperty(String inside) {
+        return internalTypes.get(inside);
+    }
+
     public static class Builder {
 
         public TypeSpec interf;
