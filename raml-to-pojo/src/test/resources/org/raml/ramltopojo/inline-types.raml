@@ -1,0 +1,55 @@
+#%RAML 1.0
+title: Hello World API
+version: v1
+baseUri: https://api.github.com
+types:
+    parentOne:
+      type: object
+      properties:
+        oneName: string
+    parentTwo:
+      type: object
+      properties:
+        twoName: string
+    foo:
+        type: object
+        properties:
+          name: string
+          inside:
+            type: object
+            properties:
+              mine: integer
+          internalInt:
+            type: integer
+            minimum: 3
+          unextended:
+            type: object
+            required: true
+          extendedFromOne:
+            type: parentOne
+            required: true
+          extendedFromOneWithExtraProperty:
+            type: parentOne
+            required: true
+            properties:
+              newProp: integer
+          objectWithExtraProperty:
+            type: object
+            required: true
+            properties:
+              newProp: integer
+          multiInheritanceWithExtraProperty:
+            type: [parentOne, parentTwo]
+            required: true
+            properties:
+              newProp: integer
+          multiInheritanceWithoutExtraProperty:
+            type: [parentOne, parentTwo]
+            required: true
+          unionWithExtraProperty:
+            type: parentOne|parentTwo
+            required: true
+            properties:
+              newProp: integer
+
+

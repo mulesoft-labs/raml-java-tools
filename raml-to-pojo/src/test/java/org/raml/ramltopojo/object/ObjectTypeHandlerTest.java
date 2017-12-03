@@ -8,7 +8,6 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import org.junit.Test;
 import org.raml.ramltopojo.*;
 import org.raml.v2.api.model.v10.api.Api;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import javax.annotation.Nullable;
@@ -32,7 +31,7 @@ public class ObjectTypeHandlerTest {
     public void simplest() throws Exception {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("simplest-type.raml"));
-        ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
+        ObjectTypeHandler handler = new ObjectTypeHandler(RamlLoader.findTypes("foo", api.types()));
 
         CreationResult r = handler.create(new GenerationContextImpl(api));
 
@@ -71,7 +70,7 @@ public class ObjectTypeHandlerTest {
     public void simplestContainingSimpleArray() throws Exception {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("simplest-containing-simple-array.raml"));
-        ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
+        ObjectTypeHandler handler = new ObjectTypeHandler(RamlLoader.findTypes("foo", api.types()));
 
         CreationResult r = handler.create(new GenerationContextImpl(api));
         System.err.println(r.getInterface().toString());
@@ -107,7 +106,7 @@ public class ObjectTypeHandlerTest {
     public void usingComposedTypes() throws Exception {
 
         final Api api = RamlLoader.load(this.getClass().getResourceAsStream("using-composed-type.raml"));
-        ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
+        ObjectTypeHandler handler = new ObjectTypeHandler(RamlLoader.findTypes("foo", api.types()));
 
         CreationResult r = handler.create(createGenerationContext(api));
 
@@ -138,7 +137,7 @@ public class ObjectTypeHandlerTest {
     public void simpleInheritance() throws Exception {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("inherited-type.raml"));
-        ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
+        ObjectTypeHandler handler = new ObjectTypeHandler(RamlLoader.findTypes("foo", api.types()));
 
         CreationResult r = handler.create(createGenerationContext(api));
 
@@ -180,7 +179,7 @@ public class ObjectTypeHandlerTest {
     public void inheritanceWithDiscriminator() throws Exception {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("inheritance-with-discriminator-type.raml"));
-        ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
+        ObjectTypeHandler handler = new ObjectTypeHandler(RamlLoader.findTypes("foo", api.types()));
 
         CreationResult r = handler.create(createGenerationContext(api));
 
@@ -227,7 +226,7 @@ public class ObjectTypeHandlerTest {
     public void inheritanceWithDiscriminatorAndValue() throws Exception {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("inheritance-with-discriminatorvalue-type.raml"));
-        ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
+        ObjectTypeHandler handler = new ObjectTypeHandler(RamlLoader.findTypes("foo", api.types()));
 
         CreationResult r = handler.create(createGenerationContext(api));
 
@@ -251,7 +250,7 @@ public class ObjectTypeHandlerTest {
     public void multipleInheritance() throws Exception {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("multiple-inheritance-type.raml"));
-        ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
+        ObjectTypeHandler handler = new ObjectTypeHandler(RamlLoader.findTypes("foo", api.types()));
 
         CreationResult r = handler.create(createGenerationContext(api));
 
@@ -313,16 +312,6 @@ public class ObjectTypeHandlerTest {
                 });
             }
         }, "pojo.pack");
-    }
-
-
-    private static ObjectTypeDeclaration findTypes(final String name, List<TypeDeclaration> types) {
-        return (ObjectTypeDeclaration) FluentIterable.from(types).firstMatch(new Predicate<TypeDeclaration>() {
-            @Override
-            public boolean apply(@Nullable TypeDeclaration input) {
-                return input.name().equals(name);
-            }
-        }).get();
     }
 
 

@@ -1,6 +1,9 @@
 package org.raml.ramltopojo;
 
+import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
@@ -9,11 +12,13 @@ import org.raml.ramltopojo.object.ObjectTypeHandler;
 import org.raml.ramltopojo.union.UnionTypeHandler;
 import org.raml.v2.api.model.v10.datamodel.*;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created. There, you have it.
@@ -61,6 +66,31 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
             CreationResult result = generationContext.findCreatedType(typeName, originalTypeDeclaration);
             return ClassName.bestGuess(result.getInterface().name);
         }
+
+
+        @Override
+        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+
+            List<TypeDeclaration> extended = declaration.parentTypes();
+            if ( extended.size() > 1) {
+
+                return true;
+            }
+
+            Set<String> allExtendedProps =
+                    FluentIterable.from(extended).filter(ObjectTypeDeclaration.class)
+                            .transformAndConcat(new Function<ObjectTypeDeclaration, Set<String>>() {
+
+                                @Nullable
+                                @Override
+                                public Set<String> apply(@Nullable ObjectTypeDeclaration input) {
+                                    return pullNames(input);
+                                }
+                            }).toSet();
+
+            Set<String> typePropertyNames = pullNames((ObjectTypeDeclaration) declaration);
+            return !Sets.difference(typePropertyNames, allExtendedProps).isEmpty();
+        }
     },
     ENUMERATION {
         @Override
@@ -71,6 +101,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         @Override
         public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return null;
+        }
+
+        @Override
+        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+            return true;
         }
     },
     ARRAY {
@@ -85,6 +120,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
             ArrayTypeDeclaration arrayTypeDeclaration = (ArrayTypeDeclaration) originalTypeDeclaration;
             return ParameterizedTypeName.get(ClassName.get(List.class), TypeDeclarationType.javaType(typeName, arrayTypeDeclaration.items(), generationContext).box());
         }
+
+        @Override
+        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+            return false;
+        }
     },
     UNION {
         @Override
@@ -97,6 +137,12 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return null;
         }
+
+        @Override
+        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+
+            return false;
+        }
     },
     INTEGER {
         @Override
@@ -107,6 +153,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         @Override
         public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return TypeName.INT;
+        }
+
+        @Override
+        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+            return false;
         }
     },
     BOOLEAN {
@@ -120,6 +171,10 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
             return TypeName.BOOLEAN;
         }
 
+        @Override
+        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+            return false;
+        }
     },
     DATE {
         @Override
@@ -130,6 +185,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         @Override
         public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return ClassName.get(Date.class);
+        }
+
+        @Override
+        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+            return false;
         }
     },
     DATETIME {
@@ -142,6 +202,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return ClassName.get(Date.class);
         }
+
+        @Override
+        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+            return false;
+        }
     },
     TIME_ONLY {
         @Override
@@ -152,6 +217,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         @Override
         public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return ClassName.get(Date.class);
+        }
+
+        @Override
+        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+            return false;
         }
     },
     DATETIME_ONLY {
@@ -164,6 +234,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return ClassName.get(Date.class);
         }
+
+        @Override
+        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+            return false;
+        }
     },
     NUMBER {
         @Override
@@ -174,6 +249,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         @Override
         public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return ClassName.get(BigDecimal.class);
+        }
+
+        @Override
+        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+            return false;
         }
     },
     STRING {
@@ -193,6 +273,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return ClassName.get(String.class);
         }
+
+        @Override
+        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+            return false;
+        }
     },
     ANY {
         @Override
@@ -203,6 +288,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         @Override
         public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return ClassName.get(Object.class);
+        }
+
+        @Override
+        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+            return false;
         }
     },
     FILE {
@@ -215,9 +305,27 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
             return ClassName.get(File.class);
         }
+
+        @Override
+        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+            return false;
+        }
     };
 
+    private static Set<String> pullNames(ObjectTypeDeclaration extending) {
+        return FluentIterable.from(extending.properties()).transform(new Function<TypeDeclaration, String>() {
+
+            @Nullable
+            @Override
+            public String apply(@Nullable TypeDeclaration input) {
+                return input.name();
+            }
+        }).toSet();
+    }
+
+
     public abstract TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext);
+    public abstract boolean shouldCreateInlineType(TypeDeclaration declaration);
 
     private static Map<Class, TypeDeclarationType> ramlToType = ImmutableMap.<Class, TypeDeclarationType>builder()
             .put(ObjectTypeDeclaration.class, OBJECT)
@@ -247,4 +355,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
         return ramlToType.get(Utils.declarationType(typeDeclaration)).asJavaPoetType(typeName, typeDeclaration, generationContext);
     }
 
+    public static boolean isNewInlineType(TypeDeclaration declaration) {
+        return ramlToType.get(Utils.declarationType(declaration)).shouldCreateInlineType(declaration);
+    }
 }

@@ -1,0 +1,17 @@
+#%RAML 1.0
+title: Hello World API
+version: v1
+baseUri: https://api.github.com
+types:
+    foo:
+        type: object
+        properties:
+          name: string
+          inside:
+            type: object
+            properties:
+              mine: integer
+          internalInt:
+            type: integer
+            minimum: 3
+
