@@ -22,7 +22,7 @@ public class TypeDeclarationTypeTest {
     @Test
     public void internalIntIsNotNewInlineType() {
 
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-types.raml"));
+        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-types.raml"), ".");
         ObjectTypeDeclaration decl = RamlLoader.findTypes("foo", api.types());
         TypeDeclaration property = findProperty(decl, "internalInt");
 
@@ -33,7 +33,7 @@ public class TypeDeclarationTypeTest {
     @Test
     public void simpleObjectIsNotNewInlineType() {
 
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-types.raml"));
+        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-types.raml"), ".");
         ObjectTypeDeclaration decl = RamlLoader.findTypes("foo", api.types());
         TypeDeclaration property = findProperty(decl, "unextended");
 
@@ -43,7 +43,7 @@ public class TypeDeclarationTypeTest {
     @Test
     public void extendedObjectIsNotNewInlineType() {
 
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-types.raml"));
+        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-types.raml"), ".");
         ObjectTypeDeclaration decl = RamlLoader.findTypes("foo", api.types());
         TypeDeclaration property = findProperty(decl, "extendedFromOne");
 
@@ -53,7 +53,7 @@ public class TypeDeclarationTypeTest {
     @Test
     public void extendedObjectWithExtraPropertiesIsNewInlineType() {
 
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-types.raml"));
+        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-types.raml"), ".");
         ObjectTypeDeclaration decl = RamlLoader.findTypes("foo", api.types());
         TypeDeclaration property = findProperty(decl, "extendedFromOneWithExtraProperty");
 
@@ -63,7 +63,7 @@ public class TypeDeclarationTypeTest {
     @Test
     public void objectWithExtraPropertiesIsNewInlineType() {
 
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-types.raml"));
+        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-types.raml"), ".");
         ObjectTypeDeclaration decl = RamlLoader.findTypes("foo", api.types());
         TypeDeclaration property = findProperty(decl, "objectWithExtraProperty");
 
@@ -73,7 +73,7 @@ public class TypeDeclarationTypeTest {
     @Test
     public void multiInheritanceWithExtraPropertiesIsNewInlineType() {
 
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-types.raml"));
+        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-types.raml"), ".");
         ObjectTypeDeclaration decl = RamlLoader.findTypes("foo", api.types());
         TypeDeclaration property = findProperty(decl, "multiInheritanceWithExtraProperty");
 
@@ -83,7 +83,7 @@ public class TypeDeclarationTypeTest {
     @Test
     public void multiInheritanceWithoutExtraPropertiesIsNotNewInlineType() {
 
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-types.raml"));
+        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-types.raml"), ".");
         ObjectTypeDeclaration decl = RamlLoader.findTypes("foo", api.types());
         TypeDeclaration property = findProperty(decl, "multiInheritanceWithoutExtraProperty");
 
@@ -93,7 +93,7 @@ public class TypeDeclarationTypeTest {
     @Test @Ignore
     public void unionWithExtraPropertiesIsNewInlineType() {
 
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-types.raml"));
+        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-types.raml"), ".");
         ObjectTypeDeclaration decl = RamlLoader.findTypes("foo", api.types());
         TypeDeclaration property = findProperty(decl, "unionWithExtraProperty");
 

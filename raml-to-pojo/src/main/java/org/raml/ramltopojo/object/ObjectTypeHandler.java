@@ -41,46 +41,61 @@ public class ObjectTypeHandler implements TypeHandler {
                 .addSuperinterface(ClassName.bestGuess(interfaceSpec.name))
                 .addModifiers(Modifier.PUBLIC);
 
+        typeSpec = generationContext.pluginsForObjects().classCreated(objectTypeDeclaration, typeSpec, EventType.IMPLEMENTATION);
+        if ( typeSpec == null ) {
+            return null;
+        }
+
         Optional<String> discriminator = Optional.fromNullable(objectTypeDeclaration.discriminator());
 
-        for (TypeDeclaration declaration : objectTypeDeclaration.properties()) {
+        for (TypeDeclaration propertyDeclaration : objectTypeDeclaration.properties()) {
 
             TypeName tn;
-            if ( TypeDeclarationType.isNewInlineType(declaration) ){
+            if ( TypeDeclarationType.isNewInlineType(propertyDeclaration) ){
 
-                CreationResult cr = builder.internalTypes.get(declaration.name());
+                CreationResult cr = builder.internalTypes.get(propertyDeclaration.name());
                 tn = ClassName.bestGuess(cr.getInterface().name);
 
             }  else {
 
-                tn = findType(declaration.type(), declaration, generationContext);
+                tn = findType(propertyDeclaration.type(), propertyDeclaration, generationContext);
             }
 
-            FieldSpec.Builder field = FieldSpec.builder(tn, Names.variableName(declaration.name())).addModifiers(Modifier.PRIVATE);
-            if ( declaration.name().equals(discriminator.orNull())) {
+            FieldSpec.Builder field = FieldSpec.builder(tn, Names.variableName(propertyDeclaration.name())).addModifiers(Modifier.PRIVATE);
+            if ( propertyDeclaration.name().equals(discriminator.orNull())) {
 
                 String discriminatorValue = Optional.fromNullable(objectTypeDeclaration.discriminatorValue()).or(objectTypeDeclaration.name());
                 field.addModifiers(Modifier.PRIVATE, Modifier.FINAL)
                         .initializer(CodeBlock.builder().add("$S", discriminatorValue).build());
 
             }
+            field = generationContext.pluginsForObjects().fieldBuilt(propertyDeclaration, field, EventType.IMPLEMENTATION);
+            if ( field != null ) {
+                typeSpec.addField(field.build());
+            }
 
-            typeSpec.addField(field.build());
-
-            typeSpec.addMethod(MethodSpec.methodBuilder(Names.methodName("get", declaration.name()))
+            MethodSpec.Builder getMethod = MethodSpec.methodBuilder(Names.methodName("get", propertyDeclaration.name()))
                     .addModifiers(Modifier.PUBLIC)
-                    .addCode(CodeBlock.builder().addStatement("return this." + Names.variableName(declaration.name())).build())
-                    .returns(tn).build());
+                    .addCode(CodeBlock.builder().addStatement("return this." + Names.variableName(propertyDeclaration.name())).build())
+                    .returns(tn);
+            getMethod = generationContext.pluginsForObjects().getterBuilt(propertyDeclaration, getMethod, EventType.IMPLEMENTATION);
+           if ( getMethod != null ) {
+               typeSpec.addMethod(getMethod.build());
+           }
 
-            if ( declaration.name().equals(discriminator.orNull())) {
+            if ( propertyDeclaration.name().equals(discriminator.orNull())) {
 
                 continue;
             }
 
-            typeSpec.addMethod(MethodSpec.methodBuilder(Names.methodName("set", declaration.name()))
+            MethodSpec.Builder setMethod = MethodSpec.methodBuilder(Names.methodName("set", propertyDeclaration.name()))
                     .addModifiers(Modifier.PUBLIC)
-                    .addCode(CodeBlock.builder().addStatement("this." + Names.variableName(declaration.name()) + " = " + Names.variableName(declaration.name())).build())
-                    .addParameter(tn, Names.variableName(declaration.name())).build());
+                    .addCode(CodeBlock.builder().addStatement("this." + Names.variableName(propertyDeclaration.name()) + " = " + Names.variableName(propertyDeclaration.name())).build())
+                    .addParameter(tn, Names.variableName(propertyDeclaration.name()));
+            setMethod = generationContext.pluginsForObjects().getterBuilt(propertyDeclaration, setMethod, EventType.IMPLEMENTATION);
+            if ( setMethod != null ) {
+                typeSpec.addMethod(setMethod.build());
+            }
         }
 
         return typeSpec.build();
@@ -92,6 +107,10 @@ public class ObjectTypeHandler implements TypeHandler {
         TypeSpec.Builder typeSpec = TypeSpec
                 .interfaceBuilder(interf)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+        typeSpec = generationContext.pluginsForObjects().classCreated(objectTypeDeclaration, typeSpec, EventType.INTERFACE);
+        if ( typeSpec == null ) {
+            return null;
+        }
 
         Optional<String> discriminator = Optional.fromNullable(objectTypeDeclaration.discriminator());
 
@@ -112,32 +131,41 @@ public class ObjectTypeHandler implements TypeHandler {
             }
         }
 
-        for (TypeDeclaration declaration : objectTypeDeclaration.properties()) {
+        for (TypeDeclaration propertyDeclaration : objectTypeDeclaration.properties()) {
 
 
             TypeName tn;
-            if ( TypeDeclarationType.isNewInlineType(declaration) ){
+            if ( TypeDeclarationType.isNewInlineType(propertyDeclaration) ){
 
-                CreationResult cr = TypeDeclarationType.typeHandler(declaration).create(generationContext);
-                builder.withInternalType(declaration.name(), cr);
+                CreationResult cr = TypeDeclarationType.typeHandler(propertyDeclaration).create(generationContext);
+                builder.withInternalType(propertyDeclaration.name(), cr);
                 tn = ClassName.bestGuess(cr.getInterface().name);
             }  else {
 
-                tn = findType(declaration.type(), declaration, generationContext);
+                tn = findType(propertyDeclaration.type(), propertyDeclaration, generationContext);
             }
 
-            typeSpec.addMethod(MethodSpec.methodBuilder(Names.methodName("get", declaration.name()))
+            MethodSpec.Builder getMethod = MethodSpec.methodBuilder(Names.methodName("get", propertyDeclaration.name()))
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                    .returns(tn).build());
+                    .returns(tn);
+            getMethod = generationContext.pluginsForObjects().getterBuilt(propertyDeclaration, getMethod, EventType.INTERFACE);
 
-            if ( declaration.name().equals(discriminator.orNull())) {
+            if ( getMethod != null ) {
+                typeSpec.addMethod(getMethod.build());
 
-                continue;
+                if (propertyDeclaration.name().equals(discriminator.orNull())) {
+
+                    continue;
+                }
             }
 
-            typeSpec.addMethod(MethodSpec.methodBuilder(Names.methodName("set", declaration.name()))
+            MethodSpec.Builder setMethod = MethodSpec.methodBuilder(Names.methodName("set", propertyDeclaration.name()))
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                    .addParameter(tn, Names.variableName(declaration.name())).build());
+                    .addParameter(tn, Names.variableName(propertyDeclaration.name()));
+            setMethod = generationContext.pluginsForObjects().setterBuilt(propertyDeclaration, setMethod, EventType.INTERFACE);
+            if ( setMethod != null ) {
+                typeSpec.addMethod(setMethod.build());
+            }
 
         }
 

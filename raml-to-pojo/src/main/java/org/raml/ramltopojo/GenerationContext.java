@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import org.raml.ramltopojo.object.ObjectTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
@@ -14,6 +15,6 @@ public interface GenerationContext {
     String defaultPackage();
 
     void createTypes(String rootDirectory) throws IOException;
-
+    ObjectTypeHandlerPlugin pluginsForObjects(TypeDeclaration... typeDeclarations);
     Api api();
 }

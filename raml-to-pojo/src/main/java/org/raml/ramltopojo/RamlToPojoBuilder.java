@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.v2.api.model.v10.api.Api;
 
 /**
@@ -43,7 +44,7 @@ public class RamlToPojoBuilder {
 
     public RamlToPojo build() {
 
-        return new RamlToPojoImpl(typeFinder, new GenerationContextImpl(api, typeFetcher, packageName));
+        return new RamlToPojoImpl(typeFinder, new GenerationContextImpl(PluginManager.createPluginManager(), api, typeFetcher, packageName));
     }
 
 

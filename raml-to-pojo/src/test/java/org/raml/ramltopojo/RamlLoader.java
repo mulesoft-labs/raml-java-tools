@@ -18,11 +18,11 @@ import java.util.List;
  * Created. There, you have it.
  */
 public class RamlLoader {
-    public static Api load(InputStream is) {
+    public static Api load(InputStream is, String directory) {
 
         RamlModelResult ramlModelResult =
                 new RamlModelBuilder().buildApi(
-                        new InputStreamReader(is), ".");
+                        new InputStreamReader(is), directory);
         if (ramlModelResult.hasErrors()) {
             for (ValidationResult validationResult : ramlModelResult.getValidationResults()) {
                 System.out.println(validationResult.getMessage());
