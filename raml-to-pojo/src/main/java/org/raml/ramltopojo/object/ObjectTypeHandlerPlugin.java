@@ -16,6 +16,29 @@ import java.util.Set;
  */
 public interface ObjectTypeHandlerPlugin {
 
+    class Helper implements ObjectTypeHandlerPlugin {
+
+        @Override
+        public TypeSpec.Builder classCreated(ObjectTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+            return incoming;
+        }
+
+        @Override
+        public FieldSpec.Builder fieldBuilt(TypeDeclaration declaration, FieldSpec.Builder incoming, EventType eventType) {
+            return incoming;
+        }
+
+        @Override
+        public MethodSpec.Builder getterBuilt(TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType) {
+            return incoming;
+        }
+
+        @Override
+        public MethodSpec.Builder setterBuilt(TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType) {
+            return incoming;
+        }
+    }
+
     TypeSpec.Builder classCreated(ObjectTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType);
     FieldSpec.Builder fieldBuilt(TypeDeclaration declaration, FieldSpec.Builder incoming, EventType eventType);
     MethodSpec.Builder getterBuilt(TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType);
