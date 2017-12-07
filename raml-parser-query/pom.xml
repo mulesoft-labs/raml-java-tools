@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.raml</groupId>
         <artifactId>raml-java-tools</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>raml-parser-query</artifactId>
@@ -43,12 +43,12 @@
         <dependency>
             <groupId>org.raml</groupId>
             <artifactId>raml-parser-tools</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.raml</groupId>
             <artifactId>test-utils</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>
