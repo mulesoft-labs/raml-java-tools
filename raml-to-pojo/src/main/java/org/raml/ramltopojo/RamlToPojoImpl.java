@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import com.squareup.javapoet.ClassName;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 /**
@@ -19,10 +20,19 @@ public class RamlToPojoImpl implements RamlToPojo {
     public ResultingPojos buildPojos() {
 
         ResultingPojos resultingPojos = new ResultingPojos(generationContext);
+
         for (TypeDeclaration typeDeclaration : typeFinder.findTypes(generationContext.api())) {
 
-            TypeHandler handler = TypeDeclarationType.typeHandler(typeDeclaration);
-            CreationResult spec = handler.create(generationContext);
+            ClassName intf = TypeDeclarationType.typeName(typeDeclaration, generationContext, EventType.INTERFACE);
+            ClassName impl = TypeDeclarationType.typeName(typeDeclaration, generationContext, EventType.IMPLEMENTATION);
+
+            CreationResult creationResult = new CreationResult(generationContext.defaultPackage(), intf, impl);
+            generationContext.newExpectedType(typeDeclaration.name(), creationResult);
+        }
+
+        for (TypeDeclaration typeDeclaration : typeFinder.findTypes(generationContext.api())) {
+
+            CreationResult spec = TypeDeclarationType.createType(typeDeclaration, generationContext);
             resultingPojos.addNewResult(spec);
         }
 

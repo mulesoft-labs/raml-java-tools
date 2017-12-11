@@ -6,6 +6,7 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.raml.ramltopojo.EventType;
+import org.raml.ramltopojo.extensions.PluginContext;
 import org.raml.testutils.UnitTest;
 import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.NumberTypeDeclaration;
@@ -38,6 +39,9 @@ public class Jsr303ExtensionTest extends UnitTest {
     ObjectTypeDeclaration object;
 
 
+    @Mock
+    PluginContext pluginContext;
+
     @Test
     public void forInteger() throws Exception {
 
@@ -46,7 +50,7 @@ public class Jsr303ExtensionTest extends UnitTest {
         FieldSpec.Builder builder =
                 FieldSpec.builder(ClassName.get(Integer.class), "champ", Modifier.PUBLIC);
 
-        ext.fieldBuilt(number, builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(pluginContext, number, builder, EventType.IMPLEMENTATION);
 
         assertForIntegerNumber(builder);
     }
@@ -60,7 +64,7 @@ public class Jsr303ExtensionTest extends UnitTest {
         FieldSpec.Builder builder =
                 FieldSpec.builder(ClassName.get(BigInteger.class), "champ", Modifier.PUBLIC);
 
-        ext.fieldBuilt(number, builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(pluginContext, number, builder, EventType.IMPLEMENTATION);
 
         assertForIntegerNumber(builder);
     }
@@ -73,7 +77,7 @@ public class Jsr303ExtensionTest extends UnitTest {
         FieldSpec.Builder builder =
                 FieldSpec.builder(ClassName.get(Double.class), "champ", Modifier.PUBLIC);
 
-        ext.fieldBuilt(object, builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(pluginContext, object, builder, EventType.IMPLEMENTATION);
 
         assertEquals(1, builder.build().annotations.size());
         assertEquals(Valid.class.getName(), builder.build().annotations.get(0).type.toString());
@@ -87,7 +91,7 @@ public class Jsr303ExtensionTest extends UnitTest {
         FieldSpec.Builder builder =
                 FieldSpec.builder(ClassName.get(Double.class), "champ", Modifier.PUBLIC);
 
-        ext.fieldBuilt(object, builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(pluginContext, object, builder, EventType.IMPLEMENTATION);
 
         assertEquals(1, builder.build().annotations.size());
         assertEquals(Valid.class.getName(), builder.build().annotations.get(0).type.toString());
@@ -103,7 +107,7 @@ public class Jsr303ExtensionTest extends UnitTest {
                 FieldSpec.builder(ParameterizedTypeName.get(List.class, String.class), "champ",
                         Modifier.PUBLIC);
         Jsr303Extension ext = new Jsr303Extension();
-        ext.fieldBuilt(array, builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(pluginContext, array, builder, EventType.IMPLEMENTATION);
         assertEquals(1, builder.build().annotations.size());
         assertEquals(Size.class.getName(), builder.build().annotations.get(0).type.toString());
         assertEquals("3", builder.build().annotations.get(0).members.get("min").get(0).toString());
@@ -120,7 +124,7 @@ public class Jsr303ExtensionTest extends UnitTest {
                 FieldSpec.builder(ParameterizedTypeName.get(List.class, String.class), "champ",
                         Modifier.PUBLIC);
         Jsr303Extension ext = new Jsr303Extension();
-        ext.fieldBuilt(array, builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(pluginContext, array, builder, EventType.IMPLEMENTATION);
         assertEquals(1, builder.build().annotations.size());
         assertEquals(Size.class.getName(), builder.build().annotations.get(0).type.toString());
         assertEquals(1, builder.build().annotations.get(0).members.size());
@@ -138,7 +142,7 @@ public class Jsr303ExtensionTest extends UnitTest {
                 FieldSpec.builder(ParameterizedTypeName.get(List.class, String.class), "champ",
                         Modifier.PUBLIC);
         Jsr303Extension ext = new Jsr303Extension();
-        ext.fieldBuilt(array, builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(pluginContext, array, builder, EventType.IMPLEMENTATION);
         assertEquals(1, builder.build().annotations.size());
         assertEquals(NotNull.class.getName(), builder.build().annotations.get(0).type.toString());
     }

@@ -23,7 +23,7 @@ import java.util.Set;
 /**
  * Created. There, you have it.
  */
-public enum TypeDeclarationType implements TypeHandlerFactory {
+public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFactory {
 
     /*
      private static Map<Class, Class<?>> ramlToType = ImmutableMap.<Class, Class<?>>builder()
@@ -57,7 +57,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
      */
     OBJECT {
         @Override
-        public TypeHandler create(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             return new ObjectTypeHandler((ObjectTypeDeclaration) typeDeclaration);
         }
 
@@ -94,7 +94,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
     },
     ENUMERATION {
         @Override
-        public TypeHandler create(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -110,7 +110,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
     },
     ARRAY {
         @Override
-        public TypeHandler create(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -128,7 +128,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
     },
     UNION {
         @Override
-        public TypeHandler create(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
 
             return new UnionTypeHandler((UnionTypeDeclaration) typeDeclaration);
         }
@@ -146,7 +146,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
     },
     INTEGER {
         @Override
-        public TypeHandler create(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -162,7 +162,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
     },
     BOOLEAN {
         @Override
-        public TypeHandler create(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -178,7 +178,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
     },
     DATE {
         @Override
-        public TypeHandler create(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -194,7 +194,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
     },
     DATETIME {
         @Override
-        public TypeHandler create(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -210,7 +210,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
     },
     TIME_ONLY {
         @Override
-        public TypeHandler create(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -226,7 +226,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
     },
     DATETIME_ONLY {
         @Override
-        public TypeHandler create(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -242,7 +242,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
     },
     NUMBER {
         @Override
-        public TypeHandler create(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -258,7 +258,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
     },
     STRING {
         @Override
-        public TypeHandler create(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
 
             StringTypeDeclaration declaration = (StringTypeDeclaration) typeDeclaration;
             if ( ! declaration.enumValues().isEmpty() ) {
@@ -281,7 +281,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
     },
     ANY {
         @Override
-        public TypeHandler create(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -297,7 +297,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
     },
     FILE {
         @Override
-        public TypeHandler create(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -343,12 +343,32 @@ public enum TypeDeclarationType implements TypeHandlerFactory {
             .put(AnyTypeDeclaration.class, ANY)
             .build();
 
-    public static TypeHandler typeHandler(TypeDeclaration typeDeclaration) {
+    public static CreationResult createType(TypeDeclaration typeDeclaration, GenerationContext context) {
 
         TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
 
-        return typeDeclarationType.create(typeDeclarationType, typeDeclaration);
+        TypeHandler handler = typeDeclarationType.createHandler(typeDeclarationType, typeDeclaration);
+        ClassName intf = handler.javaTypeName(context, EventType.INTERFACE);
+        ClassName impl = handler.javaTypeName(context, EventType.IMPLEMENTATION);
+        context.newExpectedType(typeDeclaration.name(), new CreationResult(context.defaultPackage(), intf, impl));
+        return handler.create(context);
     }
+
+    public static ClassName typeName(TypeDeclaration typeDeclaration, GenerationContext context, EventType eventType) {
+
+        TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
+
+        TypeHandler handler = typeDeclarationType.createHandler(typeDeclarationType, typeDeclaration);
+        return handler.javaTypeName(context, eventType);
+    }
+
+ /*   public static TypeAnalyser typeAnalyser(TypeDeclaration typeDeclaration) {
+
+        TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
+
+        return typeDeclarationType.analyse(typeDeclarationType, typeDeclaration);
+    }
+*/
 
     public static TypeName javaType(String typeName, TypeDeclaration typeDeclaration, GenerationContext generationContext) {
 

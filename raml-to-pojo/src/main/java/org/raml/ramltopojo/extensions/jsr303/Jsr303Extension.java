@@ -19,6 +19,7 @@ import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.EventType;
+import org.raml.ramltopojo.extensions.PluginContext;
 import org.raml.ramltopojo.object.ObjectTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.datamodel.*;
 
@@ -36,7 +37,7 @@ import java.math.BigInteger;
 public class Jsr303Extension extends ObjectTypeHandlerPlugin.Helper {
 
   @Override
-  public FieldSpec.Builder fieldBuilt(TypeDeclaration typeDeclaration, FieldSpec.Builder fieldSpec, EventType eventType) {
+  public FieldSpec.Builder fieldBuilt(PluginContext pluginContext, TypeDeclaration typeDeclaration, FieldSpec.Builder fieldSpec, EventType eventType) {
     addFacetsForAll(fieldSpec, typeDeclaration);
 
     if (typeDeclaration instanceof NumberTypeDeclaration) {

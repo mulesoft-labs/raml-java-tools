@@ -87,7 +87,7 @@ public class RamlToPojoMojo extends AbstractMojo {
         try {
             FileUtils.forceMkdir(outputDirectory);
         } catch (final IOException ioe) {
-            throw new MojoExecutionException("Failed to create directory: " + outputDirectory, ioe);
+            throw new MojoExecutionException("Failed to createHandler directory: " + outputDirectory, ioe);
         }
 
         try {

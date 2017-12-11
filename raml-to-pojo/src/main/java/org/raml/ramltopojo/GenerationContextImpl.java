@@ -1,8 +1,11 @@
 package org.raml.ramltopojo;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.SetMultimap;
 import org.raml.ramltopojo.object.ObjectTypeHandlerPlugin;
 import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.v2.api.model.v10.api.Api;
+import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import java.io.IOException;
@@ -20,6 +23,7 @@ public class GenerationContextImpl implements GenerationContext {
     private final Api api;
     private final TypeFetcher typeFetcher;
     private final ConcurrentHashMap<String, CreationResult> knownTypes = new ConcurrentHashMap<>();
+    private final SetMultimap<String, CreationResult> childTypes = HashMultimap.create();
     private final String defaultPackage;
 
     public GenerationContextImpl(Api api) {
@@ -42,8 +46,15 @@ public class GenerationContextImpl implements GenerationContext {
         } else {
 
             TypeDeclaration typeDeclaration = typeFetcher.fetchType(api, typeName);
-            CreationResult result =  TypeDeclarationType.typeHandler(typeDeclaration).create(this);
+            CreationResult result =  TypeDeclarationType.createType(typeDeclaration, this);
+
             knownTypes.put(typeName, result);
+
+            // At this point, all parent types should have been created.  So let's build the hierarchy.
+            if ( ramlType instanceof ObjectTypeDeclaration ) {
+
+               // List<String> extendedTypeNames = TypeDeclarationType.extendedTypes();
+            }
             return result;
         }
     }
@@ -51,6 +62,17 @@ public class GenerationContextImpl implements GenerationContext {
     @Override
     public String defaultPackage() {
         return defaultPackage;
+    }
+
+
+    @Override
+    public List<CreationResult> childClasses(String ramlTypeName) {
+        return null;
+    }
+
+    @Override
+    public void newExpectedType(String name, CreationResult creationResult) {
+        knownTypes.put(name, creationResult);
     }
 
     @Override

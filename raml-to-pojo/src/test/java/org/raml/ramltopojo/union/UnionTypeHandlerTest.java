@@ -33,7 +33,9 @@ public class UnionTypeHandlerTest {
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("union-type.raml"), ".");
         UnionTypeHandler handler = new UnionTypeHandler(findTypes("foo", api.types()));
 
-        CreationResult r = handler.create(new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack"));
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack");
+        generationContext.newExpectedType("foo", new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
+        CreationResult r = handler.create(generationContext);
 
 
         assertThat(r.getInterface(), is(allOf(

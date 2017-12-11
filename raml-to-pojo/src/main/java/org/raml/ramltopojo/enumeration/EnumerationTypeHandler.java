@@ -4,10 +4,7 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
-import org.raml.ramltopojo.CreationResult;
-import org.raml.ramltopojo.GenerationContext;
-import org.raml.ramltopojo.Names;
-import org.raml.ramltopojo.TypeHandler;
+import org.raml.ramltopojo.*;
 import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
 
 import javax.lang.model.element.Modifier;
@@ -25,11 +22,18 @@ public class EnumerationTypeHandler implements TypeHandler {
     }
 
     @Override
+    public ClassName javaTypeName(GenerationContext generationContext, EventType type) {
+
+        return ClassName.get(generationContext.defaultPackage(), Names.typeName(typeDeclaration.name()));
+    }
+
+    @Override
     public CreationResult create(GenerationContext generationContext) {
 
         FieldSpec.Builder field = FieldSpec.builder(ClassName.get(String.class), "name").addModifiers(Modifier.PRIVATE);
 
-        TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder(ClassName.get(generationContext.defaultPackage(), Names.typeName(typeDeclaration.name())))
+        CreationResult creationResult = generationContext.findCreatedType(typeDeclaration.name(), typeDeclaration);
+        TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder(creationResult.getJavaName(EventType.INTERFACE))
                 .addField(field.build())
                 .addModifiers(Modifier.PUBLIC)
                 .addMethod(
@@ -44,7 +48,6 @@ public class EnumerationTypeHandler implements TypeHandler {
                     builder.build());
         }
 
-
-        return CreationResult.forEnumeration(generationContext.defaultPackage(), enumBuilder.build());
+        return creationResult.withInterface(enumBuilder.build());
     }
 }

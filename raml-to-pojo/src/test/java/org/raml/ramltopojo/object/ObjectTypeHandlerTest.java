@@ -9,10 +9,13 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.raml.ramltopojo.*;
+import org.raml.ramltopojo.extensions.PluginContext;
 import org.raml.ramltopojo.plugin.PluginManager;
+import org.raml.testutils.UnitTest;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
@@ -40,7 +43,10 @@ import static org.raml.testutils.matchers.TypeSpecMatchers.*;
 /**
  * Created. There, you have it.
  */
-public class ObjectTypeHandlerTest {
+public class ObjectTypeHandlerTest extends UnitTest {
+
+    @Mock
+    PluginContext pluginContext;
 
     @Test
     public void simplest() throws Exception {
@@ -48,7 +54,10 @@ public class ObjectTypeHandlerTest {
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("simplest-type.raml"), ".");
         ObjectTypeHandler handler = new ObjectTypeHandler(RamlLoader.findTypes("foo", api.types()));
 
-        CreationResult r = handler.create(new GenerationContextImpl(api));
+        GenerationContextImpl generationContext = new GenerationContextImpl(api);
+        generationContext.newExpectedType("foo", new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
+
+        CreationResult r = handler.create(generationContext);
 
         assertThat(r.getInterface(), is(allOf(
                 name(equalTo("Foo")),
@@ -87,7 +96,9 @@ public class ObjectTypeHandlerTest {
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("simplest-containing-simple-array.raml"), ".");
         ObjectTypeHandler handler = new ObjectTypeHandler(RamlLoader.findTypes("foo", api.types()));
 
-        CreationResult r = handler.create(new GenerationContextImpl(api));
+        GenerationContextImpl generationContext = new GenerationContextImpl(api);
+        generationContext.newExpectedType("foo", new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
+        CreationResult r = handler.create(generationContext);
         System.err.println(r.getInterface().toString());
         System.err.println(r.getImplementation().toString());
 
@@ -316,7 +327,10 @@ public class ObjectTypeHandlerTest {
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-type.raml"), ".");
         ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
 
-        CreationResult r = handler.create(new GenerationContextImpl(api));
+        GenerationContextImpl generationContext = new GenerationContextImpl(api);
+        generationContext.newExpectedType("foo", new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
+
+        CreationResult r = handler.create(generationContext);
 
         assertThat(r.getInternalTypeForProperty("inside").getInterface(), name(equalTo("Inside")));
         assertThat(r.getInternalTypeForProperty("inside").getImplementation().get(), name(equalTo("InsideImpl")));
@@ -326,22 +340,22 @@ public class ObjectTypeHandlerTest {
     public void pluginCalled() throws Exception {
 
         final ObjectTypeHandlerPlugin mockPlugin = mock(ObjectTypeHandlerPlugin.class);
-        when(mockPlugin.classCreated(ArgumentMatchers.any(ObjectTypeDeclaration.class), ArgumentMatchers.any(TypeSpec.Builder.class), eq(EventType.INTERFACE))).thenAnswer(new Answer<TypeSpec.Builder>() {
+        when(mockPlugin.classCreated(ArgumentMatchers.any(PluginContext.class), ArgumentMatchers.any(ObjectTypeDeclaration.class), ArgumentMatchers.any(TypeSpec.Builder.class), eq(EventType.INTERFACE))).thenAnswer(new Answer<TypeSpec.Builder>() {
             @Override
             public TypeSpec.Builder answer(InvocationOnMock invocation) throws Throwable {
-                return (TypeSpec.Builder) invocation.getArguments()[1];
+                return (TypeSpec.Builder) invocation.getArguments()[2];
             }
         });
-        when(mockPlugin.getterBuilt(ArgumentMatchers.any(ObjectTypeDeclaration.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE))).thenAnswer(new Answer<MethodSpec.Builder>() {
+        when(mockPlugin.getterBuilt(ArgumentMatchers.any(PluginContext.class), ArgumentMatchers.any(ObjectTypeDeclaration.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE))).thenAnswer(new Answer<MethodSpec.Builder>() {
             @Override
             public MethodSpec.Builder answer(InvocationOnMock invocation) throws Throwable {
-                return (MethodSpec.Builder) invocation.getArguments()[1];
+                return (MethodSpec.Builder) invocation.getArguments()[2];
             }
         });
-        when(mockPlugin.setterBuilt(ArgumentMatchers.any(ObjectTypeDeclaration.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE))).thenAnswer(new Answer<MethodSpec.Builder>() {
+        when(mockPlugin.setterBuilt(ArgumentMatchers.any(PluginContext.class), ArgumentMatchers.any(ObjectTypeDeclaration.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE))).thenAnswer(new Answer<MethodSpec.Builder>() {
             @Override
             public MethodSpec.Builder answer(InvocationOnMock invocation) throws Throwable {
-                return (MethodSpec.Builder) invocation.getArguments()[1];
+                return (MethodSpec.Builder) invocation.getArguments()[2];
             }
         });
 
@@ -349,18 +363,21 @@ public class ObjectTypeHandlerTest {
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("plugin-test.raml"), ".");
         ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
 
-        CreationResult r = handler.create(new GenerationContextImpl(api) {
+        GenerationContextImpl generationContext = new GenerationContextImpl(api){
             @Override
             public ObjectTypeHandlerPlugin pluginsForObjects(TypeDeclaration... typeDeclarations) {
                 return mockPlugin;
             }
-        });
+        };
+        generationContext.newExpectedType("foo", new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
+
+        CreationResult r = handler.create(generationContext);
 
         assertNotNull(r);
         assertFalse(r.getImplementation().isPresent());
-        verify(mockPlugin, times(1)).classCreated(ArgumentMatchers.any(ObjectTypeDeclaration.class), ArgumentMatchers.any(TypeSpec.Builder.class), eq(EventType.INTERFACE));
-        verify(mockPlugin, times(2)).getterBuilt(ArgumentMatchers.any(StringTypeDeclaration.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE));
-        verify(mockPlugin, times(2)).setterBuilt(ArgumentMatchers.any(StringTypeDeclaration.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE));
+        verify(mockPlugin, times(1)).classCreated(ArgumentMatchers.any(PluginContext.class), ArgumentMatchers.any(ObjectTypeDeclaration.class), ArgumentMatchers.any(TypeSpec.Builder.class), eq(EventType.INTERFACE));
+        verify(mockPlugin, times(2)).getterBuilt(ArgumentMatchers.any(PluginContext.class), ArgumentMatchers.any(StringTypeDeclaration.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE));
+        verify(mockPlugin, times(2)).setterBuilt(ArgumentMatchers.any(PluginContext.class), ArgumentMatchers.any(StringTypeDeclaration.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE));
     }
 
     @Test
@@ -370,7 +387,10 @@ public class ObjectTypeHandlerTest {
         Api api = RamlLoader.load(url.openStream(), new File(url.getFile()).getAbsolutePath());
         ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
 
-        CreationResult r = handler.create(new GenerationContextImpl(PluginManager.createPluginManager("org/raml/ramltopojo/object/simple-plugin.properties"), api, TypeFetchers.NULL_FETCHER, "hello"));
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.createPluginManager("org/raml/ramltopojo/object/simple-plugin.properties"), api, TypeFetchers.NULL_FETCHER, "bar.pack");
+        generationContext.newExpectedType("foo", new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
+
+        CreationResult r = handler.create(generationContext);
 
         assertNotNull(r);
         assertTrue(r.getInterface().annotations.size() == 1);

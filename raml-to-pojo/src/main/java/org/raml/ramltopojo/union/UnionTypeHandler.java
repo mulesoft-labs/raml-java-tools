@@ -21,14 +21,19 @@ public class UnionTypeHandler implements TypeHandler {
     }
 
     @Override
+    public ClassName javaTypeName(GenerationContext generationContext, EventType type) {
+        return ClassName.get(generationContext.defaultPackage(), Names.typeName(union.name())); }
+
+    @Override
     public CreationResult create(GenerationContext generationContext) {
 
+        CreationResult result = generationContext.findCreatedType(union.name(), union);
         ClassName interfaceName = ClassName.get(generationContext.defaultPackage(), Names.typeName(union.name()));
         ClassName implementationName = ClassName.get(generationContext.defaultPackage(), Names.typeName(union.name(), "Impl"));
 
         TypeSpec.Builder interf = getDeclaration(interfaceName, generationContext);
         TypeSpec.Builder impl = getImplementation(interfaceName, implementationName, generationContext);
-        return CreationResult.forType(generationContext.defaultPackage(), interf.build(), impl.build());
+        return result.withInterface(interf.build()).withImplementation(impl.build());
     }
 
     private TypeSpec.Builder getImplementation(ClassName interfaceName, ClassName implementationName, GenerationContext generationContext) {

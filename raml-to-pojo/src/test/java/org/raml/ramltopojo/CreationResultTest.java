@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeSpec;
 import org.junit.Test;
 import org.raml.testutils.UnitTest;
@@ -19,7 +20,7 @@ public class CreationResultTest extends UnitTest{
     @Test
     public void createType() throws Exception {
 
-        CreationResult result = new CreationResult("pack.me", interf, cls) {
+        CreationResult result = new CreationResult("pack.me", ClassName.get("", "foo"), ClassName.get("", "foo")) {
 
             TypeSpec[] specs = {interf, cls};
             int c = 0;
@@ -32,6 +33,7 @@ public class CreationResultTest extends UnitTest{
             }
         };
 
+        result.withInterface(interf).withImplementation(cls);
         result.createType("/tmp/foo");
     }
 

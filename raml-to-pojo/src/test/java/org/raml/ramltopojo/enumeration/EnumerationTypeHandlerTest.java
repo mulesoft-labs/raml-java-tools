@@ -1,10 +1,13 @@
 package org.raml.ramltopojo.enumeration;
 
+import com.squareup.javapoet.ClassName;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.raml.ramltopojo.CreationResult;
 import org.raml.ramltopojo.GenerationContextImpl;
+import org.raml.ramltopojo.TypeFetchers;
+import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.testutils.UnitTest;
 import org.raml.testutils.matchers.FieldSpecMatchers;
 import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
@@ -33,7 +36,10 @@ public class EnumerationTypeHandlerTest extends UnitTest {
         when(declaration.enumValues()).thenReturn(Arrays.asList("one", "two", "three"));
 
         EnumerationTypeHandler handler = new EnumerationTypeHandler(declaration);
-        CreationResult result = handler.create(new GenerationContextImpl(null));
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, null, TypeFetchers.fromTypes(), "bar.pack");
+        generationContext.newExpectedType("Days", new CreationResult("bar.pack", ClassName.get("bar.pack", "Days"), null));
+
+        CreationResult result = handler.create(generationContext);
 
         assertThat(result.getInterface(), allOf(
                 name(equalTo("Days")),
