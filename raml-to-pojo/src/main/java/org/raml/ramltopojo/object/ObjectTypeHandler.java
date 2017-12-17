@@ -37,8 +37,8 @@ public class ObjectTypeHandler implements TypeHandler {
 
 
         // I need to createHandler an interface and an implementation.
-        PluginContext context = new PluginContextImpl(generationContext);
         CreationResult result = generationContext.findCreatedType(objectTypeDeclaration.name(), objectTypeDeclaration);
+        PluginContext context = new PluginContextImpl(generationContext, result);
         TypeSpec interfaceSpec = createInterface(context,  result, generationContext);
         TypeSpec implementationSpec = createImplementation(context,  result, interfaceSpec, generationContext);
 

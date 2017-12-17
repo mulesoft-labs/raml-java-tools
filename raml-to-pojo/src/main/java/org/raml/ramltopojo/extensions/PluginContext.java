@@ -2,12 +2,14 @@ package org.raml.ramltopojo.extensions;
 
 import org.raml.ramltopojo.CreationResult;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Created. There, you have it.
  */
 public interface PluginContext {
 
-    List<CreationResult> childClasses(String ramlTypeName);
+    Set<CreationResult> childClasses(String ramlTypeName);
+
+    CreationResult creationResult();
 }

@@ -28,6 +28,7 @@ public class RamlToPojoImpl implements RamlToPojo {
 
             CreationResult creationResult = new CreationResult(generationContext.defaultPackage(), intf, impl);
             generationContext.newExpectedType(typeDeclaration.name(), creationResult);
+            generationContext.setupTypeHierarchy(typeDeclaration);
         }
 
         for (TypeDeclaration typeDeclaration : typeFinder.findTypes(generationContext.api())) {

@@ -23,7 +23,7 @@ public class GenerationContextImpl implements GenerationContext {
     private final Api api;
     private final TypeFetcher typeFetcher;
     private final ConcurrentHashMap<String, CreationResult> knownTypes = new ConcurrentHashMap<>();
-    private final SetMultimap<String, CreationResult> childTypes = HashMultimap.create();
+    private final SetMultimap<String, String> childTypes = HashMultimap.create();
     private final String defaultPackage;
 
     public GenerationContextImpl(Api api) {
@@ -49,12 +49,6 @@ public class GenerationContextImpl implements GenerationContext {
             CreationResult result =  TypeDeclarationType.createType(typeDeclaration, this);
 
             knownTypes.put(typeName, result);
-
-            // At this point, all parent types should have been created.  So let's build the hierarchy.
-            if ( ramlType instanceof ObjectTypeDeclaration ) {
-
-               // List<String> extendedTypeNames = TypeDeclarationType.extendedTypes();
-            }
             return result;
         }
     }
@@ -66,8 +60,22 @@ public class GenerationContextImpl implements GenerationContext {
 
 
     @Override
-    public List<CreationResult> childClasses(String ramlTypeName) {
-        return null;
+    public Set<String> childClasses(String ramlTypeName) {
+        return childTypes.get(ramlTypeName);
+    }
+
+    public void setupTypeHierarchy(TypeDeclaration typeDeclaration) {
+
+        // Temporary....
+        if ( typeDeclaration instanceof ObjectTypeDeclaration ) {
+
+            ObjectTypeDeclaration objectTypeDeclaration = (ObjectTypeDeclaration) typeDeclaration;
+            List<TypeDeclaration> parents = objectTypeDeclaration.parentTypes();
+            for (TypeDeclaration parent : parents) {
+                setupTypeHierarchy(parent);
+                childTypes.put(parent.name(), objectTypeDeclaration.name());
+            }
+        }
     }
 
     @Override
