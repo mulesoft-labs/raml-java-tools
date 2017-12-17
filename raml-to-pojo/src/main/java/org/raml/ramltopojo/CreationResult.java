@@ -51,7 +51,12 @@ public class CreationResult {
 
     public void createType(String rootDirectory) throws IOException {
 
-        createInlineType(this);
+        // This is a bit wrong.  We are covering ourselves because
+        // we a generating some types twice.  TODO fix this.
+        if ( interf.typeSpecs.size() == 0 ) {
+            createInlineType(this);
+        }
+
         createJavaFile(packageName, interf, rootDirectory, true);
 
         if ( implementationName != null ) {
@@ -110,34 +115,4 @@ public class CreationResult {
         return internalTypes.get(name);
     }
 
- /*   public static class Builder {
-
-        public TypeSpec interf;
-        public TypeSpec impl;
-        public Map<String, CreationResult> internalTypes = new HashMap<>();
-
-        public Builder withInterface(TypeSpec spec) {
-            interf = spec;
-            return this;
-        }
-
-        public Builder withImplementation(TypeSpec spec) {
-            impl = spec;
-            return this;
-        }
-
-        public Builder withInternalType(String name, CreationResult internal) {
-
-            internalTypes.put(name, internal);
-            return this;
-        }
-
-        public CreationResult build(GenerationContext context) {
-
-            CreationResult result =  CreationResult.forType(context.defaultPackage(), interf, impl);
-            result.internalTypes.putAll(internalTypes);
-
-            return result;
-        }
-    }*/
 }

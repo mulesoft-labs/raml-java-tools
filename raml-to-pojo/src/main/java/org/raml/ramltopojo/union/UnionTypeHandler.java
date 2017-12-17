@@ -25,7 +25,7 @@ public class UnionTypeHandler implements TypeHandler {
         return ClassName.get(generationContext.defaultPackage(), Names.typeName(union.name())); }
 
     @Override
-    public CreationResult create(GenerationContext generationContext) {
+    public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
 
         CreationResult result = generationContext.findCreatedType(union.name(), union);
         ClassName interfaceName = ClassName.get(generationContext.defaultPackage(), Names.typeName(union.name()));

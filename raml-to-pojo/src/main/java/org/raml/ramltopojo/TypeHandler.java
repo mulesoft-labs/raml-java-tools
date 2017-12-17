@@ -7,5 +7,5 @@ import com.squareup.javapoet.ClassName;
  */
 public interface TypeHandler {
     ClassName javaTypeName(GenerationContext generationContext, EventType type);
-    CreationResult create(GenerationContext generationContext);
+    CreationResult create(GenerationContext generationContext, CreationResult preCreationResult);
 }

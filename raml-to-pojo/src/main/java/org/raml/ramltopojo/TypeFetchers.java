@@ -18,7 +18,7 @@ public class TypeFetchers {
     public static final TypeFetcher NULL_FETCHER = new TypeFetcher() {
         @Override
         public TypeDeclaration fetchType(Api api, String name) throws GenerationException {
-            throw new GenerationException("null fetcher can't fetch types");
+            throw new GenerationException("null fetcher can't fetch types: " + name);
         }
     };
 

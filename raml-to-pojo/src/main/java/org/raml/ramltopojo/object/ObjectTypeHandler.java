@@ -34,11 +34,10 @@ public class ObjectTypeHandler implements TypeHandler {
     }
 
     @Override
-    public CreationResult create(GenerationContext generationContext) {
+    public CreationResult create(GenerationContext generationContext, CreationResult result) {
 
 
         // I need to createHandler an interface and an implementation.
-        CreationResult result = generationContext.findCreatedType(objectTypeDeclaration.name(), objectTypeDeclaration);
         ObjectPluginContext context = new ObjectPluginContextImpl(generationContext, result);
         TypeSpec interfaceSpec = createInterface(context,  result, generationContext);
         TypeSpec implementationSpec = createImplementation(context,  result, interfaceSpec, generationContext);

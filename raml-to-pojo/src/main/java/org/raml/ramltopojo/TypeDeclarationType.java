@@ -9,11 +9,14 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.enumeration.EnumerationTypeHandler;
 import org.raml.ramltopojo.object.ObjectTypeHandler;
+import org.raml.ramltopojo.object.ObjectTypeHandlerPlugin;
 import org.raml.ramltopojo.union.UnionTypeHandler;
+import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.*;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -361,8 +364,9 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         TypeHandler handler = typeDeclarationType.createHandler(typeDeclarationType, typeDeclaration);
         ClassName intf = handler.javaTypeName(context, EventType.INTERFACE);
         ClassName impl = handler.javaTypeName(context, EventType.IMPLEMENTATION);
-        context.newExpectedType(typeDeclaration.name(), new CreationResult(context.defaultPackage(), intf, impl));
-        return handler.create(context);
+        CreationResult creationResult = new CreationResult(context.defaultPackage(), intf, impl);
+        context.newExpectedType(typeDeclaration.name(), creationResult);
+        return handler.create(context, creationResult);
     }
 
     /**
@@ -372,14 +376,15 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
      * @param context
      * @return
      */
-    public static CreationResult createInlineType(String name, TypeDeclaration typeDeclaration, GenerationContext context) {
+    public static CreationResult createInlineType(String name, TypeDeclaration typeDeclaration, final GenerationContext context) {
 
         TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
 
         TypeHandler handler = typeDeclarationType.createHandler(typeDeclarationType, typeDeclaration);
-        ClassName intf = handler.javaTypeName(context, EventType.INTERFACE);
-        ClassName impl = handler.javaTypeName(context, EventType.IMPLEMENTATION);
-        return new CreationResult(context.defaultPackage(), intf, impl);
+        ClassName intf = handler.javaTypeName(new InlineGenerationContext(context),  EventType.INTERFACE);
+        ClassName impl = handler.javaTypeName(new InlineGenerationContext(context), EventType.IMPLEMENTATION);
+        CreationResult preCreationResult = new CreationResult("", intf, impl);
+        return handler.create(context, preCreationResult);
     }
 
     /**
@@ -424,5 +429,48 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
 
     public static boolean isNewInlineType(TypeDeclaration declaration) {
         return ramlToType.get(Utils.declarationType(declaration)).shouldCreateInlineType(declaration);
+    }
+
+    private static class InlineGenerationContext implements GenerationContext {
+        private final GenerationContext context;
+
+        public InlineGenerationContext(GenerationContext context) {
+            this.context = context;
+        }
+
+        @Override
+        public CreationResult findCreatedType(String typeName, TypeDeclaration ramlType) {
+            return context.findCreatedType(typeName, ramlType);
+        }
+
+        @Override
+        public String defaultPackage() {
+            return "";
+        }
+
+        @Override
+        public void newExpectedType(String name, CreationResult creationResult) {
+
+        }
+
+        @Override
+        public void createTypes(String rootDirectory) throws IOException {
+
+        }
+
+        @Override
+        public ObjectTypeHandlerPlugin pluginsForObjects(TypeDeclaration... typeDeclarations) {
+            return context.pluginsForObjects(typeDeclarations);
+        }
+
+        @Override
+        public Api api() {
+            return context.api();
+        }
+
+        @Override
+        public Set<String> childClasses(String ramlTypeName) {
+            return context.childClasses(ramlTypeName);
+        }
     }
 }

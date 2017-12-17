@@ -28,7 +28,7 @@ public class EnumerationTypeHandler implements TypeHandler {
     }
 
     @Override
-    public CreationResult create(GenerationContext generationContext) {
+    public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
 
         FieldSpec.Builder field = FieldSpec.builder(ClassName.get(String.class), "name").addModifiers(Modifier.PRIVATE);
 

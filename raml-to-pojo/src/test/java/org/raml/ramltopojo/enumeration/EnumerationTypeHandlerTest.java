@@ -39,7 +39,7 @@ public class EnumerationTypeHandlerTest extends UnitTest {
         GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, null, TypeFetchers.fromTypes(), "bar.pack");
         generationContext.newExpectedType("Days", new CreationResult("bar.pack", ClassName.get("bar.pack", "Days"), null));
 
-        CreationResult result = handler.create(generationContext);
+        CreationResult result = handler.create(generationContext, null);
 
         assertThat(result.getInterface(), allOf(
                 name(equalTo("Days")),
