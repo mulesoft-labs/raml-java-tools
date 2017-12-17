@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.raml.ramltopojo.*;
-import org.raml.ramltopojo.extensions.PluginContext;
+import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.testutils.UnitTest;
 import org.raml.v2.api.model.v10.api.Api;
@@ -46,7 +46,7 @@ import static org.raml.testutils.matchers.TypeSpecMatchers.*;
 public class ObjectTypeHandlerTest extends UnitTest {
 
     @Mock
-    PluginContext pluginContext;
+    ObjectPluginContext objectPluginContext;
 
     @Test
     public void simplest() throws Exception {
@@ -340,19 +340,19 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void pluginCalled() throws Exception {
 
         final ObjectTypeHandlerPlugin mockPlugin = mock(ObjectTypeHandlerPlugin.class);
-        when(mockPlugin.classCreated(ArgumentMatchers.any(PluginContext.class), ArgumentMatchers.any(ObjectTypeDeclaration.class), ArgumentMatchers.any(TypeSpec.Builder.class), eq(EventType.INTERFACE))).thenAnswer(new Answer<TypeSpec.Builder>() {
+        when(mockPlugin.classCreated(ArgumentMatchers.any(ObjectPluginContext.class), ArgumentMatchers.any(ObjectTypeDeclaration.class), ArgumentMatchers.any(TypeSpec.Builder.class), eq(EventType.INTERFACE))).thenAnswer(new Answer<TypeSpec.Builder>() {
             @Override
             public TypeSpec.Builder answer(InvocationOnMock invocation) throws Throwable {
                 return (TypeSpec.Builder) invocation.getArguments()[2];
             }
         });
-        when(mockPlugin.getterBuilt(ArgumentMatchers.any(PluginContext.class), ArgumentMatchers.any(ObjectTypeDeclaration.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE))).thenAnswer(new Answer<MethodSpec.Builder>() {
+        when(mockPlugin.getterBuilt(ArgumentMatchers.any(ObjectPluginContext.class), ArgumentMatchers.any(ObjectTypeDeclaration.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE))).thenAnswer(new Answer<MethodSpec.Builder>() {
             @Override
             public MethodSpec.Builder answer(InvocationOnMock invocation) throws Throwable {
                 return (MethodSpec.Builder) invocation.getArguments()[2];
             }
         });
-        when(mockPlugin.setterBuilt(ArgumentMatchers.any(PluginContext.class), ArgumentMatchers.any(ObjectTypeDeclaration.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE))).thenAnswer(new Answer<MethodSpec.Builder>() {
+        when(mockPlugin.setterBuilt(ArgumentMatchers.any(ObjectPluginContext.class), ArgumentMatchers.any(ObjectTypeDeclaration.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE))).thenAnswer(new Answer<MethodSpec.Builder>() {
             @Override
             public MethodSpec.Builder answer(InvocationOnMock invocation) throws Throwable {
                 return (MethodSpec.Builder) invocation.getArguments()[2];
@@ -375,9 +375,9 @@ public class ObjectTypeHandlerTest extends UnitTest {
 
         assertNotNull(r);
         assertFalse(r.getImplementation().isPresent());
-        verify(mockPlugin, times(1)).classCreated(ArgumentMatchers.any(PluginContext.class), ArgumentMatchers.any(ObjectTypeDeclaration.class), ArgumentMatchers.any(TypeSpec.Builder.class), eq(EventType.INTERFACE));
-        verify(mockPlugin, times(2)).getterBuilt(ArgumentMatchers.any(PluginContext.class), ArgumentMatchers.any(StringTypeDeclaration.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE));
-        verify(mockPlugin, times(2)).setterBuilt(ArgumentMatchers.any(PluginContext.class), ArgumentMatchers.any(StringTypeDeclaration.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE));
+        verify(mockPlugin, times(1)).classCreated(ArgumentMatchers.any(ObjectPluginContext.class), ArgumentMatchers.any(ObjectTypeDeclaration.class), ArgumentMatchers.any(TypeSpec.Builder.class), eq(EventType.INTERFACE));
+        verify(mockPlugin, times(2)).getterBuilt(ArgumentMatchers.any(ObjectPluginContext.class), ArgumentMatchers.any(StringTypeDeclaration.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE));
+        verify(mockPlugin, times(2)).setterBuilt(ArgumentMatchers.any(ObjectPluginContext.class), ArgumentMatchers.any(StringTypeDeclaration.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE));
     }
 
     @Test

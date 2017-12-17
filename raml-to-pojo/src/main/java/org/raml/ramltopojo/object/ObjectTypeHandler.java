@@ -3,7 +3,8 @@ package org.raml.ramltopojo.object;
 import com.google.common.base.Optional;
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.*;
-import org.raml.ramltopojo.extensions.PluginContext;
+import org.raml.ramltopojo.extensions.ObjectPluginContext;
+import org.raml.ramltopojo.extensions.ObjectPluginContextImpl;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
@@ -38,7 +39,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
         // I need to createHandler an interface and an implementation.
         CreationResult result = generationContext.findCreatedType(objectTypeDeclaration.name(), objectTypeDeclaration);
-        PluginContext context = new PluginContextImpl(generationContext, result);
+        ObjectPluginContext context = new ObjectPluginContextImpl(generationContext, result);
         TypeSpec interfaceSpec = createInterface(context,  result, generationContext);
         TypeSpec implementationSpec = createImplementation(context,  result, interfaceSpec, generationContext);
 
@@ -46,7 +47,7 @@ public class ObjectTypeHandler implements TypeHandler {
         return result;
     }
 
-    private TypeSpec createImplementation(PluginContext pluginContext, CreationResult result, TypeSpec interfaceSpec, GenerationContext generationContext) {
+    private TypeSpec createImplementation(ObjectPluginContext objectPluginContext, CreationResult result, TypeSpec interfaceSpec, GenerationContext generationContext) {
 
         ClassName className = result.getJavaName(EventType.IMPLEMENTATION);
         TypeSpec.Builder typeSpec = TypeSpec
@@ -54,7 +55,7 @@ public class ObjectTypeHandler implements TypeHandler {
                 .addSuperinterface(ClassName.bestGuess(interfaceSpec.name))
                 .addModifiers(Modifier.PUBLIC);
 
-        typeSpec = generationContext.pluginsForObjects().classCreated(pluginContext, objectTypeDeclaration, typeSpec, EventType.IMPLEMENTATION);
+        typeSpec = generationContext.pluginsForObjects().classCreated(objectPluginContext, objectTypeDeclaration, typeSpec, EventType.IMPLEMENTATION);
         if ( typeSpec == null ) {
             return null;
         }
@@ -82,7 +83,7 @@ public class ObjectTypeHandler implements TypeHandler {
                         .initializer(CodeBlock.builder().add("$S", discriminatorValue).build());
 
             }
-            field = generationContext.pluginsForObjects().fieldBuilt(pluginContext, propertyDeclaration, field, EventType.IMPLEMENTATION);
+            field = generationContext.pluginsForObjects().fieldBuilt(objectPluginContext, propertyDeclaration, field, EventType.IMPLEMENTATION);
             if ( field != null ) {
                 typeSpec.addField(field.build());
             }
@@ -91,7 +92,7 @@ public class ObjectTypeHandler implements TypeHandler {
                     .addModifiers(Modifier.PUBLIC)
                     .addCode(CodeBlock.builder().addStatement("return this." + Names.variableName(propertyDeclaration.name())).build())
                     .returns(tn);
-            getMethod = generationContext.pluginsForObjects().getterBuilt(pluginContext, propertyDeclaration, getMethod, EventType.IMPLEMENTATION);
+            getMethod = generationContext.pluginsForObjects().getterBuilt(objectPluginContext, propertyDeclaration, getMethod, EventType.IMPLEMENTATION);
            if ( getMethod != null ) {
                typeSpec.addMethod(getMethod.build());
            }
@@ -105,7 +106,7 @@ public class ObjectTypeHandler implements TypeHandler {
                     .addModifiers(Modifier.PUBLIC)
                     .addCode(CodeBlock.builder().addStatement("this." + Names.variableName(propertyDeclaration.name()) + " = " + Names.variableName(propertyDeclaration.name())).build())
                     .addParameter(tn, Names.variableName(propertyDeclaration.name()));
-            setMethod = generationContext.pluginsForObjects().getterBuilt(pluginContext, propertyDeclaration, setMethod, EventType.IMPLEMENTATION);
+            setMethod = generationContext.pluginsForObjects().getterBuilt(objectPluginContext, propertyDeclaration, setMethod, EventType.IMPLEMENTATION);
             if ( setMethod != null ) {
                 typeSpec.addMethod(setMethod.build());
             }
@@ -114,13 +115,13 @@ public class ObjectTypeHandler implements TypeHandler {
         return typeSpec.build();
     }
 
-    private TypeSpec createInterface(PluginContext pluginContext, CreationResult result, GenerationContext generationContext) {
+    private TypeSpec createInterface(ObjectPluginContext objectPluginContext, CreationResult result, GenerationContext generationContext) {
 
         ClassName interf = result.getJavaName(EventType.INTERFACE);
         TypeSpec.Builder typeSpec = TypeSpec
                 .interfaceBuilder(interf)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-        typeSpec = generationContext.pluginsForObjects().classCreated(pluginContext, objectTypeDeclaration, typeSpec, EventType.INTERFACE);
+        typeSpec = generationContext.pluginsForObjects().classCreated(objectPluginContext, objectTypeDeclaration, typeSpec, EventType.INTERFACE);
         if ( typeSpec == null ) {
             return null;
         }
@@ -161,7 +162,7 @@ public class ObjectTypeHandler implements TypeHandler {
             MethodSpec.Builder getMethod = MethodSpec.methodBuilder(Names.methodName("get", propertyDeclaration.name()))
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                     .returns(tn);
-            getMethod = generationContext.pluginsForObjects().getterBuilt(pluginContext, propertyDeclaration, getMethod, EventType.INTERFACE);
+            getMethod = generationContext.pluginsForObjects().getterBuilt(objectPluginContext, propertyDeclaration, getMethod, EventType.INTERFACE);
 
             if ( getMethod != null ) {
                 typeSpec.addMethod(getMethod.build());
@@ -175,7 +176,7 @@ public class ObjectTypeHandler implements TypeHandler {
             MethodSpec.Builder setMethod = MethodSpec.methodBuilder(Names.methodName("set", propertyDeclaration.name()))
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                     .addParameter(tn, Names.variableName(propertyDeclaration.name()));
-            setMethod = generationContext.pluginsForObjects().setterBuilt(pluginContext, propertyDeclaration, setMethod, EventType.INTERFACE);
+            setMethod = generationContext.pluginsForObjects().setterBuilt(objectPluginContext, propertyDeclaration, setMethod, EventType.INTERFACE);
             if ( setMethod != null ) {
                 typeSpec.addMethod(setMethod.build());
             }

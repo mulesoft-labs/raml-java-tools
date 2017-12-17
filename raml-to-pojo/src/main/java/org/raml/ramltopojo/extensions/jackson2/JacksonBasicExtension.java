@@ -18,7 +18,7 @@ package org.raml.ramltopojo.extensions.jackson2;
 import com.fasterxml.jackson.annotation.*;
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.EventType;
-import org.raml.ramltopojo.extensions.PluginContext;
+import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.object.ObjectTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
@@ -37,7 +37,7 @@ public class JacksonBasicExtension extends ObjectTypeHandlerPlugin.Helper {
           Object.class);
 
   @Override
-  public TypeSpec.Builder classCreated(PluginContext pluginContext, ObjectTypeDeclaration obj, TypeSpec.Builder typeSpec, EventType eventType) {
+  public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration obj, TypeSpec.Builder typeSpec, EventType eventType) {
 
     if ( eventType != EventType.IMPLEMENTATION) {
 
@@ -102,19 +102,19 @@ public class JacksonBasicExtension extends ObjectTypeHandlerPlugin.Helper {
   }
 
   @Override
-  public FieldSpec.Builder fieldBuilt(PluginContext pluginContext, TypeDeclaration declaration, FieldSpec.Builder fieldSpec, EventType eventType) {
+  public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, FieldSpec.Builder fieldSpec, EventType eventType) {
     return fieldSpec.addAnnotation(AnnotationSpec.builder(JsonProperty.class)
             .addMember("value", "$S", declaration.name()).build());
   }
 
   @Override
-  public MethodSpec.Builder getterBuilt(PluginContext pluginContext, TypeDeclaration declaration, MethodSpec.Builder methodSpec, EventType eventType) {
+  public MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder methodSpec, EventType eventType) {
     return methodSpec.addAnnotation(AnnotationSpec.builder(JsonProperty.class)
             .addMember("value", "$S", declaration.name()).build());
   }
 
   @Override
-  public MethodSpec.Builder setterBuilt(PluginContext pluginContext, TypeDeclaration declaration, MethodSpec.Builder methodSpec, EventType eventType) {
+  public MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder methodSpec, EventType eventType) {
     return methodSpec.addAnnotation(AnnotationSpec.builder(JsonProperty.class)
             .addMember("value", "$S", declaration.name()).build());
   }

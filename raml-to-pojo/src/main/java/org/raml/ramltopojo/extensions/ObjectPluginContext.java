@@ -7,9 +7,8 @@ import java.util.Set;
 /**
  * Created. There, you have it.
  */
-public interface PluginContext {
+public interface ObjectPluginContext {
 
     Set<CreationResult> childClasses(String ramlTypeName);
-
     CreationResult creationResult();
 }

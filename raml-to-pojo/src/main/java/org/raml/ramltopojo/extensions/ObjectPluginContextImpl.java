@@ -1,8 +1,9 @@
-package org.raml.ramltopojo;
+package org.raml.ramltopojo.extensions;
 
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
-import org.raml.ramltopojo.extensions.PluginContext;
+import org.raml.ramltopojo.CreationResult;
+import org.raml.ramltopojo.GenerationContext;
 
 import javax.annotation.Nullable;
 import java.util.Set;
@@ -10,11 +11,11 @@ import java.util.Set;
 /**
  * Created. There, you have it.
  */
-public class PluginContextImpl implements PluginContext {
+public class ObjectPluginContextImpl implements ObjectPluginContext {
     private final GenerationContext generationContext;
     private final CreationResult result;
 
-    public PluginContextImpl(GenerationContext generationContext, CreationResult result) {
+    public ObjectPluginContextImpl(GenerationContext generationContext, CreationResult result) {
         this.generationContext = generationContext;
         this.result = result;
     }

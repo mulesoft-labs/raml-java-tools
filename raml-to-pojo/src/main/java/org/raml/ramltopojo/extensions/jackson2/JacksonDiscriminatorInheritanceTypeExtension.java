@@ -24,7 +24,7 @@ import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.Annotations;
 import org.raml.ramltopojo.CreationResult;
 import org.raml.ramltopojo.EventType;
-import org.raml.ramltopojo.extensions.PluginContext;
+import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.object.ObjectTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 
@@ -34,7 +34,7 @@ import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 public class JacksonDiscriminatorInheritanceTypeExtension extends ObjectTypeHandlerPlugin.Helper {
 
   @Override
-  public TypeSpec.Builder classCreated(PluginContext pluginContext, ObjectTypeDeclaration ramlType, TypeSpec.Builder typeSpec, EventType eventType) {
+  public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, TypeSpec.Builder typeSpec, EventType eventType) {
 
     if ( eventType == EventType.IMPLEMENTATION) {
       return typeSpec;
@@ -42,7 +42,7 @@ public class JacksonDiscriminatorInheritanceTypeExtension extends ObjectTypeHand
 
     ObjectTypeDeclaration otr = ramlType;
 
-    if (otr.discriminator() != null && pluginContext.childClasses(otr.name()).size() > 0) {
+    if (otr.discriminator() != null && objectPluginContext.childClasses(otr.name()).size() > 0) {
 
       typeSpec.addAnnotation(AnnotationSpec.builder(JsonTypeInfo.class)
               .addMember("use", "$T.Id.NAME", JsonTypeInfo.class)
@@ -50,7 +50,7 @@ public class JacksonDiscriminatorInheritanceTypeExtension extends ObjectTypeHand
               .addMember("property", "$S", otr.discriminator()).build());
 
       AnnotationSpec.Builder subTypes = AnnotationSpec.builder(JsonSubTypes.class);
-      for (CreationResult result : pluginContext.childClasses(ramlType.name())) {
+      for (CreationResult result : objectPluginContext.childClasses(ramlType.name())) {
 
         subTypes.addMember(
                 "value",
@@ -73,10 +73,10 @@ public class JacksonDiscriminatorInheritanceTypeExtension extends ObjectTypeHand
     }
 
 
-    if (pluginContext.childClasses(otr.name()).size() == 0 && !Annotations.ABSTRACT.get(otr)) {
+    if (objectPluginContext.childClasses(otr.name()).size() == 0 && !Annotations.ABSTRACT.get(otr)) {
 
       typeSpec.addAnnotation(AnnotationSpec.builder(JsonDeserialize.class)
-              .addMember("as", "$L.class", pluginContext.creationResult().getImplementation().or(pluginContext.creationResult().getImplementation()))
+              .addMember("as", "$L.class", objectPluginContext.creationResult().getImplementation().or(objectPluginContext.creationResult().getImplementation()))
               .build());
     }
 

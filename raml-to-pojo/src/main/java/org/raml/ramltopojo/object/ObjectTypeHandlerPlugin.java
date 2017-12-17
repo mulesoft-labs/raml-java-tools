@@ -4,7 +4,7 @@ import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EventType;
-import org.raml.ramltopojo.extensions.PluginContext;
+import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
@@ -20,30 +20,30 @@ public interface ObjectTypeHandlerPlugin {
     class Helper implements ObjectTypeHandlerPlugin {
 
         @Override
-        public TypeSpec.Builder classCreated(PluginContext pluginContext, ObjectTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+        public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
             return incoming;
         }
 
         @Override
-        public FieldSpec.Builder fieldBuilt(PluginContext pluginContext, TypeDeclaration declaration, FieldSpec.Builder incoming, EventType eventType) {
+        public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, FieldSpec.Builder incoming, EventType eventType) {
             return incoming;
         }
 
         @Override
-        public MethodSpec.Builder getterBuilt(PluginContext pluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType) {
+        public MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType) {
             return incoming;
         }
 
         @Override
-        public MethodSpec.Builder setterBuilt(PluginContext pluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType) {
+        public MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType) {
             return incoming;
         }
     }
 
-    TypeSpec.Builder classCreated(PluginContext pluginContext, ObjectTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType);
-    FieldSpec.Builder fieldBuilt(PluginContext pluginContext, TypeDeclaration declaration, FieldSpec.Builder incoming, EventType eventType);
-    MethodSpec.Builder getterBuilt(PluginContext pluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType);
-    MethodSpec.Builder setterBuilt(PluginContext pluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType);
+    TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType);
+    FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, FieldSpec.Builder incoming, EventType eventType);
+    MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType);
+    MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType);
 
     class Composite implements ObjectTypeHandlerPlugin {
 
@@ -55,49 +55,49 @@ public interface ObjectTypeHandlerPlugin {
         }
 
         @Override
-        public TypeSpec.Builder classCreated(PluginContext pluginContext, ObjectTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+        public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
 
             for (ObjectTypeHandlerPlugin plugin : plugins) {
                 if ( incoming == null ) {
                     break;
                 }
-                incoming = plugin.classCreated(pluginContext, ramlType, incoming, eventType);
+                incoming = plugin.classCreated(objectPluginContext, ramlType, incoming, eventType);
             }
 
             return incoming;
         }
 
         @Override
-        public FieldSpec.Builder fieldBuilt(PluginContext pluginContext, TypeDeclaration declaration, FieldSpec.Builder incoming, EventType eventType) {
+        public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, FieldSpec.Builder incoming, EventType eventType) {
             for (ObjectTypeHandlerPlugin plugin : plugins) {
                 if ( incoming == null ) {
                     break;
                 }
-                incoming = plugin.fieldBuilt(pluginContext, declaration, incoming, eventType);
+                incoming = plugin.fieldBuilt(objectPluginContext, declaration, incoming, eventType);
             }
 
             return incoming;
         }
 
         @Override
-        public MethodSpec.Builder getterBuilt(PluginContext pluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType) {
+        public MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType) {
             for (ObjectTypeHandlerPlugin plugin : plugins) {
                 if ( incoming == null ) {
                     break;
                 }
-                incoming = plugin.getterBuilt(pluginContext, declaration, incoming, eventType);
+                incoming = plugin.getterBuilt(objectPluginContext, declaration, incoming, eventType);
             }
 
             return incoming;
         }
 
         @Override
-        public MethodSpec.Builder setterBuilt(PluginContext pluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType) {
+        public MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType) {
             for (ObjectTypeHandlerPlugin plugin : plugins) {
                 if ( incoming == null ) {
                     break;
                 }
-                incoming = plugin.setterBuilt(pluginContext, declaration, incoming, eventType);
+                incoming = plugin.setterBuilt(objectPluginContext, declaration, incoming, eventType);
             }
 
             return incoming;

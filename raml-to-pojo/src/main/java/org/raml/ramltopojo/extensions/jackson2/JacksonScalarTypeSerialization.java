@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.FieldSpec;
 import org.raml.ramltopojo.EventType;
-import org.raml.ramltopojo.extensions.PluginContext;
+import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.object.ObjectTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.datamodel.*;
 
@@ -29,7 +29,7 @@ import org.raml.v2.api.model.v10.datamodel.*;
 public class JacksonScalarTypeSerialization extends ObjectTypeHandlerPlugin.Helper {
 
   @Override
-  public FieldSpec.Builder fieldBuilt(PluginContext pluginContext, TypeDeclaration typeDeclaration, FieldSpec.Builder builder, EventType eventType) {
+  public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration typeDeclaration, FieldSpec.Builder builder, EventType eventType) {
     if (typeDeclaration instanceof DateTimeOnlyTypeDeclaration) {
 
       builder.addAnnotation(AnnotationSpec.builder(JsonFormat.class)
