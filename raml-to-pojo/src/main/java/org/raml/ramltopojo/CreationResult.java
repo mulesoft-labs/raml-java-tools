@@ -24,31 +24,11 @@ public class CreationResult {
 
     private final Map<String, CreationResult> internalTypes = new HashMap<>();
 
-/*
-    public static CreationResult forType(String packageName, TypeSpec interfaceName, TypeSpec implementationName) {
-
-        return new CreationResult(packageName, interfaceName, implementationName);
-    }
-
-    public static CreationResult forEnumeration(String packageName, TypeSpec enumeration) {
-
-        return new CreationResult(packageName, enumeration, null);
-    }
-*/
-
     public CreationResult(String packageName, ClassName interfaceName, ClassName implementationName) {
         this.packageName = packageName;
         this.interfaceName = interfaceName;
         this.implementationName = implementationName;
     }
-
-/*
-    public static Builder builder() {
-
-        return new Builder();
-    }
-*/
-
 
     public CreationResult withInterface(TypeSpec spec) {
 

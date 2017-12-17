@@ -62,9 +62,13 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
+        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext, EventType eventType) {
             CreationResult result = generationContext.findCreatedType(typeName, originalTypeDeclaration);
-            return ClassName.bestGuess(result.getInterface().name);
+            if ( eventType == EventType.INTERFACE ) {
+                return ClassName.bestGuess(result.getInterface().name);
+            } else {
+                return ClassName.bestGuess(result.getImplementation().or(result.getInterface()).name);
+            }
         }
 
 
@@ -99,7 +103,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
+        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext, EventType eventType) {
             return null;
         }
 
@@ -115,10 +119,10 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
+        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext, EventType eventType) {
 
             ArrayTypeDeclaration arrayTypeDeclaration = (ArrayTypeDeclaration) originalTypeDeclaration;
-            return ParameterizedTypeName.get(ClassName.get(List.class), TypeDeclarationType.javaType(typeName, arrayTypeDeclaration.items(), generationContext).box());
+            return ParameterizedTypeName.get(ClassName.get(List.class), TypeDeclarationType.javaType(typeName, arrayTypeDeclaration.items(), generationContext, eventType).box());
         }
 
         @Override
@@ -134,7 +138,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
+        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext, EventType eventType) {
             return null;
         }
 
@@ -151,7 +155,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
+        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext, EventType eventType) {
             return TypeName.INT;
         }
 
@@ -167,7 +171,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
+        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext, EventType eventType) {
             return TypeName.BOOLEAN;
         }
 
@@ -183,7 +187,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
+        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext, EventType eventType) {
             return ClassName.get(Date.class);
         }
 
@@ -199,7 +203,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
+        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext, EventType eventType) {
             return ClassName.get(Date.class);
         }
 
@@ -215,7 +219,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
+        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext, EventType eventType) {
             return ClassName.get(Date.class);
         }
 
@@ -231,7 +235,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
+        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext, EventType eventType) {
             return ClassName.get(Date.class);
         }
 
@@ -247,7 +251,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
+        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext, EventType eventType) {
             return ClassName.get(BigDecimal.class);
         }
 
@@ -270,7 +274,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
+        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext, EventType eventType) {
             return ClassName.get(String.class);
         }
 
@@ -286,7 +290,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
+        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext, EventType eventType) {
             return ClassName.get(Object.class);
         }
 
@@ -302,7 +306,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext) {
+        public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext, EventType eventType) {
             return ClassName.get(File.class);
         }
 
@@ -324,7 +328,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     }
 
 
-    public abstract TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext);
+    public abstract TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext, EventType eventType);
     public abstract boolean shouldCreateInlineType(TypeDeclaration declaration);
 
     private static Map<Class, TypeDeclarationType> ramlToType = ImmutableMap.<Class, TypeDeclarationType>builder()
@@ -343,6 +347,13 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
             .put(AnyTypeDeclaration.class, ANY)
             .build();
 
+    /**
+     * Create the actual type.
+     *
+     * @param typeDeclaration
+     * @param context
+     * @return
+     */
     public static CreationResult createType(TypeDeclaration typeDeclaration, GenerationContext context) {
 
         TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
@@ -354,12 +365,35 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         return handler.create(context);
     }
 
+    /**
+     * Find the typename to create.
+     *
+     * @param typeDeclaration
+     * @param context
+     * @param eventType
+     * @return
+     */
     public static ClassName typeName(TypeDeclaration typeDeclaration, GenerationContext context, EventType eventType) {
 
         TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
 
         TypeHandler handler = typeDeclarationType.createHandler(typeDeclarationType, typeDeclaration);
         return handler.javaTypeName(context, eventType);
+    }
+
+    /**
+     * Find the declared type name. This does not create the type:  it's for the hierarchy types and
+     * dependent types where you have the RAML type name and need the Java type.
+     *
+     * @param typeName
+     * @param typeDeclaration
+     * @param generationContext
+     * @param eventType
+     * @return
+     */
+    public static TypeName javaType(String typeName, TypeDeclaration typeDeclaration, GenerationContext generationContext, EventType eventType) {
+
+        return ramlToType.get(Utils.declarationType(typeDeclaration)).asJavaPoetType(typeName, typeDeclaration, generationContext, eventType);
     }
 
  /*   public static TypeAnalyser typeAnalyser(TypeDeclaration typeDeclaration) {
@@ -370,10 +404,6 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     }
 */
 
-    public static TypeName javaType(String typeName, TypeDeclaration typeDeclaration, GenerationContext generationContext) {
-
-        return ramlToType.get(Utils.declarationType(typeDeclaration)).asJavaPoetType(typeName, typeDeclaration, generationContext);
-    }
 
     public static boolean isNewInlineType(TypeDeclaration declaration) {
         return ramlToType.get(Utils.declarationType(declaration)).shouldCreateInlineType(declaration);

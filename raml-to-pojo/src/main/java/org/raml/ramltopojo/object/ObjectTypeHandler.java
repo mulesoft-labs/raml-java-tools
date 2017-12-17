@@ -71,7 +71,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
             }  else {
 
-                tn = findType(propertyDeclaration.type(), propertyDeclaration, generationContext);
+                tn = findType(propertyDeclaration.type(), propertyDeclaration, generationContext, EventType.INTERFACE);
             }
 
             FieldSpec.Builder field = FieldSpec.builder(tn, Names.variableName(propertyDeclaration.name())).addModifiers(Modifier.PRIVATE);
@@ -135,7 +135,7 @@ public class ObjectTypeHandler implements TypeHandler {
                     continue;
                 }
 
-                TypeName inherits = findType(typeDeclaration.name(), typeDeclaration, generationContext);
+                TypeName inherits = findType(typeDeclaration.name(), typeDeclaration, generationContext, EventType.INTERFACE);
                 typeSpec.addSuperinterface(inherits);
             } else {
 
@@ -155,7 +155,7 @@ public class ObjectTypeHandler implements TypeHandler {
                 tn = ClassName.bestGuess(cr.getInterface().name);
             }  else {
 
-                tn = findType(propertyDeclaration.type(), propertyDeclaration, generationContext);
+                tn = findType(propertyDeclaration.type(), propertyDeclaration, generationContext, EventType.INTERFACE);
             }
 
             MethodSpec.Builder getMethod = MethodSpec.methodBuilder(Names.methodName("get", propertyDeclaration.name()))
@@ -185,8 +185,8 @@ public class ObjectTypeHandler implements TypeHandler {
         return typeSpec.build();
     }
 
-    private TypeName findType(String typeName, TypeDeclaration type, GenerationContext generationContext) {
+    private TypeName findType(String typeName, TypeDeclaration type, GenerationContext generationContext, EventType eventType) {
 
-        return TypeDeclarationType.javaType(typeName, type, generationContext);
+        return TypeDeclarationType.javaType(typeName, type, generationContext,eventType );
     }
 }
