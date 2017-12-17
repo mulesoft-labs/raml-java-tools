@@ -34,206 +34,190 @@ import java.util.List;
 public abstract class Annotations<T> {
 
 
-  public static Annotations<String> CLASS_NAME = new Annotations<String>() {
+    public static Annotations<String> CLASS_NAME = new Annotations<String>() {
 
-    @Override
-    public String getWithContext(Annotable target, Annotable... others) {
+        @Override
+        public String getWithContext(Annotable target, Annotable... others) {
 
-      return getWithDefault("classname", null, target, others);
-    }
-  };
-
-  public static Annotations<String> IMPLEMENTATION_CLASS_NAME = new Annotations<String>() {
-
-    @Override
-    public String getWithContext(Annotable target, Annotable... others) {
-
-      return getWithDefault("implementationClassName", null, target, others);
-    }
-  };
-
-  public static Annotations<Boolean> USE_PRIMITIVE_TYPE = new Annotations<Boolean>() {
-
-    @Override
-    public Boolean getWithContext(Annotable target, Annotable... others) {
-
-      return getWithDefault("usePrimitiveType", false, target, others);
-    }
-
-  };
-
-  public static Annotations<Boolean> ABSTRACT = new Annotations<Boolean>() {
-
-    @Override
-    public Boolean getWithContext(Annotable target, Annotable... others) {
-
-      return getWithDefault("abstract", false, target, others);
-    }
-  };
-
-
-  public static Annotations<List<String>> PLUGINS = new Annotations<List<String>>() {
-
-    @Override
-    public List<String> getWithContext(Annotable target, Annotable... others) {
-      return Annotations.getWithDefault("plugins", Collections.<String>emptyList(), target, others);
-    }
-  };
-
-/*
-  */
-/*
-   * Types
-   *//*
-
-  public static Annotations<TypeExtension> ON_TYPE_CLASS_CREATION = new Annotations<TypeExtension>() {
-
-    @Override
-    public TypeExtension getWithContext(CurrentBuild currentBuild, Annotable target, Annotable... others) {
-      List<String> classNames = getWithDefault("types", "onTypeCreation", null, target, others);
-
-      List<TypeExtension> extension = createExtension(currentBuild, classNames);
-      return new TypeExtension.Composite(extension);
-    }
-  };
-
-  public static Annotations<TypeExtension> ON_TYPE_CLASS_FINISH = new Annotations<TypeExtension>() {
-
-    @Override
-    public TypeExtension getWithContext(CurrentBuild currentBuild, Annotable target, Annotable... others) {
-      List<String> classNames = getWithDefault("types", "onTypeFinish", null, target, others);
-
-      List<TypeExtension> extension = createExtension(currentBuild, classNames);
-      return new TypeExtension.Composite(extension);
-    }
-  };
-
-  public static Annotations<FieldExtension> ON_TYPE_FIELD_CREATION = new Annotations<FieldExtension>() {
-
-    @Override
-    public FieldExtension getWithContext(CurrentBuild currentBuild, Annotable target, Annotable... others) {
-      List<String> classNames = getWithDefault("types", "onFieldCreation", null, target, others);
-      List<FieldExtension> extensions = createExtension(currentBuild, classNames);
-
-      return new FieldExtension.Composite(extensions);
-    }
-  };
-
-  public static Annotations<MethodExtension> ON_TYPE_METHOD_CREATION = new Annotations<MethodExtension>() {
-
-    @Override
-    public MethodExtension getWithContext(CurrentBuild currentBuild, Annotable target, Annotable... others) {
-      List<String> classNames = getWithDefault("types", "onMethodCreation", null, target, others);
-      List<MethodExtension> extension = createExtension(currentBuild, classNames);
-      return new MethodExtension.Composite(extension);
-    }
-  };
-*/
-
-
-
-  private static <T> T getWithDefault(String propName, T def, Annotable target, Annotable... others) {
-    T b = Annotations.evaluate(propName, target, others);
-    if (b == null) {
-
-      return def;
-    } else {
-      return b;
-    }
-  }
-
-  private static <T> T evaluate(String parameterName, Annotable mandatory, Annotable... others) {
-
-    T retval = null;
-    List<Annotable> targets = new ArrayList<>();
-    targets.add(mandatory);
-    targets.addAll(Arrays.asList(others));
-
-    for (Annotable target : targets) {
-
-      AnnotationRef annotationRef = Annotations.findRef(target, "types");
-      if (annotationRef == null) {
-
-        continue;
-      }
-
-      Object o = findProperty(annotationRef, parameterName);
-      if (o != null) {
-        retval = (T) o;
-      }
-
-    }
-
-    return retval;
-  }
-
-  private static Object findProperty(AnnotationRef annotationRef, String propName) {
-
-
-    // annotationRef.structuredValue().properties().get(0).values().get(0).value()
-    for (TypeInstanceProperty typeInstanceProperty : annotationRef.structuredValue().properties()) {
-      if (typeInstanceProperty.name().equalsIgnoreCase(propName)) {
-        if (typeInstanceProperty.isArray()) {
-          return toValueList(typeInstanceProperty.values());
-        } else {
-          return typeInstanceProperty.value().value();
+            return getWithDefault(new TypeInstanceAsStringFunction(), "classname", null, target, others);
         }
-      }
+    };
+
+    public static Annotations<String> IMPLEMENTATION_CLASS_NAME = new Annotations<String>() {
+
+        @Override
+        public String getWithContext(Annotable target, Annotable... others) {
+
+            return getWithDefault(new TypeInstanceAsStringFunction(), "implementationClassName", null, target, others);
+        }
+    };
+
+    public static Annotations<Boolean> USE_PRIMITIVE_TYPE = new Annotations<Boolean>() {
+
+        @Override
+        public Boolean getWithContext(Annotable target, Annotable... others) {
+
+            return getWithDefault(new TypeInstanceAsBooleanFunction(), "usePrimitiveType", false, target, others);
+        }
+
+    };
+
+    public static Annotations<Boolean> ABSTRACT = new Annotations<Boolean>() {
+
+        @Override
+        public Boolean getWithContext(Annotable target, Annotable... others) {
+
+            return getWithDefault(new TypeInstanceAsBooleanFunction(), "abstract", false, target, others);
+        }
+    };
+
+
+    public static Annotations<List<PluginDef>> PLUGINS = new Annotations<List<PluginDef>>() {
+
+        @Override
+        public List<PluginDef> getWithContext(Annotable target, Annotable... others) {
+            return Annotations.getWithDefault(new TypeInstanceToPluginDefFunction(), "plugins", Collections.<PluginDef>emptyList(), target, others);
+        }
+    };
+
+
+    private static <T,R> R getWithDefault(Function<TypeInstance, T> convert, String propName, R def, Annotable target, Annotable... others) {
+        R b = Annotations.evaluate(convert, propName, target, others);
+        if (b == null) {
+
+            return def;
+        } else {
+            return b;
+        }
     }
 
-    return null;
-  }
+    private static <T,R> R evaluate(Function<TypeInstance, T> convert, String parameterName, Annotable mandatory, Annotable... others) {
 
-  private static List<Object> toValueList(List<TypeInstance> values) {
+        R retval = null;
+        List<Annotable> targets = new ArrayList<>();
+        targets.add(mandatory);
+        targets.addAll(Arrays.asList(others));
 
-    return Lists.transform(values, new Function<TypeInstance, Object>() {
+        for (Annotable target : targets) {
 
-      @Nullable
-      @Override
-      public Object apply(@Nullable TypeInstance input) {
-        return input.value();
-      }
-    });
-  }
+            AnnotationRef annotationRef = Annotations.findRef(target, "types");
+            if (annotationRef == null) {
 
-  private static AnnotationRef findRef(Annotable annotable, String annotation) {
+                continue;
+            }
 
-    for (AnnotationRef annotationRef : annotable.annotations()) {
-      if (annotationRef.annotation().name().equalsIgnoreCase(annotation)) {
+            Object o = findProperty(annotationRef, parameterName, convert);
+            if (o != null) {
+                retval = (R) o;
+            }
 
-        return annotationRef;
-      }
+        }
+
+        return retval;
     }
 
-    return null;
-  }
+    private static <T> Object findProperty(AnnotationRef annotationRef, String propName, Function<TypeInstance, T> convert) {
 
-  public abstract T getWithContext(Annotable target, Annotable... others);
 
-  public T getValueWithDefault(T def, Annotable annotable, Annotable... others) {
+        // annotationRef.structuredValue().properties().get(0).values().get(0).value()
+        for (TypeInstanceProperty typeInstanceProperty : annotationRef.structuredValue().properties()) {
+            if (typeInstanceProperty.name().equalsIgnoreCase(propName)) {
+                if (typeInstanceProperty.isArray()) {
+                    return toValueList(convert, typeInstanceProperty.values());
+                } else {
+                    return convert.apply(typeInstanceProperty.value());
+                }
+            }
+        }
 
-    T t = getWithContext( annotable, others);
-    if (t == null) {
-
-      return def;
-    } else {
-      return t;
+        return null;
     }
-  }
 
-  public T get(T def, Annotable type) {
+    private static <T> List<T> toValueList(final Function<TypeInstance, T> convert, List<TypeInstance> values) {
 
-    return getValueWithDefault(def, type);
-  }
+        return Lists.transform(values, new Function<TypeInstance, T>() {
 
-  public T get(Annotable type) {
+            @Nullable
+            @Override
+            public T apply(@Nullable TypeInstance input) {
+                return convert.apply(input);
+            }
+        });
+    }
 
-    return getValueWithDefault(null, type);
-  }
+    private static AnnotationRef findRef(Annotable annotable, String annotation) {
 
-  public T get(T def, Annotable type, Annotable others) {
+        for (AnnotationRef annotationRef : annotable.annotations()) {
+            if (annotationRef.annotation().name().equalsIgnoreCase(annotation)) {
 
-    return getValueWithDefault(def, type, others);
-  }
+                return annotationRef;
+            }
+        }
 
+        return null;
+    }
+
+    public abstract T getWithContext(Annotable target, Annotable... others);
+
+    public T getValueWithDefault(T def, Annotable annotable, Annotable... others) {
+
+        T t = getWithContext(annotable, others);
+        if (t == null) {
+
+            return def;
+        } else {
+            return t;
+        }
+    }
+
+    public T get(T def, Annotable type) {
+
+        return getValueWithDefault(def, type);
+    }
+
+    public T get(Annotable type) {
+
+        return getValueWithDefault(null, type);
+    }
+
+    public T get(T def, Annotable type, Annotable others) {
+
+        return getValueWithDefault(def, type, others);
+    }
+
+    private static class TypeInstanceAsStringFunction implements Function<TypeInstance, String> {
+        @Nullable
+        @Override
+        public String apply(@Nullable TypeInstance input) {
+            return (String) input.value();
+        }
+    }
+
+    private static class TypeInstanceAsBooleanFunction implements Function<TypeInstance, Boolean> {
+        @Nullable
+        @Override
+        public Boolean apply(@Nullable TypeInstance input) {
+            return (Boolean) input.value();
+        }
+    }
+
+    private static class TypeInstanceToPluginDefFunction implements Function<TypeInstance, PluginDef> {
+
+        @Override
+        public PluginDef apply(@Nullable TypeInstance input) {
+
+            if (input.properties().size() == 0) {
+
+                return new PluginDef((String) input.value(), Collections.<String>emptyList());
+            } else
+                return new PluginDef((String) input.properties().get(0).value().value(), Lists.transform(input.properties().get(1).values(), new Function<TypeInstance, String>() {
+                            @Nullable
+                            @Override
+                            public String apply(@Nullable TypeInstance input) {
+                                return (String) input.value();
+                            }
+                        }
+                ));
+        }
+    }
 }

@@ -1,0 +1,27 @@
+#%RAML 1.0
+title: Hello World API
+version: v1
+baseUri: https://api.github.com
+uses:
+  ramltopojo: object/ramltopojo.raml
+(ramltopojo.types):
+  plugins:
+    - name: core.one
+      arguments: [ foo, bar ]
+    - name: core.two
+      arguments: [ alpha, gamma ]
+
+types:
+    foo:
+        type: object
+        (ramltopojo.types):
+          plugins:
+            - name: core.foo
+              arguments: [ foo, bar ]
+        properties:
+          name: string
+          lastName: string
+    too:
+        type: object
+        (ramltopojo.types):
+          plugins: [core.too, core.moo]

@@ -93,10 +93,10 @@ public class GenerationContextImpl implements GenerationContext {
 
     @Override
     public ObjectTypeHandlerPlugin pluginsForObjects(TypeDeclaration... typeDeclarations) {
-        List<String> data = Annotations.PLUGINS.get(api);
+        List<PluginDef> data = Annotations.PLUGINS.get(api);
         Set<ObjectTypeHandlerPlugin> plugins = new HashSet<>();
-        for (String datum : data) {
-            plugins.addAll(pluginManager.getClassesForName(datum, ObjectTypeHandlerPlugin.class));
+        for (PluginDef datum : data) {
+            plugins.addAll(pluginManager.getClassesForName(datum.getPluginName(), ObjectTypeHandlerPlugin.class));
         }
         return new ObjectTypeHandlerPlugin.Composite(plugins);
     }
