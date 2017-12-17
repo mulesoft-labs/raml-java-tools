@@ -68,7 +68,7 @@ public class ObjectTypeHandler implements TypeHandler {
             if ( TypeDeclarationType.isNewInlineType(propertyDeclaration) ){
 
                 CreationResult cr = result.internalType(propertyDeclaration.name());
-                tn = ClassName.bestGuess(cr.getInterface().name);
+                tn = cr.getJavaName(EventType.INTERFACE);
 
             }  else {
 
@@ -151,9 +151,9 @@ public class ObjectTypeHandler implements TypeHandler {
             TypeName tn;
             if ( TypeDeclarationType.isNewInlineType(propertyDeclaration) ){
 
-                CreationResult cr = TypeDeclarationType.createType(propertyDeclaration, generationContext);
+                CreationResult cr = TypeDeclarationType.createInlineType("", propertyDeclaration, generationContext);
                 result.withInternalType(propertyDeclaration.name(), cr);
-                tn = ClassName.bestGuess(cr.getInterface().name);
+                tn = cr.getJavaName(EventType.INTERFACE);
             }  else {
 
                 tn = findType(propertyDeclaration.type(), propertyDeclaration, generationContext, EventType.INTERFACE);
