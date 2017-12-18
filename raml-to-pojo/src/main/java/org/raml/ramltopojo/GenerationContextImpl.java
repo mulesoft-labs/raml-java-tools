@@ -2,7 +2,7 @@ package org.raml.ramltopojo;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
-import org.raml.ramltopojo.object.ObjectTypeHandlerPlugin;
+import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
@@ -96,7 +96,7 @@ public class GenerationContextImpl implements GenerationContext {
         List<PluginDef> data = Annotations.PLUGINS.get(api);
         Set<ObjectTypeHandlerPlugin> plugins = new HashSet<>();
         for (PluginDef datum : data) {
-            plugins.addAll(pluginManager.getClassesForName(datum.getPluginName(), ObjectTypeHandlerPlugin.class));
+            plugins.addAll(pluginManager.getClassesForName(datum.getPluginName(), datum.getArguments() , ObjectTypeHandlerPlugin.class));
         }
         return new ObjectTypeHandlerPlugin.Composite(plugins);
     }

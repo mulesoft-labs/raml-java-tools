@@ -25,7 +25,7 @@ import org.raml.ramltopojo.Annotations;
 import org.raml.ramltopojo.CreationResult;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
-import org.raml.ramltopojo.object.ObjectTypeHandlerPlugin;
+import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 
 /**

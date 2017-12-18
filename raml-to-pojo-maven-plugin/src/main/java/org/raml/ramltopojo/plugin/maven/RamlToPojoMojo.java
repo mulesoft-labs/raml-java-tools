@@ -74,7 +74,6 @@ public class RamlToPojoMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        getLog().error("GAAAAAA!");
         if (skip) {
             getLog().info("Skipping execution...");
             return;
@@ -93,13 +92,14 @@ public class RamlToPojoMojo extends AbstractMojo {
         try {
             project.addCompileSourceRoot(outputDirectory.getPath());
 
+            getLog().error("about to read file " + ramlFile + " in directory " + ramlFile.getParent());
             RamlModelResult ramlModelResult =
                     new RamlModelBuilder().buildApi(
                             new FileReader(ramlFile),
-                            ".");
+                            ramlFile.getAbsolutePath());
             if (ramlModelResult.hasErrors()) {
                 for (ValidationResult validationResult : ramlModelResult.getValidationResults()) {
-                    System.err.println(validationResult.getMessage());
+                    getLog().error("raml error:" + validationResult.getMessage());
                 }
                 throw new MojoExecutionException("invalid raml " + ramlFile);
             }

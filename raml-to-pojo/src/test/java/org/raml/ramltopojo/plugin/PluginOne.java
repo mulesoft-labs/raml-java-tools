@@ -5,14 +5,14 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
-import org.raml.ramltopojo.object.ObjectTypeHandlerPlugin;
+import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 /**
  * Created. There, you have it.
  */
-public class PluginOne implements ObjectTypeHandlerPlugin {
+public class PluginOne extends ObjectTypeHandlerPlugin.Helper {
 
     @Override
     public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {

@@ -1,8 +1,9 @@
 package org.raml.ramltopojo.plugin;
 
 import org.junit.Test;
-import org.raml.ramltopojo.object.ObjectTypeHandlerPlugin;
+import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 
+import java.util.Collections;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -16,7 +17,7 @@ public class PluginManagerTest {
     public void getExtension() throws Exception {
 
         PluginManager em = PluginManager.createPluginManager("org/raml/ramltopojo/plugin/test1.properties");
-        Set<ObjectTypeHandlerPlugin> list = em.getClassesForName("core.one", ObjectTypeHandlerPlugin.class);
+        Set<ObjectTypeHandlerPlugin> list = em.getClassesForName("core.one", Collections.<String>emptyList(), ObjectTypeHandlerPlugin.class);
 
         assertEquals(PluginOne.class, list.iterator().next().getClass());
     }
@@ -25,7 +26,7 @@ public class PluginManagerTest {
     public void twoClasses() throws Exception {
 
         PluginManager em = PluginManager.createPluginManager("org/raml/ramltopojo/plugin/test1.properties");
-        Set<ObjectTypeHandlerPlugin> list1 = em.getClassesForName("core.sub.two", ObjectTypeHandlerPlugin.class);
+        Set<ObjectTypeHandlerPlugin> list1 = em.getClassesForName("core.sub.two", Collections.<String>emptyList(), ObjectTypeHandlerPlugin.class);
         assertEquals(1, list1.size());
         assertEquals(PluginOne.class, list1.iterator().next().getClass());
     }

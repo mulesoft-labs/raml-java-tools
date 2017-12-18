@@ -2,12 +2,14 @@
 title: Hello World API
 version: v1
 baseUri: https://api.github.com
+uses:
+  ramltopojo: ramltopojo.raml
+(ramltopojo.types):
+  plugins:
+    - name: core.rename
+      arguments: [Fun]
+
 types:
-#    once:
-#      discriminator: kind
-#      properties:
-#        kind: string
-#        right: string
     foo:
         type: object
         discriminatorValue: myOwnValue

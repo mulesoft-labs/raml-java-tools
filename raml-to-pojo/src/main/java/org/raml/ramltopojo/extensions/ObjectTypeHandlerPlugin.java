@@ -1,10 +1,10 @@
-package org.raml.ramltopojo.object;
+package org.raml.ramltopojo.extensions;
 
+import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EventType;
-import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
@@ -18,6 +18,11 @@ import java.util.Set;
 public interface ObjectTypeHandlerPlugin {
 
     class Helper implements ObjectTypeHandlerPlugin {
+
+        @Override
+        public ClassName className(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+            return currentSuggestion;
+        }
 
         @Override
         public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
@@ -40,6 +45,7 @@ public interface ObjectTypeHandlerPlugin {
         }
     }
 
+    ClassName className(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType);
     TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType);
     FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, FieldSpec.Builder incoming, EventType eventType);
     MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType);
@@ -52,6 +58,15 @@ public interface ObjectTypeHandlerPlugin {
         public Composite(Set<ObjectTypeHandlerPlugin> actualPlugins) {
 
             plugins.addAll(actualPlugins);
+        }
+
+        @Override
+        public ClassName className(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+            for (ObjectTypeHandlerPlugin plugin : plugins) {
+                currentSuggestion = plugin.className(objectPluginContext, ramlType, currentSuggestion, eventType);
+            }
+
+            return currentSuggestion;
         }
 
         @Override

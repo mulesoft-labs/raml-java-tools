@@ -22,8 +22,11 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.SetMultimap;
 import org.raml.ramltopojo.GenerationException;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.*;
 
@@ -36,7 +39,7 @@ public class PluginManager {
 
   public static PluginManager NULL = new PluginManager(null) {
     @Override
-    public <T> Set<T> getClassesForName(String name, Class<T> ofClass) {
+    public <T> Set<T> getClassesForName(String name, List<String> arguments, Class<T> ofClass) {
       return emptySet();
     }
   };
@@ -76,7 +79,7 @@ public class PluginManager {
   }
 
 
-  public <T> Set<T> getClassesForName(String name, final Class<T> ofClass) {
+  public <T> Set<T> getClassesForName(String name, @Nonnull final List<String> arguments, final Class<T> ofClass) {
 
     return FluentIterable.from(info.get(name)).filter(new Predicate<Class<?>>() {
       @Override
@@ -88,7 +91,13 @@ public class PluginManager {
       @Override
       public T apply(@Nullable Class input) {
         try {
-          return (T) input.newInstance();
+          try {
+            Constructor constructor = input.getConstructor(List.class);
+            return (T) constructor.newInstance(arguments);
+          } catch (NoSuchMethodException|InvocationTargetException e) {
+
+            return (T) input.newInstance();
+          }
         } catch (InstantiationException|IllegalAccessException e) {
 
           throw  new GenerationException(e);

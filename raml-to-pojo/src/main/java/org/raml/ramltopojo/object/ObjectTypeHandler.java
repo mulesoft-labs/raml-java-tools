@@ -5,6 +5,7 @@ import com.squareup.javapoet.*;
 import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectPluginContextImpl;
+import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
@@ -25,15 +26,22 @@ public class ObjectTypeHandler implements TypeHandler {
     @Override
     public ClassName javaTypeName(GenerationContext generationContext, EventType type) {
 
+        ObjectPluginContext context = new ObjectPluginContextImpl(generationContext, null);
+
+        ObjectTypeHandlerPlugin plugin = generationContext.pluginsForObjects();
+        ClassName className;
         if ( type == EventType.IMPLEMENTATION ) {
-            return ClassName.get(generationContext.defaultPackage(), Names.typeName(objectTypeDeclaration.name(), "Impl"));
+            className = ClassName.get(generationContext.defaultPackage(), Names.typeName(objectTypeDeclaration.name(), "Impl"));
         } else {
 
-            return ClassName.get(generationContext.defaultPackage(), Names.typeName(objectTypeDeclaration.name()));
+            className = ClassName.get(generationContext.defaultPackage(), Names.typeName(objectTypeDeclaration.name()));
         }
+
+        return plugin.className(context, objectTypeDeclaration, className, type);
     }
 
     @Override
+    // TODO deal with null interface spec.
     public CreationResult create(GenerationContext generationContext, CreationResult result) {
 
 

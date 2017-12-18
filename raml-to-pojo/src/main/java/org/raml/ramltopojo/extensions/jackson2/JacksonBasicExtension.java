@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.*;
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
-import org.raml.ramltopojo.object.ObjectTypeHandlerPlugin;
+import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
