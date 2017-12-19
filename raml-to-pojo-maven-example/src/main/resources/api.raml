@@ -6,21 +6,35 @@ uses:
   ramltopojo: ramltopojo.raml
 (ramltopojo.types):
   plugins:
-    - name: core.rename
-      arguments: [Fun]
+    - name: core.splitInterface
+      arguments: [com.fun, com.fun.impl]
 
 types:
     foo:
-        type: object
-        discriminatorValue: myOwnValue
-        properties:
-          name: string
-          goo:
-            type: object
-            properties:
-              glue: boolean
-              flue:
-                type: object
-                properties:
-                  another: string
+#      (ramltopojo.types):
+#        plugins:
+#          - name: core.repackage
+#            arguments: [bloobloo]
+      type: object
+      discriminatorValue: myOwnValue
+      properties:
+        name: string
+        goo:
+          type: object
+          properties:
+            glue: boolean
+            flue:
+              type: object
+              properties:
+                another: string
+    eater:
+#      (ramltopojo.types):
+#        plugins:
+#          - name: core.repackage
+#            arguments: [haha]
+      type: object
+      discriminatorValue: myOwnValue
+      properties:
+        name: string
+        other: foo
 

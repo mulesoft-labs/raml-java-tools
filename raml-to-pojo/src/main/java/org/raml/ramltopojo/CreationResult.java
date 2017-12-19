@@ -67,8 +67,13 @@ public class CreationResult {
 
     protected void createJavaFile(String packageName, TypeSpec typeSpec, String rootDirectory, boolean interf ) throws IOException {
 
-        TypeSpec.Builder builder = typeSpec.toBuilder();
-        JavaFile.builder(packageName, builder.build()).skipJavaLangImports(true).build().writeTo(Paths.get(rootDirectory));
+        if ( interf ) {
+
+            JavaFile.builder(interfaceName.packageName(), typeSpec).skipJavaLangImports(true).build().writeTo(Paths.get(rootDirectory));
+        } else {
+
+            JavaFile.builder(implementationName.packageName(), typeSpec).skipJavaLangImports(true).build().writeTo(Paths.get(rootDirectory));
+        }
     }
 
     private static void createInlineType(CreationResult containingResult) {

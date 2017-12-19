@@ -180,7 +180,7 @@ public abstract class Annotations<T> {
         return getValueWithDefault(null, type);
     }
 
-    public T get(T def, Annotable type, Annotable others) {
+    public T get(T def, Annotable type, Annotable... others) {
 
         return getValueWithDefault(def, type, others);
     }

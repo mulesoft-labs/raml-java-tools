@@ -67,11 +67,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         @Override
         public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext, EventType eventType) {
             CreationResult result = generationContext.findCreatedType(typeName, originalTypeDeclaration);
-            if ( eventType == EventType.INTERFACE ) {
-                return ClassName.bestGuess(result.getInterface().name);
-            } else {
-                return ClassName.bestGuess(result.getImplementation().or(result.getInterface()).name);
-            }
+            return result.getJavaName(eventType);
         }
 
 

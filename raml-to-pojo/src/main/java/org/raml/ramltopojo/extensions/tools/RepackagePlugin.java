@@ -11,17 +11,21 @@ import java.util.List;
 /**
  * Created. There, you have it.
  */
-public class RenamePlugin extends ObjectTypeHandlerPlugin.Helper {
+public class RepackagePlugin extends ObjectTypeHandlerPlugin.Helper {
 
     private final List<String> arguments;
 
-    public RenamePlugin(List<String> arguments) {
+    public RepackagePlugin(List<String> arguments) {
         this.arguments = arguments;
     }
 
     @Override
     public ClassName className(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
 
-        return ClassName.get(currentSuggestion.packageName(),  arguments.get(0));
+        if ( "".equals(currentSuggestion.packageName())) {
+            return currentSuggestion;
+        }
+
+        return ClassName.get(arguments.get(0),  currentSuggestion.simpleName());
     }
 }

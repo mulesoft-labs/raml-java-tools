@@ -9,6 +9,7 @@ import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -93,7 +94,7 @@ public class GenerationContextImpl implements GenerationContext {
 
     @Override
     public ObjectTypeHandlerPlugin pluginsForObjects(TypeDeclaration... typeDeclarations) {
-        List<PluginDef> data = Annotations.PLUGINS.get(api);
+        List<PluginDef> data = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, typeDeclarations);
         Set<ObjectTypeHandlerPlugin> plugins = new HashSet<>();
         for (PluginDef datum : data) {
             plugins.addAll(pluginManager.getClassesForName(datum.getPluginName(), datum.getArguments() , ObjectTypeHandlerPlugin.class));
