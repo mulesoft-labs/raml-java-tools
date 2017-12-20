@@ -4,10 +4,12 @@ version: v1
 baseUri: https://api.github.com
 uses:
   ramltopojo: ramltopojo.raml
-(ramltopojo.types):
-  plugins:
-    - name: core.splitInterface
-      arguments: [com.fun, com.fun.impl]
+#(ramltopojo.types):
+#  plugins:
+#    - name: core.splitInterface
+#      arguments: [com.fun, com.fun.impl]
+#    - name: core.jackson2
+#      arguments: []
 
 types:
     foo:

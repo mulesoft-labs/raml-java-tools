@@ -76,7 +76,7 @@ public class JacksonDiscriminatorInheritanceTypeExtension extends ObjectTypeHand
     if (objectPluginContext.childClasses(otr.name()).size() == 0 && !Annotations.ABSTRACT.get(otr)) {
 
       typeSpec.addAnnotation(AnnotationSpec.builder(JsonDeserialize.class)
-              .addMember("as", "$L.class", objectPluginContext.creationResult().getImplementation().or(objectPluginContext.creationResult().getImplementation()))
+              .addMember("as", "$T.class", objectPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION))
               .build());
     }
 
