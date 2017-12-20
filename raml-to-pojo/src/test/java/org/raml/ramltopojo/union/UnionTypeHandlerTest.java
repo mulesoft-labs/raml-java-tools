@@ -41,9 +41,9 @@ public class UnionTypeHandlerTest {
         assertThat(r.getInterface(), is(allOf(
                 name(equalTo("Foo")),
                 methods(contains(
-                        allOf(methodName(equalTo("getFirst")), returnType(equalTo(ClassName.get("", "First")))),
+                        allOf(methodName(equalTo("getFirst")), returnType(equalTo(ClassName.get("bar.pack", "First")))),
                         allOf(methodName(equalTo("isFirst")), returnType(equalTo(ClassName.get(Boolean.class).unbox()))),
-                        allOf(methodName(equalTo("getSecond")), returnType(equalTo(ClassName.get("", "Second")))),
+                        allOf(methodName(equalTo("getSecond")), returnType(equalTo(ClassName.get("bar.pack", "Second")))),
                         allOf(methodName(equalTo("isSecond")), returnType(equalTo(ClassName.get(Boolean.class).unbox())))
                 ))
         )));
@@ -58,14 +58,14 @@ public class UnionTypeHandlerTest {
                 )),
                 methods(contains(
                         allOf(methodName(equalTo("<init>"))),
-                        allOf(methodName(equalTo("<init>")), parameters(contains(type(equalTo(ClassName.get("", "First")))))),
-                        allOf(methodName(equalTo("getFirst")), returnType(equalTo(ClassName.get("", "First"))), codeContent(equalTo(
-                                "if ( !(anyType instanceof  First)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: First\");\nreturn (First) anyType;\n"))),
-                        allOf(methodName(equalTo("isFirst")), returnType(equalTo(ClassName.get(Boolean.class).unbox())), codeContent(equalTo("return anyType instanceof First;\n"))),
-                        allOf(methodName(equalTo("<init>")), parameters(contains(type(equalTo(ClassName.get("", "Second")))))),
-                        allOf(methodName(equalTo("getSecond")), returnType(equalTo(ClassName.get("", "Second"))), codeContent(equalTo(
-                                "if ( !(anyType instanceof  Second)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: Second\");\nreturn (Second) anyType;\n"))),
-                        allOf(methodName(equalTo("isSecond")), returnType(equalTo(ClassName.get(Boolean.class).unbox())), codeContent(equalTo("return anyType instanceof Second;\n")))
+                        allOf(methodName(equalTo("<init>")), parameters(contains(type(equalTo(ClassName.get("bar.pack", "First")))))),
+                        allOf(methodName(equalTo("getFirst")), returnType(equalTo(ClassName.get("bar.pack", "First"))), codeContent(equalTo(
+                                "if ( !(anyType instanceof  bar.pack.First)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: bar.pack.First\");\nreturn (bar.pack.First) anyType;\n"))),
+                        allOf(methodName(equalTo("isFirst")), returnType(equalTo(ClassName.get(Boolean.class).unbox())), codeContent(equalTo("return anyType instanceof bar.pack.First;\n"))),
+                        allOf(methodName(equalTo("<init>")), parameters(contains(type(equalTo(ClassName.get("bar.pack", "Second")))))),
+                        allOf(methodName(equalTo("getSecond")), returnType(equalTo(ClassName.get("bar.pack", "Second"))), codeContent(equalTo(
+                                "if ( !(anyType instanceof  bar.pack.Second)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: bar.pack.Second\");\nreturn (bar.pack.Second) anyType;\n"))),
+                        allOf(methodName(equalTo("isSecond")), returnType(equalTo(ClassName.get(Boolean.class).unbox())), codeContent(equalTo("return anyType instanceof bar.pack.Second;\n")))
                 )),
                 superInterfaces(contains(
                         allOf(typeName(equalTo(ClassName.get("bar.pack", "Foo"))))
@@ -87,7 +87,7 @@ public class UnionTypeHandlerTest {
                 methods(contains(
                         allOf(methodName(equalTo("getInteger")), returnType(equalTo(ClassName.get(Integer.class)))),
                         allOf(methodName(equalTo("isInteger")), returnType(equalTo(ClassName.get(Boolean.class).unbox()))),
-                        allOf(methodName(equalTo("getSecond")), returnType(equalTo(ClassName.get("", "Second")))),
+                        allOf(methodName(equalTo("getSecond")), returnType(equalTo(ClassName.get("", "bar.pack.Second")))),
                         allOf(methodName(equalTo("isSecond")), returnType(equalTo(ClassName.get(Boolean.class).unbox())))
                 ))
         )));
@@ -102,17 +102,19 @@ public class UnionTypeHandlerTest {
                 fields(contains(
                         allOf(fieldName(equalTo("anyType")), fieldType(equalTo(ClassName.get(Object.class))))
                 )),
+
                 methods(contains(
                         methodName(equalTo("<init>")),
                         allOf(methodName(equalTo("<init>")), parameters(contains(type(equalTo(ClassName.get(Integer.class)))))),
                         allOf(methodName(equalTo("getInteger")), returnType(equalTo(ClassName.get(Integer.class))), codeContent(equalTo(
                                 "if ( !(anyType instanceof  java.lang.Integer)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: java.lang.Integer\");\nreturn (java.lang.Integer) anyType;\n"))),
                         allOf(methodName(equalTo("isInteger")), returnType(equalTo(ClassName.get(Boolean.class).unbox())), codeContent(equalTo("return anyType instanceof java.lang.Integer;\n"))),
-                        allOf(methodName(equalTo("<init>")), parameters(contains(type(equalTo(ClassName.get("", "Second")))))),
-                        allOf(methodName(equalTo("getSecond")), returnType(equalTo(ClassName.get("", "Second"))), codeContent(equalTo(
-                                "if ( !(anyType instanceof  Second)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: Second\");\nreturn (Second) anyType;\n"))),
-                        allOf(methodName(equalTo("isSecond")), returnType(equalTo(ClassName.get(Boolean.class).unbox())), codeContent(equalTo("return anyType instanceof Second;\n")))
+                        allOf(methodName(equalTo("<init>")), parameters(contains(type(equalTo(ClassName.get("bar.pack", "Second")))))),
+                        allOf(methodName(equalTo("getSecond")), returnType(equalTo(ClassName.get("bar.pack", "Second"))), codeContent(equalTo(
+                                "if ( !(anyType instanceof  bar.pack.Second)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: bar.pack.Second\");\nreturn (bar.pack.Second) anyType;\n"))),
+                        allOf(methodName(equalTo("isSecond")), returnType(equalTo(ClassName.get(Boolean.class).unbox())), codeContent(equalTo("return anyType instanceof bar.pack.Second;\n")))
                 )),
+
                 superInterfaces(contains(
                         allOf(typeName(equalTo(ClassName.get("bar.pack", "Foo"))))
                 ))
@@ -139,3 +141,5 @@ public class UnionTypeHandlerTest {
     }
 
 }
+//method iterable containing [method name "<init>", (method name "<init>" and parameter iterable containing [type name <java.lang.Integer>]), (method name "getInteger" and return type <java.lang.Integer> and method content "if ( !(anyType instanceof  java.lang.Integer)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: java.lang.Integer\");\nreturn (java.lang.Integer) anyType;\n"), (method name "isInteger" and return type <boolean> and method content "return anyType instanceof java.lang.Integer;\n"), (method name "<init>" and parameter iterable containing [type name <bar.pack.Second>]), (method name "getSecond" and return type <bar.pack.Second> and method content "if ( !(anyType instanceof  bar.pack.Second)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: Second\");\nreturn (bar.pack.Second) anyType;\n"), (method name "isSecond" and return type <boolean> and method content "return anyType instanceof bar.pack.Second;\n")] and super interfaces iterable containing [(typename <bar.pack.bar.pack.Foo>)])
+//method iterable containing [method name "<init>", (method name "<init>" and parameter iterable containing [type name <java.lang.Integer>]), (method name "getInteger" and return type <java.lang.Integer> and method content "if ( !(anyType instanceof  java.lang.Integer)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: java.lang.Integer\");\nreturn (java.lang.Integer) anyType;\n"), (method name "isInteger" and return type <boolean> and method content "return anyType instanceof java.lang.Integer;\n"), (method name "<init>" and parameter iterable containing [type name <bar.pack.Second>]), (method name "getSecond" and return type <bar.pack.Second> and method content "if ( !(anyType instanceof  bar.pack.Second)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: Second\");\nreturn (bar.pack.Second) anyType;\n"), (method name "isSecond" and return type <boolean> and method content "return anyType instanceof bar.pack.Second;\n")] method item 5: method content "if ( !(anyType instanceof  bar.pack.Second)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: Second\");\nreturn (bar.pack.Second) anyType;\n" method content was "if ( !(anyType instanceof  bar.pack.Second)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: bar.pack.Second\");\nreturn (bar.pack.Second) anyType;\n"

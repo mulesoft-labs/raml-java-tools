@@ -81,7 +81,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
                         allOf(methodName(equalTo("setAge")), parameters(contains(type(equalTo(ClassName.INT)))))
                 )),
                 superInterfaces(contains(
-                        allOf(typeName(equalTo(ClassName.get("", "Foo"))))
+                        allOf(typeName(equalTo(ClassName.get("", "bar.pack.Foo"))))
                 ))
         )));
 
@@ -140,19 +140,19 @@ public class ObjectTypeHandlerTest extends UnitTest {
         assertThat(r.getInterface(), is(allOf(
                 name(equalTo("Foo")),
                 methods(contains(
-                        allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get("", "Composed")))),
-                        allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get("", "Composed"))))))
+                        allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get("", "pojo.pack.Composed")))),
+                        allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get("", "pojo.pack.Composed"))))))
                 ))
         )));
 
         assertThat(r.getImplementation().get(), is(allOf(
                 name(equalTo("FooImpl")),
                 fields(contains(
-                        allOf(fieldName(equalTo("name")), fieldType(equalTo(ClassName.get("", "Composed"))))
+                        allOf(fieldName(equalTo("name")), fieldType(equalTo(ClassName.get("", "pojo.pack.Composed"))))
                 )),
                 methods(contains(
-                        allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get("", "Composed")))),
-                        allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get("", "Composed")))))))
+                        allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get("", "pojo.pack.Composed")))),
+                        allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get("", "pojo.pack.Composed")))))))
                 ))
         ));
     }
@@ -177,7 +177,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
                         allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get(String.class))))))
                 )),
                 superInterfaces(contains(
-                        allOf(typeName(equalTo(ClassName.get("", "Inherited"))))
+                        allOf(typeName(equalTo(ClassName.get("", "pojo.pack.Inherited"))))
 
                 )))));
 
@@ -194,7 +194,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
                         allOf(methodName(equalTo("setAge")), parameters(contains(type(equalTo(ClassName.INT)))))
                 )),
                 superInterfaces(contains(
-                        allOf(typeName(equalTo(ClassName.get("", "Foo"))))
+                        allOf(typeName(equalTo(ClassName.get("", "bar.pack.Foo"))))
                 ))
         )));
     }
@@ -221,7 +221,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
                         allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get(String.class))))))
                 )),
                 superInterfaces(contains(
-                        allOf(typeName(equalTo(ClassName.get("", "Once"))))
+                        allOf(typeName(equalTo(ClassName.get("", "pojo.pack.Once"))))
 
                 )))));
 
@@ -240,7 +240,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
                         allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get(String.class))))))
                 )),
                 superInterfaces(contains(
-                        allOf(typeName(equalTo(ClassName.get("", "Foo"))))
+                        allOf(typeName(equalTo(ClassName.get("", "bar.pack.Foo"))))
                 ))
         )));
 
@@ -292,8 +292,8 @@ public class ObjectTypeHandlerTest extends UnitTest {
                         allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get(String.class))))))
                 )),
                 superInterfaces(contains(
-                                typeName(equalTo(ClassName.get("", "Once"))),
-                                typeName(equalTo(ClassName.get("", "Twice")))
+                                typeName(equalTo(ClassName.get("", "pojo.pack.Once"))),
+                                typeName(equalTo(ClassName.get("", "pojo.pack.Twice")))
                         )
 
                 ))));
@@ -314,7 +314,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
                         allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get(String.class))))))
                 )),
                 superInterfaces(contains(
-                        allOf(typeName(equalTo(ClassName.get("", "Foo"))))
+                        allOf(typeName(equalTo(ClassName.get("", "bar.pack.Foo"))))
                 ))
         )));
     }
