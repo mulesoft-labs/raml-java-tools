@@ -22,6 +22,10 @@ public class ResultingPojos {
         this.results.add(spec);
     }
 
+    public List<CreationResult> creationResults() {
+        return results;
+    }
+
     public void createFoundTypes(String rootDirectory) throws IOException {
 
         for (CreationResult result : results) {

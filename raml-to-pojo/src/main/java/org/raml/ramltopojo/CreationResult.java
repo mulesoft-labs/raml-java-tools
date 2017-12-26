@@ -72,7 +72,9 @@ public class CreationResult {
             JavaFile.builder(interfaceName.packageName(), typeSpec).skipJavaLangImports(true).build().writeTo(Paths.get(rootDirectory));
         } else {
 
-            JavaFile.builder(implementationName.packageName(), typeSpec).skipJavaLangImports(true).build().writeTo(Paths.get(rootDirectory));
+            if ( typeSpec != null ) {
+                JavaFile.builder(implementationName.packageName(), typeSpec).skipJavaLangImports(true).build().writeTo(Paths.get(rootDirectory));
+            }
         }
     }
 

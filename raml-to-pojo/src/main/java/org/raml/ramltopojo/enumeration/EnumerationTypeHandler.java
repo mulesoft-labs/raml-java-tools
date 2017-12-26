@@ -44,7 +44,7 @@ public class EnumerationTypeHandler implements TypeHandler {
 
         for (String value : typeDeclaration.enumValues()) {
             TypeSpec.Builder builder = TypeSpec.anonymousClassBuilder("$S", value);
-            enumBuilder.addEnumConstant(value,
+            enumBuilder.addEnumConstant(Names.constantName(value),
                     builder.build());
         }
 

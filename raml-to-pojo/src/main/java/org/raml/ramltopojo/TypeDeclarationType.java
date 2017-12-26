@@ -98,17 +98,20 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     ENUMERATION {
         @Override
         public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
+
+            StringTypeDeclaration stringTypeDeclaration = (StringTypeDeclaration) typeDeclaration;
+            return new EnumerationTypeHandler(stringTypeDeclaration);
         }
 
         @Override
         public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext, EventType eventType) {
-            return null;
+            CreationResult result = generationContext.findCreatedType(typeName, originalTypeDeclaration);
+            return result.getJavaName(eventType);
         }
 
         @Override
         public boolean shouldCreateInlineType(TypeDeclaration declaration) {
-            return true;
+            return false;
         }
     },
     ARRAY {
@@ -121,7 +124,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext, EventType eventType) {
 
             ArrayTypeDeclaration arrayTypeDeclaration = (ArrayTypeDeclaration) originalTypeDeclaration;
-            return ParameterizedTypeName.get(ClassName.get(List.class), TypeDeclarationType.javaType(typeName, arrayTypeDeclaration.items(), generationContext, eventType).box());
+            return ParameterizedTypeName.get(ClassName.get(List.class), TypeDeclarationType.javaType(arrayTypeDeclaration.items().name(), arrayTypeDeclaration.items(), generationContext, eventType).box());
         }
 
         @Override
@@ -138,7 +141,9 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
 
         @Override
         public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext, EventType eventType) {
-            return null;
+
+            CreationResult result = generationContext.findCreatedType(typeName, originalTypeDeclaration);
+            return result.getJavaName(eventType);
         }
 
         @Override
@@ -265,7 +270,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
 
             StringTypeDeclaration declaration = (StringTypeDeclaration) typeDeclaration;
             if ( ! declaration.enumValues().isEmpty() ) {
-                return new EnumerationTypeHandler(declaration);
+                return ENUMERATION.createHandler(type, typeDeclaration);
             } else {
 
                 throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
@@ -274,12 +279,28 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
 
         @Override
         public TypeName asJavaPoetType(String typeName, TypeDeclaration originalTypeDeclaration, GenerationContext generationContext, EventType eventType) {
-            return ClassName.get(String.class);
+
+            StringTypeDeclaration declaration = (StringTypeDeclaration) originalTypeDeclaration;
+            if ( ! declaration.enumValues().isEmpty() ) {
+
+                return ENUMERATION.asJavaPoetType(typeName, originalTypeDeclaration, generationContext, eventType);
+            } else {
+
+                return ClassName.get(String.class);
+            }
         }
 
         @Override
-        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
-            return false;
+        public boolean shouldCreateInlineType(TypeDeclaration originalTypeDeclaration) {
+
+            StringTypeDeclaration declaration = (StringTypeDeclaration) originalTypeDeclaration;
+
+            if ( ! declaration.enumValues().isEmpty() ) {
+
+                return ENUMERATION.shouldCreateInlineType(originalTypeDeclaration);
+            } else {
+                return false;
+            }
         }
     },
     ANY {
