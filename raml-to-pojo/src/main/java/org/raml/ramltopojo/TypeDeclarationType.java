@@ -60,8 +60,8 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
      */
     OBJECT {
         @Override
-        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            return new ObjectTypeHandler((ObjectTypeDeclaration) typeDeclaration);
+        public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+            return new ObjectTypeHandler(name, (ObjectTypeDeclaration) typeDeclaration);
         }
 
         @Override
@@ -97,10 +97,10 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     ENUMERATION {
         @Override
-        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
 
             StringTypeDeclaration stringTypeDeclaration = (StringTypeDeclaration) typeDeclaration;
-            return new EnumerationTypeHandler(stringTypeDeclaration);
+            return new EnumerationTypeHandler(name, stringTypeDeclaration);
         }
 
         @Override
@@ -116,7 +116,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     ARRAY {
         @Override
-        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -134,9 +134,9 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     UNION {
         @Override
-        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
 
-            return new UnionTypeHandler((UnionTypeDeclaration) typeDeclaration);
+            return new UnionTypeHandler(name, (UnionTypeDeclaration) typeDeclaration);
         }
 
         @Override
@@ -154,7 +154,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     INTEGER {
         @Override
-        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -170,7 +170,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     BOOLEAN {
         @Override
-        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -186,7 +186,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     DATE {
         @Override
-        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -202,7 +202,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     DATETIME {
         @Override
-        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -218,7 +218,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     TIME_ONLY {
         @Override
-        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -234,7 +234,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     DATETIME_ONLY {
         @Override
-        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -250,7 +250,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     NUMBER {
         @Override
-        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -266,11 +266,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     STRING {
         @Override
-        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
 
             StringTypeDeclaration declaration = (StringTypeDeclaration) typeDeclaration;
             if ( ! declaration.enumValues().isEmpty() ) {
-                return ENUMERATION.createHandler(type, typeDeclaration);
+                return ENUMERATION.createHandler(name, type, typeDeclaration);
             } else {
 
                 throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
@@ -305,7 +305,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     ANY {
         @Override
-        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -321,7 +321,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     FILE {
         @Override
-        public TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+        public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
             throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
         }
 
@@ -378,7 +378,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
 
         TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
 
-        TypeHandler handler = typeDeclarationType.createHandler(typeDeclarationType, typeDeclaration);
+        TypeHandler handler = typeDeclarationType.createHandler(typeDeclaration.name(), typeDeclarationType, typeDeclaration);
         ClassName intf = handler.javaTypeName(context, EventType.INTERFACE);
         ClassName impl = handler.javaTypeName(context, EventType.IMPLEMENTATION);
         CreationResult creationResult = new CreationResult(context.defaultPackage(), intf, impl);
@@ -397,7 +397,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
 
         TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
 
-        TypeHandler handler = typeDeclarationType.createHandler(typeDeclarationType, typeDeclaration);
+        TypeHandler handler = typeDeclarationType.createHandler(name, typeDeclarationType, typeDeclaration);
         ClassName intf = handler.javaTypeName(new InlineGenerationContext(context),  EventType.INTERFACE);
         ClassName impl = handler.javaTypeName(new InlineGenerationContext(context), EventType.IMPLEMENTATION);
         CreationResult preCreationResult = new CreationResult("", intf, impl);
@@ -412,11 +412,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
      * @param eventType
      * @return
      */
-    public static ClassName typeName(TypeDeclaration typeDeclaration, GenerationContext context, EventType eventType) {
+    public static ClassName typeName(String name, TypeDeclaration typeDeclaration, GenerationContext context, EventType eventType) {
 
         TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
 
-        TypeHandler handler = typeDeclarationType.createHandler(typeDeclarationType, typeDeclaration);
+        TypeHandler handler = typeDeclarationType.createHandler(name, typeDeclarationType, typeDeclaration);
         return handler.javaTypeName(context, eventType);
     }
 

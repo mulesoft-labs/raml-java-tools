@@ -16,9 +16,11 @@ import javax.lang.model.element.Modifier;
  */
 public class ObjectTypeHandler implements TypeHandler {
 
+    private final String name;
     private final ObjectTypeDeclaration objectTypeDeclaration;
 
-    public ObjectTypeHandler(ObjectTypeDeclaration objectTypeDeclaration) {
+    public ObjectTypeHandler(String name, ObjectTypeDeclaration objectTypeDeclaration) {
+        this.name = name;
         this.objectTypeDeclaration = objectTypeDeclaration;
     }
 
@@ -31,10 +33,10 @@ public class ObjectTypeHandler implements TypeHandler {
         ObjectTypeHandlerPlugin plugin = generationContext.pluginsForObjects(objectTypeDeclaration);
         ClassName className;
         if ( type == EventType.IMPLEMENTATION ) {
-            className = ClassName.get(generationContext.defaultPackage(), Names.typeName(objectTypeDeclaration.name(), "Impl"));
+            className = ClassName.get(generationContext.defaultPackage(), Names.typeName(name, "Impl"));
         } else {
 
-            className = ClassName.get(generationContext.defaultPackage(), Names.typeName(objectTypeDeclaration.name()));
+            className = ClassName.get(generationContext.defaultPackage(), Names.typeName(name));
         }
 
         return plugin.className(context, objectTypeDeclaration, className, type);
@@ -158,7 +160,7 @@ public class ObjectTypeHandler implements TypeHandler {
             TypeName tn;
             if ( TypeDeclarationType.isNewInlineType(propertyDeclaration) ){
 
-                CreationResult cr = TypeDeclarationType.createInlineType("", propertyDeclaration, generationContext);
+                CreationResult cr = TypeDeclarationType.createInlineType(Names.typeName(propertyDeclaration.name(), "type"), propertyDeclaration, generationContext);
                 result.withInternalType(propertyDeclaration.name(), cr);
                 tn = cr.getJavaName(EventType.INTERFACE);
             }  else {

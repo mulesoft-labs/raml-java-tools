@@ -14,17 +14,18 @@ import javax.lang.model.element.Modifier;
  */
 public class EnumerationTypeHandler implements TypeHandler {
 
+    private final String name;
     private final StringTypeDeclaration typeDeclaration;
 
-    public EnumerationTypeHandler(StringTypeDeclaration stringTypeDeclaration) {
-
+    public EnumerationTypeHandler(String name, StringTypeDeclaration stringTypeDeclaration) {
+        this.name = name;
         this.typeDeclaration = stringTypeDeclaration;
     }
 
     @Override
     public ClassName javaTypeName(GenerationContext generationContext, EventType type) {
 
-        return ClassName.get(generationContext.defaultPackage(), Names.typeName(typeDeclaration.name()));
+        return ClassName.get(generationContext.defaultPackage(), Names.typeName(name));
     }
 
     @Override

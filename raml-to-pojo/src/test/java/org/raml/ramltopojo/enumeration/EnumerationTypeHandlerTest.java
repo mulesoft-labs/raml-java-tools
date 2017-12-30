@@ -35,7 +35,7 @@ public class EnumerationTypeHandlerTest extends UnitTest {
         when(declaration.name()).thenReturn("Days");
         when(declaration.enumValues()).thenReturn(Arrays.asList("one", "two", "three"));
 
-        EnumerationTypeHandler handler = new EnumerationTypeHandler(declaration);
+        EnumerationTypeHandler handler = new EnumerationTypeHandler("days", declaration);
         GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, null, TypeFetchers.fromTypes(), "bar.pack");
         generationContext.newExpectedType("Days", new CreationResult("bar.pack", ClassName.get("bar.pack", "Days"), null));
 

@@ -13,23 +13,32 @@ import javax.lang.model.element.Modifier;
  */
 public class UnionTypeHandler implements TypeHandler {
 
+    private final String name;
     private final UnionTypeDeclaration union;
 
-    public UnionTypeHandler(UnionTypeDeclaration union) {
-
+    public UnionTypeHandler(String name, UnionTypeDeclaration union) {
+        this.name = name;
         this.union = union;
     }
 
     @Override
     public ClassName javaTypeName(GenerationContext generationContext, EventType type) {
-        return ClassName.get(generationContext.defaultPackage(), Names.typeName(union.name())); }
+
+        if ( type == EventType.INTERFACE) {
+
+            return ClassName.get(generationContext.defaultPackage(), Names.typeName(name));
+        } else {
+
+            return ClassName.get(generationContext.defaultPackage(), Names.typeName(name, "Impl"));
+        }
+    }
 
     @Override
     public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
 
         CreationResult result = generationContext.findCreatedType(union.name(), union);
-        ClassName interfaceName = ClassName.get(generationContext.defaultPackage(), Names.typeName(union.name()));
-        ClassName implementationName = ClassName.get(generationContext.defaultPackage(), Names.typeName(union.name(), "Impl"));
+        ClassName interfaceName = preCreationResult.getJavaName(EventType.INTERFACE);
+        ClassName implementationName = preCreationResult.getJavaName(EventType.IMPLEMENTATION);
 
         TypeSpec.Builder interf = getDeclaration(interfaceName, generationContext);
         TypeSpec.Builder impl = getImplementation(interfaceName, implementationName, generationContext);

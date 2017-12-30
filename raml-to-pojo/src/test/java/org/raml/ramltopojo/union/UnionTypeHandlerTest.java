@@ -31,11 +31,11 @@ public class UnionTypeHandlerTest {
     public void simpleUnion() throws Exception {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("union-type.raml"), ".");
-        UnionTypeHandler handler = new UnionTypeHandler(findTypes("foo", api.types()));
+        UnionTypeHandler handler = new UnionTypeHandler("foo", findTypes("foo", api.types()));
 
         GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack");
         generationContext.newExpectedType("foo", new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
-        CreationResult r = handler.create(generationContext, null);
+        CreationResult r = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
 
 
         assertThat(r.getInterface(), is(allOf(
@@ -78,9 +78,9 @@ public class UnionTypeHandlerTest {
     public void primitiveUnion() throws Exception {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("union-primitive-type.raml"), ".");
-        UnionTypeHandler handler = new UnionTypeHandler(findTypes("foo", api.types()));
+        UnionTypeHandler handler = new UnionTypeHandler("foo", findTypes("foo", api.types()));
 
-        CreationResult r = handler.create(new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack"), null);
+        CreationResult r = handler.create(new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack"), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
 
         assertThat(r.getInterface(), is(allOf(
                 name(equalTo("Foo")),
@@ -126,7 +126,7 @@ public class UnionTypeHandlerTest {
     public void arrayUnion() throws Exception {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("union-array-type.raml"), ".");
-        UnionTypeHandler handler = new UnionTypeHandler(findTypes("foo", api.types()));
+        UnionTypeHandler handler = new UnionTypeHandler("foo", findTypes("foo", api.types()));
 
         handler.create(new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack"), null);
     }
@@ -141,5 +141,3 @@ public class UnionTypeHandlerTest {
     }
 
 }
-//method iterable containing [method name "<init>", (method name "<init>" and parameter iterable containing [type name <java.lang.Integer>]), (method name "getInteger" and return type <java.lang.Integer> and method content "if ( !(anyType instanceof  java.lang.Integer)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: java.lang.Integer\");\nreturn (java.lang.Integer) anyType;\n"), (method name "isInteger" and return type <boolean> and method content "return anyType instanceof java.lang.Integer;\n"), (method name "<init>" and parameter iterable containing [type name <bar.pack.Second>]), (method name "getSecond" and return type <bar.pack.Second> and method content "if ( !(anyType instanceof  bar.pack.Second)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: Second\");\nreturn (bar.pack.Second) anyType;\n"), (method name "isSecond" and return type <boolean> and method content "return anyType instanceof bar.pack.Second;\n")] and super interfaces iterable containing [(typename <bar.pack.bar.pack.Foo>)])
-//method iterable containing [method name "<init>", (method name "<init>" and parameter iterable containing [type name <java.lang.Integer>]), (method name "getInteger" and return type <java.lang.Integer> and method content "if ( !(anyType instanceof  java.lang.Integer)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: java.lang.Integer\");\nreturn (java.lang.Integer) anyType;\n"), (method name "isInteger" and return type <boolean> and method content "return anyType instanceof java.lang.Integer;\n"), (method name "<init>" and parameter iterable containing [type name <bar.pack.Second>]), (method name "getSecond" and return type <bar.pack.Second> and method content "if ( !(anyType instanceof  bar.pack.Second)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: Second\");\nreturn (bar.pack.Second) anyType;\n"), (method name "isSecond" and return type <boolean> and method content "return anyType instanceof bar.pack.Second;\n")] method item 5: method content "if ( !(anyType instanceof  bar.pack.Second)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: Second\");\nreturn (bar.pack.Second) anyType;\n" method content was "if ( !(anyType instanceof  bar.pack.Second)) throw new java.lang.IllegalStateException(\"fetching wrong type out of the union: bar.pack.Second\");\nreturn (bar.pack.Second) anyType;\n"

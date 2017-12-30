@@ -7,5 +7,5 @@ import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
  */
 public interface TypeHandlerFactory {
 
-    TypeHandler createHandler(TypeDeclarationType type, TypeDeclaration typeDeclaration);
+    TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration);
 }

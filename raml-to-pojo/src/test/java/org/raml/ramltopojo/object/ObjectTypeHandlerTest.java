@@ -53,7 +53,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void simplest() throws Exception {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("simplest-type.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler(RamlLoader.findTypes("foo", api.types()));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", RamlLoader.findTypes("foo", api.types()));
 
         GenerationContextImpl generationContext = new GenerationContextImpl(api);
         CreationResult r = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
@@ -93,7 +93,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void simplestContainingSimpleArray() throws Exception {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("simplest-containing-simple-array.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler(RamlLoader.findTypes("foo", api.types()));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", RamlLoader.findTypes("foo", api.types()));
 
         GenerationContextImpl generationContext = new GenerationContextImpl(api);
         CreationResult r = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
@@ -130,7 +130,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void usingComposedTypes() throws Exception {
 
         final Api api = RamlLoader.load(this.getClass().getResourceAsStream("using-composed-type.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler(RamlLoader.findTypes("foo", api.types()));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", RamlLoader.findTypes("foo", api.types()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
 
@@ -161,7 +161,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void simpleInheritance() throws Exception {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("inherited-type.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler(RamlLoader.findTypes("foo", api.types()));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", RamlLoader.findTypes("foo", api.types()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
 
@@ -203,7 +203,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void inheritanceWithDiscriminator() throws Exception {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("inheritance-with-discriminator-type.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler(RamlLoader.findTypes("foo", api.types()));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", RamlLoader.findTypes("foo", api.types()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
 
@@ -250,7 +250,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void inheritanceWithDiscriminatorAndValue() throws Exception {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("inheritance-with-discriminatorvalue-type.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler(RamlLoader.findTypes("foo", api.types()));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", RamlLoader.findTypes("foo", api.types()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
 
@@ -274,7 +274,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void multipleInheritance() throws Exception {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("multiple-inheritance-type.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler(RamlLoader.findTypes("foo", api.types()));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", RamlLoader.findTypes("foo", api.types()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
 
@@ -323,14 +323,14 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void simplestInternal() throws Exception {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-type.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findTypes("foo", api.types()));
 
         GenerationContextImpl generationContext = new GenerationContextImpl(api);
 
         CreationResult r = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
 
-        assertThat(r.getInternalTypeForProperty("inside").getInterface(), name(equalTo("Inside")));
-        assertThat(r.getInternalTypeForProperty("inside").getImplementation().get(), name(equalTo("InsideImpl")));
+        assertThat(r.getInternalTypeForProperty("inside").getInterface(), name(equalTo("InsideType")));
+        assertThat(r.getInternalTypeForProperty("inside").getImplementation().get(), name(equalTo("InsideTypeImpl")));
     }
 
     @Test
@@ -358,7 +358,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
 
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("plugin-test.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findTypes("foo", api.types()));
 
         GenerationContextImpl generationContext = new GenerationContextImpl(api) {
             @Override
@@ -381,7 +381,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
 
         URL url = this.getClass().getResource("plugin-invocation.raml");
         Api api = RamlLoader.load(url.openStream(), new File(url.getFile()).getAbsolutePath());
-        ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findTypes("foo", api.types()));
 
         GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.createPluginManager("org/raml/ramltopojo/object/simple-plugin.properties"), api, TypeFetchers.NULL_FETCHER, "bar.pack");
 
@@ -398,7 +398,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void enumerationsInline() {
 
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-enumeration.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler(RamlLoader.findTypes("foo", api.types()));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", RamlLoader.findTypes("foo", api.types()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
 
@@ -406,7 +406,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
         assertThat(r.internalType("name").getInterface(), is(allOf(
 
                 name(
-                        is(equalTo("Name"))
+                        is(equalTo("NameType"))
                 )
         )));
 
