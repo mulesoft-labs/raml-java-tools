@@ -48,13 +48,13 @@ public class ObjectTypeHandler implements TypeHandler {
         // I need to createHandler an interface and an implementation.
         ObjectPluginContext context = new ObjectPluginContextImpl(generationContext, result);
         TypeSpec interfaceSpec = createInterface(context,  result, generationContext);
-        TypeSpec implementationSpec = createImplementation(context,  result, interfaceSpec, generationContext);
+        TypeSpec implementationSpec = createImplementation(context,  result, generationContext);
 
         result.withInterface(interfaceSpec).withImplementation(implementationSpec);
         return result;
     }
 
-    private TypeSpec createImplementation(ObjectPluginContext objectPluginContext, CreationResult result, TypeSpec interfaceSpec, GenerationContext generationContext) {
+    private TypeSpec createImplementation(ObjectPluginContext objectPluginContext, CreationResult result, GenerationContext generationContext) {
 
         ClassName className = result.getJavaName(EventType.IMPLEMENTATION);
         TypeSpec.Builder typeSpec = TypeSpec

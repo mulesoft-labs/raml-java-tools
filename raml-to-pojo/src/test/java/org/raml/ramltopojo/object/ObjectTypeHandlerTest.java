@@ -292,8 +292,8 @@ public class ObjectTypeHandlerTest extends UnitTest {
                         allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get(String.class))))))
                 )),
                 superInterfaces(contains(
-                                typeName(equalTo(ClassName.get("", "pojo.pack.Once"))),
-                                typeName(equalTo(ClassName.get("", "pojo.pack.Twice")))
+                        typeName(equalTo(ClassName.get("", "pojo.pack.Once"))),
+                        typeName(equalTo(ClassName.get("", "pojo.pack.Twice")))
                         )
 
                 ))));
@@ -327,7 +327,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
 
         GenerationContextImpl generationContext = new GenerationContextImpl(api);
 
-        CreationResult r = handler.create(generationContext,  new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
+        CreationResult r = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
 
         assertThat(r.getInternalTypeForProperty("inside").getInterface(), name(equalTo("Inside")));
         assertThat(r.getInternalTypeForProperty("inside").getImplementation().get(), name(equalTo("InsideImpl")));
@@ -360,7 +360,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("plugin-test.raml"), ".");
         ObjectTypeHandler handler = new ObjectTypeHandler(findTypes("foo", api.types()));
 
-        GenerationContextImpl generationContext = new GenerationContextImpl(api){
+        GenerationContextImpl generationContext = new GenerationContextImpl(api) {
             @Override
             public ObjectTypeHandlerPlugin pluginsForObjects(TypeDeclaration... typeDeclarations) {
                 return mockPlugin;
@@ -392,6 +392,24 @@ public class ObjectTypeHandlerTest extends UnitTest {
         assertEquals("@java.lang.Deprecated", r.getInterface().annotations.get(0).toString());
         assertTrue(r.getImplementation().get().annotations.size() == 1);
         assertEquals("@java.lang.Deprecated", r.getImplementation().get().annotations.get(0).toString());
+    }
+
+    @Test
+    public void enumerationsInline() {
+
+        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-enumeration.raml"), ".");
+        ObjectTypeHandler handler = new ObjectTypeHandler(RamlLoader.findTypes("foo", api.types()));
+
+        CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
+
+        assertNotNull(r);
+        assertThat(r.internalType("name").getInterface(), is(allOf(
+
+                name(
+                        is(equalTo("Name"))
+                )
+        )));
+
     }
 
     protected GenerationContextImpl createGenerationContext(final Api api) {

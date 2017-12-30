@@ -32,10 +32,11 @@ public class EnumerationTypeHandler implements TypeHandler {
 
         FieldSpec.Builder field = FieldSpec.builder(ClassName.get(String.class), "name").addModifiers(Modifier.PRIVATE);
 
-        CreationResult creationResult = generationContext.findCreatedType(typeDeclaration.name(), typeDeclaration);
-        TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder(creationResult.getJavaName(EventType.INTERFACE))
+        ClassName className = preCreationResult.getJavaName(EventType.INTERFACE);
+
+        TypeSpec.Builder enumBuilder = TypeSpec.enumBuilder(className)
                 .addField(field.build())
-                .addModifiers(Modifier.PUBLIC)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addMethod(
                         MethodSpec.constructorBuilder().addParameter(ClassName.get(String.class), "name")
                                 .addStatement("this.$N = $N", "name", "name")
@@ -48,6 +49,6 @@ public class EnumerationTypeHandler implements TypeHandler {
                     builder.build());
         }
 
-        return creationResult.withInterface(enumBuilder.build());
+        return preCreationResult.withInterface(enumBuilder.build());
     }
 }
