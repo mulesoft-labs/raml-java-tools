@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import org.raml.ramltopojo.extensions.EnumerationTypeHandlerPlugin;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
@@ -19,6 +20,8 @@ public interface GenerationContext {
 
     void createTypes(String rootDirectory) throws IOException;
     ObjectTypeHandlerPlugin pluginsForObjects(TypeDeclaration... typeDeclarations);
+    EnumerationTypeHandlerPlugin pluginsForEnumerations(TypeDeclaration... typeDeclarations);
+
     Api api();
 
     Set<String> childClasses(String ramlTypeName);

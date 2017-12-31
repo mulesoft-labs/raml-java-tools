@@ -10,6 +10,7 @@ import org.raml.ramltopojo.TypeFetchers;
 import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.testutils.UnitTest;
 import org.raml.testutils.matchers.FieldSpecMatchers;
+import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
 
 import java.util.Arrays;
@@ -29,6 +30,10 @@ public class EnumerationTypeHandlerTest extends UnitTest {
     @Mock
     StringTypeDeclaration declaration;
 
+    @Mock
+    private Api api;
+
+
     @Test
     public void create() throws Exception {
 
@@ -36,7 +41,7 @@ public class EnumerationTypeHandlerTest extends UnitTest {
         when(declaration.enumValues()).thenReturn(Arrays.asList("one", "two", "three"));
 
         EnumerationTypeHandler handler = new EnumerationTypeHandler("days", declaration);
-        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, null, TypeFetchers.fromTypes(), "bar.pack");
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack");
         generationContext.newExpectedType("Days", new CreationResult("bar.pack", ClassName.get("bar.pack", "Days"), null));
 
         CreationResult result = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Days"), null));

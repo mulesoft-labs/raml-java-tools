@@ -46,7 +46,6 @@ public class ObjectTypeHandler implements TypeHandler {
     // TODO deal with null interface spec.
     public CreationResult create(GenerationContext generationContext, CreationResult result) {
 
-
         // I need to createHandler an interface and an implementation.
         ObjectPluginContext context = new ObjectPluginContextImpl(generationContext, result);
         TypeSpec interfaceSpec = createInterface(context,  result, generationContext);

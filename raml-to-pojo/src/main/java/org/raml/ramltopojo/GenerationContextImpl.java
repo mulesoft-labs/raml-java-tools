@@ -2,6 +2,7 @@ package org.raml.ramltopojo;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
+import org.raml.ramltopojo.extensions.EnumerationTypeHandlerPlugin;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.v2.api.model.v10.api.Api;
@@ -100,6 +101,16 @@ public class GenerationContextImpl implements GenerationContext {
             plugins.addAll(pluginManager.getClassesForName(datum.getPluginName(), datum.getArguments() , ObjectTypeHandlerPlugin.class));
         }
         return new ObjectTypeHandlerPlugin.Composite(plugins);
+    }
+
+    @Override
+    public EnumerationTypeHandlerPlugin pluginsForEnumerations(TypeDeclaration... typeDeclarations) {
+        List<PluginDef> data = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, typeDeclarations);
+        Set<EnumerationTypeHandlerPlugin> plugins = new HashSet<>();
+        for (PluginDef datum : data) {
+            plugins.addAll(pluginManager.getClassesForName(datum.getPluginName(), datum.getArguments() , EnumerationTypeHandlerPlugin.class));
+        }
+        return new EnumerationTypeHandlerPlugin.Composite(plugins);
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.enumeration.EnumerationTypeHandler;
+import org.raml.ramltopojo.extensions.EnumerationTypeHandlerPlugin;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import org.raml.ramltopojo.object.ObjectTypeHandler;
 import org.raml.ramltopojo.union.UnionTypeHandler;
@@ -478,6 +479,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         @Override
         public ObjectTypeHandlerPlugin pluginsForObjects(TypeDeclaration... typeDeclarations) {
             return context.pluginsForObjects(typeDeclarations);
+        }
+
+        @Override
+        public EnumerationTypeHandlerPlugin pluginsForEnumerations(TypeDeclaration... typeDeclarations) {
+            return context.pluginsForEnumerations(typeDeclarations);
         }
 
         @Override

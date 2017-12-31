@@ -1,0 +1,84 @@
+package org.raml.ramltopojo.extensions;
+
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.TypeSpec;
+import org.raml.ramltopojo.EventType;
+import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * Created. There, you have it.
+ */
+public interface EnumerationTypeHandlerPlugin {
+
+    class Helper implements EnumerationTypeHandlerPlugin {
+
+        @Override
+        public ClassName className(EnumerationPluginContext enumerationPluginContext, ObjectTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+            return currentSuggestion;
+        }
+
+        @Override
+        public TypeSpec.Builder classCreated(EnumerationPluginContext enumerationPluginContext, StringTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+            return incoming;
+        }
+
+        @Override
+        public TypeSpec.Builder enumValue(EnumerationPluginContext enumerationPluginContext, TypeDeclaration declaration, TypeSpec.Builder incoming, EventType eventType) {
+            return incoming;
+        }
+    }
+
+    ClassName className(EnumerationPluginContext enumerationPluginContext, ObjectTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType);
+    TypeSpec.Builder classCreated(EnumerationPluginContext enumerationPluginContext, StringTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType);
+    TypeSpec.Builder enumValue(EnumerationPluginContext enumerationPluginContext, TypeDeclaration declaration, TypeSpec.Builder enumValue, EventType eventType);
+
+    class Composite implements EnumerationTypeHandlerPlugin {
+
+        private final List<EnumerationTypeHandlerPlugin> plugins = new ArrayList<>();
+
+        public Composite(Set<EnumerationTypeHandlerPlugin> actualPlugins) {
+
+            plugins.addAll(actualPlugins);
+        }
+
+        @Override
+        public ClassName className(EnumerationPluginContext enumerationPluginContext, ObjectTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+            for (EnumerationTypeHandlerPlugin plugin : plugins) {
+                currentSuggestion = plugin.className(enumerationPluginContext, ramlType, currentSuggestion, eventType);
+            }
+
+            return currentSuggestion;
+        }
+
+        @Override
+        public TypeSpec.Builder classCreated(EnumerationPluginContext enumerationPluginContext, StringTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+
+            for (EnumerationTypeHandlerPlugin plugin : plugins) {
+                if ( incoming == null ) {
+                    break;
+                }
+                incoming = plugin.classCreated(enumerationPluginContext, ramlType, incoming, eventType);
+            }
+
+            return incoming;
+        }
+
+        @Override
+        public TypeSpec.Builder enumValue(EnumerationPluginContext enumerationPluginContext, TypeDeclaration declaration, TypeSpec.Builder incoming, EventType eventType) {
+            for (EnumerationTypeHandlerPlugin plugin : plugins) {
+                if ( incoming == null ) {
+                    break;
+                }
+                incoming = plugin.enumValue(enumerationPluginContext, declaration, incoming, eventType);
+            }
+
+            return incoming;
+        }
+    }
+}
