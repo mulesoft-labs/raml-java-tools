@@ -2,6 +2,9 @@ package org.raml.ramltopojo.union;
 
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.*;
+import org.raml.ramltopojo.extensions.UnionPluginContext;
+import org.raml.ramltopojo.extensions.UnionPluginContextImpl;
+import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
@@ -24,29 +27,40 @@ public class UnionTypeHandler implements TypeHandler {
     @Override
     public ClassName javaTypeName(GenerationContext generationContext, EventType type) {
 
-        if ( type == EventType.INTERFACE) {
+        UnionPluginContext context = new UnionPluginContextImpl(generationContext, null);
 
-            return ClassName.get(generationContext.defaultPackage(), Names.typeName(name));
+        UnionTypeHandlerPlugin plugin = generationContext.pluginsForUnions(union);
+        ClassName className;
+        if ( type == EventType.IMPLEMENTATION ) {
+            className = ClassName.get(generationContext.defaultPackage(), Names.typeName(name, "Impl"));
         } else {
 
-            return ClassName.get(generationContext.defaultPackage(), Names.typeName(name, "Impl"));
+            className = ClassName.get(generationContext.defaultPackage(), Names.typeName(name));
         }
+
+        return plugin.className(context, union, className, type);
     }
 
     @Override
     public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
 
+        UnionPluginContext context = new UnionPluginContextImpl(generationContext, preCreationResult);
+
         CreationResult result = generationContext.findCreatedType(union.name(), union);
         ClassName interfaceName = preCreationResult.getJavaName(EventType.INTERFACE);
         ClassName implementationName = preCreationResult.getJavaName(EventType.IMPLEMENTATION);
 
-        TypeSpec.Builder interf = getDeclaration(interfaceName, generationContext);
-        TypeSpec.Builder impl = getImplementation(interfaceName, implementationName, generationContext);
+        TypeSpec.Builder interf = getDeclaration(interfaceName, generationContext, context);
+        TypeSpec.Builder impl = getImplementation(interfaceName, implementationName, generationContext, context);
         return result.withInterface(interf.build()).withImplementation(impl.build());
     }
 
-    private TypeSpec.Builder getImplementation(ClassName interfaceName, ClassName implementationName, GenerationContext generationContext) {
-        TypeSpec.Builder typeSpec = TypeSpec.classBuilder(implementationName).addModifiers(Modifier.PUBLIC).addSuperinterface(interfaceName);
+    private TypeSpec.Builder getImplementation(ClassName interfaceName, ClassName implementationName, GenerationContext generationContext, UnionPluginContext context) {
+        TypeSpec.Builder typeSpec = TypeSpec.classBuilder(implementationName).addModifiers(Modifier.PUBLIC, Modifier.STATIC).addSuperinterface(interfaceName);
+        typeSpec = generationContext.pluginsForUnions(union).classCreated(context, union, typeSpec, EventType.IMPLEMENTATION);
+        if ( typeSpec == null ) {
+            return null;
+        }
 
         FieldSpec.Builder anyType = FieldSpec.builder(Object.class, "anyType", Modifier.PRIVATE);
         typeSpec.addField(anyType.build());
@@ -87,8 +101,12 @@ public class UnionTypeHandler implements TypeHandler {
         return typeSpec;
     }
 
-    private TypeSpec.Builder getDeclaration(ClassName interfaceName, GenerationContext generationContext) {
+    private TypeSpec.Builder getDeclaration(ClassName interfaceName, GenerationContext generationContext, UnionPluginContext context) {
         TypeSpec.Builder typeSpec = TypeSpec.interfaceBuilder(interfaceName).addModifiers(Modifier.PUBLIC);
+        typeSpec = generationContext.pluginsForUnions(union).classCreated(context, union, typeSpec, EventType.IMPLEMENTATION);
+        if ( typeSpec == null ) {
+            return null;
+        }
 
         for (TypeDeclaration unitedType : union.of()) {
 

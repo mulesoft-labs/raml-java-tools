@@ -3,7 +3,6 @@ package org.raml.ramltopojo.extensions;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EventType;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
@@ -19,7 +18,7 @@ public interface EnumerationTypeHandlerPlugin {
     class Helper implements EnumerationTypeHandlerPlugin {
 
         @Override
-        public ClassName className(EnumerationPluginContext enumerationPluginContext, ObjectTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+        public ClassName className(EnumerationPluginContext enumerationPluginContext, StringTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
             return currentSuggestion;
         }
 
@@ -34,7 +33,7 @@ public interface EnumerationTypeHandlerPlugin {
         }
     }
 
-    ClassName className(EnumerationPluginContext enumerationPluginContext, ObjectTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType);
+    ClassName className(EnumerationPluginContext enumerationPluginContext, StringTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType);
     TypeSpec.Builder classCreated(EnumerationPluginContext enumerationPluginContext, StringTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType);
     TypeSpec.Builder enumValue(EnumerationPluginContext enumerationPluginContext, TypeDeclaration declaration, TypeSpec.Builder enumValue, EventType eventType);
 
@@ -48,7 +47,7 @@ public interface EnumerationTypeHandlerPlugin {
         }
 
         @Override
-        public ClassName className(EnumerationPluginContext enumerationPluginContext, ObjectTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+        public ClassName className(EnumerationPluginContext enumerationPluginContext, StringTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
             for (EnumerationTypeHandlerPlugin plugin : plugins) {
                 currentSuggestion = plugin.className(enumerationPluginContext, ramlType, currentSuggestion, eventType);
             }

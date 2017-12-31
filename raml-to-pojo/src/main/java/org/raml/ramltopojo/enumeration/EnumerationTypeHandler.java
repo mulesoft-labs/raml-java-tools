@@ -27,7 +27,8 @@ public class EnumerationTypeHandler implements TypeHandler {
     @Override
     public ClassName javaTypeName(GenerationContext generationContext, EventType type) {
 
-        return ClassName.get(generationContext.defaultPackage(), Names.typeName(name));
+        EnumerationPluginContext enumerationPluginContext = new EnumerationPluginContextImpl(generationContext, null);
+        return generationContext.pluginsForEnumerations(typeDeclaration).className(enumerationPluginContext, typeDeclaration, ClassName.get(generationContext.defaultPackage(), Names.typeName(name)), EventType.INTERFACE);
     }
 
     @Override
@@ -47,14 +48,21 @@ public class EnumerationTypeHandler implements TypeHandler {
                                 .addStatement("this.$N = $N", "name", "name")
                                 .build()
                 );
-        generationContext.pluginsForEnumerations(typeDeclaration).classCreated(enumerationPluginContext, typeDeclaration, enumBuilder, EventType.INTERFACE);
+        enumBuilder = generationContext.pluginsForEnumerations(typeDeclaration).classCreated(enumerationPluginContext, typeDeclaration, enumBuilder, EventType.INTERFACE);
+        if ( enumBuilder == null ) {
+            return null;
+        }
 
         for (String value : typeDeclaration.enumValues()) {
             TypeSpec.Builder enumValueBuilder = TypeSpec.anonymousClassBuilder("$S", value);
+            enumValueBuilder = generationContext.pluginsForEnumerations(typeDeclaration).enumValue(enumerationPluginContext, typeDeclaration, enumValueBuilder, EventType.INTERFACE);
+            if ( enumValueBuilder == null ) {
+                continue;
+            }
+
             enumBuilder.addEnumConstant(Names.constantName(value),
                     enumValueBuilder.build());
 
-            generationContext.pluginsForEnumerations(typeDeclaration).enumValue(enumerationPluginContext, typeDeclaration, enumValueBuilder, EventType.INTERFACE);
         }
 
         return preCreationResult.withInterface(enumBuilder.build());
