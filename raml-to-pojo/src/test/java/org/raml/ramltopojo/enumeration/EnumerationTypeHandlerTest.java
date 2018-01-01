@@ -14,6 +14,7 @@ import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.AllOf.allOf;
@@ -41,7 +42,7 @@ public class EnumerationTypeHandlerTest extends UnitTest {
         when(declaration.enumValues()).thenReturn(Arrays.asList("one", "two", "three"));
 
         EnumerationTypeHandler handler = new EnumerationTypeHandler("days", declaration);
-        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack");
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());
         generationContext.newExpectedType("Days", new CreationResult("bar.pack", ClassName.get("bar.pack", "Days"), null));
 
         CreationResult result = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Days"), null));

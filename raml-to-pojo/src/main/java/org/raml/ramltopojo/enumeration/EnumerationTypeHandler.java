@@ -28,7 +28,7 @@ public class EnumerationTypeHandler implements TypeHandler {
     public ClassName javaTypeName(GenerationContext generationContext, EventType type) {
 
         EnumerationPluginContext enumerationPluginContext = new EnumerationPluginContextImpl(generationContext, null);
-        return generationContext.pluginsForEnumerations(typeDeclaration).className(enumerationPluginContext, typeDeclaration, ClassName.get(generationContext.defaultPackage(), Names.typeName(name)), EventType.INTERFACE);
+        return generationContext.pluginsForEnumerations(typeDeclaration).className(enumerationPluginContext, typeDeclaration, generationContext.buildDefaultClassName(Names.typeName(name), EventType.INTERFACE), EventType.INTERFACE);
     }
 
     @Override

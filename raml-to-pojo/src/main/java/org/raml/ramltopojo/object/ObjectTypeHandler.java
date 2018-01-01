@@ -33,10 +33,10 @@ public class ObjectTypeHandler implements TypeHandler {
         ObjectTypeHandlerPlugin plugin = generationContext.pluginsForObjects(objectTypeDeclaration);
         ClassName className;
         if ( type == EventType.IMPLEMENTATION ) {
-            className = ClassName.get(generationContext.defaultPackage(), Names.typeName(name, "Impl"));
+            className = generationContext.buildDefaultClassName(Names.typeName(name, "Impl"), EventType.IMPLEMENTATION);
         } else {
 
-            className = ClassName.get(generationContext.defaultPackage(), Names.typeName(name));
+            className = generationContext.buildDefaultClassName(Names.typeName(name), EventType.INTERFACE);
         }
 
         return plugin.className(context, objectTypeDeclaration, className, type);
@@ -159,7 +159,7 @@ public class ObjectTypeHandler implements TypeHandler {
             TypeName tn;
             if ( TypeDeclarationType.isNewInlineType(propertyDeclaration) ){
 
-                CreationResult cr = TypeDeclarationType.createInlineType(Names.typeName(propertyDeclaration.name(), "type"), propertyDeclaration, generationContext);
+                CreationResult cr = TypeDeclarationType.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),  Names.typeName(propertyDeclaration.name(), "type"), propertyDeclaration, generationContext);
                 result.withInternalType(propertyDeclaration.name(), cr);
                 tn = cr.getJavaName(EventType.INTERFACE);
             }  else {

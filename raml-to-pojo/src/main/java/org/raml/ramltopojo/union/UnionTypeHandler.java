@@ -1,5 +1,7 @@
 package org.raml.ramltopojo.union;
 
+import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
@@ -9,7 +11,9 @@ import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 
+import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
+import java.util.List;
 
 /**
  * Created. There, you have it.
@@ -32,10 +36,10 @@ public class UnionTypeHandler implements TypeHandler {
         UnionTypeHandlerPlugin plugin = generationContext.pluginsForUnions(union);
         ClassName className;
         if ( type == EventType.IMPLEMENTATION ) {
-            className = ClassName.get(generationContext.defaultPackage(), Names.typeName(name, "Impl"));
+            className = generationContext.buildDefaultClassName(Names.typeName(name, "Impl"), EventType.IMPLEMENTATION);
         } else {
 
-            className = ClassName.get(generationContext.defaultPackage(), Names.typeName(name));
+            className = generationContext.buildDefaultClassName(Names.typeName(name), EventType.INTERFACE);
         }
 
         return plugin.className(context, union, className, type);
@@ -56,7 +60,7 @@ public class UnionTypeHandler implements TypeHandler {
     }
 
     private TypeSpec.Builder getImplementation(ClassName interfaceName, ClassName implementationName, GenerationContext generationContext, UnionPluginContext context) {
-        TypeSpec.Builder typeSpec = TypeSpec.classBuilder(implementationName).addModifiers(Modifier.PUBLIC, Modifier.STATIC).addSuperinterface(interfaceName);
+        TypeSpec.Builder typeSpec = TypeSpec.classBuilder(implementationName).addModifiers(Modifier.PUBLIC).addSuperinterface(interfaceName);
         typeSpec = generationContext.pluginsForUnions(union).classCreated(context, union, typeSpec, EventType.IMPLEMENTATION);
         if ( typeSpec == null ) {
             return null;
@@ -101,29 +105,37 @@ public class UnionTypeHandler implements TypeHandler {
         return typeSpec;
     }
 
-    private TypeSpec.Builder getDeclaration(ClassName interfaceName, GenerationContext generationContext, UnionPluginContext context) {
+    private TypeSpec.Builder getDeclaration(ClassName interfaceName, final GenerationContext generationContext, UnionPluginContext context) {
         TypeSpec.Builder typeSpec = TypeSpec.interfaceBuilder(interfaceName).addModifiers(Modifier.PUBLIC);
-        typeSpec = generationContext.pluginsForUnions(union).classCreated(context, union, typeSpec, EventType.IMPLEMENTATION);
+        List<TypeName> names = FluentIterable.from(union.of()).transform(new Function<TypeDeclaration, TypeName>() {
+            @Nullable
+            @Override
+            public TypeName apply(@Nullable TypeDeclaration unitedType) {
+                return findType(unitedType.name(), unitedType, generationContext).box();
+            }
+        }).toList();
+
+        typeSpec = generationContext.pluginsForUnions(union).classCreated(context, union, typeSpec, EventType.INTERFACE);
         if ( typeSpec == null ) {
             return null;
         }
 
-        for (TypeDeclaration unitedType : union.of()) {
+
+        for (TypeName unitedType : names) {
 
             if ( unitedType instanceof ArrayTypeDeclaration ) {
 
                 throw new GenerationException("ramltopojo currently does not support arrays in unions");
             }
 
-            TypeName typeName = findType(unitedType.name(), unitedType, generationContext).box();
-            String shortened = shorten(typeName);
+            String shortened = shorten(unitedType);
 
             typeSpec
                     .addMethod(
                             MethodSpec
                                     .methodBuilder(Names.methodName("get", shortened))
                                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                                    .returns(typeName).build())
+                                    .returns(unitedType).build())
                     .addMethod(
                             MethodSpec.methodBuilder(Names.methodName("is", shortened))
                                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)

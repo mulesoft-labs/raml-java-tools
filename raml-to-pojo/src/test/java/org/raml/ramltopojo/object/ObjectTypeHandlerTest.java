@@ -25,6 +25,7 @@ import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 
 import static junit.framework.TestCase.assertNotNull;
@@ -383,7 +384,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
         Api api = RamlLoader.load(url.openStream(), new File(url.getFile()).getAbsolutePath());
         ObjectTypeHandler handler = new ObjectTypeHandler("foo", findTypes("foo", api.types()));
 
-        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.createPluginManager("org/raml/ramltopojo/object/simple-plugin.properties"), api, TypeFetchers.NULL_FETCHER, "bar.pack");
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.createPluginManager("org/raml/ramltopojo/object/simple-plugin.properties"), api, TypeFetchers.NULL_FETCHER, "bar.pack", Collections.<String>emptyList());
 
         CreationResult r = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
 
@@ -428,7 +429,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
                     }
                 });
             }
-        }, "pojo.pack");
+        }, "pojo.pack", Collections.<String>emptyList());
     }
 
 

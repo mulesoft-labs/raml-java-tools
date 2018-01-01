@@ -58,7 +58,7 @@ public class JacksonDiscriminatorInheritanceTypeExtension extends ObjectTypeHand
                 AnnotationSpec
                         .builder(JsonSubTypes.Type.class)
                         .addMember("value", "$L",
-                                result.getInterface().name + ".class").build());
+                                result.getJavaName(EventType.INTERFACE) + ".class").build());
       }
 
 

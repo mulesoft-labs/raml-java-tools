@@ -92,7 +92,7 @@ public class RamlToPojoMojo extends AbstractMojo {
         try {
             project.addCompileSourceRoot(outputDirectory.getPath());
 
-            getLog().error("about to read file " + ramlFile + " in directory " + ramlFile.getParent());
+            getLog().info("about to read file " + ramlFile + " in directory " + ramlFile.getParent());
             RamlModelResult ramlModelResult =
                     new RamlModelBuilder().buildApi(
                             new FileReader(ramlFile),

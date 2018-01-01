@@ -11,6 +11,7 @@ import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
@@ -33,7 +34,7 @@ public class UnionTypeHandlerTest {
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("union-type.raml"), ".");
         UnionTypeHandler handler = new UnionTypeHandler("foo", findTypes("foo", api.types()));
 
-        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack");
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());
         generationContext.newExpectedType("foo", new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
         CreationResult r = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
 
@@ -80,7 +81,7 @@ public class UnionTypeHandlerTest {
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("union-primitive-type.raml"), ".");
         UnionTypeHandler handler = new UnionTypeHandler("foo", findTypes("foo", api.types()));
 
-        CreationResult r = handler.create(new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack"), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
+        CreationResult r = handler.create(new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList()), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
 
         assertThat(r.getInterface(), is(allOf(
                 name(equalTo("Foo")),
@@ -128,7 +129,7 @@ public class UnionTypeHandlerTest {
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("union-array-type.raml"), ".");
         UnionTypeHandler handler = new UnionTypeHandler("foo", findTypes("foo", api.types()));
 
-        handler.create(new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack"), null);
+        handler.create(new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack",Collections.<String>emptyList()), null);
     }
 
     private static UnionTypeDeclaration findTypes(final String name, List<TypeDeclaration> types) {

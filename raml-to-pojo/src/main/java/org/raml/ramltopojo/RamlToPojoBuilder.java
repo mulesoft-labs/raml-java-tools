@@ -3,6 +3,9 @@ package org.raml.ramltopojo;
 import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.v2.api.model.v10.api.Api;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Created. There, you have it.
  */
@@ -44,7 +47,12 @@ public class RamlToPojoBuilder {
 
     public RamlToPojo build() {
 
-        return new RamlToPojoImpl(typeFinder, new GenerationContextImpl(PluginManager.createPluginManager(), api, typeFetcher, packageName));
+        return build(Collections.<String>emptyList());
+    }
+
+    public RamlToPojo build(List<String> basePlugins) {
+
+        return new RamlToPojoImpl(typeFinder, new GenerationContextImpl(PluginManager.createPluginManager(), api, typeFetcher, packageName, basePlugins));
     }
 
 

@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import com.squareup.javapoet.ClassName;
 import org.raml.ramltopojo.extensions.EnumerationTypeHandlerPlugin;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
@@ -26,7 +27,6 @@ public interface GenerationContext {
 
 
     Api api();
-
     Set<String> childClasses(String ramlTypeName);
-
+    ClassName buildDefaultClassName(String name, EventType eventType);
 }

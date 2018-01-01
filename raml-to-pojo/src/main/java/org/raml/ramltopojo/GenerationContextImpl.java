@@ -2,6 +2,7 @@ package org.raml.ramltopojo;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
+import com.squareup.javapoet.ClassName;
 import org.raml.ramltopojo.extensions.EnumerationTypeHandlerPlugin;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
@@ -28,16 +29,18 @@ public class GenerationContextImpl implements GenerationContext {
     private final ConcurrentHashMap<String, CreationResult> knownTypes = new ConcurrentHashMap<>();
     private final SetMultimap<String, String> childTypes = HashMultimap.create();
     private final String defaultPackage;
+    private final List<String> basePlugins;
 
     public GenerationContextImpl(Api api) {
-        this(PluginManager.NULL, api, TypeFetchers.NULL_FETCHER, "");
+        this(PluginManager.NULL, api, TypeFetchers.NULL_FETCHER, "", Collections.<String>emptyList());
     }
 
-    public GenerationContextImpl(PluginManager pluginManager, Api api, TypeFetcher typeFetcher, String defaultPackage) {
+    public GenerationContextImpl(PluginManager pluginManager, Api api, TypeFetcher typeFetcher, String defaultPackage, List<String> basePlugins) {
         this.pluginManager = pluginManager;
         this.api = api;
         this.typeFetcher = typeFetcher;
         this.defaultPackage = defaultPackage;
+        this.basePlugins = basePlugins;
     }
 
     @Override
@@ -67,6 +70,11 @@ public class GenerationContextImpl implements GenerationContext {
         return childTypes.get(ramlTypeName);
     }
 
+    @Override
+    public ClassName buildDefaultClassName(String name, EventType eventType) {
+        return ClassName.get(defaultPackage, name);
+    }
+
     public void setupTypeHierarchy(TypeDeclaration typeDeclaration) {
 
         // Temporary....
@@ -94,20 +102,31 @@ public class GenerationContextImpl implements GenerationContext {
         }
     }
 
+    private<T> void loadBasePlugins(Set<T> plugins, Class<T> pluginType) {
+
+        for (String basePlugin : basePlugins) {
+            plugins.addAll(pluginManager.getClassesForName(basePlugin, Collections.<String>emptyList(), pluginType));
+        }
+    }
+
     @Override
     public ObjectTypeHandlerPlugin pluginsForObjects(TypeDeclaration... typeDeclarations) {
         List<PluginDef> data = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, typeDeclarations);
         Set<ObjectTypeHandlerPlugin> plugins = new HashSet<>();
+        loadBasePlugins(plugins, ObjectTypeHandlerPlugin.class);
         for (PluginDef datum : data) {
             plugins.addAll(pluginManager.getClassesForName(datum.getPluginName(), datum.getArguments() , ObjectTypeHandlerPlugin.class));
         }
         return new ObjectTypeHandlerPlugin.Composite(plugins);
     }
 
+
     @Override
     public EnumerationTypeHandlerPlugin pluginsForEnumerations(TypeDeclaration... typeDeclarations) {
         List<PluginDef> data = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, typeDeclarations);
         Set<EnumerationTypeHandlerPlugin> plugins = new HashSet<>();
+        loadBasePlugins(plugins, EnumerationTypeHandlerPlugin.class);
+
         for (PluginDef datum : data) {
             plugins.addAll(pluginManager.getClassesForName(datum.getPluginName(), datum.getArguments() , EnumerationTypeHandlerPlugin.class));
         }
@@ -118,6 +137,7 @@ public class GenerationContextImpl implements GenerationContext {
     public UnionTypeHandlerPlugin pluginsForUnions(TypeDeclaration... typeDeclarations) {
         List<PluginDef> data = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, typeDeclarations);
         Set<UnionTypeHandlerPlugin> plugins = new HashSet<>();
+        loadBasePlugins(plugins, UnionTypeHandlerPlugin.class);
         for (PluginDef datum : data) {
             plugins.addAll(pluginManager.getClassesForName(datum.getPluginName(), datum.getArguments() , UnionTypeHandlerPlugin.class));
         }

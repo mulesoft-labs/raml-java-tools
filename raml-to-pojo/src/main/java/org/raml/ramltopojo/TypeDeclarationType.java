@@ -395,13 +395,13 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
      * @param context
      * @return
      */
-    public static CreationResult createInlineType(String name, TypeDeclaration typeDeclaration, final GenerationContext context) {
+    public static CreationResult createInlineType(ClassName containingClassName, ClassName containingImplementation, String name, TypeDeclaration typeDeclaration, final GenerationContext context) {
 
         TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
 
         TypeHandler handler = typeDeclarationType.createHandler(name, typeDeclarationType, typeDeclaration);
-        ClassName intf = handler.javaTypeName(new InlineGenerationContext(context),  EventType.INTERFACE);
-        ClassName impl = handler.javaTypeName(new InlineGenerationContext(context), EventType.IMPLEMENTATION);
+        ClassName intf = handler.javaTypeName(new InlineGenerationContext(containingClassName, containingImplementation, context),  EventType.INTERFACE);
+        ClassName impl = handler.javaTypeName(new InlineGenerationContext(containingClassName, containingImplementation, context), EventType.IMPLEMENTATION);
         CreationResult preCreationResult = new CreationResult("", intf, impl);
         return handler.create(context, preCreationResult);
     }
@@ -451,9 +451,13 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     }
 
     private static class InlineGenerationContext implements GenerationContext {
+        private final ClassName containingDeclaration;
+        private final ClassName containingImplementation;
         private final GenerationContext context;
 
-        public InlineGenerationContext(GenerationContext context) {
+        public InlineGenerationContext(ClassName containingDeclaration, ClassName containingImplementation, GenerationContext context) {
+            this.containingDeclaration = containingDeclaration;
+            this.containingImplementation = containingImplementation;
             this.context = context;
         }
 
@@ -500,6 +504,15 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         @Override
         public Set<String> childClasses(String ramlTypeName) {
             return context.childClasses(ramlTypeName);
+        }
+
+        @Override
+        public ClassName buildDefaultClassName(String name, EventType eventType) {
+            if ( eventType == EventType.INTERFACE ) {
+                return containingDeclaration.nestedClass(name);
+            } else {
+                return containingImplementation.nestedClass(name);
+            }
         }
     }
 }

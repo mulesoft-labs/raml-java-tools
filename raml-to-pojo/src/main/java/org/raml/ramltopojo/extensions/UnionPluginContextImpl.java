@@ -2,6 +2,7 @@ package org.raml.ramltopojo.extensions;
 
 import org.raml.ramltopojo.CreationResult;
 import org.raml.ramltopojo.GenerationContext;
+import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 
 /**
@@ -20,5 +21,10 @@ public class UnionPluginContextImpl implements UnionPluginContext {
     public CreationResult creationResult() {
 
         return result;
+    }
+
+    @Override
+    public CreationResult unionClass(TypeDeclaration ramlType) {
+        return generationContext.findCreatedType(ramlType.name(), ramlType);
     }
 }
