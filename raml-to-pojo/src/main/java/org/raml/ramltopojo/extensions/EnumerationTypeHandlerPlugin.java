@@ -28,14 +28,14 @@ public interface EnumerationTypeHandlerPlugin {
         }
 
         @Override
-        public TypeSpec.Builder enumValue(EnumerationPluginContext enumerationPluginContext, TypeDeclaration declaration, TypeSpec.Builder incoming, EventType eventType) {
+        public TypeSpec.Builder enumValue(EnumerationPluginContext enumerationPluginContext, TypeDeclaration declaration, TypeSpec.Builder incoming, String value, EventType eventType) {
             return incoming;
         }
     }
 
     ClassName className(EnumerationPluginContext enumerationPluginContext, StringTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType);
     TypeSpec.Builder classCreated(EnumerationPluginContext enumerationPluginContext, StringTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType);
-    TypeSpec.Builder enumValue(EnumerationPluginContext enumerationPluginContext, TypeDeclaration declaration, TypeSpec.Builder enumValue, EventType eventType);
+    TypeSpec.Builder enumValue(EnumerationPluginContext enumerationPluginContext, TypeDeclaration declaration, TypeSpec.Builder enumValue, String value, EventType eventType);
 
     class Composite implements EnumerationTypeHandlerPlugin {
 
@@ -69,12 +69,12 @@ public interface EnumerationTypeHandlerPlugin {
         }
 
         @Override
-        public TypeSpec.Builder enumValue(EnumerationPluginContext enumerationPluginContext, TypeDeclaration declaration, TypeSpec.Builder incoming, EventType eventType) {
+        public TypeSpec.Builder enumValue(EnumerationPluginContext enumerationPluginContext, TypeDeclaration declaration, TypeSpec.Builder incoming, String value, EventType eventType) {
             for (EnumerationTypeHandlerPlugin plugin : plugins) {
                 if ( incoming == null ) {
                     break;
                 }
-                incoming = plugin.enumValue(enumerationPluginContext, declaration, incoming, eventType);
+                incoming = plugin.enumValue(enumerationPluginContext, declaration, incoming, value, eventType);
             }
 
             return incoming;

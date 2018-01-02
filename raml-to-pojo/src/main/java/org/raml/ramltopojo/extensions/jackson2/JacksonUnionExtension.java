@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * Created. There, you have it.
  */
-public class JacksonUnionExtension implements UnionTypeHandlerPlugin {
+public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
 
     @Override
     public ClassName className(UnionPluginContext unionPluginContext, UnionTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {

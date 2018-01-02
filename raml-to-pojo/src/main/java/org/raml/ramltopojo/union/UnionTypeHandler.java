@@ -67,6 +67,12 @@ public class UnionTypeHandler implements TypeHandler {
         }
 
         FieldSpec.Builder anyType = FieldSpec.builder(Object.class, "anyType", Modifier.PRIVATE);
+        anyType = generationContext.pluginsForUnions(union).anyFieldCreated(context, union, typeSpec, anyType, EventType.IMPLEMENTATION);
+        if ( anyType == null ) {
+
+            return typeSpec;
+        }
+
         typeSpec.addField(anyType.build());
         typeSpec.addMethod(
                 MethodSpec.constructorBuilder()

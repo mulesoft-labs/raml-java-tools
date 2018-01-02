@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import org.raml.ramltopojo.CreationResult;
 import org.raml.ramltopojo.GenerationContext;
+import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import javax.annotation.Nullable;
 import java.util.Set;
@@ -36,5 +37,10 @@ public class ObjectPluginContextImpl implements ObjectPluginContext {
     public CreationResult creationResult() {
 
         return result;
+    }
+
+    @Override
+    public CreationResult dependentType(TypeDeclaration items) {
+        return generationContext.findCreatedType(items.name(), items);
     }
 }

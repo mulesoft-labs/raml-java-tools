@@ -55,7 +55,7 @@ public class EnumerationTypeHandler implements TypeHandler {
 
         for (String value : typeDeclaration.enumValues()) {
             TypeSpec.Builder enumValueBuilder = TypeSpec.anonymousClassBuilder("$S", value);
-            enumValueBuilder = generationContext.pluginsForEnumerations(typeDeclaration).enumValue(enumerationPluginContext, typeDeclaration, enumValueBuilder, EventType.INTERFACE);
+            enumValueBuilder = generationContext.pluginsForEnumerations(typeDeclaration).enumValue(enumerationPluginContext, typeDeclaration, enumValueBuilder, value, EventType.INTERFACE);
             if ( enumValueBuilder == null ) {
                 continue;
             }

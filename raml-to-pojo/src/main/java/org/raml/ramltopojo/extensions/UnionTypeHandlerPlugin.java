@@ -1,6 +1,7 @@
 package org.raml.ramltopojo.extensions;
 
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EventType;
 import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
@@ -14,6 +15,7 @@ import java.util.Set;
  */
 public interface UnionTypeHandlerPlugin {
 
+
     class Helper implements UnionTypeHandlerPlugin {
 
         @Override
@@ -25,10 +27,16 @@ public interface UnionTypeHandlerPlugin {
         public TypeSpec.Builder classCreated(UnionPluginContext unionPluginContext, UnionTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
             return incoming;
         }
+
+        @Override
+        public FieldSpec.Builder anyFieldCreated(UnionPluginContext context, UnionTypeDeclaration union, TypeSpec.Builder typeSpec, FieldSpec.Builder anyType, EventType eventType) {
+            return anyType;
+        }
     }
 
     ClassName className(UnionPluginContext unionPluginContext, UnionTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType);
     TypeSpec.Builder classCreated(UnionPluginContext unionPluginContext, UnionTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType);
+    FieldSpec.Builder anyFieldCreated(UnionPluginContext context, UnionTypeDeclaration union, TypeSpec.Builder typeSpec, FieldSpec.Builder anyType, EventType eventType);
 
     class Composite implements UnionTypeHandlerPlugin {
 
@@ -61,5 +69,16 @@ public interface UnionTypeHandlerPlugin {
             return incoming;
         }
 
+        @Override
+        public FieldSpec.Builder anyFieldCreated(UnionPluginContext context, UnionTypeDeclaration union, TypeSpec.Builder typeSpec, FieldSpec.Builder anyType, EventType eventType) {
+            for (UnionTypeHandlerPlugin plugin : plugins) {
+                if ( anyType == null ) {
+                    break;
+                }
+                anyType = plugin.anyFieldCreated(context, union, typeSpec, anyType, eventType);
+            }
+
+            return anyType;
+        }
     }
 }
