@@ -201,6 +201,6 @@ public class ObjectTypeHandler implements TypeHandler {
 
     private TypeName findType(String typeName, TypeDeclaration type, GenerationContext generationContext, EventType eventType) {
 
-        return TypeDeclarationType.javaType(typeName, type, generationContext,eventType );
+        return TypeDeclarationType.calculateTypeName(typeName, type, generationContext,eventType );
     }
 }

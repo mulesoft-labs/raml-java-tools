@@ -18,8 +18,8 @@ public class UnbuildableTypeHandler  implements TypeHandler {
         this.referenceName = referenceName;
     }
     @Override
-    public ClassName javaClassName(GenerationContext generationContext, EventType type) {
-        throw new GenerationException("won't generate "+ type.name() + " class");
+    public ClassName javaClassName(GenerationContext generationContext, EventType eventType) {
+        throw new GenerationException("won't generate "+ type.getSimpleName() + " class");
     }
 
     @Override
