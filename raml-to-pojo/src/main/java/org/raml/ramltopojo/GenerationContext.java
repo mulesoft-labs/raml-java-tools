@@ -24,7 +24,7 @@ public interface GenerationContext {
     ObjectTypeHandlerPlugin pluginsForObjects(TypeDeclaration... typeDeclarations);
     EnumerationTypeHandlerPlugin pluginsForEnumerations(TypeDeclaration... typeDeclarations);
     UnionTypeHandlerPlugin pluginsForUnions(TypeDeclaration... typeDeclarations);
-
+    void setupTypeHierarchy(TypeDeclaration typeDeclaration);
 
     Api api();
     Set<String> childClasses(String ramlTypeName);

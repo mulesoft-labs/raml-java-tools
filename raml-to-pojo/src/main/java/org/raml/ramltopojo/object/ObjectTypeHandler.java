@@ -26,7 +26,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
 
     @Override
-    public ClassName javaTypeName(GenerationContext generationContext, EventType type) {
+    public ClassName javaClassName(GenerationContext generationContext, EventType type) {
 
         ObjectPluginContext context = new ObjectPluginContextImpl(generationContext, null);
 
@@ -40,6 +40,11 @@ public class ObjectTypeHandler implements TypeHandler {
         }
 
         return plugin.className(context, objectTypeDeclaration, className, type);
+    }
+
+    @Override
+    public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
+        return javaClassName(generationContext, type);
     }
 
     @Override

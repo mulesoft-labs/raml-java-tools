@@ -118,8 +118,26 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     ARRAY {
         @Override
-        public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
+        public TypeHandler createHandler(String name, final TypeDeclarationType type, final TypeDeclaration typeDeclaration) {
+
+            return new TypeHandler() {
+                @Override
+                public ClassName javaClassName(GenerationContext generationContext, EventType type) {
+
+                    throw new GenerationException("won't generate array class");
+                }
+
+                @Override
+                public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
+                    return null;
+                }
+
+                @Override
+                public TypeName javaClassReference(GenerationContext generationContext, EventType eventType) {
+                    ArrayTypeDeclaration arrayTypeDeclaration = (ArrayTypeDeclaration) typeDeclaration;
+                    return ParameterizedTypeName.get(ClassName.get(List.class), TypeDeclarationType.calculateClassName(arrayTypeDeclaration.items().name(), arrayTypeDeclaration.items(), generationContext, eventType).box());
+                }
+            };
         }
 
         @Override
@@ -157,7 +175,23 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     INTEGER {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
+
+            return new TypeHandler() {
+                @Override
+                public ClassName javaClassName(GenerationContext generationContext, EventType type) {
+                    throw new GenerationException("won't generate integer class");
+                }
+
+                @Override
+                public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
+                    return null;
+                }
+
+                @Override
+                public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
+                    return TypeName.INT;
+                }
+            };
         }
 
         @Override
@@ -173,7 +207,23 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     BOOLEAN {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
+
+            return new TypeHandler() {
+                @Override
+                public ClassName javaClassName(GenerationContext generationContext, EventType type) {
+                    throw new GenerationException("won't generate boolean class");
+                }
+
+                @Override
+                public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
+                    return TypeName.BOOLEAN;
+                }
+
+                @Override
+                public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
+                    return null;
+                }
+            };
         }
 
         @Override
@@ -189,7 +239,24 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     DATE {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
+
+            return new TypeHandler() {
+                @Override
+                public ClassName javaClassName(GenerationContext generationContext, EventType type) {
+                    throw new GenerationException("won't generate date class");
+
+                }
+
+                @Override
+                public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
+                    return ClassName.get(Date.class);
+                }
+
+                @Override
+                public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
+                    return null;
+                }
+            };
         }
 
         @Override
@@ -205,7 +272,23 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     DATETIME {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
+            return new TypeHandler() {
+                @Override
+                public ClassName javaClassName(GenerationContext generationContext, EventType type) {
+                    throw new GenerationException("won't generate date class");
+
+                }
+
+                @Override
+                public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
+                    return ClassName.get(Date.class);
+                }
+
+                @Override
+                public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
+                    return null;
+                }
+            };
         }
 
         @Override
@@ -221,7 +304,23 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     TIME_ONLY {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
+            return new TypeHandler() {
+                @Override
+                public ClassName javaClassName(GenerationContext generationContext, EventType type) {
+                    throw new GenerationException("won't generate date class");
+
+                }
+
+                @Override
+                public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
+                    return ClassName.get(Date.class);
+                }
+
+                @Override
+                public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
+                    return null;
+                }
+            };
         }
 
         @Override
@@ -237,7 +336,23 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     DATETIME_ONLY {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
+            return new TypeHandler() {
+                @Override
+                public ClassName javaClassName(GenerationContext generationContext, EventType type) {
+                    throw new GenerationException("won't generate date class");
+
+                }
+
+                @Override
+                public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
+                    return ClassName.get(Date.class);
+                }
+
+                @Override
+                public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
+                    return null;
+                }
+            };
         }
 
         @Override
@@ -253,7 +368,22 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     NUMBER {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
+            return new TypeHandler() {
+                @Override
+                public ClassName javaClassName(GenerationContext generationContext, EventType type) {
+                    throw new GenerationException("won't generate number class");
+                }
+
+                @Override
+                public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
+                    return ClassName.get(Number.class);
+                }
+
+                @Override
+                public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
+                    return null;
+                }
+            };
         }
 
         @Override
@@ -275,7 +405,22 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
                 return ENUMERATION.createHandler(name, type, typeDeclaration);
             } else {
 
-                throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
+                return new TypeHandler() {
+                    @Override
+                    public ClassName javaClassName(GenerationContext generationContext, EventType type) {
+                        throw new GenerationException("won't generate string class");
+                    }
+
+                    @Override
+                    public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
+                        return ClassName.get(String.class);
+                    }
+
+                    @Override
+                    public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
+                        return null;
+                    }
+                };
             }
         }
 
@@ -308,7 +453,23 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     ANY {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
+
+            return new TypeHandler() {
+                @Override
+                public ClassName javaClassName(GenerationContext generationContext, EventType type) {
+                    throw new GenerationException("can't generate any type");
+                }
+
+                @Override
+                public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
+                    return ClassName.get(Object.class);
+                }
+
+                @Override
+                public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
+                    return null;
+                }
+            };
         }
 
         @Override
@@ -381,10 +542,31 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
 
         TypeHandler handler = typeDeclarationType.createHandler(typeDeclaration.name(), typeDeclarationType, typeDeclaration);
-        ClassName intf = handler.javaTypeName(context, EventType.INTERFACE);
-        ClassName impl = handler.javaTypeName(context, EventType.IMPLEMENTATION);
+        ClassName intf = handler.javaClassName(context, EventType.INTERFACE);
+        ClassName impl = handler.javaClassName(context, EventType.IMPLEMENTATION);
         CreationResult creationResult = new CreationResult(context.defaultPackage(), intf, impl);
         context.newExpectedType(typeDeclaration.name(), creationResult);
+        context.setupTypeHierarchy(typeDeclaration);
+        return handler.create(context, creationResult);
+    }
+
+    /**
+     * Create the actual type.
+     *
+     * @param typeDeclaration
+     * @param context
+     * @return
+     */
+    public static CreationResult createNamedType(String name, TypeDeclaration typeDeclaration, GenerationContext context) {
+
+        TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
+
+        TypeHandler handler = typeDeclarationType.createHandler(name, typeDeclarationType, typeDeclaration);
+        ClassName intf = handler.javaClassName(context, EventType.INTERFACE);
+        ClassName impl = handler.javaClassName(context, EventType.IMPLEMENTATION);
+        CreationResult creationResult = new CreationResult(context.defaultPackage(), intf, impl);
+        context.newExpectedType(name, creationResult);
+        context.setupTypeHierarchy(typeDeclaration);
         return handler.create(context, creationResult);
     }
 
@@ -400,8 +582,8 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
 
         TypeHandler handler = typeDeclarationType.createHandler(name, typeDeclarationType, typeDeclaration);
-        ClassName intf = handler.javaTypeName(new InlineGenerationContext(containingClassName, containingImplementation, context),  EventType.INTERFACE);
-        ClassName impl = handler.javaTypeName(new InlineGenerationContext(containingClassName, containingImplementation, context), EventType.IMPLEMENTATION);
+        ClassName intf = handler.javaClassName(new InlineGenerationContext(containingClassName, containingImplementation, context),  EventType.INTERFACE);
+        ClassName impl = handler.javaClassName(new InlineGenerationContext(containingClassName, containingImplementation, context), EventType.IMPLEMENTATION);
         CreationResult preCreationResult = new CreationResult("", intf, impl);
         return handler.create(context, preCreationResult);
     }
@@ -414,12 +596,20 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
      * @param eventType
      * @return
      */
-    public static ClassName typeName(String name, TypeDeclaration typeDeclaration, GenerationContext context, EventType eventType) {
+    public static ClassName calculateClassName(String name, TypeDeclaration typeDeclaration, GenerationContext context, EventType eventType) {
 
         TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
 
         TypeHandler handler = typeDeclarationType.createHandler(name, typeDeclarationType, typeDeclaration);
-        return handler.javaTypeName(context, eventType);
+        return handler.javaClassName(context, eventType);
+    }
+
+    public static TypeName calculateTypeName(String name, TypeDeclaration typeDeclaration, GenerationContext context, EventType eventType) {
+
+        TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
+
+        TypeHandler handler = typeDeclarationType.createHandler(name, typeDeclarationType, typeDeclaration);
+        return handler.javaClassReference(context, eventType);
     }
 
     /**
@@ -436,14 +626,6 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
 
         return ramlToType.get(Utils.declarationType(typeDeclaration)).asJavaPoetType(typeName, typeDeclaration, generationContext, eventType);
     }
-
- /*   public static TypeAnalyser typeAnalyser(TypeDeclaration typeDeclaration) {
-
-        TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
-
-        return typeDeclarationType.analyse(typeDeclarationType, typeDeclaration);
-    }
-*/
 
 
     public static boolean isNewInlineType(TypeDeclaration declaration) {
@@ -513,6 +695,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
             } else {
                 return containingImplementation.nestedClass(name);
             }
+        }
+
+        @Override
+        public void setupTypeHierarchy(TypeDeclaration typeDeclaration) {
+            context.setupTypeHierarchy(typeDeclaration);
         }
     }
 }

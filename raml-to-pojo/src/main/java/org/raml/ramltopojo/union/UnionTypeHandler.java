@@ -29,7 +29,7 @@ public class UnionTypeHandler implements TypeHandler {
     }
 
     @Override
-    public ClassName javaTypeName(GenerationContext generationContext, EventType type) {
+    public ClassName javaClassName(GenerationContext generationContext, EventType type) {
 
         UnionPluginContext context = new UnionPluginContextImpl(generationContext, null);
 
@@ -43,6 +43,11 @@ public class UnionTypeHandler implements TypeHandler {
         }
 
         return plugin.className(context, union, className, type);
+    }
+
+    @Override
+    public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
+        return javaClassName(generationContext, type);
     }
 
     @Override

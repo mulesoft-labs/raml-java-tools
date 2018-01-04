@@ -1,9 +1,6 @@
 package org.raml.ramltopojo.enumeration;
 
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.*;
 import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.EnumerationPluginContext;
 import org.raml.ramltopojo.extensions.EnumerationPluginContextImpl;
@@ -25,10 +22,15 @@ public class EnumerationTypeHandler implements TypeHandler {
     }
 
     @Override
-    public ClassName javaTypeName(GenerationContext generationContext, EventType type) {
+    public ClassName javaClassName(GenerationContext generationContext, EventType type) {
 
         EnumerationPluginContext enumerationPluginContext = new EnumerationPluginContextImpl(generationContext, null);
         return generationContext.pluginsForEnumerations(typeDeclaration).className(enumerationPluginContext, typeDeclaration, generationContext.buildDefaultClassName(Names.typeName(name), EventType.INTERFACE), EventType.INTERFACE);
+    }
+
+    @Override
+    public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
+        return javaClassName(generationContext, type);
     }
 
     @Override

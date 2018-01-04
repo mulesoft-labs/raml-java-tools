@@ -1,6 +1,6 @@
 package org.raml.ramltopojo;
 
-import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.TypeName;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 /**
@@ -23,20 +23,44 @@ public class RamlToPojoImpl implements RamlToPojo {
 
         for (TypeDeclaration typeDeclaration : typeFinder.findTypes(generationContext.api())) {
 
-            ClassName intf = TypeDeclarationType.typeName(typeDeclaration.name(), typeDeclaration, generationContext, EventType.INTERFACE);
-            ClassName impl = TypeDeclarationType.typeName(typeDeclaration.name(), typeDeclaration, generationContext, EventType.IMPLEMENTATION);
-
-            CreationResult creationResult = new CreationResult(generationContext.defaultPackage(), intf, impl);
-            generationContext.newExpectedType(typeDeclaration.name(), creationResult);
-            generationContext.setupTypeHierarchy(typeDeclaration);
-        }
-
-        for (TypeDeclaration typeDeclaration : typeFinder.findTypes(generationContext.api())) {
-
             CreationResult spec = TypeDeclarationType.createType(typeDeclaration, generationContext);
             resultingPojos.addNewResult(spec);
         }
 
         return resultingPojos;
+    }
+
+    @Override
+    public ResultingPojos buildPojo(TypeDeclaration typeDeclaration) {
+
+        ResultingPojos resultingPojos = new ResultingPojos(generationContext);
+
+        CreationResult spec = TypeDeclarationType.createType(typeDeclaration, generationContext);
+        resultingPojos.addNewResult(spec);
+
+        return resultingPojos;
+    }
+
+    @Override
+    public ResultingPojos buildPojo(String suggestedJavaName, TypeDeclaration typeDeclaration) {
+
+        ResultingPojos resultingPojos = new ResultingPojos(generationContext);
+
+        CreationResult spec = TypeDeclarationType.createNamedType(suggestedJavaName, typeDeclaration, generationContext);
+        resultingPojos.addNewResult(spec);
+
+        return resultingPojos;
+    }
+
+    @Override
+    public TypeName fetchType(String suggestedName, TypeDeclaration typeDeclaration) {
+
+
+        return TypeDeclarationType.calculateTypeName(suggestedName, typeDeclaration, generationContext, EventType.INTERFACE);
+    }
+
+    public boolean isInline(TypeDeclaration typeDeclaration) {
+
+        return TypeDeclarationType.isNewInlineType(typeDeclaration);
     }
 }
