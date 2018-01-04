@@ -7,6 +7,7 @@ import com.google.common.collect.Sets;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
+import org.raml.UnbuildableTypeHandler;
 import org.raml.ramltopojo.enumeration.EnumerationTypeHandler;
 import org.raml.ramltopojo.extensions.EnumerationTypeHandlerPlugin;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
@@ -120,6 +121,8 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         @Override
         public TypeHandler createHandler(String name, final TypeDeclarationType type, final TypeDeclaration typeDeclaration) {
 
+            final ArrayTypeDeclaration arrayTypeDeclaration = (ArrayTypeDeclaration) typeDeclaration;
+
             return new TypeHandler() {
                 @Override
                 public ClassName javaClassName(GenerationContext generationContext, EventType type) {
@@ -134,7 +137,6 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
 
                 @Override
                 public TypeName javaClassReference(GenerationContext generationContext, EventType eventType) {
-                    ArrayTypeDeclaration arrayTypeDeclaration = (ArrayTypeDeclaration) typeDeclaration;
                     return ParameterizedTypeName.get(ClassName.get(List.class), TypeDeclarationType.calculateClassName(arrayTypeDeclaration.items().name(), arrayTypeDeclaration.items(), generationContext, eventType).box());
                 }
             };
@@ -176,22 +178,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
 
-            return new TypeHandler() {
-                @Override
-                public ClassName javaClassName(GenerationContext generationContext, EventType type) {
-                    throw new GenerationException("won't generate integer class");
-                }
-
-                @Override
-                public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
-                    return null;
-                }
-
-                @Override
-                public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
-                    return TypeName.INT;
-                }
-            };
+            return new UnbuildableTypeHandler(Integer.class, TypeName.INT);
         }
 
         @Override
@@ -208,22 +195,8 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
 
-            return new TypeHandler() {
-                @Override
-                public ClassName javaClassName(GenerationContext generationContext, EventType type) {
-                    throw new GenerationException("won't generate boolean class");
-                }
+            return new UnbuildableTypeHandler(Boolean.class, TypeName.BOOLEAN);
 
-                @Override
-                public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
-                    return TypeName.BOOLEAN;
-                }
-
-                @Override
-                public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
-                    return null;
-                }
-            };
         }
 
         @Override
@@ -240,23 +213,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
 
-            return new TypeHandler() {
-                @Override
-                public ClassName javaClassName(GenerationContext generationContext, EventType type) {
-                    throw new GenerationException("won't generate date class");
-
-                }
-
-                @Override
-                public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
-                    return ClassName.get(Date.class);
-                }
-
-                @Override
-                public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
-                    return null;
-                }
-            };
+            return new UnbuildableTypeHandler(Date.class, ClassName.get(Date.class));
         }
 
         @Override
@@ -272,23 +229,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     DATETIME {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            return new TypeHandler() {
-                @Override
-                public ClassName javaClassName(GenerationContext generationContext, EventType type) {
-                    throw new GenerationException("won't generate date class");
-
-                }
-
-                @Override
-                public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
-                    return ClassName.get(Date.class);
-                }
-
-                @Override
-                public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
-                    return null;
-                }
-            };
+            return new UnbuildableTypeHandler(Date.class, ClassName.get(Date.class));
         }
 
         @Override
@@ -304,23 +245,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     TIME_ONLY {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            return new TypeHandler() {
-                @Override
-                public ClassName javaClassName(GenerationContext generationContext, EventType type) {
-                    throw new GenerationException("won't generate date class");
-
-                }
-
-                @Override
-                public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
-                    return ClassName.get(Date.class);
-                }
-
-                @Override
-                public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
-                    return null;
-                }
-            };
+            return new UnbuildableTypeHandler(Date.class, ClassName.get(Date.class));
         }
 
         @Override
@@ -336,23 +261,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     DATETIME_ONLY {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            return new TypeHandler() {
-                @Override
-                public ClassName javaClassName(GenerationContext generationContext, EventType type) {
-                    throw new GenerationException("won't generate date class");
-
-                }
-
-                @Override
-                public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
-                    return ClassName.get(Date.class);
-                }
-
-                @Override
-                public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
-                    return null;
-                }
-            };
+            return new UnbuildableTypeHandler(Date.class, ClassName.get(Date.class));
         }
 
         @Override
@@ -368,22 +277,8 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     NUMBER {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            return new TypeHandler() {
-                @Override
-                public ClassName javaClassName(GenerationContext generationContext, EventType type) {
-                    throw new GenerationException("won't generate number class");
-                }
+            return new UnbuildableTypeHandler(Number.class, ClassName.get(Number.class));
 
-                @Override
-                public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
-                    return ClassName.get(Number.class);
-                }
-
-                @Override
-                public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
-                    return null;
-                }
-            };
         }
 
         @Override
@@ -405,22 +300,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
                 return ENUMERATION.createHandler(name, type, typeDeclaration);
             } else {
 
-                return new TypeHandler() {
-                    @Override
-                    public ClassName javaClassName(GenerationContext generationContext, EventType type) {
-                        throw new GenerationException("won't generate string class");
-                    }
-
-                    @Override
-                    public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
-                        return ClassName.get(String.class);
-                    }
-
-                    @Override
-                    public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
-                        return null;
-                    }
-                };
+                return new UnbuildableTypeHandler(String.class, ClassName.get(String.class));
             }
         }
 
@@ -454,22 +334,8 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
 
-            return new TypeHandler() {
-                @Override
-                public ClassName javaClassName(GenerationContext generationContext, EventType type) {
-                    throw new GenerationException("can't generate any type");
-                }
+            return new UnbuildableTypeHandler(Object.class, ClassName.get(Object.class));
 
-                @Override
-                public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
-                    return ClassName.get(Object.class);
-                }
-
-                @Override
-                public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
-                    return null;
-                }
-            };
         }
 
         @Override
@@ -485,7 +351,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     FILE {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            throw new IllegalArgumentException("can't handle " + typeDeclaration.getClass());
+            return new UnbuildableTypeHandler(File.class, ClassName.get(File.class));
         }
 
         @Override
