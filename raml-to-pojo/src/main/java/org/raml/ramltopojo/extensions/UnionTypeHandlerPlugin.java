@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * Created. There, you have it.
  */
-public interface UnionTypeHandlerPlugin {
+public interface UnionTypeHandlerPlugin extends NamingPlugin<UnionPluginContext, UnionTypeDeclaration> {
 
 
     class Helper implements UnionTypeHandlerPlugin {

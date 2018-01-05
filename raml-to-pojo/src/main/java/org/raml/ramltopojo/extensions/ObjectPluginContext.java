@@ -8,10 +8,8 @@ import java.util.Set;
 /**
  * Created. There, you have it.
  */
-public interface ObjectPluginContext {
+public interface ObjectPluginContext extends GenericPluginContext {
 
     Set<CreationResult> childClasses(String ramlTypeName);
-    CreationResult creationResult();
-
     CreationResult dependentType(TypeDeclaration items);
 }

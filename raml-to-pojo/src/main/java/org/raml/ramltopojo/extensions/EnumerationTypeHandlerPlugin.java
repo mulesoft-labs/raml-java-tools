@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * Created. There, you have it.
  */
-public interface EnumerationTypeHandlerPlugin {
+public interface EnumerationTypeHandlerPlugin extends NamingPlugin<EnumerationPluginContext, StringTypeDeclaration> {
 
     class Helper implements EnumerationTypeHandlerPlugin {
 
@@ -33,7 +33,6 @@ public interface EnumerationTypeHandlerPlugin {
         }
     }
 
-    ClassName className(EnumerationPluginContext enumerationPluginContext, StringTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType);
     TypeSpec.Builder classCreated(EnumerationPluginContext enumerationPluginContext, StringTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType);
     TypeSpec.Builder enumValue(EnumerationPluginContext enumerationPluginContext, TypeDeclaration declaration, TypeSpec.Builder enumValue, String value, EventType eventType);
 

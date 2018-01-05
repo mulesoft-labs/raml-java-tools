@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * Created. There, you have it.
  */
-public interface ObjectTypeHandlerPlugin {
+public interface ObjectTypeHandlerPlugin extends NamingPlugin<ObjectPluginContext, ObjectTypeDeclaration> {
 
     class Helper implements ObjectTypeHandlerPlugin {
 
@@ -45,7 +45,6 @@ public interface ObjectTypeHandlerPlugin {
         }
     }
 
-    ClassName className(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType);
     TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType);
     FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, FieldSpec.Builder incoming, EventType eventType);
     MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType);
