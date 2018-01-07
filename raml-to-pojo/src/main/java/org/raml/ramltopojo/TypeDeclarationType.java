@@ -363,7 +363,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
 
         TypeHandler handler = typeDeclarationType.createHandler(name, typeDeclarationType, typeDeclaration);
-        ClassName intf = handler.javaClassName(new InlineGenerationContext(containingClassName, containingImplementation, context),  EventType.INTERFACE);
+        ClassName intf = handler.javaClassName(new InlineGenerationContext(containingClassName, containingClassName, context),  EventType.INTERFACE);
         ClassName impl = handler.javaClassName(new InlineGenerationContext(containingClassName, containingImplementation, context), EventType.IMPLEMENTATION);
         CreationResult preCreationResult = new CreationResult("", intf, impl);
         return handler.create(context, preCreationResult);

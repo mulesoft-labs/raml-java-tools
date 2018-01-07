@@ -22,10 +22,16 @@ public class RepackagePlugin extends ObjectTypeHandlerPlugin.Helper {
     @Override
     public ClassName className(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
 
-        if ( "".equals(currentSuggestion.packageName())) {
-            return currentSuggestion;
-        }
-
-        return ClassName.get(arguments.get(0),  currentSuggestion.simpleName());
+        return makeContained(arguments.get(0),  currentSuggestion);
     }
+
+    private ClassName makeContained(String pack, ClassName currentSuggestion) {
+
+        if ( currentSuggestion.simpleNames().size() > 1) {
+            return ClassName.get(pack, currentSuggestion.simpleNames().get(0), currentSuggestion.simpleNames().subList(1, currentSuggestion.simpleNames().size()).toArray(new String[0]));
+        } else {
+            return ClassName.get(pack, currentSuggestion.simpleNames().get(0));
+        }
+    }
+
 }
