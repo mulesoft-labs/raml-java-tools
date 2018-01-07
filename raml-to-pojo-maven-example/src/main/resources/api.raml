@@ -13,10 +13,10 @@ uses:
 
 types:
     foo:
-#      (ramltopojo.types):
-#        plugins:
-#          - name: core.repackage
-#            arguments: [bloobloo]
+      (ramltopojo.types):
+        plugins:
+          - name: core.repackage
+            arguments: [bloobloo]
       type: object
       discriminatorValue: myOwnValue
       properties:
@@ -30,10 +30,10 @@ types:
               properties:
                 another: string
     eater:
-#      (ramltopojo.types):
-#        plugins:
-#          - name: core.repackage
-#            arguments: [haha]
+      (ramltopojo.types):
+        plugins:
+          - name: core.repackage
+            arguments: [haha]
       type: object
       discriminatorValue: myOwnValue
       properties:

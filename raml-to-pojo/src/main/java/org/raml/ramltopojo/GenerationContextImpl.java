@@ -5,6 +5,7 @@ import com.google.common.collect.SetMultimap;
 import com.squareup.javapoet.ClassName;
 import org.raml.ramltopojo.extensions.EnumerationTypeHandlerPlugin;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
+import org.raml.ramltopojo.extensions.ReferenceTypeHandlerPlugin;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
 import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.v2.api.model.v10.api.Api;
@@ -111,6 +112,7 @@ public class GenerationContextImpl implements GenerationContext {
 
     @Override
     public ObjectTypeHandlerPlugin pluginsForObjects(TypeDeclaration... typeDeclarations) {
+
         List<PluginDef> data = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, typeDeclarations);
         Set<ObjectTypeHandlerPlugin> plugins = new HashSet<>();
         loadBasePlugins(plugins, ObjectTypeHandlerPlugin.class);
@@ -142,6 +144,18 @@ public class GenerationContextImpl implements GenerationContext {
             plugins.addAll(pluginManager.getClassesForName(datum.getPluginName(), datum.getArguments() , UnionTypeHandlerPlugin.class));
         }
         return new UnionTypeHandlerPlugin.Composite(plugins);
+    }
+
+    @Override
+    public ReferenceTypeHandlerPlugin pluginsForReferences(TypeDeclaration... typeDeclarations) {
+
+        List<PluginDef> data = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, typeDeclarations);
+        Set<ReferenceTypeHandlerPlugin> plugins = new HashSet<>();
+        loadBasePlugins(plugins, ReferenceTypeHandlerPlugin.class);
+        for (PluginDef datum : data) {
+            plugins.addAll(pluginManager.getClassesForName(datum.getPluginName(), datum.getArguments() , ReferenceTypeHandlerPlugin.class));
+        }
+        return new ReferenceTypeHandlerPlugin.Composite(plugins);
     }
 
     @Override

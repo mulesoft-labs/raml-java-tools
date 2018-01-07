@@ -35,4 +35,14 @@ public class Utils {
 
         return foundTypes;
     }
+
+    static public  List<TypeDeclaration> allParents(TypeDeclaration target, List<TypeDeclaration> found) {
+
+        found.add(target);
+        for (TypeDeclaration typeDeclaration : target.parentTypes()) {
+            allParents(typeDeclaration, found);
+        }
+
+        return found;
+    }
 }

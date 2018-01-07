@@ -7,12 +7,13 @@ import com.google.common.collect.Sets;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
-import org.raml.UnbuildableTypeHandler;
 import org.raml.ramltopojo.enumeration.EnumerationTypeHandler;
 import org.raml.ramltopojo.extensions.EnumerationTypeHandlerPlugin;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
+import org.raml.ramltopojo.extensions.ReferenceTypeHandlerPlugin;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
 import org.raml.ramltopojo.object.ObjectTypeHandler;
+import org.raml.ramltopojo.references.ReferenceTypeHandler;
 import org.raml.ramltopojo.union.UnionTypeHandler;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.*;
@@ -151,7 +152,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
 
-            return new UnbuildableTypeHandler(Integer.class, TypeName.INT);
+            return new ReferenceTypeHandler(typeDeclaration, Integer.class, TypeName.INT);
         }
 
         @Override
@@ -163,7 +164,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
 
-            return new UnbuildableTypeHandler(Boolean.class, TypeName.BOOLEAN);
+            return new ReferenceTypeHandler(typeDeclaration, Boolean.class, TypeName.BOOLEAN);
 
         }
 
@@ -176,7 +177,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
 
-            return new UnbuildableTypeHandler(Date.class, ClassName.get(Date.class));
+            return new ReferenceTypeHandler(typeDeclaration, Date.class, ClassName.get(Date.class));
         }
 
         @Override
@@ -187,7 +188,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     DATETIME {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            return new UnbuildableTypeHandler(Date.class, ClassName.get(Date.class));
+            return new ReferenceTypeHandler(typeDeclaration, Date.class, ClassName.get(Date.class));
         }
 
         @Override
@@ -198,7 +199,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     TIME_ONLY {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            return new UnbuildableTypeHandler(Date.class, ClassName.get(Date.class));
+            return new ReferenceTypeHandler(typeDeclaration, Date.class, ClassName.get(Date.class));
         }
 
         @Override
@@ -209,7 +210,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     DATETIME_ONLY {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            return new UnbuildableTypeHandler(Date.class, ClassName.get(Date.class));
+            return new ReferenceTypeHandler(typeDeclaration, Date.class, ClassName.get(Date.class));
         }
 
         @Override
@@ -220,7 +221,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     NUMBER {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            return new UnbuildableTypeHandler(Number.class, ClassName.get(Number.class));
+            return new ReferenceTypeHandler(typeDeclaration, Number.class, ClassName.get(Number.class));
 
         }
 
@@ -238,7 +239,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
                 return ENUMERATION.createHandler(name, type, typeDeclaration);
             } else {
 
-                return new UnbuildableTypeHandler(String.class, ClassName.get(String.class));
+                return new ReferenceTypeHandler(typeDeclaration, String.class, ClassName.get(String.class));
             }
         }
 
@@ -259,7 +260,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
 
-            return new UnbuildableTypeHandler(Object.class, ClassName.get(Object.class));
+            return new ReferenceTypeHandler(typeDeclaration, Object.class, ClassName.get(Object.class));
 
         }
 
@@ -271,7 +272,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     FILE {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            return new UnbuildableTypeHandler(File.class, ClassName.get(File.class));
+            return new ReferenceTypeHandler(typeDeclaration, File.class, ClassName.get(File.class));
         }
 
         @Override
@@ -444,6 +445,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
             } else {
                 return containingImplementation.nestedClass(name);
             }
+        }
+
+        @Override
+        public ReferenceTypeHandlerPlugin pluginsForReferences(TypeDeclaration... typeDeclarations) {
+            return context.pluginsForReferences(typeDeclarations);
         }
 
         @Override

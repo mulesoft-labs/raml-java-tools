@@ -3,6 +3,7 @@ package org.raml.ramltopojo;
 import com.squareup.javapoet.ClassName;
 import org.raml.ramltopojo.extensions.EnumerationTypeHandlerPlugin;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
+import org.raml.ramltopojo.extensions.ReferenceTypeHandlerPlugin;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
@@ -24,9 +25,12 @@ public interface GenerationContext {
     ObjectTypeHandlerPlugin pluginsForObjects(TypeDeclaration... typeDeclarations);
     EnumerationTypeHandlerPlugin pluginsForEnumerations(TypeDeclaration... typeDeclarations);
     UnionTypeHandlerPlugin pluginsForUnions(TypeDeclaration... typeDeclarations);
-    void setupTypeHierarchy(TypeDeclaration typeDeclaration);
+    ReferenceTypeHandlerPlugin pluginsForReferences(TypeDeclaration... typeDeclarations);
 
+
+    void setupTypeHierarchy(TypeDeclaration typeDeclaration);
     Api api();
     Set<String> childClasses(String ramlTypeName);
     ClassName buildDefaultClassName(String name, EventType eventType);
+
 }

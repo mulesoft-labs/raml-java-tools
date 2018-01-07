@@ -10,6 +10,7 @@ import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import javax.lang.model.element.Modifier;
+import java.util.ArrayList;
 
 /**
  * Created. There, you have it.
@@ -30,7 +31,8 @@ public class ObjectTypeHandler implements TypeHandler {
 
         ObjectPluginContext context = new ObjectPluginContextImpl(generationContext, null);
 
-        ObjectTypeHandlerPlugin plugin = generationContext.pluginsForObjects(objectTypeDeclaration);
+
+        ObjectTypeHandlerPlugin plugin = generationContext.pluginsForObjects(Utils.allParents(objectTypeDeclaration, new ArrayList<TypeDeclaration>()).toArray(new TypeDeclaration[0]));
         ClassName className;
         if ( type == EventType.IMPLEMENTATION ) {
             className = generationContext.buildDefaultClassName(Names.typeName(name, "Impl"), EventType.IMPLEMENTATION);

@@ -5,8 +5,10 @@ import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.EnumerationPluginContext;
 import org.raml.ramltopojo.extensions.EnumerationPluginContextImpl;
 import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import javax.lang.model.element.Modifier;
+import java.util.ArrayList;
 
 /**
  * Created. There, you have it.
@@ -25,7 +27,7 @@ public class EnumerationTypeHandler implements TypeHandler {
     public ClassName javaClassName(GenerationContext generationContext, EventType type) {
 
         EnumerationPluginContext enumerationPluginContext = new EnumerationPluginContextImpl(generationContext, null);
-        return generationContext.pluginsForEnumerations(typeDeclaration).className(enumerationPluginContext, typeDeclaration, generationContext.buildDefaultClassName(Names.typeName(name), EventType.INTERFACE), EventType.INTERFACE);
+        return generationContext.pluginsForEnumerations(Utils.allParents(typeDeclaration, new ArrayList<TypeDeclaration>()).toArray(new TypeDeclaration[0])).className(enumerationPluginContext, typeDeclaration, generationContext.buildDefaultClassName(Names.typeName(name), EventType.INTERFACE), EventType.INTERFACE);
     }
 
     @Override

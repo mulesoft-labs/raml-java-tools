@@ -6,7 +6,8 @@ import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 /**
  * Created. There, you have it.
  */
-public interface UnionPluginContext extends GenericPluginContext {
+public interface UnionPluginContext {
 
+    CreationResult creationResult();
     CreationResult unionClass(TypeDeclaration ramlType);
 }
