@@ -375,7 +375,9 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
 
         TypeHandler handler = typeDeclarationType.createHandler(name, typeDeclarationType, typeDeclaration);
-        return handler.javaClassReference(context, eventType);
+        TypeName typeName = handler.javaClassReference(context, eventType);
+        context.setupTypeHierarchy(typeDeclaration);
+        return typeName;
     }
 
     public static boolean isNewInlineType(TypeDeclaration declaration) {

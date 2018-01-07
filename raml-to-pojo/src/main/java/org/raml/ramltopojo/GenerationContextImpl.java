@@ -9,7 +9,6 @@ import org.raml.ramltopojo.extensions.ReferenceTypeHandlerPlugin;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
 import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.v2.api.model.v10.api.Api;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import java.io.IOException;
@@ -78,15 +77,10 @@ public class GenerationContextImpl implements GenerationContext {
 
     public void setupTypeHierarchy(TypeDeclaration typeDeclaration) {
 
-        // Temporary....
-        if ( typeDeclaration instanceof ObjectTypeDeclaration ) {
-
-            ObjectTypeDeclaration objectTypeDeclaration = (ObjectTypeDeclaration) typeDeclaration;
-            List<TypeDeclaration> parents = objectTypeDeclaration.parentTypes();
-            for (TypeDeclaration parent : parents) {
-                setupTypeHierarchy(parent);
-                childTypes.put(parent.name(), objectTypeDeclaration.name());
-            }
+        List<TypeDeclaration> parents = typeDeclaration.parentTypes();
+        for (TypeDeclaration parent : parents) {
+            setupTypeHierarchy(parent);
+            childTypes.put(parent.name(), typeDeclaration.name());
         }
     }
 

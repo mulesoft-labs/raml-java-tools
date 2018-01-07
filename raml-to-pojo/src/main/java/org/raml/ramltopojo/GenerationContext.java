@@ -20,13 +20,12 @@ public interface GenerationContext {
     String defaultPackage();
 
     void newExpectedType(String name, CreationResult creationResult);
-
     void createTypes(String rootDirectory) throws IOException;
+
     ObjectTypeHandlerPlugin pluginsForObjects(TypeDeclaration... typeDeclarations);
     EnumerationTypeHandlerPlugin pluginsForEnumerations(TypeDeclaration... typeDeclarations);
     UnionTypeHandlerPlugin pluginsForUnions(TypeDeclaration... typeDeclarations);
     ReferenceTypeHandlerPlugin pluginsForReferences(TypeDeclaration... typeDeclarations);
-
 
     void setupTypeHierarchy(TypeDeclaration typeDeclaration);
     Api api();

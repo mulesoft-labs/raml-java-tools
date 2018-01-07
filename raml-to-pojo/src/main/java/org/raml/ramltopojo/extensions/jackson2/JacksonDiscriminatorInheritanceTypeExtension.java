@@ -61,6 +61,13 @@ public class JacksonDiscriminatorInheritanceTypeExtension extends ObjectTypeHand
                                 result.getJavaName(EventType.INTERFACE) + ".class").build());
       }
 
+      subTypes.addMember(
+              "value",
+              "$L",
+              AnnotationSpec
+                      .builder(JsonSubTypes.Type.class)
+                      .addMember("value", "$L",
+                              objectPluginContext.creationResult().getJavaName(EventType.INTERFACE) + ".class").build());
 
       typeSpec.addAnnotation(subTypes.build());
 
@@ -73,7 +80,7 @@ public class JacksonDiscriminatorInheritanceTypeExtension extends ObjectTypeHand
     }
 
 
-    if (objectPluginContext.childClasses(otr.name()).size() == 0 && !Annotations.ABSTRACT.get(otr)) {
+    if (!Annotations.ABSTRACT.get(otr)) {
 
       typeSpec.addAnnotation(AnnotationSpec.builder(JsonDeserialize.class)
               .addMember("as", "$T.class", objectPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION))
