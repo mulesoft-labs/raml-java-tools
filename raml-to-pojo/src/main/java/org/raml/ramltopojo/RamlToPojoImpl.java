@@ -23,6 +23,11 @@ public class RamlToPojoImpl implements RamlToPojo {
 
         for (TypeDeclaration typeDeclaration : typeFinder.findTypes(generationContext.api())) {
 
+            TypeDeclarationType.calculateTypeName(typeDeclaration.name(), typeDeclaration, generationContext, EventType.INTERFACE);
+        }
+
+        for (TypeDeclaration typeDeclaration : typeFinder.findTypes(generationContext.api())) {
+
             CreationResult spec = TypeDeclarationType.createType(typeDeclaration, generationContext);
             resultingPojos.addNewResult(spec);
         }

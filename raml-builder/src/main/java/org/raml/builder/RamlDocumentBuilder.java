@@ -47,16 +47,20 @@ public class RamlDocumentBuilder implements NodeBuilder, ModelBuilder<Api> {
             documentNode.addChild(builder.buildNode());
         }
 
-        KeyValueNode baseUriNode = new KeyValueNodeImpl(new StringNodeImpl("baseUri"), new StringNodeImpl(baseUri));
-        documentNode.addChild(baseUriNode);
+        if ( baseUri != null ) {
+            KeyValueNode baseUriNode = new KeyValueNodeImpl(new StringNodeImpl("baseUri"), new StringNodeImpl(baseUri));
+            documentNode.addChild(baseUriNode);
+        }
 
         if( title != null ) {
             KeyValueNode titleNode = new KeyValueNodeImpl(new StringNodeImpl("title"), new StringNodeImpl(title));
             documentNode.addChild(titleNode);
         }
 
-        KeyValueNode version = new KeyValueNodeImpl(new StringNodeImpl("version"), new StringNodeImpl(this.version));
-        documentNode.addChild(version);
+        if ( version != null ) {
+            KeyValueNode version = new KeyValueNodeImpl(new StringNodeImpl("version"), new StringNodeImpl(this.version));
+            documentNode.addChild(version);
+        }
 
         if ( mediaType != null ) {
             KeyValueNode mediaType = new KeyValueNodeImpl(new StringNodeImpl("mediaType"), new StringNodeImpl(this.mediaType));

@@ -32,6 +32,12 @@ public class ExamplesBuilder extends KeyValueNodeBuilder<ExamplesBuilder> implem
         return this;
     }
 
+    public ExamplesBuilder withNoProperties() {
+
+        this.propertyValues.clear();
+        return this;
+    }
+
     public ExamplesBuilder withPropertyValues(PropertyValueBuilder... values) {
 
         this.propertyValues.addAll(Arrays.asList(values));
@@ -48,7 +54,7 @@ public class ExamplesBuilder extends KeyValueNodeBuilder<ExamplesBuilder> implem
     public KeyValueNode buildNode() {
 
         KeyValueNode node = super.buildNode();
-        node.getValue().addChild(new KeyValueNodeImpl(new StringNodeImpl("strict"), new StringNodeImpl(Boolean.toString(strict))));
+        node.getValue().addChild(new KeyValueNodeImpl(new StringNodeImpl("strict"), new BooleanNode(strict)));
 
         if ( ! propertyValues.isEmpty() ) {
 
@@ -57,6 +63,10 @@ public class ExamplesBuilder extends KeyValueNodeBuilder<ExamplesBuilder> implem
                 kvn.getValue().addChild(example.buildNode());
             }
 
+            node.getValue().addChild(kvn);
+        } else {
+
+            KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("value"), new ObjectNodeImpl());
             node.getValue().addChild(kvn);
         }
 
