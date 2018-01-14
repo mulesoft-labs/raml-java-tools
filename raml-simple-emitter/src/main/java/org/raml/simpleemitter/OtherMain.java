@@ -29,7 +29,8 @@ public class OtherMain {
         } else {
 
             Api realApi = ramlModelResult.getApiV10();
-            System.err.println("grr " + realApi.annotationTypes().get(0).name());
+            Emitter emitter = new Emitter();
+            emitter.emit(realApi);
         }
     }
 }
