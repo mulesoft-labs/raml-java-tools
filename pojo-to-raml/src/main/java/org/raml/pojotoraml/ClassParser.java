@@ -12,6 +12,4 @@ public interface ClassParser {
     Class<?> underlyingClass();
     List<Property> properties();
     Collection<Type> parentClasses();
-
-    ClassParser parseDependentClass(Class<?> type);
 }

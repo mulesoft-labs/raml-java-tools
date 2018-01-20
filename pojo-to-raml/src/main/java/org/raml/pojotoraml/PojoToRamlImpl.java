@@ -63,7 +63,7 @@ public class PojoToRamlImpl implements PojoToRaml {
                 builder.withProperty(adjuster.adjustProperty(typePropertyBuilder));
             } else {
 
-                ClassParser subParser = parser.parseDependentClass((ramlType.type()));
+                ClassParser subParser = classParserFactory.createParser(ramlType.type());
 
                 final String subSimpleName = adjuster.adjustTypeName(ramlType.type().getSimpleName(), parser);
                 if ( ! builtTypes.containsKey(subSimpleName)) {
@@ -85,7 +85,7 @@ public class PojoToRamlImpl implements PojoToRaml {
 
             RamlType ramlType = exploreType(parser, supertype, adjuster);
 
-            ClassParser subParser = parser.parseDependentClass((ramlType.type()));
+            ClassParser subParser = classParserFactory.createParser((ramlType.type()));
             final String subSimpleName = adjuster.adjustTypeName(ramlType.type().getSimpleName(), parser);
             if ( ! builtTypes.containsKey(subSimpleName)) {
 

@@ -1,5 +1,7 @@
 package org.raml.pojotoraml;
 
+import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
 import org.junit.Test;
 import org.raml.builder.RamlDocumentBuilder;
 import org.raml.builder.TypeDeclarationBuilder;
@@ -25,8 +27,11 @@ import org.raml.yagi.framework.phase.GrammarPhase;
 import org.raml.yagi.framework.phase.Phase;
 import org.raml.yagi.framework.phase.TransformationPhase;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -68,6 +73,38 @@ public class PojoToRamlImplTest {
         assertEquals(2, buildTypes.size());
         assertEquals("Inherited", buildTypes.get(0).name());
         assertEquals("Inheriting", buildTypes.get(1).name());
+    }
+
+    @Test
+    public void withMultipleInheritance() throws Exception {
+
+        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(new ClassParserFactory() {
+            @Override
+            public ClassParser createParser(final Class<?> clazz) {
+                return new FieldClassParser(clazz) {
+                    @Override
+                    public Collection<Type> parentClasses() {
+                        return FluentIterable.of(clazz.getInterfaces()).transform(new Function<Class<?>, Type>() {
+                            @Nullable
+                            @Override
+                            public Type apply(@Nullable Class<?> aClass) {
+                                return aClass;
+                            }
+                        }).toList();
+                    }
+                };
+            }
+        }, RamlAdjuster.NULL_ADJUSTER);
+        Result types =  pojoToRaml.classToRaml(MultipleInheriting.class);
+
+        Api api = createApi(types);
+
+        List<TypeDeclaration> buildTypes = api.types();
+
+        assertEquals(3, buildTypes.size());
+        assertEquals("AnotherInherited", buildTypes.get(0).name());
+        assertEquals("MultipleInheriting", buildTypes.get(1).name());
+        assertEquals("FirstInherited", buildTypes.get(2).name());
     }
 
     @Test

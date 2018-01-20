@@ -18,7 +18,7 @@ public class FieldClassParser implements ClassParser {
 
     private final Class<?> classSource;
 
-    FieldClassParser(Class<?> classSource) {
+    public FieldClassParser(Class<?> classSource) {
         this.classSource = classSource;
     }
 
@@ -49,11 +49,6 @@ public class FieldClassParser implements ClassParser {
             type.add(classSource.getSuperclass());
         }
         return type;
-    }
-
-    @Override
-    public ClassParser parseDependentClass(Class<?> type) {
-        return new FieldClassParser(type);
     }
 
     public static FieldClassParser extractFieldsFrom(Class<?> classSource) {
