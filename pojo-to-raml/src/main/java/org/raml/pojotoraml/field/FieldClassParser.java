@@ -6,7 +6,9 @@ import org.raml.pojotoraml.Property;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -37,6 +39,16 @@ public class FieldClassParser implements ClassParser {
             }
         }
         return props;
+    }
+
+    @Override
+    public Collection<Type> parentClasses() {
+
+        ArrayList<Type> type = new ArrayList<>();
+        if ( classSource.getSuperclass() != Object.class) {
+            type.add(classSource.getSuperclass());
+        }
+        return type;
     }
 
     @Override

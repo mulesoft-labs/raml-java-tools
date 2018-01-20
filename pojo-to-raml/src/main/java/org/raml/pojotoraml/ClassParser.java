@@ -1,5 +1,7 @@
 package org.raml.pojotoraml;
 
+import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -9,5 +11,7 @@ public interface ClassParser {
 
     Class<?> underlyingClass();
     List<Property> properties();
+    Collection<Type> parentClasses();
+
     ClassParser parseDependentClass(Class<?> type);
 }

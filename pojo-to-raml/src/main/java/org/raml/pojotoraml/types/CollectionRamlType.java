@@ -7,7 +7,7 @@ public class CollectionRamlType  implements RamlType{
 
     private final RamlType type;
 
-    public CollectionRamlType(RamlType type) {
+    CollectionRamlType(RamlType type) {
 
         this.type = type;
     }

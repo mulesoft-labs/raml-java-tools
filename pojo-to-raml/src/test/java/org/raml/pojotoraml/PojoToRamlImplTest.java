@@ -4,9 +4,11 @@ import org.junit.Test;
 import org.raml.builder.RamlDocumentBuilder;
 import org.raml.builder.TypeDeclarationBuilder;
 import org.raml.pojotoraml.field.FieldClassParser;
+import org.raml.simpleemitter.Emitter;
 import org.raml.v2.api.loader.ResourceLoader;
 import org.raml.v2.api.model.v10.RamlFragment;
 import org.raml.v2.api.model.v10.api.Api;
+import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import org.raml.v2.internal.impl.commons.RamlHeader;
 import org.raml.v2.internal.impl.commons.phase.*;
@@ -23,6 +25,7 @@ import org.raml.yagi.framework.phase.GrammarPhase;
 import org.raml.yagi.framework.phase.Phase;
 import org.raml.yagi.framework.phase.TransformationPhase;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,11 +38,55 @@ import static org.raml.v2.internal.impl.commons.RamlVersion.RAML_10;
  */
 public class PojoToRamlImplTest {
     @Test
-    public void pojoToRamlTypeBuilder() throws Exception {
+    public void simpleStuff() throws Exception {
 
         PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), RamlAdjuster.NULL_ADJUSTER);
         Result types =  pojoToRaml.classToRaml(Fun.class);
 
+        Api api = createApi(types);
+
+        List<TypeDeclaration> buildTypes = api.types();
+
+        assertEquals(2, buildTypes.size());
+        assertEquals("Fun", buildTypes.get(0).name());
+        assertEquals(5, ((ObjectTypeDeclaration)buildTypes.get(0)).properties().size());
+
+        assertEquals("SubFun", buildTypes.get(1).name());
+        assertEquals(1, ((ObjectTypeDeclaration)buildTypes.get(1)).properties().size());
+    }
+
+    @Test
+    public void withInheritance() throws Exception {
+
+        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), RamlAdjuster.NULL_ADJUSTER);
+        Result types =  pojoToRaml.classToRaml(Inheriting.class);
+
+        Api api = createApi(types);
+
+        List<TypeDeclaration> buildTypes = api.types();
+
+        assertEquals(2, buildTypes.size());
+        assertEquals("Inherited", buildTypes.get(0).name());
+        assertEquals("Inheriting", buildTypes.get(1).name());
+    }
+
+    @Test
+    public void scalarType() throws Exception {
+
+        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), RamlAdjuster.NULL_ADJUSTER);
+        Result types =  pojoToRaml.classToRaml(String.class);
+
+        Api api = createApi(types);
+
+        List<TypeDeclaration> buildTypes = api.types();
+
+        assertEquals(0, buildTypes.size());
+
+        Emitter emitter = new Emitter();
+        emitter.emit(api);
+    }
+
+    protected Api createApi(Result types) throws IOException {
         RamlDocumentBuilder ramlDocumentBuilder = RamlDocumentBuilder
                 .document()
                 .baseUri("http://google.com")
@@ -57,12 +104,10 @@ public class PojoToRamlImplTest {
             System.err.println("error: " + error.getErrorMessage());
         }
 
-        List<TypeDeclaration> buildTypes = api.types();
+        Emitter emitter = new Emitter();
+        emitter.emit(api);
 
-        assertEquals(2, buildTypes.size());
-        assertEquals("Fun", buildTypes.get(0).name());
-        assertEquals("SubFun", buildTypes.get(1).name());
-
+        return api;
     }
 
     private List<Phase> createPhases(ResourceLoader resourceLoader, RamlFragment fragment)

@@ -8,7 +8,7 @@ public class ComposedRamlType implements RamlType{
     private final Class<?> cls;
     private final String actualRamlName;
 
-    public ComposedRamlType(Class<?> cls, String actualRamlName) {
+    ComposedRamlType(Class<?> cls, String actualRamlName) {
 
         this.cls = cls;
         this.actualRamlName = actualRamlName;

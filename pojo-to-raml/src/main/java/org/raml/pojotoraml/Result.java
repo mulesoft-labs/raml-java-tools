@@ -29,6 +29,10 @@ public class Result {
     }
 
     public Collection<TypeDeclarationBuilder> allTypes() {
-        return FluentIterable.from(Collections.singleton(requestedType)).append(dependentTypes).toList();
+        if ( requestedType == null ) {
+            return Collections.emptyList();
+        } else {
+            return FluentIterable.from(Collections.singleton(requestedType)).append(dependentTypes).toList();
+        }
     }
 }
