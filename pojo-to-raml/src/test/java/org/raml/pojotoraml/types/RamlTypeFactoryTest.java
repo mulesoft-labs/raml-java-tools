@@ -5,6 +5,7 @@ import org.mockito.Mock;
 import org.raml.pojotoraml.ClassParser;
 import org.raml.pojotoraml.Fun;
 import org.raml.pojotoraml.RamlAdjuster;
+import org.raml.pojotoraml.field.SubFun;
 import org.raml.testutils.UnitTest;
 
 import static org.junit.Assert.assertEquals;
@@ -32,7 +33,7 @@ public class RamlTypeFactoryTest  extends UnitTest {
     @Test
     public void forComposed() throws Exception {
 
-        when(adjuster.adjustTypeName("SubFun", classParser)).thenReturn("foo");
+        when(adjuster.adjustTypeName(SubFun.class, "SubFun", classParser)).thenReturn("foo");
         RamlType type = RamlTypeFactory.forType(Fun.class.getDeclaredField("sub").getGenericType(), classParser, adjuster);
         assertTrue(type instanceof ComposedRamlType);
         assertEquals("foo", type.getRamlSyntax());
@@ -49,7 +50,7 @@ public class RamlTypeFactoryTest  extends UnitTest {
     @Test
     public void forListOfComposed() throws Exception {
 
-        when(adjuster.adjustTypeName("SubFun", classParser)).thenReturn("foo");
+        when(adjuster.adjustTypeName(SubFun.class, "SubFun", classParser)).thenReturn("foo");
         RamlType type = RamlTypeFactory.forType(Fun.class.getDeclaredField("listOfSubs").getGenericType(), classParser, adjuster);
         assertTrue(type instanceof CollectionRamlType);
         assertEquals("foo[]", type.getRamlSyntax());

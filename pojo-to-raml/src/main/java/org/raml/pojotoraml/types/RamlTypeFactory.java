@@ -31,7 +31,7 @@ public class RamlTypeFactory {
                 return CollectionRamlType.of(ramlType.or(new Supplier<RamlType>() {
                     @Override
                     public RamlType get() {
-                        return ComposedRamlType.forClass(cls, adjuster.adjustTypeName(cls.getSimpleName(), parser));
+                        return ComposedRamlType.forClass(cls, adjuster.adjustTypeName(cls, cls.getSimpleName(), parser));
                     }
                 }));
             }
@@ -45,7 +45,7 @@ public class RamlTypeFactory {
             return ramlType.or(new Supplier<RamlType>() {
                 @Override
                 public RamlType get() {
-                    return ComposedRamlType.forClass(cls, adjuster.adjustTypeName(cls.getSimpleName(), parser));
+                    return ComposedRamlType.forClass(cls, adjuster.adjustTypeName(cls, cls.getSimpleName(), parser));
                 }
             });
         }
