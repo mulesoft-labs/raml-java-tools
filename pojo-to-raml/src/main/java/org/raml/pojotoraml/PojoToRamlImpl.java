@@ -121,18 +121,20 @@ public class PojoToRamlImpl implements PojoToRaml {
     private TypeBuilder buildSuperType(ClassParser parser, RamlAdjuster adjuster, Map<String, TypeDeclarationBuilder> builtTypes) {
         Collection<Type> types = parser.parentClasses();
         ArrayList<String> typeNames = new ArrayList<>();
-        for (Type supertype : types) {
+        if ( types != null ) {
+            for (Type supertype : types) {
 
-            RamlType ramlType = exploreType(parser, supertype, adjuster);
+                RamlType ramlType = exploreType(parser, supertype, adjuster);
 
-            ClassParser subParser = classParserFactory.createParser((ramlType.type()));
-            final String subSimpleName = adjuster.adjustTypeName(parser.underlyingClass(), ramlType.type().getSimpleName(), parser);
-            if ( ! builtTypes.containsKey(subSimpleName)) {
+                ClassParser subParser = classParserFactory.createParser((ramlType.type()));
+                final String subSimpleName = adjuster.adjustTypeName(parser.underlyingClass(), ramlType.type().getSimpleName(), parser);
+                if (!builtTypes.containsKey(subSimpleName)) {
 
-                handleSingleType(subParser, adjuster, builtTypes);
+                    handleSingleType(subParser, adjuster, builtTypes);
+                }
+
+                typeNames.add(subSimpleName);
             }
-
-            typeNames.add(subSimpleName);
         }
 
         TypeBuilder builder;
