@@ -1,6 +1,6 @@
 package org.raml.builder;
 
-import org.raml.v2.internal.impl.commons.nodes.TypeDeclarationNode;
+import org.raml.v2.internal.impl.commons.nodes.FacetNode;
 import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
 import org.raml.yagi.framework.nodes.ObjectNode;
 import org.raml.yagi.framework.nodes.ObjectNodeImpl;
@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.raml.builder.NodeBuilders.arrayProperty;
 import static org.raml.builder.NodeBuilders.property;
 
 /**
@@ -86,7 +85,7 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
     @Override
     public ObjectNode buildNode() {
 
-        TypeDeclarationNode node = new TypeDeclarationNode();
+        ObjectNodeImpl node = new ObjectNodeImpl();
 
         if ( types != null ) {
             if (types.length == 1) {
@@ -108,7 +107,16 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
 
         if ( enumValues != null ) {
 
-            node.addChild(arrayProperty("enum", enumValues).buildNode());
+           // node.addChild(arrayProperty("enum", enumValues).buildNode());
+
+            FacetNode facetNode = new FacetNode();
+            facetNode.addChild(new StringNodeImpl("enum"));
+            SimpleSYArrayNode san = new SimpleSYArrayNode();
+            for (String value : enumValues) {
+                san.addChild(new StringNodeImpl(value));
+            }
+            facetNode.addChild(san);
+            node.addChild(facetNode);
         }
 
         if ( ! annotations.isEmpty() ) {

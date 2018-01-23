@@ -37,6 +37,12 @@ public class RamlTypeFactory {
             }
         }
 
+        if ( type instanceof Class && Enum.class.isAssignableFrom((Class<?>) type) ) {
+
+            final Class<?> cls = (Class<?>) type;
+            return EnumRamlType.forClass(cls, adjuster.adjustTypeName(cls, cls.getSimpleName(), parser));
+        }
+
         if ( type instanceof Class ) {
             final Class<?> cls = (Class<?>) type;
 

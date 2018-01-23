@@ -3,20 +3,20 @@ package org.raml.pojotoraml.types;
 /**
  * Created. There, you have it.
  */
-public class ComposedRamlType implements RamlType{
+public class EnumRamlType implements RamlType{
 
     private final Class<?> cls;
     private final String actualRamlName;
 
-    ComposedRamlType(Class<?> cls, String actualRamlName) {
+    public EnumRamlType(Class<?> cls, String actualRamlName) {
 
         this.cls = cls;
         this.actualRamlName = actualRamlName;
     }
 
-    public static ComposedRamlType forClass(Class<?> cls, String actualRamlName ) {
+    public static EnumRamlType forClass(Class<?> cls, String actualRamlName ) {
 
-        return new ComposedRamlType(cls, actualRamlName);
+        return new EnumRamlType(cls, actualRamlName);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class ComposedRamlType implements RamlType{
 
     @Override
     public boolean isEnum() {
-        return false;
+        return true;
     }
 
     @Override

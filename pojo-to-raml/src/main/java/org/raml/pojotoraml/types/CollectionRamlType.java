@@ -23,6 +23,11 @@ public class CollectionRamlType  implements RamlType{
     }
 
     @Override
+    public boolean isEnum() {
+        return false;
+    }
+
+    @Override
     public Class<?> type() {
         return type.type();
     }

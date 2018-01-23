@@ -16,6 +16,11 @@ public interface RamlAdjuster {
     class Helper implements RamlAdjuster {
 
         @Override
+        public String adjustEnumValue(Class<?> type, String name) {
+            return name;
+        }
+
+        @Override
         public TypeBuilder adjustType(Type type, TypeBuilder builder) {
             return builder;
         }
@@ -36,6 +41,7 @@ public interface RamlAdjuster {
         }
     }
 
+    String adjustEnumValue(Class<?> type, String name);
     TypeBuilder adjustType(Type type, TypeBuilder builder);
     String adjustTypeName(Class<?> aClass, String name, ClassParser parser);
     TypePropertyBuilder adjustScalarProperty(TypeDeclarationBuilder typeDeclaration, Property property, TypePropertyBuilder typePropertyBuilder);

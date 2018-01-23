@@ -19,5 +19,6 @@ public interface RamlType {
 
   String getRamlSyntax();
   boolean isScalar();
+  boolean isEnum();
   Class<?> type();
 }

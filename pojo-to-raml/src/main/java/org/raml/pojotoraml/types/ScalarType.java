@@ -74,7 +74,12 @@ public enum ScalarType implements RamlType {
     return true;
   }
 
-  @Override
+    @Override
+    public boolean isEnum() {
+        return false;
+    }
+
+    @Override
   public Class<?> type() {
     return (Class<?>) correspondingJavaTypes.iterator().next();
   }

@@ -11,6 +11,7 @@ import org.raml.v2.api.loader.ResourceLoader;
 import org.raml.v2.api.model.v10.RamlFragment;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import org.raml.v2.internal.impl.commons.RamlHeader;
 import org.raml.v2.internal.impl.commons.phase.*;
@@ -34,6 +35,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.raml.v2.api.model.v10.RamlFragment.Default;
 import static org.raml.v2.internal.impl.commons.RamlVersion.RAML_10;
@@ -118,6 +120,42 @@ public class PojoToRamlImplTest {
         List<TypeDeclaration> buildTypes = api.types();
 
         assertEquals(0, buildTypes.size());
+
+        Emitter emitter = new Emitter();
+        emitter.emit(api);
+    }
+
+    @Test
+    public void enumeration() throws Exception {
+
+        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), RamlAdjuster.NULL_ADJUSTER);
+        Result types =  pojoToRaml.classToRaml(SimpleEnum.class);
+
+        Api api = createApi(types);
+
+        List<TypeDeclaration> buildTypes = api.types();
+
+        assertEquals(1, buildTypes.size());
+        assertEquals("SimpleEnum", buildTypes.get(0).name());
+        assertArrayEquals(new String[] {"ONE", "TWO"}, ((StringTypeDeclaration) buildTypes.get(0)).enumValues().toArray(new String[0]));
+
+        Emitter emitter = new Emitter();
+        emitter.emit(api);
+    }
+
+    @Test
+    public void enumerationLive() throws Exception {
+
+        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), RamlAdjuster.NULL_ADJUSTER);
+        Result types =  pojoToRaml.classToRaml(SimpleEnum.class);
+
+        Api api = createApi(types);
+
+        List<TypeDeclaration> buildTypes = api.types();
+
+        assertEquals(1, buildTypes.size());
+        assertEquals("SimpleEnum", buildTypes.get(0).name());
+        assertArrayEquals(new String[] {"ONE", "TWO"}, ((StringTypeDeclaration) buildTypes.get(0)).enumValues().toArray(new String[0]));
 
         Emitter emitter = new Emitter();
         emitter.emit(api);
