@@ -99,4 +99,10 @@ public class NamesTest {
     assertEquals("_funAllo", Names.variableName("_Fun", "allo"));
     assertEquals("_funAllo", Names.variableName("_fun", "_allo"));
   }
+
+  @Test
+  public void nameWithDot() {
+
+    assertEquals("FunImpl", Names.typeName("lib.Fun", "Impl"));
+  }
 }

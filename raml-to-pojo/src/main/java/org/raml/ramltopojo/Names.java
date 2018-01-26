@@ -194,6 +194,13 @@ public class Names {
   }
 
   private static String buildPart(int i, String s, NameFixer format) {
+
+    if ( i == 0 ) {
+
+      // if this is the first name part, remove everything up until the last dot.
+      s = s.replaceAll("^.*\\.", "");
+    }
+
     String part;
     if (s.matches(".*[^a-zA-Z0-9].*")) {
 
