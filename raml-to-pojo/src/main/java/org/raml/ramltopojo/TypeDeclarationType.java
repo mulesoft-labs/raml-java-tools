@@ -1,6 +1,7 @@
 package org.raml.ramltopojo;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
@@ -50,17 +51,9 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
 
   // cheating: I know I only have one table for floats and ints, but the parser
   // should prevent problems.
-  private static Map<String, Class<?>> properType = ImmutableMap.<String, Class<?>>builder()
-      .put("float", float.class).put("double", double.class).put("int8", byte.class)
-      .put("int16", short.class).put("int32", int.class).put("int64", long.class)
-      .put("int", int.class).build();
+*/
 
-  private static Map<String, Class<?>> properTypeObject = ImmutableMap.<String, Class<?>>builder()
-      .put("float", Float.class).put("double", Double.class).put("int8", Byte.class)
-      .put("int16", Short.class).put("int32", Integer.class).put("int64", Long.class)
-      .put("int", Integer.class).build();
 
-     */
     OBJECT {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
@@ -152,7 +145,9 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
 
-            return new ReferenceTypeHandler(typeDeclaration, Integer.class, TypeName.INT);
+            NumberTypeDeclaration integerTypeDeclaration = (NumberTypeDeclaration) typeDeclaration;
+            TypeName typeName = Optional.fromNullable(properType.get(integerTypeDeclaration.format())).or(TypeName.INT);
+            return new ReferenceTypeHandler(typeDeclaration, Integer.class, typeName);
         }
 
         @Override
@@ -221,7 +216,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     NUMBER {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
-            return new ReferenceTypeHandler(typeDeclaration, Number.class, ClassName.get(Number.class));
+
+            NumberTypeDeclaration integerTypeDeclaration = (NumberTypeDeclaration) typeDeclaration;
+            TypeName typeName = Optional.fromNullable(properType.get(integerTypeDeclaration.format())).or(ClassName.get(Number.class));
+
+            return new ReferenceTypeHandler(typeDeclaration, Number.class, typeName);
 
         }
 
@@ -291,6 +290,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
             }
         }).toSet();
     }
+
+    private static Map<String, TypeName> properType = ImmutableMap.<String, TypeName>builder()
+            .put("float", TypeName.FLOAT).put("double", TypeName.DOUBLE).put("int8", TypeName.BYTE)
+            .put("int16", TypeName.SHORT).put("int32", TypeName.INT).put("int64", TypeName.LONG)
+            .put("int", TypeName.INT).build();
 
 
     public abstract boolean shouldCreateInlineType(TypeDeclaration declaration);

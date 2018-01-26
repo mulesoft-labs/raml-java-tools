@@ -19,10 +19,10 @@ public class ReferenceTypeHandler implements TypeHandler {
 
     public ReferenceTypeHandler(TypeDeclaration typeDeclaration, Class type, TypeName referenceName) {
         this.typeDeclaration = typeDeclaration;
-
         this.type = type;
         this.referenceName = referenceName;
     }
+
     @Override
     public ClassName javaClassName(GenerationContext generationContext, EventType eventType) {
         throw new GenerationException("won't generate name for " + type.getSimpleName() + " class");
@@ -31,13 +31,15 @@ public class ReferenceTypeHandler implements TypeHandler {
     @Override
     public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
 
-        return generationContext.pluginsForReferences(Utils.allParents(typeDeclaration, new ArrayList<TypeDeclaration>()).toArray(new TypeDeclaration[0])).typeName(new ReferencePluginContext() {
-        }, typeDeclaration, referenceName);
+        return generationContext.pluginsForReferences(
+                    Utils.allParents(typeDeclaration, new ArrayList<TypeDeclaration>()).toArray(new TypeDeclaration[0]))
+                .typeName(new ReferencePluginContext() {
+                }, typeDeclaration, referenceName);
     }
 
     @Override
     public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
 
-        throw new GenerationException("won't generate "+ type.getSimpleName() + " class");
+        throw new GenerationException("won't generate " + type.getSimpleName() + " class");
     }
 }

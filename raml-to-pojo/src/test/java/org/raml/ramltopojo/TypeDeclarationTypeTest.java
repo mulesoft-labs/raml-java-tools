@@ -2,9 +2,17 @@ package org.raml.ramltopojo;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.TypeName;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.raml.ramltopojo.extensions.ReferencePluginContext;
+import org.raml.ramltopojo.extensions.ReferenceTypeHandlerPlugin;
+import org.raml.testutils.UnitTest;
 import org.raml.v2.api.model.v10.api.Api;
+import org.raml.v2.api.model.v10.datamodel.IntegerTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.NumberTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
@@ -12,11 +20,27 @@ import javax.annotation.Nullable;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Created. There, you have it.
  */
-public class TypeDeclarationTypeTest {
+public class TypeDeclarationTypeTest extends UnitTest {
+
+    @Mock
+    IntegerTypeDeclaration integerTypeDeclaration;
+
+    @Mock
+    NumberTypeDeclaration numberTypeDeclaration;
+
+    @Mock
+    GenerationContext context;
+
+    @Mock
+    private ReferenceTypeHandlerPlugin plugin;
 
 
     @Test
@@ -88,6 +112,65 @@ public class TypeDeclarationTypeTest {
         TypeDeclaration property = findProperty(decl, "multiInheritanceWithoutExtraProperty");
 
         assertTrue(TypeDeclarationType.isNewInlineType(property));
+    }
+
+
+    @Test
+    public void integerType() {
+
+        createIntegerTypeNameSetup(integerTypeDeclaration, TypeDeclarationType.INTEGER);
+
+        verify(plugin).typeName(any(ReferencePluginContext.class), any(TypeDeclaration.class), eq(TypeName.INT));
+    }
+
+    @Test
+    public void integerTypeWithByteFormat() {
+
+        when(integerTypeDeclaration.format()).thenReturn("int8");
+        createIntegerTypeNameSetup(integerTypeDeclaration, TypeDeclarationType.INTEGER);
+
+        verify(plugin).typeName(any(ReferencePluginContext.class), any(TypeDeclaration.class), eq(TypeName.BYTE));
+    }
+
+    @Test
+    public void integerTypeWithDoubleFormat() {
+
+        when(integerTypeDeclaration.format()).thenReturn("double");
+        createIntegerTypeNameSetup(integerTypeDeclaration, TypeDeclarationType.INTEGER);
+
+        verify(plugin).typeName(any(ReferencePluginContext.class), any(TypeDeclaration.class), eq(TypeName.DOUBLE));
+    }
+
+    @Test
+    public void numberType() {
+
+        createIntegerTypeNameSetup(numberTypeDeclaration, TypeDeclarationType.NUMBER);
+
+        verify(plugin).typeName(any(ReferencePluginContext.class), any(TypeDeclaration.class), eq(ClassName.get(Number.class)));
+    }
+
+    @Test
+    public void numberTypeWithByteFormat() {
+
+        when(numberTypeDeclaration.format()).thenReturn("int8");
+        createIntegerTypeNameSetup(numberTypeDeclaration, TypeDeclarationType.NUMBER);
+
+        verify(plugin).typeName(any(ReferencePluginContext.class), any(TypeDeclaration.class), eq(TypeName.BYTE));
+    }
+
+    @Test
+    public void numberTypeWithDoubleFormat() {
+
+        when(numberTypeDeclaration.format()).thenReturn("double");
+        createIntegerTypeNameSetup(numberTypeDeclaration, TypeDeclarationType.NUMBER);
+
+        verify(plugin).typeName(any(ReferencePluginContext.class), any(TypeDeclaration.class), eq(TypeName.DOUBLE));
+    }
+
+    private void createIntegerTypeNameSetup(TypeDeclaration integerTypeDeclaration, TypeDeclarationType typeDeclarationType) {
+        when(context.pluginsForReferences(integerTypeDeclaration)).thenReturn(plugin);
+        TypeHandler handler = typeDeclarationType.createHandler("foo", TypeDeclarationType.INTEGER, integerTypeDeclaration);
+        TypeName tn = handler.javaClassReference(context, EventType.INTERFACE);
     }
 
     @Test @Ignore
