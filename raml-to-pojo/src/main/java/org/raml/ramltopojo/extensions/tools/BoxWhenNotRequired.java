@@ -10,11 +10,11 @@ import java.util.List;
 /**
  * Created. There, you have it.
  */
-public class BoxNotRequired implements ReferenceTypeHandlerPlugin {
+public class BoxWhenNotRequired implements ReferenceTypeHandlerPlugin {
 
     private final List<String> arguments;
 
-    public BoxNotRequired(List<String> arguments) {
+    public BoxWhenNotRequired(List<String> arguments) {
         this.arguments = arguments;
     }
 

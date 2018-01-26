@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created. There, you have it.
  */
-public class BoxNotRequiredTest extends UnitTest {
+public class BoxWhenNotRequiredTest extends UnitTest {
 
     @Mock
     private IntegerTypeDeclaration integerDeclaration;
@@ -22,8 +22,8 @@ public class BoxNotRequiredTest extends UnitTest {
 
         when(integerDeclaration.required()).thenReturn(false);
 
-        BoxNotRequired boxNotRequired = new BoxNotRequired(null);
-        TypeName tn = boxNotRequired.typeName(null, integerDeclaration, TypeName.INT);
+        BoxWhenNotRequired boxWhenNotRequired = new BoxWhenNotRequired(null);
+        TypeName tn = boxWhenNotRequired.typeName(null, integerDeclaration, TypeName.INT);
         assertEquals(TypeName.INT.box(), tn);
     }
 
@@ -32,8 +32,8 @@ public class BoxNotRequiredTest extends UnitTest {
 
         when(integerDeclaration.required()).thenReturn(true);
 
-        BoxNotRequired boxNotRequired = new BoxNotRequired(null);
-        TypeName tn = boxNotRequired.typeName(null, integerDeclaration, TypeName.INT);
+        BoxWhenNotRequired boxWhenNotRequired = new BoxWhenNotRequired(null);
+        TypeName tn = boxWhenNotRequired.typeName(null, integerDeclaration, TypeName.INT);
         assertEquals(TypeName.INT, tn);
     }
 
