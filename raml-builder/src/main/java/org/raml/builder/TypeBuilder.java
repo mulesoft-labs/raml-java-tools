@@ -23,7 +23,7 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
 
     public String[] types;
     private String description;
-    private String[] enumValues;
+    private ValueNodeFactory enumValues;
 
     private TypeBuilder(String type) {
         this.types= new String[] {type};
@@ -56,8 +56,6 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
         return this;
     }
 
-
-
     public TypeBuilder withProperty(TypePropertyBuilder... properties) {
 
         this.properties.addAll(Arrays.asList(properties));
@@ -78,7 +76,18 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
 
     public TypeBuilder enumValues(String... enumValues) {
 
-        this.enumValues = enumValues;
+        this.enumValues = ValueNodeFactories.create(new SimpleSYArrayNode(), enumValues);
+        return this;
+    }
+
+    public TypeBuilder enumValues(long... enumValues) {
+
+        this.enumValues = ValueNodeFactories.create(new SimpleSYArrayNode(), enumValues);
+        return this;
+    }
+    public TypeBuilder enumValues(boolean... enumValues) {
+
+        this.enumValues = ValueNodeFactories.create(new SimpleSYArrayNode(), enumValues);
         return this;
     }
 
@@ -107,15 +116,10 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
 
         if ( enumValues != null ) {
 
-           // node.addChild(arrayProperty("enum", enumValues).buildNode());
-
             FacetNode facetNode = new FacetNode();
             facetNode.addChild(new StringNodeImpl("enum"));
-            SimpleSYArrayNode san = new SimpleSYArrayNode();
-            for (String value : enumValues) {
-                san.addChild(new StringNodeImpl(value));
-            }
-            facetNode.addChild(san);
+
+            facetNode.addChild(enumValues.createNode());
             node.addChild(facetNode);
         }
 

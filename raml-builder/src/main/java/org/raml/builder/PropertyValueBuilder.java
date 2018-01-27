@@ -12,21 +12,12 @@ public class PropertyValueBuilder implements NodeBuilder, SupportsProperties<Pro
 
 
     private String name;
-    private final String value;
-    private final String[] values;
+    private final ValueNodeFactory value;
     private PropertyValueBuilder subValue;
 
-    public PropertyValueBuilder(String name, String value) {
+    public PropertyValueBuilder(String name, ValueNodeFactory value) {
         this.name = name;
         this.value = value;
-        this.values = null;
-        this.subValue = null;
-    }
-
-    public PropertyValueBuilder(String name, String[] values) {
-        this.name = name;
-        this.values = values;
-        this.value = null;
         this.subValue = null;
     }
 
@@ -34,21 +25,40 @@ public class PropertyValueBuilder implements NodeBuilder, SupportsProperties<Pro
 
         this.name = name;
         this.subValue = null;
-        this.values = null;
         this.value = null;
     }
 
     public static PropertyValueBuilder property(String name, String value) {
 
-        return  new PropertyValueBuilder(name, value);
+        return new PropertyValueBuilder(name, ValueNodeFactories.create(value));
     }
 
-    public static PropertyValueBuilder property(String name, String... values) {
+    public static PropertyValueBuilder property(String name, long value) {
 
-        return  new PropertyValueBuilder(name, values);
+        return new PropertyValueBuilder(name, ValueNodeFactories.create(value));
     }
 
-    public static PropertyValueBuilder property(String name){
+    public static PropertyValueBuilder property(String name, boolean value) {
+
+        return new PropertyValueBuilder(name, ValueNodeFactories.create(value));
+    }
+
+    public static PropertyValueBuilder propertyOfArray(String name, String... values) {
+
+        return new PropertyValueBuilder(name, ValueNodeFactories.create(values));
+    }
+
+    public static PropertyValueBuilder propertyOfArray(String name, long... values) {
+
+        return new PropertyValueBuilder(name, ValueNodeFactories.create(values));
+    }
+
+    public static PropertyValueBuilder propertyOfArray(String name, boolean... values) {
+
+        return new PropertyValueBuilder(name, ValueNodeFactories.create(values));
+    }
+
+    public static PropertyValueBuilder property(String name) {
 
         return new PropertyValueBuilder(name);
     }
@@ -63,25 +73,18 @@ public class PropertyValueBuilder implements NodeBuilder, SupportsProperties<Pro
     @Override
     public KeyValueNode buildNode() {
 
-        if ( value != null ) {
-            return new KeyValueNodeImpl(new StringNodeImpl(name), new StringNodeImpl(value));
+        if (value != null) {
+            return new KeyValueNodeImpl(new StringNodeImpl(name), value.createNode());
         } else {
 
-            if (values != null) {
-                SimpleArrayNode node = new SimpleArrayNode();
-                for (String value : values) {
-                    node.addChild(new StringNodeImpl(value));
-                }
-                return new KeyValueNodeImpl(new StringNodeImpl(name), node);
+            if (subValue != null) {
+                return new KeyValueNodeImpl(new StringNodeImpl(name), subValue.buildNode());
             } else {
 
-                if ( subValue != null ) {
-                    return new KeyValueNodeImpl(new StringNodeImpl(name), subValue.buildNode());
-                } else {
-
-                    return new KeyValueNodeImpl(new StringNodeImpl(name), new ObjectNodeImpl());
-                }
+                return new KeyValueNodeImpl(new StringNodeImpl(name), new ObjectNodeImpl());
             }
         }
     }
+
+
 }

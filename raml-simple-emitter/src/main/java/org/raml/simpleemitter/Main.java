@@ -50,14 +50,17 @@ public class Main {
                 .version("1.0beta6")
                 .withTypes(
                         TypeDeclarationBuilder.typeDeclaration("EnumFoo").ofType(TypeBuilder.type().enumValues("UN", "DEUX")),
+                        TypeDeclarationBuilder.typeDeclaration("EnumNum").ofType(TypeBuilder.type("integer").enumValues(1,2)),
+
                         TypeDeclarationBuilder.typeDeclaration("Foo").ofType(
                                 TypeBuilder.type("object")
-                                        .withAnnotations(AnnotationBuilder.annotation("Foo").withProperties(PropertyValueBuilder.property("time", "2022-02-02")))
+                                        .withAnnotations(AnnotationBuilder.annotation("Foo")
+                                                .withProperties(PropertyValueBuilder.property("time", "2022-02-02"), PropertyValueBuilder.propertyOfArray("count", 1,2)))
                         ),
                         TypeDeclarationBuilder.typeDeclaration("Goo").ofType(TypeBuilder.type("object"))
                 )
                 .withAnnotationTypes(
-                        AnnotationTypeBuilder.annotationType("Foo").withProperty(property("time", "date-only"))
+                        AnnotationTypeBuilder.annotationType("Foo").withProperty(property("time", "date-only")).withProperty(property("count", "integer[]"))
                 )
                 .withResources(
                         resource("/no")
@@ -67,7 +70,9 @@ public class Main {
                                         method("get")
                                                 .description("fooofooofooo")
                                                 .withQueryParameter(ParameterBuilder.parameter("apaaa").ofType("integer").withFacets(FacetBuilder.facet("minimum").value(44)))
-                                                .withAnnotations(AnnotationBuilder.annotation("Foo").withProperties(PropertyValueBuilder.property("time", "2022-02-02")))
+                                                .withAnnotations(AnnotationBuilder.annotation("Foo").withProperties(
+                                                        PropertyValueBuilder.property("time", "2022-02-02"),
+                                                        PropertyValueBuilder.propertyOfArray("count", 7)))
                                                 .withBodies(
                                                         BodyBuilder.body("application/json")
                                                                 .ofType(TypeBuilder.type("Foo", "Goo")
