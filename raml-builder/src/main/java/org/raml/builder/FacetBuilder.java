@@ -1,15 +1,13 @@
 package org.raml.builder;
 
-import org.raml.yagi.framework.nodes.Node;
-import org.raml.yagi.framework.nodes.StringNodeImpl;
+import org.raml.yagi.framework.nodes.KeyValueNode;
 
 /**
  * Created. There, you have it.
  */
 public class FacetBuilder extends KeyValueNodeBuilder<FacetBuilder> {
 
-    private String string;
-    private long number;
+    private ValueNodeFactory value;
 
     public FacetBuilder(String name) {
         super(name);
@@ -20,32 +18,17 @@ public class FacetBuilder extends KeyValueNodeBuilder<FacetBuilder> {
         return new FacetBuilder(name);
     }
 
-    public FacetBuilder value(String value) {
+    public FacetBuilder ofType(String typeName) {
 
-        this.string = value;
-        return this;
-    }
-
-    public FacetBuilder value(int value) {
-
-        this.number = value;
-        return this;
-    }
-
-    public FacetBuilder value(long value) {
-
-        this.number = value;
+        this.value = ValueNodeFactories.create(typeName);
         return this;
     }
 
     @Override
-    protected Node createValueNode() {
-
-        if ( string != null ) {
-
-            return new StringNodeImpl(string);
-        } else {
-            return new NumberNode(number);
-        }
+    public KeyValueNode buildNode() {
+        KeyValueNode node = super.buildNode();
+        node.setValue(value.createNode());
+        return node;
     }
+
 }

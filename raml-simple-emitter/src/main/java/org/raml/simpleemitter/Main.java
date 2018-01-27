@@ -54,6 +54,7 @@ public class Main {
 
                         TypeDeclarationBuilder.typeDeclaration("Foo").ofType(
                                 TypeBuilder.type("object")
+                                        .withFacets(FacetBuilder.facet("required").ofType("boolean"))
                                         .withAnnotations(AnnotationBuilder.annotation("Foo")
                                                 .withProperties(PropertyValueBuilder.property("time", "2022-02-02"), PropertyValueBuilder.propertyOfArray("count", 1,2)))
                         ),
@@ -69,7 +70,7 @@ public class Main {
                                 .with(
                                         method("get")
                                                 .description("fooofooofooo")
-                                                .withQueryParameter(ParameterBuilder.parameter("apaaa").ofType("integer").withFacets(FacetBuilder.facet("minimum").value(44)))
+                                                .withQueryParameter(ParameterBuilder.parameter("apaaa").ofType("integer"))
                                                 .withAnnotations(AnnotationBuilder.annotation("Foo").withProperties(
                                                         PropertyValueBuilder.property("time", "2022-02-02"),
                                                         PropertyValueBuilder.propertyOfArray("count", 7)))

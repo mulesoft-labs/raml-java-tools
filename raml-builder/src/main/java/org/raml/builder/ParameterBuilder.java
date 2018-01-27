@@ -4,10 +4,6 @@ import org.raml.v2.internal.impl.commons.nodes.TypeDeclarationNode;
 import org.raml.yagi.framework.nodes.KeyValueNode;
 import org.raml.yagi.framework.nodes.Node;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * Created. There, you have it.
  */
@@ -16,7 +12,6 @@ public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
     private String type;
     private String displayName;
     private String description;
-    private List<FacetBuilder> facets = new ArrayList<>();
     private Boolean required;
 
     private ParameterBuilder(String name) {
@@ -34,11 +29,6 @@ public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
         return this;
     }
 
-    public ParameterBuilder withFacets(FacetBuilder... builders) {
-        this.facets.addAll(Arrays.asList(builders));
-        return this;
-    }
-
     @Override
     protected Node createValueNode() {
         return new TypeDeclarationNode();
@@ -53,14 +43,6 @@ public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
         addProperty(node.getValue(), "displayName", displayName);
         addProperty(node.getValue(), "description", description);
         addProperty(node.getValue(), "required", required);
-
-        if ( ! facets.isEmpty() ) {
-
-            for (FacetBuilder facet : facets) {
-                node.getValue().addChild(facet.buildNode());
-            }
-        }
-
 
         return node;
     }

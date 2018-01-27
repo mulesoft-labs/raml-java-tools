@@ -20,6 +20,8 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
     private List<TypePropertyBuilder> properties = new ArrayList<>();
     private List<ExamplesBuilder> examples = new ArrayList<>();
     private List<AnnotationBuilder> annotations = new ArrayList<>();
+    private List<FacetBuilder> facets = new ArrayList<>();
+
 
     public String[] types;
     private String description;
@@ -68,6 +70,12 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
         return this;
     }
 
+    public TypeBuilder withFacets(FacetBuilder... facetBuilders) {
+
+        this.facets.addAll(Arrays.asList(facetBuilders));
+        return this;
+    }
+
     public TypeBuilder description(String description) {
 
         this.description = description;
@@ -109,6 +117,17 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
             }
         }
 
+
+        if ( ! facets.isEmpty() ) {
+
+            KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("facets"), new ObjectNodeImpl());
+            for (FacetBuilder facetBuilder : facets) {
+                kvn.getValue().addChild(facetBuilder.buildNode());
+            }
+
+            node.addChild(kvn);
+        }
+
         if ( description != null ) {
 
             node.addChild(property("description", description).buildNode());
@@ -133,7 +152,7 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
         if ( ! properties.isEmpty() ) {
 
             KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("properties"), new ObjectNodeImpl());
-            for (NodeBuilder property : properties) {
+            for (TypePropertyBuilder property : properties) {
                 kvn.getValue().addChild(property.buildNode());
             }
 
