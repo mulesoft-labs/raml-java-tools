@@ -37,6 +37,19 @@ public class RamlTypeFactory {
             }
         }
 
+        if ( type instanceof Class && ((Class)type).isArray() ) {
+
+            final Class<?> cls = (Class<?>) type;
+            Optional<RamlType> ramlType =  ScalarType.fromType(cls.getComponentType());
+
+            return CollectionRamlType.of(ramlType.or(new Supplier<RamlType>() {
+                @Override
+                public RamlType get() {
+                    return ComposedRamlType.forClass(cls.getComponentType(), adjuster.adjustTypeName(cls.getComponentType(), cls.getComponentType().getSimpleName(), parser));
+                }
+            }));
+
+        }
         if ( type instanceof Class && Enum.class.isAssignableFrom((Class<?>) type) ) {
 
             final Class<?> cls = (Class<?>) type;

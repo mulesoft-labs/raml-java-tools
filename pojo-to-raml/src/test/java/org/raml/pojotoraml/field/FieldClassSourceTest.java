@@ -26,7 +26,7 @@ public class FieldClassSourceTest {
 
         FieldClassParser source = new FieldClassParser(Fun.class);
         List<Property> props =  source.properties();
-        assertEquals(5, props.size());
+        assertEquals(7, props.size());
         assertEquals("one", props.get(0).name());
         assertEquals(String.class, props.get(0).type());
 

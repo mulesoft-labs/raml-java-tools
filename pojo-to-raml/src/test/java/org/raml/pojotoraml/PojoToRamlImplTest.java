@@ -56,7 +56,7 @@ public class PojoToRamlImplTest {
 
         assertEquals(2, buildTypes.size());
         assertEquals("Fun", buildTypes.get(0).name());
-        assertEquals(5, ((ObjectTypeDeclaration)buildTypes.get(0)).properties().size());
+        assertEquals(7, ((ObjectTypeDeclaration)buildTypes.get(0)).properties().size());
 
         assertEquals("SubFun", buildTypes.get(1).name());
         assertEquals(1, ((ObjectTypeDeclaration)buildTypes.get(1)).properties().size());

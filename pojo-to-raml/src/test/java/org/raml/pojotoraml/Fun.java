@@ -14,4 +14,6 @@ public class Fun {
     SubFun sub;
     List<String> listOfStrings;
     List<SubFun> listOfSubs;
+    int[] arrayOfInts;
+    SubFun[] arrayOfSubs;
 }
