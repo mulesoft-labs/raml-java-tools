@@ -33,35 +33,6 @@ import java.util.List;
  */
 public abstract class Annotations<T> {
 
-
-    public static Annotations<String> CLASS_NAME = new Annotations<String>() {
-
-        @Override
-        public String getWithContext(Annotable target, Annotable... others) {
-
-            return getWithDefault(new TypeInstanceAsStringFunction(), "classname", null, target, others);
-        }
-    };
-
-    public static Annotations<String> IMPLEMENTATION_CLASS_NAME = new Annotations<String>() {
-
-        @Override
-        public String getWithContext(Annotable target, Annotable... others) {
-
-            return getWithDefault(new TypeInstanceAsStringFunction(), "implementationClassName", null, target, others);
-        }
-    };
-
-    public static Annotations<Boolean> USE_PRIMITIVE_TYPE = new Annotations<Boolean>() {
-
-        @Override
-        public Boolean getWithContext(Annotable target, Annotable... others) {
-
-            return getWithDefault(new TypeInstanceAsBooleanFunction(), "usePrimitiveType", false, target, others);
-        }
-
-    };
-
     public static Annotations<Boolean> ABSTRACT = new Annotations<Boolean>() {
 
         @Override
@@ -82,7 +53,7 @@ public abstract class Annotations<T> {
 
 
     private static <T,R> R getWithDefault(Function<TypeInstance, T> convert, String propName, R def, Annotable target, Annotable... others) {
-        R b = Annotations.evaluate(convert, propName, target, others);
+        R b = Annotations.evaluate(convert, "types", propName, target, others);
         if (b == null) {
 
             return def;
@@ -91,7 +62,7 @@ public abstract class Annotations<T> {
         }
     }
 
-    private static <T,R> R evaluate(Function<TypeInstance, T> convert, String parameterName, Annotable mandatory, Annotable... others) {
+    public static <T,R> R evaluate(Function<TypeInstance, T> convert, String annotationName, String parameterName, Annotable mandatory, Annotable... others) {
 
         R retval = null;
         List<Annotable> targets = new ArrayList<>();
@@ -100,7 +71,7 @@ public abstract class Annotations<T> {
 
         for (Annotable target : targets) {
 
-            AnnotationRef annotationRef = Annotations.findRef(target, "types");
+            AnnotationRef annotationRef = Annotations.findRef(target, annotationName);
             if (annotationRef == null) {
 
                 continue;
@@ -145,7 +116,7 @@ public abstract class Annotations<T> {
         });
     }
 
-    private static AnnotationRef findRef(Annotable annotable, String annotation) {
+    public static AnnotationRef findRef(Annotable annotable, String annotation) {
 
         for (AnnotationRef annotationRef : annotable.annotations()) {
             if (annotationRef.annotation().name().equalsIgnoreCase(annotation)) {
