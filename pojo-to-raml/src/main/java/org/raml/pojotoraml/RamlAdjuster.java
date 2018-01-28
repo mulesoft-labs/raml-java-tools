@@ -5,7 +5,7 @@ import org.raml.builder.TypeDeclarationBuilder;
 import org.raml.builder.TypePropertyBuilder;
 
 import java.lang.reflect.Type;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Created. There, you have it.
@@ -44,9 +44,9 @@ public interface RamlAdjuster {
 
     class Composite implements RamlAdjuster {
 
-        private final  List<RamlAdjuster> adjusters;
+        private final  Collection<RamlAdjuster> adjusters;
 
-        public Composite(List<RamlAdjuster> adjusters) {
+        public Composite(Collection<RamlAdjuster> adjusters) {
             this.adjusters = adjusters;
         }
 
