@@ -13,16 +13,21 @@ import java.util.List;
  */
 public class TypePropertyBuilder extends KeyValueNodeBuilder<TypePropertyBuilder> implements AnnotableBuilder<TypePropertyBuilder> {
 
-    private final String type;
+    private final TypeBuilder type;
     private List<AnnotationBuilder> annotations = new ArrayList<>();
 
-    public TypePropertyBuilder(String name, String type) {
+    public TypePropertyBuilder(String name, TypeBuilder type) {
 
         super(name);
         this.type = type;
     }
 
     public static TypePropertyBuilder property(String name, String type) {
+
+        return new TypePropertyBuilder(name, TypeBuilder.type(type));
+    }
+
+    public static TypePropertyBuilder property(String name, TypeBuilder type) {
 
         return new TypePropertyBuilder(name, type);
     }
@@ -38,7 +43,7 @@ public class TypePropertyBuilder extends KeyValueNodeBuilder<TypePropertyBuilder
     public KeyValueNode buildNode() {
 
         KeyValueNode node = super.buildNode();
-        node.getValue().addChild(new KeyValueNodeImpl(new StringNodeImpl("type"), new StringNodeImpl(type)));
+        node.getValue().addChild(new KeyValueNodeImpl(new StringNodeImpl("type"), type.buildNode()));
         if ( ! annotations.isEmpty() ) {
 
             for (AnnotationBuilder annotation : annotations) {

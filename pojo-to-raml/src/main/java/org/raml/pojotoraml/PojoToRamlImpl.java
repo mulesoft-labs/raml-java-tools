@@ -43,7 +43,7 @@ public class PojoToRamlImpl implements PojoToRaml {
     }
 
     @Override
-    public String name(Class<?> clazz) {
+    public TypeBuilder name(Class<?> clazz) {
 
         RamlAdjuster adjuster = this.adjuster.createAdjuster(clazz);
 
@@ -52,11 +52,11 @@ public class PojoToRamlImpl implements PojoToRaml {
 
         if ( type.isScalar()) {
 
-            return type.getRamlSyntax();
+            return TypeBuilder.type(type.getRamlSyntax());
         }
 
         final String simpleName = adjuster.adjustTypeName(parser.underlyingClass(), parser.underlyingClass().getSimpleName(), parser);
-        return simpleName;
+        return TypeBuilder.type(simpleName);
     }
 
     private TypeDeclarationBuilder handleSingleType(ClassParser parser, RamlAdjuster adjuster, Map<String, TypeDeclarationBuilder> builtTypes) {

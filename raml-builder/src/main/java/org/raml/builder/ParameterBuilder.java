@@ -2,14 +2,16 @@ package org.raml.builder;
 
 import org.raml.v2.internal.impl.commons.nodes.TypeDeclarationNode;
 import org.raml.yagi.framework.nodes.KeyValueNode;
+import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
 import org.raml.yagi.framework.nodes.Node;
+import org.raml.yagi.framework.nodes.StringNodeImpl;
 
 /**
  * Created. There, you have it.
  */
 public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
 
-    private String type;
+    private TypeBuilder type;
     private String displayName;
     private String description;
     private Boolean required;
@@ -25,6 +27,12 @@ public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
 
     public ParameterBuilder ofType(String name) {
 
+        this.type = TypeBuilder.type(name);
+        return this;
+    }
+
+    public ParameterBuilder ofType(TypeBuilder name) {
+
         this.type = name;
         return this;
     }
@@ -39,7 +47,11 @@ public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
 
         KeyValueNode node = super.buildNode();
 
-        addProperty(node.getValue(), "type", type);
+        if ( type != null ) {
+
+            node.getValue().addChild(new KeyValueNodeImpl(new StringNodeImpl("type"), type.buildNode()));
+        }
+
         addProperty(node.getValue(), "displayName", displayName);
         addProperty(node.getValue(), "description", description);
         addProperty(node.getValue(), "required", required);

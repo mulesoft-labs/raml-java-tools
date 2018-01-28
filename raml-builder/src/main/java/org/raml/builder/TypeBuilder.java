@@ -1,5 +1,6 @@
 package org.raml.builder;
 
+import com.google.common.base.Joiner;
 import org.raml.v2.internal.impl.commons.nodes.FacetNode;
 import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
 import org.raml.yagi.framework.nodes.ObjectNode;
@@ -34,6 +35,16 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
     public TypeBuilder(String[] types) {
 
         this.types = types;
+    }
+
+    public String id() {
+
+        if (types.length == 1) {
+            return types[0];
+        } else {
+
+            return "[" + Joiner.on(",").join(types) + "]";
+        }
     }
 
     static public TypeBuilder type(String type) {
