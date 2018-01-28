@@ -15,9 +15,11 @@
  */
 package org.raml.pojotoraml.types;
 
+import org.raml.builder.TypeBuilder;
+
 public interface RamlType {
 
-  String getRamlSyntax();
+  TypeBuilder getRamlSyntax();
   boolean isScalar();
   boolean isEnum();
   Class<?> type();

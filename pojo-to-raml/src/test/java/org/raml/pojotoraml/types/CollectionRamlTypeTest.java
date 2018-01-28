@@ -12,11 +12,11 @@ public class CollectionRamlTypeTest {
     @Test
     public void wrappingScalar() throws Exception {
 
-        CollectionRamlType collectionRamlType = CollectionRamlType.of(ScalarType.BOOLEAN);
+        CollectionRamlType collectionRamlType = CollectionRamlType.of(ScalarType.fromType(boolean.class).get());
 
         assertTrue(collectionRamlType.isScalar());
         assertEquals(boolean.class, collectionRamlType.type());
-        assertEquals("boolean[]", collectionRamlType.getRamlSyntax());
+        assertEquals("array", collectionRamlType.getRamlSyntax().id());
     }
 
     @Test
@@ -26,7 +26,7 @@ public class CollectionRamlTypeTest {
 
         assertFalse(collectionRamlType.isScalar());
         assertEquals(Fun.class, collectionRamlType.type());
-        assertEquals("myName[]", collectionRamlType.getRamlSyntax());
+        assertEquals("array", collectionRamlType.getRamlSyntax().id());
     }
 
 }

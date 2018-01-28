@@ -28,6 +28,8 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
     private String description;
     private ValueNodeFactory enumValues;
 
+    private TypeBuilder arrayItems;
+
     private TypeBuilder(String type) {
         this.types= new String[] {type};
     }
@@ -35,6 +37,11 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
     public TypeBuilder(String[] types) {
 
         this.types = types;
+    }
+
+    public TypeBuilder(TypeBuilder builder) {
+        this.types = new String[] {"array"};
+        this.arrayItems = builder;
     }
 
     public String id() {
@@ -50,6 +57,11 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
     static public TypeBuilder type(String type) {
 
         return new TypeBuilder(type);
+    }
+
+    static public TypeBuilder arrayOf(TypeBuilder builder) {
+
+        return new TypeBuilder(builder);
     }
 
     static public TypeBuilder type() {
@@ -113,7 +125,7 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
     @Override
     public ObjectNode buildNode() {
 
-        ObjectNodeImpl node = new ObjectNodeImpl();
+        ObjectNode node = super.buildNode();
 
         if ( types != null ) {
             if (types.length == 1) {
@@ -177,6 +189,13 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
                 kvn.getValue().addChild(example.buildNode());
             }
 
+            node.addChild(kvn);
+        }
+
+
+        if (  arrayItems != null  ) {
+
+            KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("items"), arrayItems.buildNode());
             node.addChild(kvn);
         }
 

@@ -1,5 +1,7 @@
 package org.raml.pojotoraml.types;
 
+import org.raml.builder.TypeBuilder;
+
 /**
  * Created. There, you have it.
  */
@@ -13,8 +15,8 @@ public class CollectionRamlType  implements RamlType{
     }
 
     @Override
-    public String getRamlSyntax() {
-        return type.getRamlSyntax() + "[]";
+    public TypeBuilder getRamlSyntax() {
+        return TypeBuilder.arrayOf(type.getRamlSyntax());
     }
 
     @Override

@@ -52,7 +52,7 @@ public class PojoToRamlImpl implements PojoToRaml {
 
         if ( type.isScalar()) {
 
-            return TypeBuilder.type(type.getRamlSyntax());
+            return type.getRamlSyntax();
         }
 
         final String simpleName = adjuster.adjustTypeName(parser.underlyingClass(), parser.underlyingClass().getSimpleName(), parser);
@@ -64,7 +64,7 @@ public class PojoToRamlImpl implements PojoToRaml {
         RamlType quickType = exploreType(parser, parser.underlyingClass(), adjuster);
         if ( quickType.isScalar()) {
 
-            return TypeDeclarationBuilder.typeDeclaration(quickType.getRamlSyntax());
+            return TypeDeclarationBuilder.typeDeclaration(quickType.getRamlSyntax().id()).ofType(quickType.getRamlSyntax());
         }
 
         if ( quickType.isEnum()) {
@@ -119,7 +119,7 @@ public class PojoToRamlImpl implements PojoToRaml {
         );
 
         adjuster.adjustType(quickType.type(), typeBuilder);
-        return TypeDeclarationBuilder.typeDeclaration(quickType.getRamlSyntax()).ofType(typeBuilder);
+        return TypeDeclarationBuilder.typeDeclaration(quickType.getRamlSyntax().id()).ofType(typeBuilder);
     }
 
     private TypeBuilder buildSuperType(ClassParser parser, RamlAdjuster adjuster, Map<String, TypeDeclarationBuilder> builtTypes) {
