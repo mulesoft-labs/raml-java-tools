@@ -47,7 +47,7 @@ public class PojoToRamlImplTest {
     @Test
     public void simpleStuff() throws Exception {
 
-        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), RamlAdjuster.NULL_ADJUSTER);
+        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), AdjusterFactory.NULL_FACTORY);
         Result types =  pojoToRaml.classToRaml(Fun.class);
 
         Api api = createApi(types);
@@ -65,7 +65,7 @@ public class PojoToRamlImplTest {
     @Test
     public void withInheritance() throws Exception {
 
-        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), RamlAdjuster.NULL_ADJUSTER);
+        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), AdjusterFactory.NULL_FACTORY);
         Result types =  pojoToRaml.classToRaml(Inheriting.class);
 
         Api api = createApi(types);
@@ -96,7 +96,7 @@ public class PojoToRamlImplTest {
                     }
                 };
             }
-        }, RamlAdjuster.NULL_ADJUSTER);
+        }, AdjusterFactory.NULL_FACTORY);
         Result types =  pojoToRaml.classToRaml(MultipleInheriting.class);
 
         Api api = createApi(types);
@@ -112,7 +112,7 @@ public class PojoToRamlImplTest {
     @Test
     public void scalarType() throws Exception {
 
-        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), RamlAdjuster.NULL_ADJUSTER);
+        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), AdjusterFactory.NULL_FACTORY);
         Result types =  pojoToRaml.classToRaml(String.class);
 
         Api api = createApi(types);
@@ -128,7 +128,7 @@ public class PojoToRamlImplTest {
     @Test
     public void enumeration() throws Exception {
 
-        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), RamlAdjuster.NULL_ADJUSTER);
+        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), AdjusterFactory.NULL_FACTORY);
         Result types =  pojoToRaml.classToRaml(SimpleEnum.class);
 
         Api api = createApi(types);
@@ -146,7 +146,7 @@ public class PojoToRamlImplTest {
     @Test
     public void enumerationLive() throws Exception {
 
-        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), RamlAdjuster.NULL_ADJUSTER);
+        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), AdjusterFactory.NULL_FACTORY);
         Result types =  pojoToRaml.classToRaml(SimpleEnum.class);
 
         Api api = createApi(types);
