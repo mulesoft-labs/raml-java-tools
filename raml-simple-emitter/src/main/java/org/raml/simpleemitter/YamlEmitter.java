@@ -87,7 +87,7 @@ public class YamlEmitter {
     private void writeQuoted(String value) throws IOException {
 
         boolean escapeChar = value != null
-                && (value.matches("[-|#{}?&!>':%@`,\\[\\]\"].*") || value.matches(".*:.*"));
+                && (value.matches(".*?[\"].*"));
 
         if (escapeChar || value.contains("\n")) {
 
@@ -96,7 +96,13 @@ public class YamlEmitter {
             String[] str = value.split("\n");
             writer.write(Joiner.on("\n" + indentationString(indent + 1)).join(str));
         } else {
-            writer.write("\"" + value + "\"");
+            if  (value.matches(".*?[-*|#{}?&!>':%@`,\\[\\]\"].*")) {
+
+                writer.write("\"" + value + "\"");
+            } else {
+                writer.write(value);
+            }
+
         }
         writer.flush();
     }

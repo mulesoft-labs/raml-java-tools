@@ -3,15 +3,12 @@ package org.raml.simpleemitter;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.raml.testutils.UnitTest;
-import org.raml.v2.internal.impl.commons.nodes.TypeExpressionNode;
-import org.raml.yagi.framework.nodes.SimpleTypeNode;
 import org.raml.yagi.framework.nodes.StringNode;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.StringWriter;
 import java.io.Writer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
@@ -24,13 +21,23 @@ public class YamlEmitterTest extends UnitTest {
     private StringNode stringNode;
 
     @Test
-    public void writeValue() throws Exception {
+    public void writeValueClean() throws Exception {
 
         when(stringNode.getLiteralValue()).thenReturn("hello");
         YamlEmitter emitter = new YamlEmitter(writer, 0);
         emitter.writeValue(stringNode);
 
-        assertEquals("\"hello\"", writer.toString());
+        assertEquals("hello", writer.toString());
+    }
+
+    @Test
+    public void writeValue() throws Exception {
+
+        when(stringNode.getLiteralValue()).thenReturn("hel@lo");
+        YamlEmitter emitter = new YamlEmitter(writer, 0);
+        emitter.writeValue(stringNode);
+
+        assertEquals("\"hel@lo\"", writer.toString());
     }
 
     @Test
@@ -41,6 +48,16 @@ public class YamlEmitterTest extends UnitTest {
         emitter.writeValue(stringNode);
 
         assertEquals("|\n    hello\n    man", writer.toString());
+    }
+
+    @Test
+    public void writeMultilineValueBecauseOfQuote() throws Exception {
+
+        when(stringNode.getLiteralValue()).thenReturn("hello\"man");
+        YamlEmitter emitter = new YamlEmitter(writer, 0);
+        emitter.writeValue(stringNode);
+
+        assertEquals("|\n    hello\"man", writer.toString());
     }
 
     @Test
