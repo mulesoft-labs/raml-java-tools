@@ -1,18 +1,12 @@
 package org.raml.simpleemitter;
 
 import com.google.common.base.Joiner;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
-import org.raml.v2.api.model.v10.system.types.MarkdownString;
-import org.raml.v2.api.model.v10.system.types.StatusCodeString;
-import org.raml.v2.internal.impl.commons.nodes.TypeExpressionNode;
-import org.raml.yagi.framework.nodes.AbstractStringNode;
 import org.raml.yagi.framework.nodes.SimpleTypeNode;
 import org.raml.yagi.framework.nodes.StringNode;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.List;
 
 /**
  * Created. There, you have it.
@@ -92,7 +86,10 @@ public class YamlEmitter {
 
     private void writeQuoted(String value) throws IOException {
 
-        if (value.contains("\n")) {
+        boolean escapeChar = value != null
+                && (value.matches("[-|#{}?&!>':%@`,\\[\\]\"].*") || value.matches(".*:.*"));
+
+        if (escapeChar || value.contains("\n")) {
 
             writer.write("|\n");
             writer.write(indentationString(indent + 1));
