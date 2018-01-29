@@ -128,6 +128,11 @@ public class PojoToRamlImpl implements PojoToRaml {
         if ( types != null ) {
             for (Type supertype : types) {
 
+                // Currently a workaround.
+                if ( supertype instanceof Class && ((Class)supertype).getPackage().getName().startsWith("java.")) {
+                    continue;
+                }
+
                 RamlType ramlType = exploreType(parser, supertype, adjuster);
 
                 ClassParser subParser = classParserFactory.createParser((ramlType.type()));
