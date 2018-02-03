@@ -37,7 +37,7 @@ public class PojoToRamlImpl implements PojoToRaml {
         }
 
         Map<String, TypeDeclarationBuilder> dependentTypes = new HashMap<>();
-        TypeDeclarationBuilder builder = handleSingleType(classParserFactory.createParser(clazz), dependentTypes);
+        TypeDeclarationBuilder builder = handleSingleType(clazz, dependentTypes);
         dependentTypes.remove(builder.id());
         return new Result(builder, dependentTypes);
     }
@@ -55,13 +55,14 @@ public class PojoToRamlImpl implements PojoToRaml {
             return type.getRamlSyntax();
         }
 
-        final String simpleName = adjuster.adjustTypeName(parser.underlyingClass(), parser.underlyingClass().getSimpleName(), parser);
+        final String simpleName = adjuster.adjustTypeName(clazz, clazz.getSimpleName());
         return TypeBuilder.type(simpleName);
     }
 
-    private TypeDeclarationBuilder handleSingleType(ClassParser parser, Map<String, TypeDeclarationBuilder> builtTypes) {
+    private TypeDeclarationBuilder handleSingleType(Class<?> clazz, Map<String, TypeDeclarationBuilder> builtTypes) {
 
-        RamlType quickType = exploreType(parser, parser.underlyingClass());
+        ClassParser parser = classParserFactory.createParser(clazz);
+        RamlType quickType = exploreType(parser, clazz);
         if ( quickType.isScalar()) {
 
             return TypeDeclarationBuilder.typeDeclaration(quickType.getRamlSyntax().id()).ofType(quickType.getRamlSyntax());
@@ -69,20 +70,20 @@ public class PojoToRamlImpl implements PojoToRaml {
 
         if ( quickType.isEnum()) {
 
-            return handleEnum(quickType, adjusterFactory.createAdjuster(parser.underlyingClass()));
+            return handleEnum(quickType, adjusterFactory.createAdjuster(clazz));
         }
 
-        final String simpleName = adjusterFactory.createAdjuster(parser.underlyingClass()).adjustTypeName(parser.underlyingClass(), parser.underlyingClass().getSimpleName(), parser);
+        final String simpleName = adjusterFactory.createAdjuster(clazz).adjustTypeName(clazz, clazz.getSimpleName());
 
-        TypeBuilder builder = buildSuperType(parser, builtTypes);
+        TypeBuilder builder = buildSuperType(clazz, builtTypes);
 
-        builder = adjusterFactory.createAdjuster(parser.underlyingClass()).adjustType(parser.underlyingClass(), builder);
+        builder = adjusterFactory.createAdjuster(clazz).adjustType(clazz, builder);
         TypeDeclarationBuilder typeDeclaration = TypeDeclarationBuilder.typeDeclaration(simpleName).ofType(builder);
         if ( !ScalarType.isRamalScalarType(simpleName)) {
             builtTypes.put(simpleName, typeDeclaration);
         }
 
-        for (Property property : parser.properties()) {
+        for (Property property : parser.properties(clazz)) {
 
             RamlType ramlType = exploreType(parser, property.type());
 
@@ -91,11 +92,10 @@ public class PojoToRamlImpl implements PojoToRaml {
                 builder.withProperty(adjusterFactory.createAdjuster(ramlType.type()).adjustScalarProperty(typeDeclaration, property,  typePropertyBuilder));
             } else {
 
-                ClassParser subParser = classParserFactory.createParser(ramlType.type());
-                final String subSimpleName = adjusterFactory.createAdjuster(parser.underlyingClass()).adjustTypeName(parser.underlyingClass(), ramlType.type().getSimpleName(), parser);
+                final String subSimpleName = adjusterFactory.createAdjuster(clazz).adjustTypeName(clazz, ramlType.type().getSimpleName());
                 if ( ! builtTypes.containsKey(subSimpleName)) {
 
-                    handleSingleType(subParser, builtTypes);
+                    handleSingleType(ramlType.type(), builtTypes);
                 }
                 TypePropertyBuilder typePropertyBuilder = TypePropertyBuilder.property(property.name(), ramlType.getRamlSyntax());
 
@@ -123,8 +123,9 @@ public class PojoToRamlImpl implements PojoToRaml {
         return TypeDeclarationBuilder.typeDeclaration(quickType.getRamlSyntax().id()).ofType(typeBuilder);
     }
 
-    private TypeBuilder buildSuperType(ClassParser parser, Map<String, TypeDeclarationBuilder> builtTypes) {
-        Collection<Type> types = parser.parentClasses();
+    private TypeBuilder buildSuperType(Class<?> clazz, Map<String, TypeDeclarationBuilder> builtTypes) {
+        ClassParser parser = classParserFactory.createParser(clazz);
+        Collection<Type> types = parser.parentClasses(clazz);
         ArrayList<String> typeNames = new ArrayList<>();
         if ( types != null ) {
             for (Type supertype : types) {
@@ -136,11 +137,10 @@ public class PojoToRamlImpl implements PojoToRaml {
 
                 RamlType ramlType = exploreType(parser, supertype);
 
-                ClassParser subParser = classParserFactory.createParser((ramlType.type()));
-                final String subSimpleName = adjusterFactory.createAdjuster(parser.underlyingClass()).adjustTypeName(parser.underlyingClass(), ramlType.type().getSimpleName(), parser);
+                final String subSimpleName = adjusterFactory.createAdjuster(ramlType.type()).adjustTypeName(ramlType.type(), ramlType.type().getSimpleName());
                 if (!builtTypes.containsKey(subSimpleName)) {
 
-                    handleSingleType(subParser, builtTypes);
+                    handleSingleType(ramlType.type(), builtTypes);
                 }
 
                 typeNames.add(subSimpleName);

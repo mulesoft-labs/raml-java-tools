@@ -27,7 +27,7 @@ public interface RamlAdjuster {
         }
 
         @Override
-        public String adjustTypeName(Class<?> aClass, String name, ClassParser parser) {
+        public String adjustTypeName(Class<?> aClass, String name) {
             return name;
         }
 
@@ -70,10 +70,10 @@ public interface RamlAdjuster {
         }
 
         @Override
-        public String adjustTypeName(Class<?> aClass, String name, ClassParser parser) {
+        public String adjustTypeName(Class<?> aClass, String name) {
             String val = name;
             for (RamlAdjuster adjuster : adjusters) {
-                val = adjuster.adjustTypeName(aClass, val, parser);
+                val = adjuster.adjustTypeName(aClass, val);
             }
             return val;
         }
@@ -96,9 +96,46 @@ public interface RamlAdjuster {
             return val;
         }
     }
+
+    /**
+     * If the type being adjusted is an enumeration, you may change the enumerated value's name.
+     * @param type
+     * @param name
+     * @return
+     */
     String adjustEnumValue(Class<?> type, String name);
+
+    /**
+     * Changes the type.  You may RAML information to the type builder (or change it entirely).
+     * @param type
+     * @param builder
+     * @return
+     */
     TypeBuilder adjustType(Type type, TypeBuilder builder);
-    String adjustTypeName(Class<?> aClass, String name, ClassParser parser);
+
+    /**
+     * Allows you to change the name when used as a reference.
+     * @param aClass
+     * @param name
+     * @return
+     */
+    String adjustTypeName(Class<?> aClass, String name);
+
+    /**
+     * You may change the property definition for a given scalar type.
+     * @param typeDeclaration
+     * @param property
+     * @param typePropertyBuilder
+     * @return
+     */
     TypePropertyBuilder adjustScalarProperty(TypeDeclarationBuilder typeDeclaration, Property property, TypePropertyBuilder typePropertyBuilder);
+
+    /**
+     * You may change the property definition for a given composed type.
+     * @param typeDeclaration
+     * @param property
+     * @param typePropertyBuilder
+     * @return
+     */
     TypePropertyBuilder adjustComposedProperty(TypeDeclarationBuilder typeDeclaration, Property property, TypePropertyBuilder typePropertyBuilder);
 }

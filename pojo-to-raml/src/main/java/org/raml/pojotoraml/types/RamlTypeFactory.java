@@ -34,7 +34,7 @@ public class RamlTypeFactory {
                     public RamlType get() {
 
                         RamlAdjuster adjuster = adjusterFactory.createAdjuster(cls);
-                        return ComposedRamlType.forClass(cls, adjuster.adjustTypeName(cls, cls.getSimpleName(), parser));
+                        return ComposedRamlType.forClass(cls, adjuster.adjustTypeName(cls, cls.getSimpleName()));
                     }
                 }));
             }
@@ -50,7 +50,7 @@ public class RamlTypeFactory {
                 public RamlType get() {
 
                     RamlAdjuster adjuster = adjusterFactory.createAdjuster(cls.getComponentType());
-                    return ComposedRamlType.forClass(cls.getComponentType(), adjuster.adjustTypeName(cls.getComponentType(), cls.getComponentType().getSimpleName(), parser));
+                    return ComposedRamlType.forClass(cls.getComponentType(), adjuster.adjustTypeName(cls.getComponentType(), cls.getComponentType().getSimpleName()));
                 }
             }));
 
@@ -59,7 +59,7 @@ public class RamlTypeFactory {
 
             final Class<?> cls = (Class<?>) type;
             RamlAdjuster adjuster = adjusterFactory.createAdjuster(cls);
-            return EnumRamlType.forClass(cls, adjuster.adjustTypeName(cls, cls.getSimpleName(), parser));
+            return EnumRamlType.forClass(cls, adjuster.adjustTypeName(cls, cls.getSimpleName()));
         }
 
         if ( type instanceof Class ) {
@@ -71,7 +71,7 @@ public class RamlTypeFactory {
                 @Override
                 public RamlType get() {
                     RamlAdjuster adjuster = adjusterFactory.createAdjuster(cls);
-                    return ComposedRamlType.forClass(cls, adjuster.adjustTypeName(cls, cls.getSimpleName(), parser));
+                    return ComposedRamlType.forClass(cls, adjuster.adjustTypeName(cls, cls.getSimpleName()));
                 }
             });
         }

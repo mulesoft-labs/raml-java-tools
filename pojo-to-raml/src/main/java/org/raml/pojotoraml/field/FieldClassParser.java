@@ -16,22 +16,11 @@ import java.util.List;
  */
 public class FieldClassParser implements ClassParser {
 
-    private final Class<?> classSource;
-
-    public FieldClassParser(Class<?> classSource) {
-        this.classSource = classSource;
-    }
-
     @Override
-    public Class<?> underlyingClass() {
-        return classSource;
-    }
-
-    @Override
-    public List<Property> properties() {
+    public List<Property> properties(Class<?> sourceClass) {
 
         List<Property> props = new ArrayList<>();
-        for (final Field field : classSource.getDeclaredFields()) {
+        for (final Field field : sourceClass.getDeclaredFields()) {
 
             if (! Modifier.isTransient(field.getModifiers())) {
                 Property prop = new FieldProperty(field);
@@ -42,25 +31,21 @@ public class FieldClassParser implements ClassParser {
     }
 
     @Override
-    public Collection<Type> parentClasses() {
+    public Collection<Type> parentClasses(Class<?> sourceClass) {
 
         ArrayList<Type> type = new ArrayList<>();
-        if ( classSource.getSuperclass() != Object.class && classSource.getSuperclass() != null ) {
-            type.add(classSource.getSuperclass());
+        if ( sourceClass.getSuperclass() != Object.class && sourceClass.getSuperclass() != null ) {
+            type.add(sourceClass.getSuperclass());
         }
         return type;
     }
 
-    public static FieldClassParser extractFieldsFrom(Class<?> classSource) {
-
-        return new FieldClassParser(classSource);
-    }
 
     public static ClassParserFactory factory() {
         return new ClassParserFactory() {
             @Override
             public ClassParser createParser(Class<?> clazz) {
-                return new FieldClassParser(clazz);
+                return new FieldClassParser();
             }
         };
     }

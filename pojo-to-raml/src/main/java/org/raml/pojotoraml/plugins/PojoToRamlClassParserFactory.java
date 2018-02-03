@@ -24,7 +24,6 @@ import org.raml.pojotoraml.ClassParserFactory;
 import org.raml.pojotoraml.field.FieldClassParser;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * Created. There, you have it.
@@ -45,8 +44,8 @@ public class PojoToRamlClassParserFactory implements ClassParserFactory {
     ClassParser parser = null;
     if (generator != null) {
       try {
-        parser = generator.parser().getConstructor(Class.class).newInstance(clazz);
-      } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        parser = generator.parser().newInstance();
+      } catch (InstantiationException | IllegalAccessException e) {
       }
     }
 
@@ -66,17 +65,17 @@ public class PojoToRamlClassParserFactory implements ClassParserFactory {
             @Override
             public ClassParser apply(@Nullable RamlGeneratorForClass ramlGeneratorForClass) {
               try {
-                return ramlGeneratorForClass.generator().parser().getConstructor(Class.class).newInstance(clazz);
-              } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                return ramlGeneratorForClass.generator().parser().newInstance();
+              } catch (InstantiationException | IllegalAccessException e) {
 
                 return null;
               }
             }
           });
 
-      return classParserOptional.or(new FieldClassParser(clazz));
+      return classParserOptional.or(new FieldClassParser());
     }
 
-    return Optional.fromNullable(parser).or(new FieldClassParser(clazz));
+    return Optional.fromNullable(parser).or(new FieldClassParser());
   }
 }

@@ -83,9 +83,9 @@ public class PojoToRamlImplTest {
         PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(new ClassParserFactory() {
             @Override
             public ClassParser createParser(final Class<?> clazz) {
-                return new FieldClassParser(clazz) {
+                return new FieldClassParser() {
                     @Override
-                    public Collection<Type> parentClasses() {
+                    public Collection<Type> parentClasses(Class<?> sourceClass) {
                         return FluentIterable.of(clazz.getInterfaces()).transform(new Function<Class<?>, Type>() {
                             @Nullable
                             @Override
@@ -143,23 +143,6 @@ public class PojoToRamlImplTest {
         emitter.emit(api);
     }
 
-    @Test
-    public void enumerationLive() throws Exception {
-
-        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), AdjusterFactory.NULL_FACTORY);
-        Result types =  pojoToRaml.classToRaml(SimpleEnum.class);
-
-        Api api = createApi(types);
-
-        List<TypeDeclaration> buildTypes = api.types();
-
-        assertEquals(1, buildTypes.size());
-        assertEquals("SimpleEnum", buildTypes.get(0).name());
-        assertArrayEquals(new String[] {"ONE", "TWO"}, ((StringTypeDeclaration) buildTypes.get(0)).enumValues().toArray(new String[0]));
-
-        Emitter emitter = new Emitter();
-        emitter.emit(api);
-    }
 
     protected Api createApi(Result types) throws IOException {
         RamlDocumentBuilder ramlDocumentBuilder = RamlDocumentBuilder

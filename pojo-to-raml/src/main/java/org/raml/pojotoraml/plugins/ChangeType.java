@@ -18,7 +18,6 @@ package org.raml.pojotoraml.plugins;
 import org.raml.builder.TypeBuilder;
 import org.raml.builder.TypeDeclarationBuilder;
 import org.raml.builder.TypePropertyBuilder;
-import org.raml.pojotoraml.ClassParser;
 import org.raml.pojotoraml.Property;
 import org.raml.pojotoraml.RamlAdjuster;
 
@@ -38,7 +37,7 @@ public class ChangeType extends RamlAdjuster.Helper {
 
 
   @Override
-  public String adjustTypeName(Class<?> type, String name, ClassParser parser) {
+  public String adjustTypeName(Class<?> type, String name) {
 
     return arguments.get(0);
   }

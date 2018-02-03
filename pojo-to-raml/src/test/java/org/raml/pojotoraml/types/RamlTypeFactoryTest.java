@@ -38,7 +38,7 @@ public class RamlTypeFactoryTest  extends UnitTest {
     public void forComposed() throws Exception {
 
         when(adjusterFactory.createAdjuster(SubFun.class)).thenReturn(adjuster);
-        when(adjuster.adjustTypeName(SubFun.class, "SubFun", classParser)).thenReturn("foo");
+        when(adjuster.adjustTypeName(SubFun.class, "SubFun")).thenReturn("foo");
         RamlType type = RamlTypeFactory.forType(Fun.class.getDeclaredField("sub").getGenericType(), classParser, adjusterFactory);
         assertTrue(type instanceof ComposedRamlType);
         assertEquals("foo", type.getRamlSyntax().id());
@@ -66,7 +66,7 @@ public class RamlTypeFactoryTest  extends UnitTest {
     public void forListOfComposed() throws Exception {
 
         when(adjusterFactory.createAdjuster(SubFun.class)).thenReturn(RamlAdjuster.NULL_ADJUSTER);
-        when(adjuster.adjustTypeName(SubFun.class, "SubFun", classParser)).thenReturn("foo");
+        when(adjuster.adjustTypeName(SubFun.class, "SubFun")).thenReturn("foo");
         RamlType type = RamlTypeFactory.forType(Fun.class.getDeclaredField("listOfSubs").getGenericType(), classParser, adjusterFactory);
         assertTrue(type instanceof CollectionRamlType);
         assertEquals("array", type.getRamlSyntax().id());
