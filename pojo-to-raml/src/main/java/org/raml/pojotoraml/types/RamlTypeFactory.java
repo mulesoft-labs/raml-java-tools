@@ -2,6 +2,7 @@ package org.raml.pojotoraml.types;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
+import org.raml.pojotoraml.AdjusterFactory;
 import org.raml.pojotoraml.ClassParser;
 import org.raml.pojotoraml.RamlAdjuster;
 
@@ -14,7 +15,7 @@ import java.util.Collection;
  */
 public class RamlTypeFactory {
 
-    public static RamlType forType(Type type, final ClassParser parser, final RamlAdjuster adjuster) {
+    public static RamlType forType(Type type, final ClassParser parser, final AdjusterFactory adjusterFactory) {
 
         if ( type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
@@ -31,6 +32,8 @@ public class RamlTypeFactory {
                 return CollectionRamlType.of(ramlType.or(new Supplier<RamlType>() {
                     @Override
                     public RamlType get() {
+
+                        RamlAdjuster adjuster = adjusterFactory.createAdjuster(cls);
                         return ComposedRamlType.forClass(cls, adjuster.adjustTypeName(cls, cls.getSimpleName(), parser));
                     }
                 }));
@@ -45,6 +48,8 @@ public class RamlTypeFactory {
             return CollectionRamlType.of(ramlType.or(new Supplier<RamlType>() {
                 @Override
                 public RamlType get() {
+
+                    RamlAdjuster adjuster = adjusterFactory.createAdjuster(cls.getComponentType());
                     return ComposedRamlType.forClass(cls.getComponentType(), adjuster.adjustTypeName(cls.getComponentType(), cls.getComponentType().getSimpleName(), parser));
                 }
             }));
@@ -53,6 +58,7 @@ public class RamlTypeFactory {
         if ( type instanceof Class && Enum.class.isAssignableFrom((Class<?>) type) ) {
 
             final Class<?> cls = (Class<?>) type;
+            RamlAdjuster adjuster = adjusterFactory.createAdjuster(cls);
             return EnumRamlType.forClass(cls, adjuster.adjustTypeName(cls, cls.getSimpleName(), parser));
         }
 
@@ -64,6 +70,7 @@ public class RamlTypeFactory {
             return ramlType.or(new Supplier<RamlType>() {
                 @Override
                 public RamlType get() {
+                    RamlAdjuster adjuster = adjusterFactory.createAdjuster(cls);
                     return ComposedRamlType.forClass(cls, adjuster.adjustTypeName(cls, cls.getSimpleName(), parser));
                 }
             });

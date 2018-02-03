@@ -23,7 +23,9 @@ import org.raml.builder.TypeBuilder;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public enum ScalarType implements RamlType {
     NUMBER("number", new ImmutableMap.Builder<Class<?>, String>()
@@ -81,6 +83,14 @@ public enum ScalarType implements RamlType {
         builder.put(Boolean.class, BOOLEAN);
 
         JAVA_TO_RAML_TYPES = builder.build();
+    }
+
+    private static final Set<String> SCALAR_TYPES = new HashSet<>();
+    static {
+        for (ScalarType scalarType : ScalarType.values()) {
+
+            SCALAR_TYPES.add(scalarType.ramlSyntax);
+        }
     }
 
     private final String ramlSyntax;
@@ -151,5 +161,9 @@ public enum ScalarType implements RamlType {
         return Optional.of(wrappedType);
     }
 
+    public static boolean  isRamalScalarType(String type) {
+
+        return SCALAR_TYPES.contains(type);
+    }
 
 }
