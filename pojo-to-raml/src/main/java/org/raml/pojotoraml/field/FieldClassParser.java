@@ -45,7 +45,7 @@ public class FieldClassParser implements ClassParser {
     public Collection<Type> parentClasses() {
 
         ArrayList<Type> type = new ArrayList<>();
-        if ( classSource.getSuperclass() != Object.class) {
+        if ( classSource.getSuperclass() != Object.class && classSource.getSuperclass() != null ) {
             type.add(classSource.getSuperclass());
         }
         return type;
