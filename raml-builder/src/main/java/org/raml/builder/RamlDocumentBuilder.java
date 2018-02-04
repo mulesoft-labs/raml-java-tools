@@ -6,7 +6,10 @@ import org.raml.v2.internal.impl.commons.model.DefaultModelElement;
 import org.raml.v2.internal.impl.commons.model.StringType;
 import org.raml.v2.internal.impl.commons.model.factory.TypeDeclarationModelFactory;
 import org.raml.v2.internal.impl.commons.nodes.RamlDocumentNode;
-import org.raml.yagi.framework.model.*;
+import org.raml.yagi.framework.model.DefaultModelBindingConfiguration;
+import org.raml.yagi.framework.model.ModelBindingConfiguration;
+import org.raml.yagi.framework.model.NodeModel;
+import org.raml.yagi.framework.model.NodeModelFactory;
 import org.raml.yagi.framework.nodes.KeyValueNode;
 import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
 import org.raml.yagi.framework.nodes.Node;
@@ -101,7 +104,8 @@ public class RamlDocumentBuilder implements NodeBuilder, ModelBuilder<Api> {
         NodeModelFactory fac = binding.bindingOf(Api.class);
         Node node = buildNode();
         NodeModel model = fac.create(node);
-        return  ModelProxyBuilder.createModel(Api.class, model, binding);
+        //return ModelProxyBuilder.createModel(Api.class, model, binding);
+        return Util.buildModel(binding, node, Api.class);
     }
 
     static private ModelBindingConfiguration createV10Binding()

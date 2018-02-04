@@ -1,13 +1,28 @@
 package org.raml.builder;
 
+import org.raml.v2.api.loader.ResourceLoader;
+import org.raml.v2.api.model.v10.RamlFragment;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import org.raml.v2.internal.impl.commons.RamlHeader;
 import org.raml.v2.internal.impl.commons.model.DefaultModelElement;
 import org.raml.v2.internal.impl.commons.model.StringType;
 import org.raml.v2.internal.impl.commons.model.factory.TypeDeclarationModelFactory;
+import org.raml.v2.internal.impl.commons.phase.*;
+import org.raml.v2.internal.impl.v10.Raml10Builder;
+import org.raml.v2.internal.impl.v10.grammar.Raml10Grammar;
+import org.raml.v2.internal.impl.v10.phase.AnnotationValidationPhase;
+import org.raml.v2.internal.impl.v10.phase.ExampleValidationPhase;
+import org.raml.v2.internal.impl.v10.phase.MediaTypeInjectionPhase;
+import org.raml.v2.internal.impl.v10.phase.ReferenceResolverTransformer;
 import org.raml.yagi.framework.model.*;
+import org.raml.yagi.framework.nodes.ErrorNode;
 import org.raml.yagi.framework.nodes.Node;
 import org.raml.yagi.framework.phase.GrammarPhase;
+import org.raml.yagi.framework.phase.Phase;
+import org.raml.yagi.framework.phase.TransformationPhase;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static org.raml.v2.api.RamlModelBuilder.MODEL_PACKAGE;
 import static org.raml.v2.api.model.v10.RamlFragment.Default;
@@ -30,16 +45,84 @@ public class Util {
         return bindingConfiguration;
     }
 
-    public static<T> T buildModel(ModelBindingConfiguration binding, Node node, Class<T> cls) {
+    public static <T> T buildModel(ModelBindingConfiguration binding, Node node, Class<T> cls) {
         NodeModelFactory fac = binding.bindingOf(cls);
         NodeModel model = fac.create(node);
-        T m =  ModelProxyBuilder.createModel(cls, model, binding);
+        T m = ModelProxyBuilder.createModel(cls, model, binding);
 
-        final GrammarPhase grammarPhase = new GrammarPhase(RamlHeader.getFragmentRule(new RamlHeader(RAML_10, Default).getFragment()));
-        Node newNode = ((NodeModel) m).getNode().copy();
+        final Phase grammarPhase = createPhases(null, new RamlHeader(RAML_10, Default).getFragment());
+        Node newNode = ((NodeModel) m).getNode();
         grammarPhase.apply(newNode);
 
-        return m;
+        List<ErrorNode> errors = node.findDescendantsWith(ErrorNode.class);
+        if (!errors.isEmpty()) {
 
+            throw new ModelBuilderException(errors);
+        }
+
+        return m;
     }
+
+    private static Phase createPhases(ResourceLoader resourceLoader, RamlFragment fragment) {
+        final TransformationPhase ramlFragmentsValidator = new TransformationPhase(new RamlFragmentGrammarTransformer(new Raml10Builder(), resourceLoader));
+
+        // Runs Schema. Applies the Raml rules and changes each node for a more specific. Annotations Library TypeSystem
+        final GrammarPhase grammarPhase = new GrammarPhase(RamlHeader.getFragmentRule(fragment));
+
+        final TransformationPhase referenceCheck = new TransformationPhase(new ReferenceResolverTransformer());
+
+        // Applies resourceTypes and Traits Library
+        final TransformationPhase resourcePhase = new TransformationPhase(new ResourceTypesTraitsTransformer(new Raml10Grammar()));
+
+        final TransformationPhase duplicatedPaths = new TransformationPhase(new DuplicatedPathsTransformer());
+
+        // Check unused uri parameters
+        final TransformationPhase checkUnusedParameters = new TransformationPhase(new UnusedParametersTransformer());
+
+        // Run grammar again to re-validate tree
+
+        final AnnotationValidationPhase annotationValidationPhase = new AnnotationValidationPhase(resourceLoader);
+
+        final MediaTypeInjectionPhase mediaTypeInjection = new MediaTypeInjectionPhase();
+
+        // Schema Types example validation
+        final TransformationPhase schemaValidationPhase = new TransformationPhase(new SchemaValidationTransformer(resourceLoader));
+
+        // Checks types consistency and custom facets
+        final TypeValidationPhase typeValidationPhase = new TypeValidationPhase();
+
+        final ExampleValidationPhase exampleValidationPhase = new ExampleValidationPhase(resourceLoader);
+
+        Phase phase = new Phase() {
+            @Override
+            public Node apply(Node tree) {
+
+                List<Phase> phases = Arrays.asList(
+                        //      includePhase,
+                        ramlFragmentsValidator,
+                        grammarPhase,
+                        referenceCheck,
+                        resourcePhase,
+                        duplicatedPaths,
+                        checkUnusedParameters,
+                        annotationValidationPhase,
+                        mediaTypeInjection,
+                        grammarPhase,
+                        schemaValidationPhase,
+                        typeValidationPhase,
+                        exampleValidationPhase
+                );
+
+                Node node = null;
+                for (Phase phase : phases) {
+                    node = phase.apply(tree);
+                }
+
+                return node;
+            }
+        };
+
+        return phase;
+    }
+
 }

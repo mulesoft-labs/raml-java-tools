@@ -1,7 +1,9 @@
 package org.raml.builder;
 
-import org.raml.v2.api.model.v10.methods.Method;
-import org.raml.yagi.framework.nodes.*;
+import org.raml.yagi.framework.nodes.KeyValueNode;
+import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
+import org.raml.yagi.framework.nodes.ObjectNodeImpl;
+import org.raml.yagi.framework.nodes.StringNodeImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +12,7 @@ import java.util.List;
 /**
  * Created. There, you have it.
  */
-public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder> implements AnnotableBuilder<MethodBuilder>, ModelBuilder<Method> {
+public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder> implements AnnotableBuilder<MethodBuilder>/*, ModelBuilder<Method>*/ {
 
     private List<ResponseBuilder> responses = new ArrayList<>();
     private List<BodyBuilder> bodies = new ArrayList<>();
@@ -127,22 +129,22 @@ public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder> implements
         return node;
 
     }
-
+/*
     @Override
     public Method buildModel() {
 
         Node node = buildNode();
 
         return Util.buildModel(binding, node, Method.class);
-    }
+    }*/
 
     public MethodBuilder description(String description) {
         this.description = description;
         return this;
     }
 
-    public static void main(String[] args) {
+  /*  public static void main(String[] args) {
         Method m = MethodBuilder.method("foo").description("hello").buildModel();
         System.err.println(m.description().value());
-    }
+    }*/
 }
