@@ -15,23 +15,21 @@
  */
 package org.raml.pojotoraml.plugins;
 
-import org.raml.builder.TypeBuilder;
 import org.raml.builder.TypeDeclarationBuilder;
 import org.raml.builder.TypePropertyBuilder;
 import org.raml.pojotoraml.Property;
 import org.raml.pojotoraml.RamlAdjuster;
 
-import java.lang.reflect.Type;
 import java.util.List;
 
 /**
  * Created. There, you have it.
  */
-public class ChangeType extends RamlAdjuster.Helper {
+public class ChangeTypeName extends RamlAdjuster.Helper {
 
   final private List<String> arguments;
 
-  public ChangeType(List<String> arguments) {
+  public ChangeTypeName(List<String> arguments) {
     this.arguments = arguments;
   }
 
@@ -40,12 +38,6 @@ public class ChangeType extends RamlAdjuster.Helper {
   public String adjustTypeName(Class<?> type, String name) {
 
     return arguments.get(0);
-  }
-
-  @Override
-  public TypeBuilder adjustType(Type type, TypeBuilder builder) {
-
-    return TypeBuilder.type(arguments.get(0));
   }
 
   @Override

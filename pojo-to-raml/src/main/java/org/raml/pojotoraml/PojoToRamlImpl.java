@@ -151,7 +151,7 @@ public class PojoToRamlImpl implements PojoToRaml {
         if ( typeNames.isEmpty()) {
             builder = TypeBuilder.type("object");
         } else {
-            builder = TypeBuilder.type(typeNames.get(0));
+            builder = TypeBuilder.type(typeNames.toArray(new String[0]));
         }
         return builder;
     }

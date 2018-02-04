@@ -108,15 +108,16 @@ public interface RamlAdjuster {
     /**
      * Changes the type.  You may RAML information to the type builder (or change it entirely).
      * @param type
-     * @param builder
+     * @param builder a suggested builder. You can add to it and return this builder, or build a new one.
      * @return
      */
     TypeBuilder adjustType(Type type, TypeBuilder builder);
 
     /**
-     * Allows you to change the name when used as a reference.
+     * Allows you to change the name when used as a reference.  In most cases, it should match what comes out of
+     * {@link #adjustType(Type, TypeBuilder)} should you overload both.
      * @param aClass
-     * @param name
+     * @param name a suggested type name.  You may return it or change it.  It may not be null.
      * @return
      */
     String adjustTypeName(Class<?> aClass, String name);
@@ -125,7 +126,7 @@ public interface RamlAdjuster {
      * You may change the property definition for a given scalar type.
      * @param typeDeclaration
      * @param property
-     * @param typePropertyBuilder
+     * @param typePropertyBuilder a suggested builder. You can add to it and return this builder, or build a new one.
      * @return
      */
     TypePropertyBuilder adjustScalarProperty(TypeDeclarationBuilder typeDeclaration, Property property, TypePropertyBuilder typePropertyBuilder);
@@ -134,7 +135,7 @@ public interface RamlAdjuster {
      * You may change the property definition for a given composed type.
      * @param typeDeclaration
      * @param property
-     * @param typePropertyBuilder
+     * @param typePropertyBuilder a suggested builder. You can add to it and return this builder, or build a new one.
      * @return
      */
     TypePropertyBuilder adjustComposedProperty(TypeDeclarationBuilder typeDeclaration, Property property, TypePropertyBuilder typePropertyBuilder);
