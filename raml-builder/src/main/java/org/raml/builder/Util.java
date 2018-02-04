@@ -21,6 +21,8 @@ import org.raml.yagi.framework.phase.GrammarPhase;
 import org.raml.yagi.framework.phase.Phase;
 import org.raml.yagi.framework.phase.TransformationPhase;
 
+import javax.annotation.Nullable;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -50,7 +52,13 @@ public class Util {
         NodeModel model = fac.create(node);
         T m = ModelProxyBuilder.createModel(cls, model, binding);
 
-        final Phase grammarPhase = createPhases(null, new RamlHeader(RAML_10, Default).getFragment());
+        final Phase grammarPhase = createPhases(new ResourceLoader() {
+            @Nullable
+            @Override
+            public InputStream fetchResource(String resourceName) {
+                return null;
+            }
+        }, new RamlHeader(RAML_10, Default).getFragment());
         Node newNode = ((NodeModel) m).getNode();
         grammarPhase.apply(newNode);
 
