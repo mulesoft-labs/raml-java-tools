@@ -56,7 +56,6 @@ Annotations can also be added directly on types, or properties.
 
 Current supported plugins are:
 * core.jsr303: add jsr303 annotation to types.
-
 * core.jackson2: add jackson2 annotations to types.
 * core.jackson:  same as jackson2, for backward compatibility
 * core.jaxb: add jaxb annotations.
