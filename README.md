@@ -3,7 +3,7 @@
 This is a collection of tools used to work with the RAML 1.0 spec.  Currently they are used by the raml-for-jaxrs project to:
  * [Convert](raml-to-pojo/README.md) RAML specified object declarations into POJOs.
  * [Convert](pojo-to-raml/README.md) POJOs to RAML 1.0 type declarations. 
- * [Emit](raml-emitter/README.md) a RAML API definition into an output stream.
+ * [Emit](raml-simple-emitter/README.md) a RAML API definition into an output stream.
  * [Programmatically build](raml-builder/README.md) a RAML 1.0 specification.
  
  The other projects are experiments we are trying.
