@@ -1,6 +1,6 @@
 # raml-to-pojo
 
-The simples way to use this code:
+The simplest way to use this code:
 ```java
 public class Main {
 
