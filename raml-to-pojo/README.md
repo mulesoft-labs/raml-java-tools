@@ -66,4 +66,18 @@ Current supported plugins are:
 * core.splitInterface:  separate interface and implementation into different packages
 * core.changeType: change the generated type (two arguments:  the new type, and the optional "unbox" argument, to unbox java primitives)
 * core.box: box java primitive types.
-* core.boxWhenNotRequired:  box primitive types when not required.
+* core.boxWhenNotRequired: box primitive types when not required.
+
+# writing your own plugin
+
+The simplest way to do this is to package a jar with a META-INF/ramltopojo-plugin.properties file listing your plugins, as in 
+this [example](src/main/resources/META-INF/ramltopojo-plugin.properties).  There are four interfaces that you might have to 
+implement.
+
+* [ObjectTypeHandlerPlugin](src/main/java/org/raml/ramltopojo/extensions/ObjectTypeHandlerPlugin.java) handles RAML object types.
+* [UnionTypeHandlerPlugin](src/main/java/org/raml/ramltopojo/extensions/UnionTypeHandlerPlugin.java) handles RAML union types types.
+* [EnumerationTypeHandlerPlugin](src/main/java/org/raml/ramltopojo/extensions/EnumerationTypeHandlerPlugin.java) handles RAML enum types.
+* [ReferenceTypeHandlerPlugin](src/main/java/org/raml/ramltopojo/extensions/ReferenceTypeHandlerPlugin.java) handles RAML reference types (strings and such).
+
+You may implement these interfaces in separate classes and combine these classes as a list (like the core.jackson2 plugin), 
+or all the interfaces in one class (like pretty much all the others).  You may want to read up on [JavaPoet](https://github.com/square/javapoet)

@@ -2,16 +2,20 @@ package org.raml.ramltopojo.extensions.tools;
 
 import com.squareup.javapoet.ClassName;
 import org.raml.ramltopojo.EventType;
+import org.raml.ramltopojo.extensions.AllTypesPluginHelper;
+import org.raml.ramltopojo.extensions.EnumerationPluginContext;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
-import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
+import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 
 import java.util.List;
 
 /**
  * Created. There, you have it.
  */
-public class SeparatePackagesPlugin extends ObjectTypeHandlerPlugin.Helper {
+public class SeparatePackagesPlugin extends AllTypesPluginHelper {
 
     private final List<String> arguments;
 
@@ -22,6 +26,20 @@ public class SeparatePackagesPlugin extends ObjectTypeHandlerPlugin.Helper {
     @Override
     public ClassName className(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
 
+        return fixName(currentSuggestion, eventType);
+    }
+
+    @Override
+    public ClassName className(UnionPluginContext unionPluginContext, UnionTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+        return fixName(currentSuggestion, eventType);
+    }
+
+    @Override
+    public ClassName className(EnumerationPluginContext enumerationPluginContext, StringTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+        return fixName(currentSuggestion, eventType);
+    }
+
+    private ClassName fixName(ClassName currentSuggestion, EventType eventType) {
         if ( eventType == EventType.INTERFACE) {
 
             return makeContained(arguments.get(0), currentSuggestion);
@@ -30,6 +48,7 @@ public class SeparatePackagesPlugin extends ObjectTypeHandlerPlugin.Helper {
             return makeContained(arguments.get(1), currentSuggestion);
         }
     }
+
 
     private ClassName makeContained(String pack, ClassName currentSuggestion) {
 
