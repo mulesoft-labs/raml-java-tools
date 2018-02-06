@@ -83,3 +83,11 @@ import java.util.UUID;
 ``` 
 
 In this example, the UUID class is parsed by the NullClassParser class and it's type is changed to the basic "string" type.
+
+# Writing your own plugin
+
+The simplest way to do this is to package a jar with a META-INF/pojotoraml-plugin.properties file listing your plugins, as in 
+this [example](src/main/resources/META-INF/pojotoraml-plugin.properties).  In there you have one interface you have to 
+[implement](src/main/java/org/raml/pojotoraml/RamlAdjuster.java).  There is a helper interface in there should you not want to 
+override all methods.
+
