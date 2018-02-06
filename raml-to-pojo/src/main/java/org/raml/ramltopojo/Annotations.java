@@ -42,6 +42,33 @@ public abstract class Annotations<T> {
         }
     };
 
+    public static Annotations<Boolean> USE_PRIMITIVE = new Annotations<Boolean>() {
+
+        @Override
+        public Boolean getWithContext(Annotable target, Annotable... others) {
+
+            return getWithDefault(new TypeInstanceAsBooleanFunction(), "usePrimitiveType", true, target, others);
+        }
+    };
+
+    public static Annotations<String> IMPLEMENTATION_CLASS_NAME = new Annotations<String>() {
+
+        @Override
+        public String getWithContext(Annotable target, Annotable... others) {
+
+            return getWithDefault(new TypeInstanceAsBooleanFunction(), "implementationClassName", null, target, others);
+        }
+    };
+
+    public static Annotations<String> CLASS_NAME = new Annotations<String>() {
+
+        @Override
+        public String getWithContext(Annotable target, Annotable... others) {
+
+            return getWithDefault(new TypeInstanceAsBooleanFunction(), "className", null, target, others);
+        }
+    };
+
 
     public static Annotations<List<PluginDef>> PLUGINS = new Annotations<List<PluginDef>>() {
 
@@ -180,15 +207,22 @@ public abstract class Annotations<T> {
             if (input.properties().size() == 0) {
 
                 return new PluginDef((String) input.value(), Collections.<String>emptyList());
-            } else
-                return new PluginDef((String) input.properties().get(0).value().value(), Lists.transform(input.properties().get(1).values(), new Function<TypeInstance, String>() {
-                            @Nullable
-                            @Override
-                            public String apply(@Nullable TypeInstance input) {
-                                return (String) input.value();
+            } else {
+
+                if ( input.properties().size() == 1 ) {
+
+                    return new PluginDef((String) input.properties().get(0).value().value(), Collections.<String>emptyList());
+                } else {
+                    return new PluginDef((String) input.properties().get(0).value().value(), Lists.transform(input.properties().get(1).values(), new Function<TypeInstance, String>() {
+                                @Nullable
+                                @Override
+                                public String apply(@Nullable TypeInstance input) {
+                                    return (String) input.value();
+                                }
                             }
-                        }
-                ));
+                    ));
+                }
+            }
         }
     }
 }

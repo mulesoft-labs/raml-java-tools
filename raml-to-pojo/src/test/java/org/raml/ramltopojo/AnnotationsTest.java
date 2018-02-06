@@ -45,6 +45,16 @@ public class AnnotationsTest extends UnitTest{
     }
 
     @Test
+    public void abstractAnnotationsReading() throws IOException {
+
+        Api api = getApi();
+        TypeDeclaration fooType = RamlLoader.findTypes("foo", api.types());
+
+        boolean b  = Annotations.ABSTRACT.get(fooType);
+        assertEquals(true, b);
+    }
+
+    @Test
     public void simplerTypeAnnotationsReading() throws IOException {
 
         Api api = getApi();
