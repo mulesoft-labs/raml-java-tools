@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.enumeration;
 
+import com.google.common.base.Optional;
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.EnumerationPluginContext;
@@ -36,7 +37,7 @@ public class EnumerationTypeHandler implements TypeHandler {
     }
 
     @Override
-    public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
+    public Optional<CreationResult> create(GenerationContext generationContext, CreationResult preCreationResult) {
 
         FieldSpec.Builder field = FieldSpec.builder(ClassName.get(String.class), "name").addModifiers(Modifier.PRIVATE);
         EnumerationPluginContext enumerationPluginContext = new EnumerationPluginContextImpl(generationContext, preCreationResult);
@@ -54,7 +55,7 @@ public class EnumerationTypeHandler implements TypeHandler {
                 );
         enumBuilder = generationContext.pluginsForEnumerations(typeDeclaration).classCreated(enumerationPluginContext, typeDeclaration, enumBuilder, EventType.INTERFACE);
         if ( enumBuilder == null ) {
-            return null;
+            return Optional.absent();
         }
 
         for (String value : typeDeclaration.enumValues()) {
@@ -69,6 +70,6 @@ public class EnumerationTypeHandler implements TypeHandler {
 
         }
 
-        return preCreationResult.withInterface(enumBuilder.build());
+        return Optional.of(preCreationResult.withInterface(enumBuilder.build()));
     }
 }

@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.squareup.javapoet.ClassName;
@@ -52,10 +53,15 @@ public class GenerationContextImpl implements GenerationContext {
         } else {
 
             TypeDeclaration typeDeclaration = typeFetcher.fetchType(api, typeName);
-            CreationResult result =  TypeDeclarationType.createType(typeDeclaration, this);
+            Optional<CreationResult> result =  TypeDeclarationType.createType(typeDeclaration, this);
 
-            knownTypes.put(typeName, result);
-            return result;
+            // todo fix this.
+            if ( result.isPresent() ) {
+                knownTypes.put(typeName, result.get());
+                return result.get();
+            }  else {
+                return null;
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.references;
 
+import com.google.common.base.Optional;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.*;
@@ -38,7 +39,7 @@ public class ReferenceTypeHandler implements TypeHandler {
     }
 
     @Override
-    public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
+    public Optional<CreationResult> create(GenerationContext generationContext, CreationResult preCreationResult) {
 
         throw new GenerationException("won't generate " + type.getSimpleName() + " class");
     }

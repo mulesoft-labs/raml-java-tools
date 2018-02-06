@@ -1,6 +1,7 @@
 package org.raml.ramltopojo.union;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.*;
@@ -52,7 +53,7 @@ public class UnionTypeHandler implements TypeHandler {
     }
 
     @Override
-    public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
+    public Optional<CreationResult> create(GenerationContext generationContext, CreationResult preCreationResult) {
 
         UnionPluginContext context = new UnionPluginContextImpl(generationContext, preCreationResult);
 
@@ -62,7 +63,13 @@ public class UnionTypeHandler implements TypeHandler {
 
         TypeSpec.Builder interf = getDeclaration(interfaceName, generationContext, context);
         TypeSpec.Builder impl = getImplementation(interfaceName, implementationName, generationContext, context);
-        return result.withInterface(interf.build()).withImplementation(impl.build());
+
+        if ( interf == null ) {
+
+            return Optional.absent();
+        } else {
+            return Optional.of(result.withInterface(interf.build()).withImplementation(impl.build()));
+        }
     }
 
     private TypeSpec.Builder getImplementation(ClassName interfaceName, ClassName implementationName, GenerationContext generationContext, UnionPluginContext context) {

@@ -112,7 +112,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
                 }
 
                 @Override
-                public CreationResult create(GenerationContext generationContext, CreationResult preCreationResult) {
+                public Optional<CreationResult> create(GenerationContext generationContext, CreationResult preCreationResult) {
                     return null;
                 }
 
@@ -322,7 +322,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
      * @param context
      * @return
      */
-    public static CreationResult createType(TypeDeclaration typeDeclaration, GenerationContext context) {
+    public static Optional<CreationResult> createType(TypeDeclaration typeDeclaration, GenerationContext context) {
 
         TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
 
@@ -342,7 +342,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
      * @param context
      * @return
      */
-    public static CreationResult createNamedType(String name, TypeDeclaration typeDeclaration, GenerationContext context) {
+    public static Optional<CreationResult> createNamedType(String name, TypeDeclaration typeDeclaration, GenerationContext context) {
 
         TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
 
@@ -362,7 +362,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
      * @param context
      * @return
      */
-    public static CreationResult createInlineType(ClassName containingClassName, ClassName containingImplementation, String name, TypeDeclaration typeDeclaration, final GenerationContext context) {
+    public static Optional<CreationResult> createInlineType(ClassName containingClassName, ClassName containingImplementation, String name, TypeDeclaration typeDeclaration, final GenerationContext context) {
 
         TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
 

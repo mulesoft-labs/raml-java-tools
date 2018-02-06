@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import com.google.common.base.Optional;
 import com.squareup.javapoet.TypeName;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
@@ -28,8 +29,10 @@ public class RamlToPojoImpl implements RamlToPojo {
 
         for (TypeDeclaration typeDeclaration : typeFinder.findTypes(generationContext.api())) {
 
-            CreationResult spec = TypeDeclarationType.createType(typeDeclaration, generationContext);
-            resultingPojos.addNewResult(spec);
+            Optional<CreationResult> spec = TypeDeclarationType.createType(typeDeclaration, generationContext);
+            if ( spec.isPresent() ) {
+                resultingPojos.addNewResult(spec.get());
+            }
         }
 
         return resultingPojos;
@@ -40,8 +43,10 @@ public class RamlToPojoImpl implements RamlToPojo {
 
         ResultingPojos resultingPojos = new ResultingPojos(generationContext);
 
-        CreationResult spec = TypeDeclarationType.createType(typeDeclaration, generationContext);
-        resultingPojos.addNewResult(spec);
+        Optional<CreationResult> spec = TypeDeclarationType.createType(typeDeclaration, generationContext);
+        if (spec.isPresent() ) {
+            resultingPojos.addNewResult(spec.get());
+        }
 
         return resultingPojos;
     }
@@ -51,8 +56,10 @@ public class RamlToPojoImpl implements RamlToPojo {
 
         ResultingPojos resultingPojos = new ResultingPojos(generationContext);
 
-        CreationResult spec = TypeDeclarationType.createNamedType(suggestedJavaName, typeDeclaration, generationContext);
-        resultingPojos.addNewResult(spec);
+        Optional<CreationResult> spec = TypeDeclarationType.createNamedType(suggestedJavaName, typeDeclaration, generationContext);
+        if ( spec.isPresent() ) {
+            resultingPojos.addNewResult(spec.get());
+        }
 
         return resultingPojos;
     }

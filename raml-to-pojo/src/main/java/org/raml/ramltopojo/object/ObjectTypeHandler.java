@@ -51,15 +51,19 @@ public class ObjectTypeHandler implements TypeHandler {
 
     @Override
     // TODO deal with null interface spec.
-    public CreationResult create(GenerationContext generationContext, CreationResult result) {
+    public Optional<CreationResult> create(GenerationContext generationContext, CreationResult result) {
 
         // I need to createHandler an interface and an implementation.
         ObjectPluginContext context = new ObjectPluginContextImpl(generationContext, result);
         TypeSpec interfaceSpec = createInterface(context,  result, generationContext);
         TypeSpec implementationSpec = createImplementation(context,  result, generationContext);
 
-        result.withInterface(interfaceSpec).withImplementation(implementationSpec);
-        return result;
+        if ( interfaceSpec == null ) {
+
+            return Optional.absent();
+        } else {
+            return Optional.of(result.withInterface(interfaceSpec).withImplementation(implementationSpec));
+        }
     }
 
     private TypeSpec createImplementation(ObjectPluginContext objectPluginContext, CreationResult result, GenerationContext generationContext) {
@@ -163,17 +167,22 @@ public class ObjectTypeHandler implements TypeHandler {
         for (TypeDeclaration propertyDeclaration : objectTypeDeclaration.properties()) {
 
 
-            TypeName tn;
+            TypeName tn = null;
             if ( TypeDeclarationType.isNewInlineType(propertyDeclaration) ){
 
-                CreationResult cr = TypeDeclarationType.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),  Names.typeName(propertyDeclaration.name(), "type"), propertyDeclaration, generationContext);
-                result.withInternalType(propertyDeclaration.name(), cr);
-                tn = cr.getJavaName(EventType.INTERFACE);
+                Optional<CreationResult> cr = TypeDeclarationType.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),  Names.typeName(propertyDeclaration.name(), "type"), propertyDeclaration, generationContext);
+                if ( cr.isPresent() ) {
+                    result.withInternalType(propertyDeclaration.name(), cr.get());
+                    tn = cr.get().getJavaName(EventType.INTERFACE);
+                }
             }  else {
 
                 tn = findType(propertyDeclaration.type(), propertyDeclaration, generationContext, EventType.INTERFACE);
             }
 
+            if (tn == null) {
+                continue;
+            }
             MethodSpec.Builder getMethod = MethodSpec.methodBuilder(Names.methodName("get", propertyDeclaration.name()))
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                     .returns(tn);
