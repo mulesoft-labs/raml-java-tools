@@ -125,7 +125,7 @@ public class ObjectTypeHandler implements TypeHandler {
                     .addModifiers(Modifier.PUBLIC)
                     .addCode(CodeBlock.builder().addStatement("this." + Names.variableName(propertyDeclaration.name()) + " = " + Names.variableName(propertyDeclaration.name())).build())
                     .addParameter(tn, Names.variableName(propertyDeclaration.name()));
-            setMethod = generationContext.pluginsForObjects(objectTypeDeclaration, propertyDeclaration).getterBuilt(objectPluginContext, propertyDeclaration, setMethod, EventType.IMPLEMENTATION);
+            setMethod = generationContext.pluginsForObjects(objectTypeDeclaration, propertyDeclaration).setterBuilt(objectPluginContext, propertyDeclaration, setMethod, EventType.IMPLEMENTATION);
             if ( setMethod != null ) {
                 typeSpec.addMethod(setMethod.build());
             }

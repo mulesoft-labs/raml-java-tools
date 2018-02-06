@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.extensions;
 
+import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.CreationResult;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
@@ -12,6 +13,6 @@ public interface ObjectPluginContext {
 
     Set<CreationResult> childClasses(String ramlTypeName);
     CreationResult creationResult();
-
     CreationResult dependentType(TypeDeclaration items);
+    TypeName forProperty(TypeDeclaration typeDeclaration);
 }

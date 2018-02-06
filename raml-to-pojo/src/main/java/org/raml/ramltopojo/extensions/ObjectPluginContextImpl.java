@@ -2,8 +2,11 @@ package org.raml.ramltopojo.extensions;
 
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
+import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.CreationResult;
+import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.GenerationContext;
+import org.raml.ramltopojo.TypeDeclarationType;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import javax.annotation.Nullable;
@@ -42,5 +45,10 @@ public class ObjectPluginContextImpl implements ObjectPluginContext {
     @Override
     public CreationResult dependentType(TypeDeclaration items) {
         return generationContext.findCreatedType(items.name(), items);
+    }
+
+    @Override
+    public TypeName forProperty(TypeDeclaration typeDeclaration) {
+        return TypeDeclarationType.calculateTypeName("", typeDeclaration, generationContext, EventType.INTERFACE);
     }
 }
