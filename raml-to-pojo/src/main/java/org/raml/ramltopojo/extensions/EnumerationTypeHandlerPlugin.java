@@ -3,7 +3,6 @@ package org.raml.ramltopojo.extensions;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EventType;
-import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import java.util.ArrayList;
@@ -18,12 +17,12 @@ public interface EnumerationTypeHandlerPlugin {
     class Helper implements EnumerationTypeHandlerPlugin {
 
         @Override
-        public ClassName className(EnumerationPluginContext enumerationPluginContext, StringTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+        public ClassName className(EnumerationPluginContext enumerationPluginContext, TypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
             return currentSuggestion;
         }
 
         @Override
-        public TypeSpec.Builder classCreated(EnumerationPluginContext enumerationPluginContext, StringTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+        public TypeSpec.Builder classCreated(EnumerationPluginContext enumerationPluginContext, TypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
             return incoming;
         }
 
@@ -31,11 +30,16 @@ public interface EnumerationTypeHandlerPlugin {
         public TypeSpec.Builder enumValue(EnumerationPluginContext enumerationPluginContext, TypeDeclaration declaration, TypeSpec.Builder incoming, String value, EventType eventType) {
             return incoming;
         }
+        @Override
+        public TypeSpec.Builder enumValue(EnumerationPluginContext enumerationPluginContext, TypeDeclaration declaration, TypeSpec.Builder incoming, Number value, EventType eventType) {
+            return incoming;
+        }
     }
 
-    ClassName className(EnumerationPluginContext enumerationPluginContext, StringTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType);
-    TypeSpec.Builder classCreated(EnumerationPluginContext enumerationPluginContext, StringTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType);
+    ClassName className(EnumerationPluginContext enumerationPluginContext, TypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType);
+    TypeSpec.Builder classCreated(EnumerationPluginContext enumerationPluginContext, TypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType);
     TypeSpec.Builder enumValue(EnumerationPluginContext enumerationPluginContext, TypeDeclaration declaration, TypeSpec.Builder enumValue, String value, EventType eventType);
+    TypeSpec.Builder enumValue(EnumerationPluginContext enumerationPluginContext, TypeDeclaration declaration, TypeSpec.Builder enumValue, Number value, EventType eventType);
 
     class Composite implements EnumerationTypeHandlerPlugin {
 
@@ -47,7 +51,7 @@ public interface EnumerationTypeHandlerPlugin {
         }
 
         @Override
-        public ClassName className(EnumerationPluginContext enumerationPluginContext, StringTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+        public ClassName className(EnumerationPluginContext enumerationPluginContext, TypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
             for (EnumerationTypeHandlerPlugin plugin : plugins) {
                 currentSuggestion = plugin.className(enumerationPluginContext, ramlType, currentSuggestion, eventType);
             }
@@ -56,7 +60,7 @@ public interface EnumerationTypeHandlerPlugin {
         }
 
         @Override
-        public TypeSpec.Builder classCreated(EnumerationPluginContext enumerationPluginContext, StringTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+        public TypeSpec.Builder classCreated(EnumerationPluginContext enumerationPluginContext, TypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
 
             for (EnumerationTypeHandlerPlugin plugin : plugins) {
                 if ( incoming == null ) {
@@ -79,5 +83,18 @@ public interface EnumerationTypeHandlerPlugin {
 
             return incoming;
         }
+
+        @Override
+        public TypeSpec.Builder enumValue(EnumerationPluginContext enumerationPluginContext, TypeDeclaration declaration, TypeSpec.Builder incoming, Number value, EventType eventType) {
+            for (EnumerationTypeHandlerPlugin plugin : plugins) {
+                if ( incoming == null ) {
+                    break;
+                }
+                incoming = plugin.enumValue(enumerationPluginContext, declaration, incoming, value, eventType);
+            }
+
+            return incoming;
+        }
+
     }
 }

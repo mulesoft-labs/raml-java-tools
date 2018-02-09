@@ -7,7 +7,7 @@ import org.raml.ramltopojo.extensions.EnumerationPluginContext;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class RenameImplementationPlugin extends AllTypesPluginHelper {
     }
 
     @Override
-    public ClassName className(EnumerationPluginContext enumerationPluginContext, StringTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+    public ClassName className(EnumerationPluginContext enumerationPluginContext, TypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
         return changeName(currentSuggestion, eventType);
     }
     @Override

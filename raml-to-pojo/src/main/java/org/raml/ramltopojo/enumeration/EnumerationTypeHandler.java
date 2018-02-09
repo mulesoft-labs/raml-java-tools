@@ -5,11 +5,14 @@ import com.squareup.javapoet.*;
 import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.EnumerationPluginContext;
 import org.raml.ramltopojo.extensions.EnumerationPluginContextImpl;
+import org.raml.v2.api.model.v10.datamodel.IntegerTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.NumberTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created. There, you have it.
@@ -17,9 +20,9 @@ import java.util.ArrayList;
 public class EnumerationTypeHandler implements TypeHandler {
 
     private final String name;
-    private final StringTypeDeclaration typeDeclaration;
+    private final TypeDeclaration typeDeclaration;
 
-    public EnumerationTypeHandler(String name, StringTypeDeclaration stringTypeDeclaration) {
+    public EnumerationTypeHandler(String name, TypeDeclaration stringTypeDeclaration) {
         this.name = name;
         this.typeDeclaration = stringTypeDeclaration;
     }
@@ -39,7 +42,9 @@ public class EnumerationTypeHandler implements TypeHandler {
     @Override
     public Optional<CreationResult> create(GenerationContext generationContext, CreationResult preCreationResult) {
 
-        FieldSpec.Builder field = FieldSpec.builder(ClassName.get(String.class), "name").addModifiers(Modifier.PRIVATE);
+        Class cls = (typeDeclaration instanceof StringTypeDeclaration)?String.class:Number.class;
+
+        FieldSpec.Builder field = FieldSpec.builder(ClassName.get(cls), "name").addModifiers(Modifier.PRIVATE);
         EnumerationPluginContext enumerationPluginContext = new EnumerationPluginContextImpl(generationContext, preCreationResult);
 
         ClassName className = preCreationResult.getJavaName(EventType.INTERFACE);
@@ -49,7 +54,7 @@ public class EnumerationTypeHandler implements TypeHandler {
         enumBuilder.addField(field.build())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addMethod(
-                        MethodSpec.constructorBuilder().addParameter(ClassName.get(String.class), "name")
+                        MethodSpec.constructorBuilder().addParameter(ClassName.get(cls), "name")
                                 .addStatement("this.$N = $N", "name", "name")
                                 .build()
                 );
@@ -58,18 +63,36 @@ public class EnumerationTypeHandler implements TypeHandler {
             return Optional.absent();
         }
 
-        for (String value : typeDeclaration.enumValues()) {
-            TypeSpec.Builder enumValueBuilder = TypeSpec.anonymousClassBuilder("$S", value);
-            enumValueBuilder = generationContext.pluginsForEnumerations(typeDeclaration).enumValue(enumerationPluginContext, typeDeclaration, enumValueBuilder, value, EventType.INTERFACE);
+        for (Object value : pullEnumValues(typeDeclaration)) {
+            TypeSpec.Builder enumValueBuilder;
+            if ( value instanceof String) {
+                enumValueBuilder= TypeSpec.anonymousClassBuilder("$S", value);
+                enumValueBuilder = generationContext.pluginsForEnumerations(typeDeclaration).enumValue(enumerationPluginContext, typeDeclaration, enumValueBuilder, (String)value, EventType.INTERFACE);
+            } else {
+
+                enumValueBuilder= TypeSpec.anonymousClassBuilder("$L", value);
+                enumValueBuilder = generationContext.pluginsForEnumerations(typeDeclaration).enumValue(enumerationPluginContext, typeDeclaration, enumValueBuilder, (Number)value, EventType.INTERFACE);
+            }
             if ( enumValueBuilder == null ) {
                 continue;
             }
 
-            enumBuilder.addEnumConstant(Names.constantName(value),
+            enumBuilder.addEnumConstant(Names.constantName(String.valueOf(value)),
                     enumValueBuilder.build());
 
         }
 
         return Optional.of(preCreationResult.withInterface(enumBuilder.build()));
+    }
+
+    List pullEnumValues(TypeDeclaration typeDeclaration) {
+
+        if ( typeDeclaration instanceof  IntegerTypeDeclaration ) {
+            return ((IntegerTypeDeclaration)typeDeclaration).enumValues();
+        } else  if (typeDeclaration instanceof NumberTypeDeclaration) {
+            return ((NumberTypeDeclaration)typeDeclaration).enumValues();
+        } else {
+            return ((StringTypeDeclaration)typeDeclaration).enumValues();
+        }
     }
 }

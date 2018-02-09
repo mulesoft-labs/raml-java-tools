@@ -5,7 +5,6 @@ import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.EnumerationPluginContext;
 import org.raml.ramltopojo.extensions.EnumerationTypeHandlerPlugin;
-import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import javax.xml.bind.annotation.XmlEnum;
@@ -17,7 +16,7 @@ import javax.xml.bind.annotation.XmlEnumValue;
 public class JaxbEnumExtension extends EnumerationTypeHandlerPlugin.Helper {
 
     @Override
-    public TypeSpec.Builder classCreated(EnumerationPluginContext enumerationPluginContext, StringTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+    public TypeSpec.Builder classCreated(EnumerationPluginContext enumerationPluginContext, TypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
 
         return incoming.addAnnotation(AnnotationSpec.builder(XmlEnum.class).build());
     }

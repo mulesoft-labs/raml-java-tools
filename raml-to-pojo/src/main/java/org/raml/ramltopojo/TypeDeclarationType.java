@@ -89,13 +89,12 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
 
-            StringTypeDeclaration stringTypeDeclaration = (StringTypeDeclaration) typeDeclaration;
-            return new EnumerationTypeHandler(name, stringTypeDeclaration);
+            return new EnumerationTypeHandler(name, typeDeclaration);
         }
 
         @Override
         public boolean shouldCreateInlineType(TypeDeclaration declaration) {
-            return "string".equals(declaration.type());
+            return "string".equals(declaration.type()) || "number".equals(declaration.type()) || "integer".equals(declaration.type());
         }
     },
     ARRAY {
@@ -146,13 +145,25 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
 
             NumberTypeDeclaration integerTypeDeclaration = (NumberTypeDeclaration) typeDeclaration;
-            TypeName typeName = Optional.fromNullable(properType.get(integerTypeDeclaration.format())).or(TypeName.INT);
-            return new ReferenceTypeHandler(typeDeclaration, Integer.class, typeName);
+            if ( ! integerTypeDeclaration.enumValues().isEmpty() ) {
+                return ENUMERATION.createHandler(name, type, typeDeclaration);
+            } else {
+
+                TypeName typeName = Optional.fromNullable(properType.get(integerTypeDeclaration.format())).or(TypeName.INT);
+                return new ReferenceTypeHandler(typeDeclaration, Integer.class, typeName);
+            }
         }
 
         @Override
-        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
-            return false;
+        public boolean shouldCreateInlineType(TypeDeclaration originalTypeDeclaration) {
+            IntegerTypeDeclaration declaration = (IntegerTypeDeclaration) originalTypeDeclaration;
+
+            if ( ! declaration.enumValues().isEmpty() ) {
+
+                return ENUMERATION.shouldCreateInlineType(originalTypeDeclaration);
+            } else {
+                return false;
+            }
         }
     },
     BOOLEAN {
@@ -218,15 +229,27 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
 
             NumberTypeDeclaration integerTypeDeclaration = (NumberTypeDeclaration) typeDeclaration;
-            TypeName typeName = Optional.fromNullable(properType.get(integerTypeDeclaration.format())).or(ClassName.get(Number.class));
+            if ( ! integerTypeDeclaration.enumValues().isEmpty() ) {
+                return ENUMERATION.createHandler(name, type, typeDeclaration);
+            } else {
 
-            return new ReferenceTypeHandler(typeDeclaration, Number.class, typeName);
-
+                TypeName typeName = Optional.fromNullable(properType.get(integerTypeDeclaration.format())).or(ClassName.get(Number.class));
+                return new ReferenceTypeHandler(typeDeclaration, Number.class, typeName);
+            }
         }
 
         @Override
-        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
-            return false;
+        public boolean shouldCreateInlineType(TypeDeclaration originalTypeDeclaration) {
+
+            NumberTypeDeclaration declaration = (NumberTypeDeclaration) originalTypeDeclaration;
+
+            if ( ! declaration.enumValues().isEmpty() ) {
+
+                return ENUMERATION.shouldCreateInlineType(originalTypeDeclaration);
+            } else {
+                return false;
+            }
+
         }
     },
     STRING {

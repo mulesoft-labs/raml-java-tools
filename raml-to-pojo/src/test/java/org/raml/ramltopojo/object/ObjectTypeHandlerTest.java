@@ -411,6 +411,20 @@ public class ObjectTypeHandlerTest extends UnitTest {
                 )
         )));
 
+        assertThat(r.internalType("int").getInterface(), is(allOf(
+
+                name(
+                        is(equalTo("IntType"))
+                )
+        )));
+
+        assertThat(r.internalType("num").getInterface(), is(allOf(
+
+                name(
+                        is(equalTo("NumType"))
+                )
+        )));
+
     }
 
     protected GenerationContextImpl createGenerationContext(final Api api) {
