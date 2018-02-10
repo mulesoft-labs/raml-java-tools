@@ -57,23 +57,21 @@ public class UnionTypeHandler implements TypeHandler {
 
         UnionPluginContext context = new UnionPluginContextImpl(generationContext, preCreationResult);
 
-        CreationResult result = generationContext.findCreatedType(union.name(), union);
         ClassName interfaceName = preCreationResult.getJavaName(EventType.INTERFACE);
-        ClassName implementationName = preCreationResult.getJavaName(EventType.IMPLEMENTATION);
 
-        TypeSpec.Builder interf = getDeclaration(interfaceName, generationContext, context);
-        TypeSpec.Builder impl = getImplementation(interfaceName, implementationName, generationContext, context);
+        TypeSpec.Builder interf = getDeclaration(generationContext, context, preCreationResult);
+        TypeSpec.Builder impl = getImplementation(interfaceName, generationContext, context, preCreationResult);
 
         if ( interf == null ) {
 
             return Optional.absent();
         } else {
-            return Optional.of(result.withInterface(interf.build()).withImplementation(impl.build()));
+            return Optional.of(preCreationResult.withInterface(interf.build()).withImplementation(impl.build()));
         }
     }
 
-    private TypeSpec.Builder getImplementation(ClassName interfaceName, ClassName implementationName, GenerationContext generationContext, UnionPluginContext context) {
-        TypeSpec.Builder typeSpec = TypeSpec.classBuilder(implementationName).addModifiers(Modifier.PUBLIC).addSuperinterface(interfaceName);
+    private TypeSpec.Builder getImplementation(ClassName interfaceName, GenerationContext generationContext, UnionPluginContext context, CreationResult preCreationResult) {
+        TypeSpec.Builder typeSpec = TypeSpec.classBuilder(preCreationResult.getJavaName(EventType.IMPLEMENTATION)).addModifiers(Modifier.PUBLIC).addSuperinterface(interfaceName);
         typeSpec = generationContext.pluginsForUnions(union).classCreated(context, union, typeSpec, EventType.IMPLEMENTATION);
         if ( typeSpec == null ) {
             return null;
@@ -124,8 +122,8 @@ public class UnionTypeHandler implements TypeHandler {
         return typeSpec;
     }
 
-    private TypeSpec.Builder getDeclaration(ClassName interfaceName, final GenerationContext generationContext, UnionPluginContext context) {
-        TypeSpec.Builder typeSpec = TypeSpec.interfaceBuilder(interfaceName).addModifiers(Modifier.PUBLIC);
+    private TypeSpec.Builder getDeclaration(final GenerationContext generationContext, UnionPluginContext context, CreationResult preCreationResult) {
+        TypeSpec.Builder typeSpec = TypeSpec.interfaceBuilder(preCreationResult.getJavaName(EventType.INTERFACE)).addModifiers(Modifier.PUBLIC);
         List<TypeName> names = FluentIterable.from(union.of()).transform(new Function<TypeDeclaration, TypeName>() {
             @Nullable
             @Override

@@ -124,6 +124,12 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
 
         @Override
         public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+
+            ArrayTypeDeclaration arrayTypeDeclaration = (ArrayTypeDeclaration) declaration;
+            if (TypeDeclarationType.isNewInlineType(arrayTypeDeclaration.items())) {
+
+                throw new GenerationException("can't handle inline array types right now (" + declaration.name() + ", " + declaration.type() + ")");
+            }
             return false;
         }
     },
@@ -137,7 +143,8 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         @Override
         public boolean shouldCreateInlineType(TypeDeclaration declaration) {
 
-            return declaration.type().contains("|");
+            // this seems wrong.
+            return declaration.name().contains("|") || declaration.type().contains("|");
         }
     },
     INTEGER {
