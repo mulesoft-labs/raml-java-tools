@@ -427,6 +427,45 @@ public class ObjectTypeHandlerTest extends UnitTest {
 
     }
 
+    @Test
+    public void unionsInline() {
+
+        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-union.raml"), ".");
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", RamlLoader.findTypes("foo", api.types()));
+
+        CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+
+        assertNotNull(r);
+        assertThat(r.internalType("unionOfPrimitives").getInterface(), is(allOf(
+
+                name(
+                        is(equalTo("UnionOfPrimitivesType"))
+                ),
+                methods(containsInAnyOrder(
+                        allOf(methodName(equalTo("getInteger")), returnType(equalTo(ClassName.get(Integer.class)))),
+                        allOf(methodName(equalTo("isInteger")), returnType(equalTo(ClassName.get(Boolean.class).unbox()))),
+                        allOf(methodName(equalTo("getString")), returnType(equalTo(ClassName.get(String.class)))),
+                        allOf(methodName(equalTo("isString")), returnType(equalTo(ClassName.get(Boolean.class).unbox())))
+                ))
+
+        )));
+
+        assertThat(r.internalType("unionOfOthers").getInterface(), is(allOf(
+
+                name(
+                        is(equalTo("UnionOfOthersType"))
+                ),
+                methods(contains(
+                        allOf(methodName(equalTo("getOne")), returnType(equalTo(ClassName.get("pojo.pack", "One")))),
+                        allOf(methodName(equalTo("isOne")), returnType(equalTo(ClassName.get(Boolean.class).unbox()))),
+                        allOf(methodName(equalTo("getTwo")), returnType(equalTo(ClassName.get("pojo.pack", "Two")))),
+                        allOf(methodName(equalTo("isTwo")), returnType(equalTo(ClassName.get(Boolean.class).unbox())))
+                ))
+
+        )));
+
+        System.err.println(r.internalType("unionOfOthers").getInterface());
+    }
     protected GenerationContextImpl createGenerationContext(final Api api) {
         return new GenerationContextImpl(PluginManager.NULL, api, new TypeFetcher() {
             @Override
