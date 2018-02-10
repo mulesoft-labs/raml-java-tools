@@ -137,7 +137,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         @Override
         public boolean shouldCreateInlineType(TypeDeclaration declaration) {
 
-            return false;
+            return declaration.type().contains("|");
         }
     },
     INTEGER {
