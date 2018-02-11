@@ -96,10 +96,10 @@ public class PojoToRamlExtensionFactory {
           }
         });
 
-        return finalAdjuster.or(RamlAdjuster.NULL_ADJUSTER);
+        return finalAdjuster.or(new RamlAdjuster.Composite(Arrays.asList(ramlAdjusters)));
       } else {
 
-        return RamlAdjuster.NULL_ADJUSTER;
+        return new RamlAdjuster.Composite(Arrays.asList(ramlAdjusters));
       }
     }
 

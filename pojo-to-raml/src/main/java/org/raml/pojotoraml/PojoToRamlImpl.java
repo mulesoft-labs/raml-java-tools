@@ -77,7 +77,7 @@ public class PojoToRamlImpl implements PojoToRaml {
 
         TypeBuilder builder = buildSuperType(clazz, builtTypes);
 
-        builder = adjusterFactory.createAdjuster(clazz).adjustType(clazz, builder);
+        builder = adjusterFactory.createAdjuster(clazz).adjustType(clazz, simpleName, builder);
         TypeDeclarationBuilder typeDeclaration = TypeDeclarationBuilder.typeDeclaration(simpleName).ofType(builder);
         if ( !ScalarType.isRamalScalarType(simpleName)) {
             builtTypes.put(simpleName, typeDeclaration);
@@ -119,7 +119,7 @@ public class PojoToRamlImpl implements PojoToRaml {
                 }).toArray(String.class)
         );
 
-        adjuster.adjustType(quickType.type(), typeBuilder);
+        adjuster.adjustType(quickType.type(), quickType.getRamlSyntax().id(), typeBuilder);
         return TypeDeclarationBuilder.typeDeclaration(quickType.getRamlSyntax().id()).ofType(typeBuilder);
     }
 

@@ -22,7 +22,7 @@ public interface RamlAdjuster {
         }
 
         @Override
-        public TypeBuilder adjustType(Type type, TypeBuilder builder) {
+        public TypeBuilder adjustType(Type type, String typeName, TypeBuilder builder) {
             return builder;
         }
 
@@ -61,10 +61,10 @@ public interface RamlAdjuster {
         }
 
         @Override
-        public TypeBuilder adjustType(Type type, TypeBuilder builder) {
+        public TypeBuilder adjustType(Type type, String typeName, TypeBuilder builder) {
             TypeBuilder val = builder;
             for (RamlAdjuster adjuster : adjusters) {
-                val = adjuster.adjustType(type, val);
+                val = adjuster.adjustType(type, typeName, val);
             }
             return val;
         }
@@ -108,14 +108,15 @@ public interface RamlAdjuster {
     /**
      * Changes the type.  You may RAML information to the type builder (or change it entirely).
      * @param type
+     * @param typeName
      * @param builder a suggested builder. You can add to it and return this builder, or build a new one.
      * @return
      */
-    TypeBuilder adjustType(Type type, TypeBuilder builder);
+    TypeBuilder adjustType(Type type, String typeName, TypeBuilder builder);
 
     /**
      * Allows you to change the name when used as a reference.  In most cases, it should match what comes out of
-     * {@link #adjustType(Type, TypeBuilder)} should you overload both.
+     * {@link #adjustType(Type, String, TypeBuilder)} should you overload both.
      * @param aClass
      * @param name a suggested type name.  You may return it or change it.  It may not be null.
      * @return
