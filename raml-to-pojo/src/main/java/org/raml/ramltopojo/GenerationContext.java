@@ -1,10 +1,7 @@
 package org.raml.ramltopojo;
 
 import com.squareup.javapoet.ClassName;
-import org.raml.ramltopojo.extensions.EnumerationTypeHandlerPlugin;
-import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
-import org.raml.ramltopojo.extensions.ReferenceTypeHandlerPlugin;
-import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
+import org.raml.ramltopojo.extensions.*;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
@@ -25,6 +22,7 @@ public interface GenerationContext {
     ObjectTypeHandlerPlugin pluginsForObjects(TypeDeclaration... typeDeclarations);
     EnumerationTypeHandlerPlugin pluginsForEnumerations(TypeDeclaration... typeDeclarations);
     UnionTypeHandlerPlugin pluginsForUnions(TypeDeclaration... typeDeclarations);
+    ArrayTypeHandlerPlugin pluginsForArrays(TypeDeclaration... typeDeclarations);
     ReferenceTypeHandlerPlugin pluginsForReferences(TypeDeclaration... typeDeclarations);
 
     void setupTypeHierarchy(TypeDeclaration typeDeclaration);

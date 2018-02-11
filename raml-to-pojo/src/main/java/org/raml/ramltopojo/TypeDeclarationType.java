@@ -6,13 +6,10 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
+import org.raml.ramltopojo.array.ArrayTypeHandler;
 import org.raml.ramltopojo.enumeration.EnumerationTypeHandler;
-import org.raml.ramltopojo.extensions.EnumerationTypeHandlerPlugin;
-import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
-import org.raml.ramltopojo.extensions.ReferenceTypeHandlerPlugin;
-import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
+import org.raml.ramltopojo.extensions.*;
 import org.raml.ramltopojo.object.ObjectTypeHandler;
 import org.raml.ramltopojo.references.ReferenceTypeHandler;
 import org.raml.ramltopojo.union.UnionTypeHandler;
@@ -65,6 +62,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         public boolean shouldCreateInlineType(TypeDeclaration declaration) {
 
             List<TypeDeclaration> extended = declaration.parentTypes();
+
             if ( extended.size() > 1) {
 
                 return true;
@@ -103,33 +101,13 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
 
             final ArrayTypeDeclaration arrayTypeDeclaration = (ArrayTypeDeclaration) typeDeclaration;
 
-            return new TypeHandler() {
-                @Override
-                public ClassName javaClassName(GenerationContext generationContext, EventType type) {
-
-                    throw new GenerationException("won't generate array class");
-                }
-
-                @Override
-                public Optional<CreationResult> create(GenerationContext generationContext, CreationResult preCreationResult) {
-                    return null;
-                }
-
-                @Override
-                public TypeName javaClassReference(GenerationContext generationContext, EventType eventType) {
-                    return ParameterizedTypeName.get(ClassName.get(List.class), TypeDeclarationType.calculateTypeName(arrayTypeDeclaration.items().name(), arrayTypeDeclaration.items(), generationContext, eventType).box());
-                }
-            };
+            return new ArrayTypeHandler(name, arrayTypeDeclaration);
         }
 
         @Override
         public boolean shouldCreateInlineType(TypeDeclaration declaration) {
 
             ArrayTypeDeclaration arrayTypeDeclaration = (ArrayTypeDeclaration) declaration;
-            if (TypeDeclarationType.isNewInlineType(arrayTypeDeclaration.items())) {
-
-                throw new GenerationException("can't handle inline array types right now (" + declaration.name() + ", " + declaration.type() + ")");
-            }
             return false;
         }
     },
@@ -462,6 +440,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         @Override
         public UnionTypeHandlerPlugin pluginsForUnions(TypeDeclaration... typeDeclarations) {
             return context.pluginsForUnions(typeDeclarations);
+        }
+
+        @Override
+        public ArrayTypeHandlerPlugin pluginsForArrays(TypeDeclaration... typeDeclarations) {
+            return context.pluginsForArrays(typeDeclarations);
         }
 
         @Override
