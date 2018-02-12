@@ -38,7 +38,17 @@ public class Main {
                                         .withAnnotations(AnnotationBuilder.annotation("Foo")
                                                 .withProperties(PropertyValueBuilder.property("time", "2022-02-02"), PropertyValueBuilder.propertyOfArray("count", 1,2)))
                         ),
-                        TypeDeclarationBuilder.typeDeclaration("Goo").ofType(TypeBuilder.type("object"))
+                        TypeDeclarationBuilder.typeDeclaration("Goo").ofType(TypeBuilder.type("object")),
+                        TypeDeclarationBuilder.typeDeclaration("GooWithExamples").ofType(TypeBuilder.type("object")
+                                .withProperty(TypePropertyBuilder.property("count", "integer"))
+                                .withExamples(ExamplesBuilder.example("one").withPropertyValue(PropertyValueBuilder.property("count", 1)))
+                        ),
+                        TypeDeclarationBuilder.typeDeclaration("GooWithExample").ofType(TypeBuilder.type("object")
+                                .withProperty(TypePropertyBuilder.property("count", "integer"))
+                                .withExample(ExamplesBuilder.singleExample().withPropertyValue(PropertyValueBuilder.property("count", 1)))
+                        )
+
+
                 )
                 .withAnnotationTypes(
                         AnnotationTypeBuilder.annotationType("Foo").withProperty(property("time", "date-only")).withProperty(property("count", "integer[]"))

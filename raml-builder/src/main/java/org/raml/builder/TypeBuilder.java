@@ -28,6 +28,8 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
     private String description;
     private ValueNodeFactory enumValues;
 
+    private ExamplesBuilder example;
+
     private TypeBuilder arrayItems;
 
     private TypeBuilder(String type) {
@@ -89,7 +91,15 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
 
     public TypeBuilder withExamples(ExamplesBuilder... properties) {
 
+        this.example = null;
         this.examples.addAll(Arrays.asList(properties));
+        return this;
+    }
+
+    public TypeBuilder withExample(ExamplesBuilder example) {
+
+        this.examples.clear();
+        this.example = example;
         return this;
     }
 
@@ -186,12 +196,17 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
 
             KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("examples"), new ObjectNodeImpl());
             for (ExamplesBuilder example : examples) {
-                kvn.getValue().addChild(example.buildNode());
+                    kvn.getValue().addChild(example.buildNode());
             }
 
-            node.addChild(kvn);
+        //    node.addChild(kvn);
         }
 
+        if ( example != null ) {
+
+            KeyValueNodeImpl kvn2 = new KeyValueNodeImpl(new StringNodeImpl("example"), example.buildNode().getValue());
+            node.addChild(kvn2);
+        }
 
         if (  arrayItems != null  ) {
 

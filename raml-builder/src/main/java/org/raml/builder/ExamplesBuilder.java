@@ -26,6 +26,10 @@ public class ExamplesBuilder extends KeyValueNodeBuilder<ExamplesBuilder> implem
         return new ExamplesBuilder(name);
     }
 
+    public static ExamplesBuilder singleExample() {
+        return new ExamplesBuilder(null);
+    }
+
     public ExamplesBuilder strict(boolean strict) {
 
         this.strict = strict;
