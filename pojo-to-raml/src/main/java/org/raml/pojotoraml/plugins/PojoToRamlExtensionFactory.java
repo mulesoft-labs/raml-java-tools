@@ -92,7 +92,7 @@ public class PojoToRamlExtensionFactory {
                                                         Arrays.asList(ramlGeneratorPlugin.parameters()), RamlAdjuster.class);
                     return new RamlAdjuster.Composite(adjuster);
                   }
-                }).toList());
+                }).append(ramlAdjusters).toList());
           }
         });
 
