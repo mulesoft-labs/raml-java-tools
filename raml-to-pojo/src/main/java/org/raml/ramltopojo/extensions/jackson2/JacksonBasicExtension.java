@@ -103,19 +103,36 @@ public class JacksonBasicExtension extends ObjectTypeHandlerPlugin.Helper {
 
   @Override
   public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, FieldSpec.Builder fieldSpec, EventType eventType) {
-    return fieldSpec.addAnnotation(AnnotationSpec.builder(JsonProperty.class)
-            .addMember("value", "$S", declaration.name()).build());
+    AnnotationSpec.Builder annotation = AnnotationSpec.builder(JsonProperty.class)
+            .addMember("value", "$S", declaration.name());
+    if ( declaration.defaultValue() != null ) {
+                  annotation.addMember("defaultValue", "$S", declaration.defaultValue());
+
+    }
+    return fieldSpec.addAnnotation(
+            annotation.build());
   }
 
   @Override
   public MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder methodSpec, EventType eventType) {
-    return methodSpec.addAnnotation(AnnotationSpec.builder(JsonProperty.class)
-            .addMember("value", "$S", declaration.name()).build());
+
+    AnnotationSpec.Builder annotation = AnnotationSpec.builder(JsonProperty.class)
+            .addMember("value", "$S", declaration.name());
+    if ( declaration.defaultValue() != null ) {
+      annotation.addMember("defaultValue", "$S", declaration.defaultValue());
+    }
+
+    return methodSpec.addAnnotation(annotation.build());
   }
 
   @Override
   public MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder methodSpec, EventType eventType) {
-    return methodSpec.addAnnotation(AnnotationSpec.builder(JsonProperty.class)
-            .addMember("value", "$S", declaration.name()).build());
+    AnnotationSpec.Builder annotation = AnnotationSpec.builder(JsonProperty.class)
+            .addMember("value", "$S", declaration.name());
+    if ( declaration.defaultValue() != null ) {
+      annotation.addMember("defaultValue", "$S", declaration.defaultValue());
+    }
+
+    return methodSpec.addAnnotation(annotation.build());
   }
 }
