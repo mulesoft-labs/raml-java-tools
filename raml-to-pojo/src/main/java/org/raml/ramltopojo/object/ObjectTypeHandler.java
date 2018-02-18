@@ -74,11 +74,6 @@ public class ObjectTypeHandler implements TypeHandler {
                 .addSuperinterface(result.getJavaName(EventType.INTERFACE))
                 .addModifiers(Modifier.PUBLIC);
 
-        typeSpec = generationContext.pluginsForObjects(objectTypeDeclaration).classCreated(objectPluginContext, objectTypeDeclaration, typeSpec, EventType.IMPLEMENTATION);
-        if ( typeSpec == null ) {
-            return null;
-        }
-
         Optional<String> discriminator = Optional.fromNullable(objectTypeDeclaration.discriminator());
 
         for (TypeDeclaration propertyDeclaration : objectTypeDeclaration.properties()) {
@@ -129,6 +124,11 @@ public class ObjectTypeHandler implements TypeHandler {
             if ( setMethod != null ) {
                 typeSpec.addMethod(setMethod.build());
             }
+        }
+
+        typeSpec = generationContext.pluginsForObjects(objectTypeDeclaration).classCreated(objectPluginContext, objectTypeDeclaration, typeSpec, EventType.IMPLEMENTATION);
+        if ( typeSpec == null ) {
+            return null;
         }
 
         return typeSpec.build();

@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -38,11 +39,16 @@ public class AnnotationsTest extends UnitTest{
         Api api = getApi();
         TypeDeclaration fooType = RamlLoader.findTypes("foo", api.types());
 
-        List<PluginDef> defs = Annotations.PLUGINS.get(fooType);
-        assertEquals(1, defs.size());
-        assertEquals("core.foo", defs.get(0).getPluginName());
+        List<PluginDef> defs = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, fooType);
+        assertEquals(3, defs.size());
+        assertEquals("core.one", defs.get(0).getPluginName());
         assertEquals(Arrays.asList("foo", "bar"), defs.get(0).getArguments());
+        assertEquals("core.two", defs.get(1).getPluginName());
+        assertEquals(Arrays.asList("alpha", "gamma"), defs.get(1).getArguments());
+        assertEquals("core.foo", defs.get(2).getPluginName());
+        assertEquals(Arrays.asList("foo", "bar"), defs.get(2).getArguments());
     }
+
 
     @Test
     public void abstractAnnotationsReading() throws IOException {

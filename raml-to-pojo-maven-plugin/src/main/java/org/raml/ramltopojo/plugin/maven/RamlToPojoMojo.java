@@ -33,6 +33,7 @@ import org.raml.v2.api.model.v10.api.Api;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 
 import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE_PLUS_RUNTIME;
 import static org.raml.ramltopojo.TypeFetchers.fromAnywhere;
@@ -69,6 +70,12 @@ public class RamlToPojoMojo extends AbstractMojo {
      */
     @Parameter(property = "defaultPackage", required = true)
     private String defaultPackage;
+
+    /**
+     * An array of locations of the RAML file(s).
+     */
+    @Parameter(property = "defaultPackage", required = false)
+    private List<String> basePlugins;
 
 
     @Override
@@ -108,7 +115,7 @@ public class RamlToPojoMojo extends AbstractMojo {
             RamlToPojo ramlToPojo = RamlToPojoBuilder.builder(api)
                     .inPackage(defaultPackage)
                     .fetchTypes(fromAnywhere())
-                    .findTypes(everyWhere()).build();
+                    .findTypes(everyWhere()).build(basePlugins);
 
             ramlToPojo.buildPojos().createAllTypes(outputDirectory.getAbsolutePath());
 

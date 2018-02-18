@@ -22,4 +22,12 @@ public class PluginDef {
     public List<String> getArguments() {
         return arguments;
     }
+
+    @Override
+    public String toString() {
+        return "PluginDef{" +
+                "pluginName='" + pluginName + '\'' +
+                ", arguments=" + arguments +
+                '}';
+    }
 }

@@ -134,11 +134,13 @@ public class GenerationContextImpl implements GenerationContext {
     public ObjectTypeHandlerPlugin pluginsForObjects(TypeDeclaration... typeDeclarations) {
 
         List<PluginDef> data = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, typeDeclarations);
+        System.err.println("annotation defined plugins for " + typeDeclarations[0].name() + "are " + data);
         Set<ObjectTypeHandlerPlugin> plugins = new HashSet<>();
         loadBasePlugins(plugins, ObjectTypeHandlerPlugin.class);
         for (PluginDef datum : data) {
             plugins.addAll(pluginManager.getClassesForName(datum.getPluginName(), datum.getArguments() , ObjectTypeHandlerPlugin.class));
         }
+        System.err.println("plugin definitions for object type " + plugins + " for " + typeDeclarations[0].name());
         return new ObjectTypeHandlerPlugin.Composite(plugins);
     }
 

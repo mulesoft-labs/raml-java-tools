@@ -8,15 +8,16 @@ uses:
     plugins:
       - name: core.splitInterface
         arguments: [com.fun, com.fun.impl]
+#      - name: core.equalsAndHashCode
 #    - name: core.jackson2
 #      arguments: []
 
 types:
     foo:
-#      (ramltopojo.types):
-#        plugins:
-#          - name: core.repackage
-#            arguments: [bloobloo]
+      (ramltopojo.types):
+        plugins:
+          - name: core.equalsAndHashCode
+            arguments: [bloobloo]
       type: object
       discriminatorValue: myOwnValue
       properties:
@@ -30,13 +31,14 @@ types:
               properties:
                 another: string
     eater:
-#      (ramltopojo.types):
-#        plugins:
-#          - name: core.repackage
-#            arguments: [haha]
+      (ramltopojo.types):
+        plugins:
+          - name: core.equalsAndHashCode
+            arguments: [name]
       type: object
       discriminatorValue: myOwnValue
       properties:
         name: string
+        count: integer
         other: foo
 

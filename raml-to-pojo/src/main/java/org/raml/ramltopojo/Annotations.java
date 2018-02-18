@@ -74,7 +74,7 @@ public abstract class Annotations<T> {
 
         @Override
         public List<PluginDef> getWithContext(Annotable target, Annotable... others) {
-            return Annotations.getWithDefault(new TypeInstanceToPluginDefFunction(), "plugins", Collections.<PluginDef>emptyList(), target, others);
+            return Annotations.getWithDefaultList(new TypeInstanceToPluginDefFunction(), "plugins", target, others);
         }
     };
 
@@ -84,6 +84,16 @@ public abstract class Annotations<T> {
         if (b == null) {
 
             return def;
+        } else {
+            return b;
+        }
+    }
+
+    private static <T,R> List<R> getWithDefaultList(Function<TypeInstance, T> convert, String propName, Annotable target, Annotable... others) {
+        List<R> b = Annotations.evaluateAsList(convert, "types", propName, target, others);
+        if (b == null) {
+
+            return Collections.emptyList();
         } else {
             return b;
         }
@@ -112,6 +122,31 @@ public abstract class Annotations<T> {
         }
 
         return retval;
+    }
+
+    public static <T,R> List<R> evaluateAsList(Function<TypeInstance, T> convert, String annotationName, String parameterName, Annotable mandatory, Annotable... others) {
+
+        List<Annotable> targets = new ArrayList<>();
+        targets.add(mandatory);
+        targets.addAll(Arrays.asList(others));
+
+        List<R> finalList = new ArrayList<>();
+
+        for (Annotable target : targets) {
+
+            AnnotationRef annotationRef = Annotations.findRef(target, annotationName);
+            if (annotationRef == null) {
+
+                continue;
+            }
+
+            Object o = findProperty(annotationRef, parameterName, convert);
+            if (o != null) {
+                finalList.addAll((List)o);
+            }
+        }
+
+        return finalList;
     }
 
     private static <T> Object findProperty(AnnotationRef annotationRef, String propName, Function<TypeInstance, T> convert) {

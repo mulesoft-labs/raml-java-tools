@@ -81,7 +81,7 @@ public class PluginManager {
 
   public <T> Set<T> getClassesForName(String name, @Nonnull final List<String> arguments, final Class<T> ofClass) {
 
-    return FluentIterable.from(info.get(name)).filter(new Predicate<Class<?>>() {
+    Set<T> plugins =  FluentIterable.from(info.get(name)).filter(new Predicate<Class<?>>() {
       @Override
       public boolean apply(@Nullable Class<?> input) {
         return ofClass.isAssignableFrom(input);
@@ -104,6 +104,9 @@ public class PluginManager {
         }
       }
     }).toSet();
+
+//    System.err.println("returning  plugin set: " + plugins + " for " + name + " with " + arguments);
+    return plugins;
   }
 
   private static void buildPluginNames(SetMultimap<String, Class<?>> info, Properties properties) {
