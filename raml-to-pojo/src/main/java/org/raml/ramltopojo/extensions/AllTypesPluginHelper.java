@@ -12,11 +12,12 @@ import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 /**
  * Created. There, you have it.
  */
-public class AllTypesPluginHelper implements ObjectTypeHandlerPlugin, UnionTypeHandlerPlugin, EnumerationTypeHandlerPlugin {
+public class AllTypesPluginHelper implements ObjectTypeHandlerPlugin, UnionTypeHandlerPlugin, EnumerationTypeHandlerPlugin, ArrayTypeHandlerPlugin {
 
     private final ObjectTypeHandlerPlugin.Helper objectTypeHandlerPlugin= new ObjectTypeHandlerPlugin.Helper();
     private final UnionTypeHandlerPlugin.Helper unionTypeHandlerPlugin= new UnionTypeHandlerPlugin.Helper();
     private final EnumerationTypeHandlerPlugin.Helper enumerationTypeHandlerPlugin= new EnumerationTypeHandlerPlugin.Helper();
+    private final ArrayTypeHandlerPlugin.Helper arrayTypeHandlerPlugin = new ArrayTypeHandlerPlugin.Helper();
 
     @Override
     public ClassName className(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
@@ -78,4 +79,13 @@ public class AllTypesPluginHelper implements ObjectTypeHandlerPlugin, UnionTypeH
         return enumerationTypeHandlerPlugin.enumValue(enumerationPluginContext, declaration, incoming, value, eventType);
     }
 
+    @Override
+    public ClassName className(ArrayPluginContext arrayPluginContext, TypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+        return arrayTypeHandlerPlugin.className(arrayPluginContext, ramlType, currentSuggestion, eventType);
+    }
+
+    @Override
+    public TypeSpec.Builder classCreated(ArrayPluginContext arrayPluginContext, TypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+        return arrayTypeHandlerPlugin.classCreated(arrayPluginContext, ramlType, incoming, eventType);
+    }
 }

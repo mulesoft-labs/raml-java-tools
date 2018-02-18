@@ -114,6 +114,15 @@ public class AddEqualsAndHashCode extends AllTypesPluginHelper {
 
     @Override
     public TypeSpec.Builder classCreated(UnionPluginContext unionPluginContext, UnionTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
-        return super.classCreated(unionPluginContext, ramlType, incoming, eventType);
+
+        if ( eventType != EventType.IMPLEMENTATION) {
+
+            return incoming;
+        }
+
+        List<FieldSpec> specs = incoming.build().fieldSpecs;
+        createEquals(specs, incoming);
+        createHashCode(specs, incoming);
+        return incoming;
     }
 }

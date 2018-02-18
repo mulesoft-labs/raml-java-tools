@@ -72,10 +72,6 @@ public class UnionTypeHandler implements TypeHandler {
 
     private TypeSpec.Builder getImplementation(ClassName interfaceName, GenerationContext generationContext, UnionPluginContext context, CreationResult preCreationResult) {
         TypeSpec.Builder typeSpec = TypeSpec.classBuilder(preCreationResult.getJavaName(EventType.IMPLEMENTATION)).addModifiers(Modifier.PUBLIC).addSuperinterface(interfaceName);
-        typeSpec = generationContext.pluginsForUnions(union).classCreated(context, union, typeSpec, EventType.IMPLEMENTATION);
-        if ( typeSpec == null ) {
-            return null;
-        }
 
         FieldSpec.Builder anyType = FieldSpec.builder(Object.class, "anyType", Modifier.PRIVATE);
         anyType = generationContext.pluginsForUnions(union).anyFieldCreated(context, union, typeSpec, anyType, EventType.IMPLEMENTATION);
@@ -119,6 +115,12 @@ public class UnionTypeHandler implements TypeHandler {
                                     .returns(TypeName.BOOLEAN).build()
                     ).build();
         }
+
+        typeSpec = generationContext.pluginsForUnions(union).classCreated(context, union, typeSpec, EventType.IMPLEMENTATION);
+        if ( typeSpec == null ) {
+            return null;
+        }
+
         return typeSpec;
     }
 
