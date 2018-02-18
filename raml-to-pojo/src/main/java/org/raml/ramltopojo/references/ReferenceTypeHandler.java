@@ -26,7 +26,7 @@ public class ReferenceTypeHandler implements TypeHandler {
 
     @Override
     public ClassName javaClassName(GenerationContext generationContext, EventType eventType) {
-        throw new GenerationException("won't generate name for " + type.getSimpleName() + " class");
+        return ClassName.get(type);
     }
 
     @Override
@@ -41,6 +41,6 @@ public class ReferenceTypeHandler implements TypeHandler {
     @Override
     public Optional<CreationResult> create(GenerationContext generationContext, CreationResult preCreationResult) {
 
-        throw new GenerationException("won't generate " + type.getSimpleName() + " class");
+        return Optional.absent();
     }
 }
