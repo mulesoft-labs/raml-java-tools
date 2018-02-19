@@ -17,7 +17,6 @@ types:
       (ramltopojo.types):
         plugins:
           - name: core.equalsAndHashCode
-            arguments: [bloobloo]
       type: object
       discriminatorValue: myOwnValue
       properties:
@@ -35,6 +34,7 @@ types:
         plugins:
           - name: core.equalsAndHashCode
             arguments: [name]
+          - name: core.toString
       type: object
       discriminatorValue: myOwnValue
       properties:
