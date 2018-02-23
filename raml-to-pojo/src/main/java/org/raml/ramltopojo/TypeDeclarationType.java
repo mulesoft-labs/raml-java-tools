@@ -19,10 +19,7 @@ import org.raml.v2.api.model.v10.datamodel.*;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created. There, you have it.
@@ -68,16 +65,23 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
                 return true;
             }
 
-            Set<String> allExtendedProps =
-                    FluentIterable.from(extended).filter(ObjectTypeDeclaration.class)
-                            .transformAndConcat(new Function<ObjectTypeDeclaration, Set<String>>() {
+            Set<String> allExtendedProps;
 
-                                @Nullable
-                                @Override
-                                public Set<String> apply(@Nullable ObjectTypeDeclaration input) {
-                                    return pullNames(input);
-                                }
-                            }).toSet();
+            if ( extended.size() == 1  && extended.get(0).name().equals("object")) {
+
+                allExtendedProps = Collections.emptySet();
+            } else {
+                allExtendedProps =
+                        FluentIterable.from(extended).filter(ObjectTypeDeclaration.class)
+                                .transformAndConcat(new Function<ObjectTypeDeclaration, Set<String>>() {
+
+                                    @Nullable
+                                    @Override
+                                    public Set<String> apply(@Nullable ObjectTypeDeclaration input) {
+                                        return pullNames(input);
+                                    }
+                                }).toSet();
+            }
 
             Set<String> typePropertyNames = pullNames((ObjectTypeDeclaration) declaration);
             return !Sets.difference(typePropertyNames, allExtendedProps).isEmpty();
