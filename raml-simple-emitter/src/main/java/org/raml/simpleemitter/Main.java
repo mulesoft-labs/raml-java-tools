@@ -6,16 +6,14 @@ import org.raml.v2.api.RamlModelBuilder;
 import org.raml.v2.api.RamlModelResult;
 import org.raml.v2.api.model.common.ValidationResult;
 import org.raml.v2.api.model.v10.api.Api;
+import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
 
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import static org.raml.builder.MethodBuilder.method;
 import static org.raml.builder.NodeBuilders.property;
 import static org.raml.builder.RamlDocumentBuilder.document;
-import static org.raml.builder.ResourceBuilder.resource;
-import static org.raml.builder.ResponseBuilder.response;
 
 /**
  * Created by jpbelang on 2017-06-25.
@@ -29,8 +27,6 @@ public class Main {
                 .title("Hello!")
                 .version("1.0beta6")
                 .withTypes(
-                        TypeDeclarationBuilder.typeDeclaration("EnumFoo").ofType(TypeBuilder.type().enumValues("UN", "DEUX")),
-                        TypeDeclarationBuilder.typeDeclaration("EnumNum").ofType(TypeBuilder.type("integer").enumValues(1,2)),
 
                         TypeDeclarationBuilder.typeDeclaration("Foo").ofType(
                                 TypeBuilder.type("object")
@@ -38,22 +34,29 @@ public class Main {
                                         .withAnnotations(AnnotationBuilder.annotation("Foo")
                                                 .withProperties(PropertyValueBuilder.property("time", "2022-02-02"), PropertyValueBuilder.propertyOfArray("count", 1,2)))
                         ),
+                        TypeDeclarationBuilder.typeDeclaration("EnumFoo").ofType(TypeBuilder.type().enumValues("UN", "DEUX")),
+                        TypeDeclarationBuilder.typeDeclaration("EnumNum").ofType(TypeBuilder.type("integer").enumValues(1,2)),
+
                         TypeDeclarationBuilder.typeDeclaration("Goo").ofType(TypeBuilder.type("object")),
                         TypeDeclarationBuilder.typeDeclaration("GooWithExamples").ofType(TypeBuilder.type("object")
-                                .withProperty(TypePropertyBuilder.property("count", "integer"))
+                                .withProperty(TypePropertyBuilder.property("count", "integer"),TypePropertyBuilder.property("realType", "Foo"))
                                 .withExamples(ExamplesBuilder.example("one").withPropertyValue(PropertyValueBuilder.property("count", 1)))
                         ),
                         TypeDeclarationBuilder.typeDeclaration("GooWithExample").ofType(TypeBuilder.type("object")
-                                .withProperty(TypePropertyBuilder.property("count", "integer"))
-                                .withExample(ExamplesBuilder.singleExample().withPropertyValue(PropertyValueBuilder.property("count", 1)))
+                                .withProperty(
+                                        TypePropertyBuilder.property("count", "integer"),
+                                        TypePropertyBuilder.property("counts", TypeBuilder.arrayOf(TypeBuilder.type("string"))),
+                                        TypePropertyBuilder.property("realType", "Foo"))
+                                .withExample(ExamplesBuilder.singleExample().strict(false).withPropertyValue(PropertyValueBuilder.property("count", 1)))
                         )
 
 
                 )
+
                 .withAnnotationTypes(
                         AnnotationTypeBuilder.annotationType("Foo").withProperty(property("time", "date-only")).withProperty(property("count", "integer[]"))
-                )
-                .withResources(
+                ).buildModel();
+/*                .withResources(
                         resource("/no")
                                 .description("fooo!!!")
                                 .displayName("Mama!!!")
@@ -71,7 +74,8 @@ public class Main {
                                                                 )
                                                 ).withResponses(response(200))
                                 )
-                ).buildModel();
+*/
+//                ).buildModel();
 
         StringTypeDeclaration stdzero = (StringTypeDeclaration) api.types().get(0);
         System.err.println(stdzero.enumValues());
@@ -93,5 +97,12 @@ public class Main {
 
         StringTypeDeclaration std = (StringTypeDeclaration) re_read.getApiV10().types().get(0);
         System.err.println(std.enumValues());
+
+        ObjectTypeDeclaration third = (ObjectTypeDeclaration) re_read.getApiV10().types().get(3);
+        System.err.println(third.properties().get(0).name());
+        System.err.println(third.properties().get(0).type());
+        System.err.println(third.properties().get(1).name());
+        System.err.println(third.properties().get(1).type());
+        System.err.println(third.properties().get(1).parentTypes().get(0).type());
     }
 }

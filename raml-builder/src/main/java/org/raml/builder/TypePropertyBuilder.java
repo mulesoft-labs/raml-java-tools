@@ -1,8 +1,6 @@
 package org.raml.builder;
 
 import org.raml.yagi.framework.nodes.KeyValueNode;
-import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
-import org.raml.yagi.framework.nodes.StringNodeImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,7 +41,7 @@ public class TypePropertyBuilder extends KeyValueNodeBuilder<TypePropertyBuilder
     public KeyValueNode buildNode() {
 
         KeyValueNode node = super.buildNode();
-        node.getValue().addChild(new KeyValueNodeImpl(new StringNodeImpl("type"), type.buildNode()));
+        node.setValue(type.buildNode());
         if ( ! annotations.isEmpty() ) {
 
             for (AnnotationBuilder annotation : annotations) {
