@@ -34,7 +34,7 @@
             <plugin>
                 <groupId>org.raml</groupId>
                 <artifactId>raml-to-pojo-maven-plugin</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <executions>
                     <execution>
                         <id>goo</id>
