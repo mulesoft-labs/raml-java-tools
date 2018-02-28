@@ -67,6 +67,8 @@ Current supported plugins are:
 * core.changeType: change the generated type (two arguments:  the new type, and the optional "unbox" argument, to unbox java primitives)
 * core.box: box java primitive types.
 * core.boxWhenNotRequired: box primitive types when not required.
+* core.toString:  generates a toString() for objects using the defined fields.  You may specify the fields as parameters to limit their use. 
+* core.equalsAndHashCode:  generates equals() and hashCode() method for objects using the defined fields.  You may specify the fields as parameters to limit their use. 
 
 # writing your own plugin
 
