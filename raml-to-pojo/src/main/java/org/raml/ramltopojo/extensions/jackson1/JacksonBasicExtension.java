@@ -44,13 +44,15 @@ public class JacksonBasicExtension extends ObjectTypeHandlerPlugin.Helper {
 
       typeSpec.addMethod(MethodSpec.methodBuilder("getAdditionalProperties")
               .returns(ADDITIONAL_PROPERTIES_TYPE).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+              .addAnnotation(JsonAnyGetter.class)
               .build());
 
       typeSpec.addMethod(MethodSpec
               .methodBuilder("setAdditionalProperties")
               .returns(TypeName.VOID)
-              .addParameter(
-                      ParameterSpec.builder(ADDITIONAL_PROPERTIES_TYPE, "additionalProperties").build())
+              .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(String.class), "key").build())
+              .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(Object.class), "value").build())
+              .addAnnotation(JsonAnySetter.class)
               .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
 
       return typeSpec;
@@ -90,12 +92,12 @@ public class JacksonBasicExtension extends ObjectTypeHandlerPlugin.Helper {
     typeSpec.addMethod(MethodSpec
             .methodBuilder("setAdditionalProperties")
             .returns(TypeName.VOID)
-            .addParameter(
-                    ParameterSpec.builder(ADDITIONAL_PROPERTIES_TYPE, "additionalProperties").build())
+            .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(String.class), "key").build())
+            .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(Object.class), "value").build())
             .addAnnotation(JsonAnySetter.class)
             .addModifiers(Modifier.PUBLIC)
             .addCode(
-                    CodeBlock.builder().add("this.additionalProperties = additionalProperties;\n").build())
+                    CodeBlock.builder().add("this.additionalProperties.put(key, value);\n").build())
             .build());
 
     return typeSpec;
