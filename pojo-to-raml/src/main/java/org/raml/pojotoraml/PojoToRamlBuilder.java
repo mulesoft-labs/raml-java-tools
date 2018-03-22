@@ -20,9 +20,4 @@ public class PojoToRamlBuilder {
 
         return new PojoToRamlImpl(factory, adjusterFactory);
     }
-
-    public static void main(String[] args) {
-        PojoToRaml pojoToRaml = create();
-        Result result = pojoToRaml.classToRaml(null);
-    }
 }

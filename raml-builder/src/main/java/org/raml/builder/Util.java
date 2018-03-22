@@ -123,7 +123,12 @@ public class Util {
 
                 Node node = null;
                 for (Phase phase : phases) {
+
                     node = phase.apply(tree);
+                    List<ErrorNode> descendantsWith = node.findDescendantsWith(ErrorNode.class);
+                    if (descendantsWith.size() != 0) {
+                        throw new ModelBuilderException(descendantsWith);
+                    }
                 }
 
                 return node;

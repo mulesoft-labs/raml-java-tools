@@ -129,22 +129,9 @@ public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder> implements
         return node;
 
     }
-/*
-    @Override
-    public Method buildModel() {
-
-        Node node = buildNode();
-
-        return Util.buildModel(binding, node, Method.class);
-    }*/
 
     public MethodBuilder description(String description) {
         this.description = description;
         return this;
     }
-
-  /*  public static void main(String[] args) {
-        Method m = MethodBuilder.method("foo").description("hello").buildModel();
-        System.err.println(m.description().value());
-    }*/
 }
