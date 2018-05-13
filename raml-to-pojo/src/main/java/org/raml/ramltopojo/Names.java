@@ -15,7 +15,7 @@
  */
 package org.raml.ramltopojo;
 
-import joptsimple.internal.Strings;
+import com.google.common.base.Joiner;
 import org.raml.v2.api.model.v08.bodies.BodyLike;
 import org.raml.v2.api.model.v10.bodies.Response;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
@@ -58,7 +58,7 @@ public class Names {
       values.add(value);
       i++;
     }
-    return Strings.join(values, "");
+    return Joiner.on("").join(values);
   }
 
   public static String methodName(String... name) {
@@ -93,7 +93,7 @@ public class Names {
       values.add(buildPart(i, s, format));
     }
 
-    return Strings.join(values, "");
+    return Joiner.on("").join(values);
   }
 
   public static String variableName(String... name) {
@@ -190,7 +190,7 @@ public class Names {
       i++;
     }
 
-    return Strings.join(friendlyNameBits, "");
+    return Joiner.on("").join(friendlyNameBits);
   }
 
   private static String buildPart(int i, String s, NameFixer format) {

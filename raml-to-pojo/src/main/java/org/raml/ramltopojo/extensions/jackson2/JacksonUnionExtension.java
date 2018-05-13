@@ -11,9 +11,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.squareup.javapoet.*;
-import joptsimple.internal.Strings;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.Names;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
@@ -167,7 +167,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                 }
             });
 
-            spec.addStatement("return map.keySet().containsAll($T.asList($L))", Arrays.class, Strings.join(names, ","));
+            spec.addStatement("return map.keySet().containsAll($T.asList($L))", Arrays.class, Joiner.on(",").join(names));
         }
 
         spec.addModifiers(Modifier.PRIVATE).returns(TypeName.BOOLEAN);

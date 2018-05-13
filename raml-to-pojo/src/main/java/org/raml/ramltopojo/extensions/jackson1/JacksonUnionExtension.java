@@ -1,9 +1,9 @@
 package org.raml.ramltopojo.extensions.jackson1;
 
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.squareup.javapoet.*;
-import joptsimple.internal.Strings;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonProcessingException;
@@ -167,7 +167,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                 }
             });
 
-            spec.addStatement("return map.keySet().containsAll($T.asList($L))", Arrays.class, Strings.join(names, ","));
+            spec.addStatement("return map.keySet().containsAll($T.asList($L))", Arrays.class, Joiner.on(",").join(names));
         }
 
         spec.addModifiers(Modifier.PRIVATE).returns(TypeName.BOOLEAN);
