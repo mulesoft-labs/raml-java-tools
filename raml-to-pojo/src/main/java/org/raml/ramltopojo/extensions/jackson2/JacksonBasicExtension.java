@@ -32,109 +32,116 @@ import java.util.Map;
  */
 public class JacksonBasicExtension extends ObjectTypeHandlerPlugin.Helper {
 
-  public static final ParameterizedTypeName ADDITIONAL_PROPERTIES_TYPE = ParameterizedTypeName.get(
-          Map.class, String.class,
-          Object.class);
+    public static final ParameterizedTypeName ADDITIONAL_PROPERTIES_TYPE = ParameterizedTypeName.get(
+            Map.class, String.class,
+            Object.class);
 
-  @Override
-  public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration obj, TypeSpec.Builder typeSpec, EventType eventType) {
+    @Override
+    public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration obj, TypeSpec.Builder typeSpec, EventType eventType) {
 
-    if ( eventType != EventType.IMPLEMENTATION) {
+        if (eventType != EventType.IMPLEMENTATION) {
 
-      typeSpec.addMethod(MethodSpec.methodBuilder("getAdditionalProperties")
-              .returns(ADDITIONAL_PROPERTIES_TYPE).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-              .addAnnotation(JsonAnyGetter.class)
-              .build());
+            if (obj.additionalProperties()) {
+                typeSpec.addMethod(MethodSpec.methodBuilder("getAdditionalProperties")
+                        .returns(ADDITIONAL_PROPERTIES_TYPE).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                        .addAnnotation(JsonAnyGetter.class)
+                        .build());
 
-      typeSpec.addMethod(MethodSpec
-              .methodBuilder("setAdditionalProperties")
-              .returns(TypeName.VOID)
-              .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(String.class), "key").build())
-              .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(Object.class), "value").build())
-              .addAnnotation(JsonAnySetter.class)
-              .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
+                typeSpec.addMethod(MethodSpec
+                        .methodBuilder("setAdditionalProperties")
+                        .returns(TypeName.VOID)
+                        .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(String.class), "key").build())
+                        .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(Object.class), "value").build())
+                        .addAnnotation(JsonAnySetter.class)
+                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
+            }
 
-      return typeSpec;
-    }
-
-
-    typeSpec.addAnnotation(AnnotationSpec.builder(JsonInclude.class)
-            .addMember("value", "$T.$L", JsonInclude.Include.class, "NON_NULL").build());
-
-    if (obj.discriminatorValue() != null) {
-
-      typeSpec.addAnnotation(AnnotationSpec.builder(JsonTypeName.class)
-              .addMember("value", "$S", obj.discriminatorValue()).build());
-    }
+            return typeSpec;
+        }
 
 
-    AnnotationSpec.Builder builder = AnnotationSpec.builder(JsonPropertyOrder.class);
-    for (TypeDeclaration declaration : obj.properties()) {
+        typeSpec.addAnnotation(AnnotationSpec.builder(JsonInclude.class)
+                .addMember("value", "$T.$L", JsonInclude.Include.class, "NON_NULL").build());
+
+        if (obj.discriminatorValue() != null) {
+
+            typeSpec.addAnnotation(AnnotationSpec.builder(JsonTypeName.class)
+                    .addMember("value", "$S", obj.discriminatorValue()).build());
+        }
 
 
-      builder.addMember("value", "$S", declaration.name());
-    }
+        AnnotationSpec.Builder builder = AnnotationSpec.builder(JsonPropertyOrder.class);
+        for (TypeDeclaration declaration : obj.properties()) {
 
-    typeSpec.addAnnotation(builder.build());
 
-    typeSpec.addField(FieldSpec
-            .builder(ADDITIONAL_PROPERTIES_TYPE, "additionalProperties", Modifier.PRIVATE)
-            .addAnnotation(AnnotationSpec.builder(JsonIgnore.class).build())
-            .initializer(
-                    CodeBlock.of("new $T()",
-                            ParameterizedTypeName.get(HashMap.class, String.class, Object.class))).build());
+            builder.addMember("value", "$S", declaration.name());
+        }
 
-    typeSpec.addMethod(MethodSpec.methodBuilder("getAdditionalProperties")
-            .returns(ADDITIONAL_PROPERTIES_TYPE).addModifiers(Modifier.PUBLIC)
-            .addCode("return additionalProperties;\n").addAnnotation(JsonAnyGetter.class).build());
+        typeSpec.addAnnotation(builder.build());
 
-    typeSpec.addMethod(MethodSpec
-            .methodBuilder("setAdditionalProperties")
-            .returns(TypeName.VOID)
-            .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(String.class), "key").build())
-            .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(Object.class), "value").build())
-            .addAnnotation(JsonAnySetter.class)
-            .addModifiers(Modifier.PUBLIC)
-            .addCode(
-                    CodeBlock.builder().add("this.additionalProperties.put(key, value);\n").build())
-            .build());
+        if (obj.additionalProperties()) {
+            typeSpec.addField(FieldSpec
+                    .builder(ADDITIONAL_PROPERTIES_TYPE, "additionalProperties", Modifier.PRIVATE)
+                    .addAnnotation(AnnotationSpec.builder(JsonIgnore.class).build())
+                    .initializer(
+                            CodeBlock.of("new $T()",
+                                    ParameterizedTypeName.get(HashMap.class, String.class, Object.class))).build());
 
-    return typeSpec;
+            if (obj.additionalProperties()) {
 
-  }
+                typeSpec.addMethod(MethodSpec.methodBuilder("getAdditionalProperties")
+                        .returns(ADDITIONAL_PROPERTIES_TYPE).addModifiers(Modifier.PUBLIC)
+                        .addCode("return additionalProperties;\n").addAnnotation(JsonAnyGetter.class).build());
 
-  @Override
-  public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, FieldSpec.Builder fieldSpec, EventType eventType) {
-    AnnotationSpec.Builder annotation = AnnotationSpec.builder(JsonProperty.class)
-            .addMember("value", "$S", declaration.name());
-    if ( declaration.defaultValue() != null ) {
-                  annotation.addMember("defaultValue", "$S", declaration.defaultValue());
+                typeSpec.addMethod(MethodSpec
+                        .methodBuilder("setAdditionalProperties")
+                        .returns(TypeName.VOID)
+                        .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(String.class), "key").build())
+                        .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(Object.class), "value").build())
+                        .addAnnotation(JsonAnySetter.class)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addCode(
+                                CodeBlock.builder().add("this.additionalProperties.put(key, value);\n").build())
+                        .build());
+            }
+        }
+
+        return typeSpec;
 
     }
-    return fieldSpec.addAnnotation(
-            annotation.build());
-  }
 
-  @Override
-  public MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder methodSpec, EventType eventType) {
+    @Override
+    public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, FieldSpec.Builder fieldSpec, EventType eventType) {
+        AnnotationSpec.Builder annotation = AnnotationSpec.builder(JsonProperty.class)
+                .addMember("value", "$S", declaration.name());
+        if (declaration.defaultValue() != null) {
+            annotation.addMember("defaultValue", "$S", declaration.defaultValue());
 
-    AnnotationSpec.Builder annotation = AnnotationSpec.builder(JsonProperty.class)
-            .addMember("value", "$S", declaration.name());
-    if ( declaration.defaultValue() != null ) {
-      annotation.addMember("defaultValue", "$S", declaration.defaultValue());
+        }
+        return fieldSpec.addAnnotation(
+                annotation.build());
     }
 
-    return methodSpec.addAnnotation(annotation.build());
-  }
+    @Override
+    public MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder methodSpec, EventType eventType) {
 
-  @Override
-  public MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder methodSpec, EventType eventType) {
-    AnnotationSpec.Builder annotation = AnnotationSpec.builder(JsonProperty.class)
-            .addMember("value", "$S", declaration.name());
-    if ( declaration.defaultValue() != null ) {
-      annotation.addMember("defaultValue", "$S", declaration.defaultValue());
+        AnnotationSpec.Builder annotation = AnnotationSpec.builder(JsonProperty.class)
+                .addMember("value", "$S", declaration.name());
+        if (declaration.defaultValue() != null) {
+            annotation.addMember("defaultValue", "$S", declaration.defaultValue());
+        }
+
+        return methodSpec.addAnnotation(annotation.build());
     }
 
-    return methodSpec.addAnnotation(annotation.build());
-  }
+    @Override
+    public MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder methodSpec, EventType eventType) {
+        AnnotationSpec.Builder annotation = AnnotationSpec.builder(JsonProperty.class)
+                .addMember("value", "$S", declaration.name());
+        if (declaration.defaultValue() != null) {
+            annotation.addMember("defaultValue", "$S", declaration.defaultValue());
+        }
+
+        return methodSpec.addAnnotation(annotation.build());
+    }
 }

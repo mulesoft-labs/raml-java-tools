@@ -40,7 +40,7 @@ public class JacksonBasicExtension extends ObjectTypeHandlerPlugin.Helper {
   @Override
   public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration obj, TypeSpec.Builder typeSpec, EventType eventType) {
 
-    if ( eventType != EventType.IMPLEMENTATION) {
+    if ( eventType != EventType.IMPLEMENTATION && obj.additionalProperties()) {
 
       typeSpec.addMethod(MethodSpec.methodBuilder("getAdditionalProperties")
               .returns(ADDITIONAL_PROPERTIES_TYPE).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
@@ -78,27 +78,29 @@ public class JacksonBasicExtension extends ObjectTypeHandlerPlugin.Helper {
 
     typeSpec.addAnnotation(builder.build());
 
-    typeSpec.addField(FieldSpec
-            .builder(ADDITIONAL_PROPERTIES_TYPE, "additionalProperties", Modifier.PRIVATE)
-            .addAnnotation(AnnotationSpec.builder(JsonIgnore.class).build())
-            .initializer(
-                    CodeBlock.of("new $T()",
-                            ParameterizedTypeName.get(HashMap.class, String.class, Object.class))).build());
+    if ( obj.additionalProperties()) {
+      typeSpec.addField(FieldSpec
+              .builder(ADDITIONAL_PROPERTIES_TYPE, "additionalProperties", Modifier.PRIVATE)
+              .addAnnotation(AnnotationSpec.builder(JsonIgnore.class).build())
+              .initializer(
+                      CodeBlock.of("new $T()",
+                              ParameterizedTypeName.get(HashMap.class, String.class, Object.class))).build());
 
-    typeSpec.addMethod(MethodSpec.methodBuilder("getAdditionalProperties")
-            .returns(ADDITIONAL_PROPERTIES_TYPE).addModifiers(Modifier.PUBLIC)
-            .addCode("return additionalProperties;\n").addAnnotation(JsonAnyGetter.class).build());
+      typeSpec.addMethod(MethodSpec.methodBuilder("getAdditionalProperties")
+              .returns(ADDITIONAL_PROPERTIES_TYPE).addModifiers(Modifier.PUBLIC)
+              .addCode("return additionalProperties;\n").addAnnotation(JsonAnyGetter.class).build());
 
-    typeSpec.addMethod(MethodSpec
-            .methodBuilder("setAdditionalProperties")
-            .returns(TypeName.VOID)
-            .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(String.class), "key").build())
-            .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(Object.class), "value").build())
-            .addAnnotation(JsonAnySetter.class)
-            .addModifiers(Modifier.PUBLIC)
-            .addCode(
-                    CodeBlock.builder().add("this.additionalProperties.put(key, value);\n").build())
-            .build());
+      typeSpec.addMethod(MethodSpec
+              .methodBuilder("setAdditionalProperties")
+              .returns(TypeName.VOID)
+              .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(String.class), "key").build())
+              .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(Object.class), "value").build())
+              .addAnnotation(JsonAnySetter.class)
+              .addModifiers(Modifier.PUBLIC)
+              .addCode(
+                      CodeBlock.builder().add("this.additionalProperties.put(key, value);\n").build())
+              .build());
+    }
 
     return typeSpec;
 
