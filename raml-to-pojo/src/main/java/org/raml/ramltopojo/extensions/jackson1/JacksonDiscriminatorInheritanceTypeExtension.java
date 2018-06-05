@@ -46,7 +46,7 @@ public class JacksonDiscriminatorInheritanceTypeExtension extends ObjectTypeHand
 
       typeSpec.addAnnotation(AnnotationSpec.builder(JsonTypeInfo.class)
               .addMember("use", "$T.Id.NAME", JsonTypeInfo.class)
-              .addMember("include", "$T.As.PROPERTY", JsonTypeInfo.class)
+              .addMember("include", "$T.As.EXISTING_PROPERTY", JsonTypeInfo.class)
               .addMember("property", "$S", otr.discriminator()).build());
 
       AnnotationSpec.Builder subTypes = AnnotationSpec.builder(JsonSubTypes.class);
