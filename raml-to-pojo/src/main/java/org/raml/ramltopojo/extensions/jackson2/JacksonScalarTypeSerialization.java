@@ -34,7 +34,7 @@ public class JacksonScalarTypeSerialization extends ObjectTypeHandlerPlugin.Help
 
       builder.addAnnotation(AnnotationSpec.builder(JsonFormat.class)
               .addMember("shape", "$T.STRING", JsonFormat.Shape.class)
-              .addMember("pattern", "$S", "yyyy-MM-dd'T'HH:mm:ss.SSSZ").build());
+              .addMember("pattern", "$S", "yyyy-MM-dd'T'HH:mm:ss").build());
     }
 
     if (typeDeclaration instanceof TimeOnlyTypeDeclaration) {
