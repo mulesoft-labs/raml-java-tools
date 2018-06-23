@@ -8,7 +8,6 @@ import org.raml.v2.internal.impl.commons.model.DefaultModelElement;
 import org.raml.v2.internal.impl.commons.model.StringType;
 import org.raml.v2.internal.impl.commons.model.factory.TypeDeclarationModelFactory;
 import org.raml.v2.internal.impl.commons.phase.*;
-import org.raml.v2.internal.impl.v10.Raml10Builder;
 import org.raml.v2.internal.impl.v10.grammar.Raml10Grammar;
 import org.raml.v2.internal.impl.v10.phase.AnnotationValidationPhase;
 import org.raml.v2.internal.impl.v10.phase.ExampleValidationPhase;
@@ -72,7 +71,7 @@ public class Util {
     }
 
     private static Phase createPhases(ResourceLoader resourceLoader, RamlFragment fragment) {
-        final TransformationPhase ramlFragmentsValidator = new TransformationPhase(new RamlFragmentGrammarTransformer(new Raml10Builder(), resourceLoader));
+        final TransformationPhase ramlFragmentsValidator = new TransformationPhase(new RamlFragmentGrammarTransformer());
 
         // Runs Schema. Applies the Raml rules and changes each node for a more specific. Annotations Library TypeSystem
         final GrammarPhase grammarPhase = new GrammarPhase(RamlHeader.getFragmentRule(fragment));
