@@ -8,6 +8,7 @@ uses:
     plugins:
       - name: core.splitInterface
         arguments: [com.fun, com.fun.impl]
+      - name: core.jsr303
 #      - name: core.equalsAndHashCode
 #    - name: core.jackson2
 #      arguments: []
@@ -20,7 +21,9 @@ types:
       type: object
       discriminatorValue: myOwnValue
       properties:
-        name: string
+        name:
+          type: string
+          pattern: aaa
         goo:
           type: object
           properties:

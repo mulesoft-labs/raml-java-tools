@@ -24,10 +24,7 @@ import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.datamodel.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -123,6 +120,11 @@ public class Jsr303Extension extends ObjectTypeHandlerPlugin.Helper {
 
     if (minMax != null) {
       typeSpec.addAnnotation(minMax.build());
+    }
+
+    if ( typeDeclaration.pattern() != null ) {
+
+      typeSpec.addAnnotation(AnnotationSpec.builder(Pattern.class).addMember("regexp", "$S", typeDeclaration.pattern()).build());
     }
   }
 
