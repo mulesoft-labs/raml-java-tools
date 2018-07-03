@@ -18,6 +18,7 @@ package org.raml.ramltopojo.extensions.jsr303;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.TypeName;
+import org.raml.ramltopojo.EcmaPattern;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
@@ -124,7 +125,7 @@ public class Jsr303Extension extends ObjectTypeHandlerPlugin.Helper {
 
     if ( typeDeclaration.pattern() != null ) {
 
-      typeSpec.addAnnotation(AnnotationSpec.builder(Pattern.class).addMember("regexp", "$S", typeDeclaration.pattern()).build());
+      typeSpec.addAnnotation(AnnotationSpec.builder(Pattern.class).addMember("regexp", "$S", EcmaPattern.fromString(typeDeclaration.pattern()).asJavaPattern()).build());
     }
   }
 
