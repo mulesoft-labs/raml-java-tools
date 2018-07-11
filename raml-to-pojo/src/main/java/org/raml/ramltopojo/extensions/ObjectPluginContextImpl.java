@@ -3,6 +3,7 @@ package org.raml.ramltopojo.extensions;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.CreationResult;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.GenerationContext;
@@ -50,5 +51,11 @@ public class ObjectPluginContextImpl implements ObjectPluginContext {
     @Override
     public TypeName forProperty(TypeDeclaration typeDeclaration) {
         return TypeDeclarationType.calculateTypeName("", typeDeclaration, generationContext, EventType.INTERFACE);
+    }
+
+    @Override
+    public TypeName createSupportClass(TypeSpec.Builder newSupportType) {
+
+        return this.generationContext.createSupportClass(newSupportType);
     }
 }

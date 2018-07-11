@@ -15,7 +15,10 @@
  */
 package org.raml.ramltopojo.extensions.jackson2;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
@@ -23,8 +26,6 @@ import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
-import javax.lang.model.element.Modifier;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -40,21 +41,6 @@ public class JacksonBasicExtension extends ObjectTypeHandlerPlugin.Helper {
     public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration obj, TypeSpec.Builder typeSpec, EventType eventType) {
 
         if (eventType != EventType.IMPLEMENTATION) {
-
-            if (obj.additionalProperties()) {
-                typeSpec.addMethod(MethodSpec.methodBuilder("getAdditionalProperties")
-                        .returns(ADDITIONAL_PROPERTIES_TYPE).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                        .addAnnotation(JsonAnyGetter.class)
-                        .build());
-
-                typeSpec.addMethod(MethodSpec
-                        .methodBuilder("setAdditionalProperties")
-                        .returns(TypeName.VOID)
-                        .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(String.class), "key").build())
-                        .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(Object.class), "value").build())
-                        .addAnnotation(JsonAnySetter.class)
-                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
-            }
 
             return typeSpec;
         }
@@ -78,33 +64,6 @@ public class JacksonBasicExtension extends ObjectTypeHandlerPlugin.Helper {
         }
 
         typeSpec.addAnnotation(builder.build());
-
-        if (obj.additionalProperties()) {
-            typeSpec.addField(FieldSpec
-                    .builder(ADDITIONAL_PROPERTIES_TYPE, "additionalProperties", Modifier.PRIVATE)
-                    .addAnnotation(AnnotationSpec.builder(JsonIgnore.class).build())
-                    .initializer(
-                            CodeBlock.of("new $T()",
-                                    ParameterizedTypeName.get(HashMap.class, String.class, Object.class))).build());
-
-            if (obj.additionalProperties()) {
-
-                typeSpec.addMethod(MethodSpec.methodBuilder("getAdditionalProperties")
-                        .returns(ADDITIONAL_PROPERTIES_TYPE).addModifiers(Modifier.PUBLIC)
-                        .addCode("return additionalProperties;\n").addAnnotation(JsonAnyGetter.class).build());
-
-                typeSpec.addMethod(MethodSpec
-                        .methodBuilder("setAdditionalProperties")
-                        .returns(TypeName.VOID)
-                        .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(String.class), "key").build())
-                        .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(Object.class), "value").build())
-                        .addAnnotation(JsonAnySetter.class)
-                        .addModifiers(Modifier.PUBLIC)
-                        .addCode(
-                                CodeBlock.builder().add("this.additionalProperties.put(key, value);\n").build())
-                        .build());
-            }
-        }
 
         return typeSpec;
 

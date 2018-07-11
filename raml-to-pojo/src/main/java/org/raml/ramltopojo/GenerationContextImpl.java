@@ -4,16 +4,17 @@ import com.google.common.base.Optional;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.extensions.*;
 import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -28,6 +29,7 @@ public class GenerationContextImpl implements GenerationContext {
     private final SetMultimap<String, String> childTypes = HashMultimap.create();
     private final String defaultPackage;
     private final List<String> basePlugins;
+    private Map<String, TypeSpec> supportClasses = new HashMap<>();
 
     public GenerationContextImpl(Api api) {
         this(PluginManager.NULL, api, TypeFetchers.NULL_FETCHER, "", Collections.<String>emptyList());
@@ -98,6 +100,11 @@ public class GenerationContextImpl implements GenerationContext {
         for (CreationResult creationResult : knownTypes.values()) {
             creationResult.createType(rootDirectory);
         }
+
+        for (TypeSpec typeSpec : supportClasses.values()) {
+
+            JavaFile.builder(defaultPackage(), typeSpec).build().writeTo(Paths.get(rootDirectory));
+        }
     }
 
     private<T> void loadBasePlugins(Set<T> plugins, Class<T> pluginType, TypeDeclaration... typeDeclarations) {
@@ -127,6 +134,22 @@ public class GenerationContextImpl implements GenerationContext {
         }
         for (String basePlugin : basePlugins) {
             plugins.addAll(pluginManager.getClassesForName(basePlugin, Collections.<String>emptyList(), pluginType));
+        }
+    }
+
+    @Override
+    public TypeName createSupportClass(TypeSpec.Builder newSupportType) {
+
+
+        TypeSpec typeSpec = newSupportType.build();
+        if ( supportClasses.containsKey(typeSpec.name) ) {
+
+            TypeSpec builder = supportClasses.get(typeSpec.name);
+            return ClassName.get(this.defaultPackage, builder.name);
+        } else {
+
+            this.supportClasses.put(typeSpec.name, typeSpec);
+            return ClassName.get(this.defaultPackage, typeSpec.name);
         }
     }
 
@@ -191,6 +214,7 @@ public class GenerationContextImpl implements GenerationContext {
         }
         return new ReferenceTypeHandlerPlugin.Composite(plugins);
     }
+
 
     @Override
     public Api api() {

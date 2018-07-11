@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.array.ArrayTypeHandler;
 import org.raml.ramltopojo.enumeration.EnumerationTypeHandler;
 import org.raml.ramltopojo.extensions.*;
@@ -409,6 +410,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
             this.containingDeclaration = containingDeclaration;
             this.containingImplementation = containingImplementation;
             this.context = context;
+        }
+
+        @Override
+        public TypeName createSupportClass(TypeSpec.Builder newSupportType) {
+            return context.createSupportClass(newSupportType);
         }
 
         @Override

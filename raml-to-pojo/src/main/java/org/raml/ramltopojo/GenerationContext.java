@@ -1,6 +1,8 @@
 package org.raml.ramltopojo;
 
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.extensions.*;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
@@ -30,4 +32,5 @@ public interface GenerationContext {
     Set<String> childClasses(String ramlTypeName);
     ClassName buildDefaultClassName(String name, EventType eventType);
 
+    TypeName createSupportClass(TypeSpec.Builder newSupportType);
 }
