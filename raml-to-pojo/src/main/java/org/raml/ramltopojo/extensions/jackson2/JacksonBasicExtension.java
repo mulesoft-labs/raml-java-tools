@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.squareup.javapoet.*;
+import org.raml.ramltopojo.EcmaPattern;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
@@ -59,6 +60,10 @@ public class JacksonBasicExtension extends ObjectTypeHandlerPlugin.Helper {
         AnnotationSpec.Builder builder = AnnotationSpec.builder(JsonPropertyOrder.class);
         for (TypeDeclaration declaration : obj.properties()) {
 
+            if (EcmaPattern.isSlashedPattern(declaration.name())) {
+
+                continue;
+            }
 
             builder.addMember("value", "$S", declaration.name());
         }

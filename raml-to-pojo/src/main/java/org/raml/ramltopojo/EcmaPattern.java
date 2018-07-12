@@ -16,6 +16,10 @@ public class EcmaPattern {
         this.pattern = pattern;
     }
 
+    public static boolean isSlashedPattern(String name) {
+        return ECMA_WITH_SLASHES.matcher(name).matches();
+    }
+
     public String asJavaPattern() {
 
         return pattern.toString();

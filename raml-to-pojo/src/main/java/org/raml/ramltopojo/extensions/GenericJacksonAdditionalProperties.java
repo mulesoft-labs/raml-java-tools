@@ -28,6 +28,29 @@ public class GenericJacksonAdditionalProperties extends ObjectTypeHandlerPlugin.
             return typeSpec;
         }
 
+        TypeName newSpec = objectPluginContext.createSupportClass(
+                TypeSpec.classBuilder("ExcludingMap")
+                        .superclass(ParameterizedTypeName.get(ClassName.get(HashMap.class), ClassName.get(String.class), ClassName.get(Object.class)))
+                        .addMethod(
+                                MethodSpec.methodBuilder("put")
+                                        .addParameter(ClassName.get(String.class), "key")
+                                        .addParameter(ClassName.get(Object.class), "value")
+                                        .addAnnotation(Override.class)
+                                        .addModifiers(Modifier.PUBLIC)
+                                        .returns(TypeName.OBJECT)
+                                        .addCode(CodeBlock.builder().addStatement("return super.put(key, value)").build())
+                                        .build())
+                        .addMethod(
+                                MethodSpec.methodBuilder("putAll")
+                                        .addParameter(ParameterizedTypeName.get(ClassName.get(Map.class), WildcardTypeName.subtypeOf(String.class), WildcardTypeName.subtypeOf(Object.class)), "otherMap")
+                                        .addAnnotation(Override.class)
+                                        .addModifiers(Modifier.PUBLIC)
+                                        .returns(TypeName.VOID)
+                                        .addCode(CodeBlock.builder().addStatement("super.putAll(otherMap)").build())
+                                        .build())
+                        .addModifiers(Modifier.PUBLIC));
+
+
         if (eventType != EventType.IMPLEMENTATION) {
 
 
@@ -46,16 +69,12 @@ public class GenericJacksonAdditionalProperties extends ObjectTypeHandlerPlugin.
 
         } else {
 
-            TypeName newSpec = objectPluginContext.createSupportClass(TypeSpec.classBuilder("FooFoo").addModifiers(Modifier.PUBLIC));
-            typeSpec.addField(FieldSpec.builder(newSpec, "foo", Modifier.PRIVATE).build());
-
             typeSpec.addField(FieldSpec
                     .builder(ADDITIONAL_PROPERTIES_TYPE, "additionalProperties", Modifier.PRIVATE)
                     .addAnnotation(AnnotationSpec.builder(JsonIgnore.class).build())
                     .initializer(
                             CodeBlock.of("new $T()",
-                                    ParameterizedTypeName.get(HashMap.class, String.class, Object.class))).build());
-
+                                    newSpec)).build());
 
             typeSpec.addMethod(MethodSpec.methodBuilder("getAdditionalProperties")
                     .returns(ADDITIONAL_PROPERTIES_TYPE).addModifiers(Modifier.PUBLIC)

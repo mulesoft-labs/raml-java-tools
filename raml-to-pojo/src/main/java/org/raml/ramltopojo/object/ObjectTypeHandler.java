@@ -31,7 +31,6 @@ public class ObjectTypeHandler implements TypeHandler {
 
         ObjectPluginContext context = new ObjectPluginContextImpl(generationContext, null);
 
-
         ObjectTypeHandlerPlugin plugin = generationContext.pluginsForObjects(Utils.allParents(objectTypeDeclaration, new ArrayList<TypeDeclaration>()).toArray(new TypeDeclaration[0]));
         ClassName className;
         if ( type == EventType.IMPLEMENTATION ) {
@@ -77,6 +76,11 @@ public class ObjectTypeHandler implements TypeHandler {
         Optional<String> discriminator = Optional.fromNullable(objectTypeDeclaration.discriminator());
 
         for (TypeDeclaration propertyDeclaration : objectTypeDeclaration.properties()) {
+
+            if ( EcmaPattern.isSlashedPattern(propertyDeclaration.name())) {
+
+                continue;
+            }
 
             TypeName tn;
             if ( TypeDeclarationType.isNewInlineType(propertyDeclaration) ){
@@ -166,6 +170,10 @@ public class ObjectTypeHandler implements TypeHandler {
 
         for (TypeDeclaration propertyDeclaration : objectTypeDeclaration.properties()) {
 
+            if ( EcmaPattern.isSlashedPattern(propertyDeclaration.name())) {
+
+                continue;
+            }
 
             TypeName tn = null;
             if ( TypeDeclarationType.isNewInlineType(propertyDeclaration) ){
