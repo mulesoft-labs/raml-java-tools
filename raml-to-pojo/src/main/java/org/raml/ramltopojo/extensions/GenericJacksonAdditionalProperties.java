@@ -9,7 +9,10 @@ import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 
 import javax.lang.model.element.Modifier;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Created. There, you have it.
@@ -29,26 +32,7 @@ public class GenericJacksonAdditionalProperties extends ObjectTypeHandlerPlugin.
         }
 
         TypeName newSpec = objectPluginContext.createSupportClass(
-                TypeSpec.classBuilder("ExcludingMap")
-                        .superclass(ParameterizedTypeName.get(ClassName.get(HashMap.class), ClassName.get(String.class), ClassName.get(Object.class)))
-                        .addMethod(
-                                MethodSpec.methodBuilder("put")
-                                        .addParameter(ClassName.get(String.class), "key")
-                                        .addParameter(ClassName.get(Object.class), "value")
-                                        .addAnnotation(Override.class)
-                                        .addModifiers(Modifier.PUBLIC)
-                                        .returns(TypeName.OBJECT)
-                                        .addCode(CodeBlock.builder().addStatement("return super.put(key, value)").build())
-                                        .build())
-                        .addMethod(
-                                MethodSpec.methodBuilder("putAll")
-                                        .addParameter(ParameterizedTypeName.get(ClassName.get(Map.class), WildcardTypeName.subtypeOf(String.class), WildcardTypeName.subtypeOf(Object.class)), "otherMap")
-                                        .addAnnotation(Override.class)
-                                        .addModifiers(Modifier.PUBLIC)
-                                        .returns(TypeName.VOID)
-                                        .addCode(CodeBlock.builder().addStatement("super.putAll(otherMap)").build())
-                                        .build())
-                        .addModifiers(Modifier.PUBLIC));
+                buildSpecialMap());
 
 
         if (eventType != EventType.IMPLEMENTATION) {
@@ -94,5 +78,70 @@ public class GenericJacksonAdditionalProperties extends ObjectTypeHandlerPlugin.
         }
 
         return typeSpec;
+    }
+
+    protected TypeSpec.Builder buildSpecialMap() {
+        return TypeSpec.classBuilder("ExcludingMap")
+                .superclass(ParameterizedTypeName.get(ClassName.get(HashMap.class), ClassName.get(String.class), ClassName.get(Object.class)))
+                .addField(
+                        FieldSpec.builder(ParameterizedTypeName.get(Set.class, Pattern.class), "additionalProperties")
+                                .initializer(CodeBlock.builder().add(" new $T()", ParameterizedTypeName.get(HashSet.class, Pattern.class)).build())
+                        .build())
+                .addMethod(
+                        MethodSpec.methodBuilder("put")
+                                .addParameter(ClassName.get(String.class), "key")
+                                .addParameter(ClassName.get(Object.class), "value")
+                                .addAnnotation(Override.class)
+                                .addModifiers(Modifier.PUBLIC)
+                                .returns(TypeName.OBJECT)
+                                .beginControlFlow("if ( additionalProperties.size() == 0 ) ")
+                                .addStatement("return super.put(key, value)")
+                                .endControlFlow()
+                                .beginControlFlow("else")
+                                .addStatement("return super.put(key, value)")
+                                .endControlFlow()
+                                .build())
+                .addMethod(
+                        MethodSpec.methodBuilder("putAll")
+                                .addParameter(ParameterizedTypeName.get(ClassName.get(Map.class), WildcardTypeName.subtypeOf(String.class), WildcardTypeName.subtypeOf(Object.class)), "otherMap")
+                                .addAnnotation(Override.class)
+                                .addModifiers(Modifier.PUBLIC)
+                                .returns(TypeName.VOID)
+                                .addCode(CodeBlock.builder()
+                                        .beginControlFlow("if ( additionalProperties.size() == 0 ) ")
+                                        .addStatement("super.putAll(otherMap)")
+                                        .endControlFlow()
+                                        .beginControlFlow("else")
+                                        .addStatement("super.putAll(otherMap)")
+                                        .endControlFlow()
+                                        .build())
+                                .build())
+                .addMethod(
+                        MethodSpec.methodBuilder("addAcceptedPattern")
+                                .addParameter(ClassName.get(Pattern.class), "pattern")
+                                .addModifiers(Modifier.PUBLIC)
+                                .returns(TypeName.VOID)
+                                .addCode(CodeBlock.builder().addStatement("additionalProperties.add(pattern)").build())
+                                .build())
+                .addMethod(
+                        MethodSpec.methodBuilder("setProperty")
+                                .addParameter(ClassName.get(String.class), "key")
+                                .addParameter(ClassName.get(Object.class), "value")
+                                .addModifiers(Modifier.PRIVATE)
+                                .returns(TypeName.OBJECT)
+                                .beginControlFlow("if ( additionalProperties.size() == 0 ) ")
+                                .addStatement("return super.put(key, value)")
+                                .endControlFlow()
+                                .beginControlFlow("else")
+                                .beginControlFlow("for ( $T p : additionalProperties)", Pattern.class)
+                                .beginControlFlow("if ( p.matcher(key).matches() )")
+                                .addStatement("return super.put(key, value)")
+                                .endControlFlow()
+                                .endControlFlow()
+                                .addStatement("throw new $T()", IllegalArgumentException.class)
+                                .endControlFlow()
+                                .build())
+
+                .addModifiers(Modifier.PUBLIC);
     }
 }
