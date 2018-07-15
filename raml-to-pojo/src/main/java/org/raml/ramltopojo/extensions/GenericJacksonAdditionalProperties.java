@@ -91,15 +91,15 @@ public class GenericJacksonAdditionalProperties extends ObjectTypeHandlerPlugin.
 
         if ( properties.size() == 0) {
 
-            return CodeBlock.builder().addStatement("new $T()", newSpec);
+            return CodeBlock.of("new $T()", newSpec).toBuilder();
         }
 
-        CodeBlock.Builder cb = CodeBlock.builder().beginControlFlow("new $T(){", newSpec);
+        CodeBlock.Builder cb = CodeBlock.builder().beginControlFlow("new $T()", newSpec).beginControlFlow("");
         for (TypeDeclaration typeDeclaration : object.properties()) {
 
                 cb.addStatement("addAcceptedPattern($T.compile($S))", Pattern.class, EcmaPattern.fromString(typeDeclaration.name()).asJavaPattern());
         }
-        return cb.endControlFlow("}");
+        return cb.endControlFlow().endControlFlow();
     }
 
     protected TypeSpec.Builder buildSpecialMap() {
