@@ -1,5 +1,6 @@
-package com.fun.impl;
+package foo.foo.impl;
 
+import foo.foo.EaterImpl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -33,7 +34,7 @@ public class EaterImplTest {
         EaterImpl first = new EaterImpl();
         first.setName("One");
         first.setCount(7);
-        //assertEquals("name = One, count = 7, other = [null], additionalProperties = [{}]", first.toString());
+        assertEquals("name = One, count = 7, other = [null]", first.toString());
     }
 
 }

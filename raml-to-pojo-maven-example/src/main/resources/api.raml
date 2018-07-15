@@ -4,20 +4,14 @@ version: v1
 baseUri: https://api.github.com
 uses:
   ramltopojo: ramltopojo.raml
-(ramltopojo.types):
-    plugins:
-      - name: core.splitInterface
-        arguments: [com.fun, com.fun.impl]
-      - name: core.jsr303
-#      - name: core.equalsAndHashCode
-      - name: core.jackson2
-#      arguments: []
 
 types:
     foo:
       (ramltopojo.types):
-        plugins:
-          - name: core.equalsAndHashCode
+          plugins:
+            - name: core.equalsAndHashCode
+            - name: core.jsr303
+            - name: core.jackson2
       type: object
       discriminatorValue: myOwnValue
       properties:
@@ -38,11 +32,20 @@ types:
           - name: core.equalsAndHashCode
             arguments: [name]
           - name: core.toString
+#          - name: core.jackson2
       type: object
       discriminatorValue: myOwnValue
       properties:
         name: string
         count: integer
         other: foo
-        /node\d+/: string
+    addPropsVerification:
+      (ramltopojo.types):
+        plugins:
+          - name: core.jackson2
+      type: object
+      discriminatorValue: myOwnValue
+      properties:
+        name: string
+        /note\d+/: string
 

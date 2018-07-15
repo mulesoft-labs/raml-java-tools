@@ -3,15 +3,17 @@ package org.raml.ramltopojo.extensions;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 import com.squareup.javapoet.*;
+import org.raml.ramltopojo.EcmaPattern;
 import org.raml.ramltopojo.EventType;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
+import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -57,8 +59,7 @@ public class GenericJacksonAdditionalProperties extends ObjectTypeHandlerPlugin.
                     .builder(ADDITIONAL_PROPERTIES_TYPE, "additionalProperties", Modifier.PRIVATE)
                     .addAnnotation(AnnotationSpec.builder(JsonIgnore.class).build())
                     .initializer(
-                            CodeBlock.of("new $T()",
-                                    newSpec)).build());
+                            withProperties(newSpec, obj).build()).build());
 
             typeSpec.addMethod(MethodSpec.methodBuilder("getAdditionalProperties")
                     .returns(ADDITIONAL_PROPERTIES_TYPE).addModifiers(Modifier.PUBLIC)
@@ -74,10 +75,31 @@ public class GenericJacksonAdditionalProperties extends ObjectTypeHandlerPlugin.
                     .addCode(
                             CodeBlock.builder().add("this.additionalProperties.put(key, value);\n").build())
                     .build());
-
         }
 
         return typeSpec;
+    }
+
+    private CodeBlock.Builder withProperties(TypeName newSpec, ObjectTypeDeclaration object) {
+
+        List<TypeDeclaration> properties = FluentIterable.from(object.properties()).filter(new Predicate<TypeDeclaration>() {
+            @Override
+            public boolean apply(@Nullable TypeDeclaration property) {
+                return property != null && EcmaPattern.isSlashedPattern(property.name()) && ! EcmaPattern.fromString(property.name()).asJavaPattern().isEmpty();
+            }
+        }).toList();
+
+        if ( properties.size() == 0) {
+
+            return CodeBlock.builder().addStatement("new $T()", newSpec);
+        }
+
+        CodeBlock.Builder cb = CodeBlock.builder().beginControlFlow("new $T(){", newSpec);
+        for (TypeDeclaration typeDeclaration : object.properties()) {
+
+                cb.addStatement("addAcceptedPattern($T.compile($S))", Pattern.class, EcmaPattern.fromString(typeDeclaration.name()).asJavaPattern());
+        }
+        return cb.endControlFlow("}");
     }
 
     protected TypeSpec.Builder buildSpecialMap() {
@@ -98,7 +120,7 @@ public class GenericJacksonAdditionalProperties extends ObjectTypeHandlerPlugin.
                                 .addStatement("return super.put(key, value)")
                                 .endControlFlow()
                                 .beginControlFlow("else")
-                                .addStatement("return super.put(key, value)")
+                                .addStatement("return setProperty(key, value)")
                                 .endControlFlow()
                                 .build())
                 .addMethod(
@@ -112,14 +134,16 @@ public class GenericJacksonAdditionalProperties extends ObjectTypeHandlerPlugin.
                                         .addStatement("super.putAll(otherMap)")
                                         .endControlFlow()
                                         .beginControlFlow("else")
-                                        .addStatement("super.putAll(otherMap)")
+                                        .beginControlFlow("for ( String key: otherMap.keySet() )")
+                                        .addStatement("setProperty(key, otherMap.get(key))")
+                                        .endControlFlow()
                                         .endControlFlow()
                                         .build())
                                 .build())
                 .addMethod(
                         MethodSpec.methodBuilder("addAcceptedPattern")
                                 .addParameter(ClassName.get(Pattern.class), "pattern")
-                                .addModifiers(Modifier.PUBLIC)
+                                .addModifiers(Modifier.PROTECTED)
                                 .returns(TypeName.VOID)
                                 .addCode(CodeBlock.builder().addStatement("additionalProperties.add(pattern)").build())
                                 .build())
@@ -138,7 +162,7 @@ public class GenericJacksonAdditionalProperties extends ObjectTypeHandlerPlugin.
                                 .addStatement("return super.put(key, value)")
                                 .endControlFlow()
                                 .endControlFlow()
-                                .addStatement("throw new $T()", IllegalArgumentException.class)
+                                .addStatement("throw new $T(\"property \" + key + \" is invalid according to RAML type\")", IllegalArgumentException.class)
                                 .endControlFlow()
                                 .build())
 
