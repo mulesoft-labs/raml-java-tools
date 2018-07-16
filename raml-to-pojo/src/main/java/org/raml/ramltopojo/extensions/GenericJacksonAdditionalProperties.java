@@ -1,8 +1,5 @@
 package org.raml.ramltopojo.extensions;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.squareup.javapoet.*;
@@ -13,6 +10,7 @@ import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
+import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -24,6 +22,16 @@ public class GenericJacksonAdditionalProperties extends ObjectTypeHandlerPlugin.
     private static final ParameterizedTypeName ADDITIONAL_PROPERTIES_TYPE = ParameterizedTypeName.get(
             Map.class, String.class,
             Object.class);
+
+    private final Class<? extends Annotation> jsonAnyGetterAnnotation;
+    private final Class<? extends Annotation> jsonAnySetterAnnotation;
+    private final Class<? extends Annotation> jsonIgnore;
+
+    public GenericJacksonAdditionalProperties(Class<? extends Annotation> jsonAnyGetterAnnotation, Class<? extends Annotation> jsonAnySetterAnnotation, Class<? extends Annotation> jsonIgnore) {
+        this.jsonAnyGetterAnnotation = jsonAnyGetterAnnotation;
+        this.jsonAnySetterAnnotation = jsonAnySetterAnnotation;
+        this.jsonIgnore = jsonIgnore;
+    }
 
     @Override
     public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration obj, TypeSpec.Builder typeSpec, EventType eventType) {
@@ -42,7 +50,7 @@ public class GenericJacksonAdditionalProperties extends ObjectTypeHandlerPlugin.
 
             typeSpec.addMethod(MethodSpec.methodBuilder("getAdditionalProperties")
                     .returns(ADDITIONAL_PROPERTIES_TYPE).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                    .addAnnotation(JsonAnyGetter.class)
+                    .addAnnotation(jsonAnyGetterAnnotation)
                     .build());
 
             typeSpec.addMethod(MethodSpec
@@ -50,27 +58,27 @@ public class GenericJacksonAdditionalProperties extends ObjectTypeHandlerPlugin.
                     .returns(TypeName.VOID)
                     .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(String.class), "key").build())
                     .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(Object.class), "value").build())
-                    .addAnnotation(JsonAnySetter.class)
+                    .addAnnotation(jsonAnySetterAnnotation)
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).build());
 
         } else {
 
             typeSpec.addField(FieldSpec
                     .builder(ADDITIONAL_PROPERTIES_TYPE, "additionalProperties", Modifier.PRIVATE)
-                    .addAnnotation(AnnotationSpec.builder(JsonIgnore.class).build())
+                    .addAnnotation(AnnotationSpec.builder(jsonIgnore).build())
                     .initializer(
                             withProperties(newSpec, obj).build()).build());
 
             typeSpec.addMethod(MethodSpec.methodBuilder("getAdditionalProperties")
                     .returns(ADDITIONAL_PROPERTIES_TYPE).addModifiers(Modifier.PUBLIC)
-                    .addCode("return additionalProperties;\n").addAnnotation(JsonAnyGetter.class).build());
+                    .addCode("return additionalProperties;\n").addAnnotation(jsonAnyGetterAnnotation).build());
 
             typeSpec.addMethod(MethodSpec
                     .methodBuilder("setAdditionalProperties")
                     .returns(TypeName.VOID)
                     .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(String.class), "key").build())
                     .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(Object.class), "value").build())
-                    .addAnnotation(JsonAnySetter.class)
+                    .addAnnotation(jsonAnySetterAnnotation)
                     .addModifiers(Modifier.PUBLIC)
                     .addCode(
                             CodeBlock.builder().add("this.additionalProperties.put(key, value);\n").build())

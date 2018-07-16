@@ -19,7 +19,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.squareup.javapoet.*;
+import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EcmaPattern;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
@@ -27,16 +30,10 @@ import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
-import java.util.Map;
-
 /**
  * Created by Jean-Philippe Belanger on 12/15/16. Just potential zeroes and ones
  */
 public class JacksonBasicExtension extends ObjectTypeHandlerPlugin.Helper {
-
-    public static final ParameterizedTypeName ADDITIONAL_PROPERTIES_TYPE = ParameterizedTypeName.get(
-            Map.class, String.class,
-            Object.class);
 
     @Override
     public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration obj, TypeSpec.Builder typeSpec, EventType eventType) {
