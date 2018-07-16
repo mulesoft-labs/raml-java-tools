@@ -100,7 +100,10 @@ public class GenerationContextImpl implements GenerationContext {
         for (CreationResult creationResult : knownTypes.values()) {
             creationResult.createType(rootDirectory);
         }
+    }
 
+    @Override
+    public void createSupportTypes(String rootDirectory) throws IOException {
         for (TypeSpec typeSpec : supportClasses.values()) {
 
             JavaFile.builder(defaultPackage(), typeSpec).build().writeTo(Paths.get(rootDirectory));

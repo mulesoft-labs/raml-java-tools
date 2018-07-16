@@ -27,6 +27,8 @@ public class ResultingPojosTest extends UnitTest {
         pojos.createAllTypes("/tmp/fun");
 
         verify(generationContext).createTypes("/tmp/fun");
+        verify(generationContext).createSupportTypes("/tmp/fun");
+
         verify(result).createType("/tmp/fun");
     }
 
@@ -40,6 +42,8 @@ public class ResultingPojosTest extends UnitTest {
         pojos.createFoundTypes("/tmp/fun");
 
         verify(result).createType("/tmp/fun");
+        verify(generationContext).createSupportTypes("/tmp/fun");
+
         verify(generationContext, never()).createTypes("/tmp/fun");
     }
 }

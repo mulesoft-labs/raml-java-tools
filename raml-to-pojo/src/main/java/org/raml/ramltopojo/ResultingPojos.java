@@ -28,12 +28,16 @@ public class ResultingPojos {
 
     public void createFoundTypes(String rootDirectory) throws IOException {
 
+        generationContext.createSupportTypes(rootDirectory);
+
         for (CreationResult result : results) {
             result.createType(rootDirectory);
         }
     }
 
     public void createAllTypes(String rootDirectory) throws IOException {
+
+        generationContext.createSupportTypes(rootDirectory);
 
         for (CreationResult result : results) {
             result.createType(rootDirectory);

@@ -32,5 +32,7 @@ public interface GenerationContext {
     Set<String> childClasses(String ramlTypeName);
     ClassName buildDefaultClassName(String name, EventType eventType);
 
+    void createSupportTypes(String rootDirectory) throws IOException;
+
     TypeName createSupportClass(TypeSpec.Builder newSupportType);
 }

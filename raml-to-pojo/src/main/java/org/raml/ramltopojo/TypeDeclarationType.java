@@ -413,6 +413,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
+        public void createSupportTypes(String rootDirectory) throws IOException {
+            context.createSupportTypes(rootDirectory);
+        }
+
+        @Override
         public TypeName createSupportClass(TypeSpec.Builder newSupportType) {
             return context.createSupportClass(newSupportType);
         }
