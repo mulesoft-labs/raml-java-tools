@@ -39,12 +39,17 @@ public class Main {
     }
 }
 ```
-* By annotating your RAML 1.0 file to activate a plugin.
+* By [annotating](https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md#annotations) your RAML 1.0 file to activate a plugin.
 ```yaml
 #%RAML 1.0
 title: Hello World API
 version: v1
 baseUri: https://api.github.com
+annotationTypes:
+  types:
+    allowedTargets: [TypeDeclaration,API]
+    properties:
+      className?:
 uses:
   ramltopojo: ramltopojo.raml
 (ramltopojo.types):
@@ -52,7 +57,8 @@ uses:
       - name: core.splitInterface
         arguments: [com.fun, com.fun.impl]
 ```
-Annotations can also be added directly on types, or properties.
+
+Annotations must be declared in the `annotationTypes` node in the root of the RAML file, and then they must annotate the corresponding nodes (types, properties, ...).
 
 Current supported plugins are:
 * core.jsr303: add jsr303 annotation to types.
