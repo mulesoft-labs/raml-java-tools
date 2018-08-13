@@ -84,8 +84,7 @@ public class AddEqualsAndHashCode extends AllTypesPluginHelper {
             @Override
             public String apply(@Nullable FieldSpec fieldSpec) {
                 if ( fieldSpec.type.isPrimitive()) {
-
-                    return CodeBlock.builder().add("(this.$L == $L)", fieldSpec.name, fieldSpec.name).build().toString();
+                    return CodeBlock.builder().add("(this.$L == other.$L)", fieldSpec.name, fieldSpec.name).build().toString();
                 } else {
                     return CodeBlock.builder().add("$T.equals(this.$L, other.$L)", Objects.class, fieldSpec.name, fieldSpec.name).build().toString();
                 }
