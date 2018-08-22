@@ -30,8 +30,8 @@ public class ArrayTypeHandler implements TypeHandler {
     @Override
     public ClassName javaClassName(GenerationContext generationContext, EventType type) {
 
-        ArrayPluginContext enumerationPluginContext = new ArrayPluginContextImpl(generationContext, null);
-        return generationContext.pluginsForArrays(Utils.allParents(typeDeclaration, new ArrayList<TypeDeclaration>()).toArray(new TypeDeclaration[0])).className(enumerationPluginContext, typeDeclaration, generationContext.buildDefaultClassName(Names.typeName(name), EventType.INTERFACE), EventType.INTERFACE);
+        ArrayPluginContext arrayPluginContext = new ArrayPluginContextImpl(generationContext, null);
+        return generationContext.pluginsForArrays(Utils.allParents(typeDeclaration, new ArrayList<TypeDeclaration>()).toArray(new TypeDeclaration[0])).className(arrayPluginContext, typeDeclaration, generationContext.buildDefaultClassName(Names.typeName(name), EventType.INTERFACE), EventType.INTERFACE);
     }
 
     @Override
