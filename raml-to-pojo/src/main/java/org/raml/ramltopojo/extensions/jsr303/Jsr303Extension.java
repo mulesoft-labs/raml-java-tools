@@ -18,10 +18,12 @@ package org.raml.ramltopojo.extensions.jsr303;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EcmaPattern;
 import org.raml.ramltopojo.EventType;
+import org.raml.ramltopojo.extensions.AllTypesPluginHelper;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
-import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
+import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.v2.api.model.v10.datamodel.*;
 
 import javax.validation.Valid;
@@ -32,7 +34,7 @@ import java.math.BigInteger;
 /**
  * Created by Jean-Philippe Belanger on 12/12/16. Just potential zeroes and ones
  */
-public class Jsr303Extension extends ObjectTypeHandlerPlugin.Helper {
+public class Jsr303Extension extends AllTypesPluginHelper {
 
   @Override
   public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration typeDeclaration, FieldSpec.Builder fieldSpec, EventType eventType) {
@@ -54,15 +56,28 @@ public class Jsr303Extension extends ObjectTypeHandlerPlugin.Helper {
       addFacetsForArray(fieldSpec, (ArrayTypeDeclaration) typeDeclaration);
     }
 
-    if (typeDeclaration instanceof ObjectTypeDeclaration) {
+    if (isFieldFromBuiltType(typeDeclaration)) {
 
-      addFacetsForObject(fieldSpec);
+      addFacetsForBuilt(fieldSpec);
     }
 
     return fieldSpec;
   }
 
-  private void addFacetsForObject(FieldSpec.Builder fieldSpec) {
+  @Override
+  public FieldSpec.Builder anyFieldCreated(UnionPluginContext context, UnionTypeDeclaration union, TypeSpec.Builder typeSpec, FieldSpec.Builder anyType, EventType eventType) {
+
+    addFacetsForBuilt(anyType);
+
+    return anyType;
+  }
+
+  private boolean isFieldFromBuiltType(TypeDeclaration typeDeclaration) {
+
+    return typeDeclaration instanceof ObjectTypeDeclaration || typeDeclaration instanceof UnionTypeDeclaration;
+  }
+
+  private void addFacetsForBuilt(FieldSpec.Builder fieldSpec) {
 
     fieldSpec.addAnnotation(Valid.class);
   }
@@ -75,7 +90,13 @@ public class Jsr303Extension extends ObjectTypeHandlerPlugin.Helper {
     }
   }
 
-  private void addFacetsForArray(FieldSpec.Builder typeSpec, ArrayTypeDeclaration typeDeclaration) {
+  private void addFacetsForArray(FieldSpec.Builder fieldSpec, ArrayTypeDeclaration typeDeclaration) {
+
+    if ( isFieldFromBuiltType(typeDeclaration.items()) ) {
+
+      fieldSpec.addAnnotation(Valid.class);
+    }
+
     AnnotationSpec.Builder minMax = null;
     if (typeDeclaration.minItems() != null) {
 
@@ -95,7 +116,7 @@ public class Jsr303Extension extends ObjectTypeHandlerPlugin.Helper {
     }
 
     if (minMax != null) {
-      typeSpec.addAnnotation(minMax.build());
+      fieldSpec.addAnnotation(minMax.build());
     }
   }
 
