@@ -1,0 +1,35 @@
+#%RAML 1.0 Library
+types:
+    child:
+      type: object
+      properties:
+        name: string
+    childArray:
+      type: array
+      items: child
+    emptyArrayType:
+      type: array
+    father:
+      type: object
+      properties:
+        others: child[]
+        some: string[]
+        children: childArray
+        otherChildren:
+          type: array
+          items:
+            type: child
+#        complicatedChildren:
+#          type: emptyArrayType
+#          items:
+#            type: child
+#    mother:
+#      type: object
+#      properties:
+#        children:
+#          type: array
+#          items:
+#            type: object
+#            properties:
+#              name: string
+
