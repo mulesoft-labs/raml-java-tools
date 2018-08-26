@@ -4,6 +4,7 @@ version: v1
 baseUri: https://api.github.com
 uses:
   ramltopojo: ramltopojo.raml
+  arrays: arrays.raml
 
 types:
     foo:
@@ -49,25 +50,3 @@ types:
         name: string
         /note\d+/: string
 
-    child:
-      type: object
-      properties:
-        name: string
-    childArray:
-      type: array
-      items: child
-    father:
-      type: object
-      properties:
-        others: child[]
-        some: string[]
-        children: childArray
-#    mother:
-#      type: object
-#      properties:
-#        children:
-#          type: array
-#          items:
-#            type: object
-#            properties:
-#              name: string

@@ -31,22 +31,35 @@ public class ArrayTypeHandler implements TypeHandler {
     public ClassName javaClassName(GenerationContext generationContext, EventType type) {
 
         ArrayPluginContext arrayPluginContext = new ArrayPluginContextImpl(generationContext, null);
-        return generationContext.pluginsForArrays(Utils.allParents(typeDeclaration, new ArrayList<TypeDeclaration>()).toArray(new TypeDeclaration[0])).className(arrayPluginContext, typeDeclaration, generationContext.buildDefaultClassName(Names.typeName(name), EventType.INTERFACE), EventType.INTERFACE);
+        return generationContext.pluginsForArrays(
+                Utils.allParents(typeDeclaration, new ArrayList<TypeDeclaration>())
+                        .toArray(new TypeDeclaration[0]))
+                        .className(
+                                arrayPluginContext,
+                                typeDeclaration,
+                                generationContext.buildDefaultClassName(Names.typeName(name), EventType.INTERFACE), EventType.INTERFACE);
     }
 
     @Override
     public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
-        String itemTypeName = typeDeclaration.items().name();
-        if ( "object".equals(itemTypeName)) {
-            itemTypeName = typeDeclaration.items().type();
+
+        if ( name.contains("[") || name.equals("array")) {
+            String itemTypeName = typeDeclaration.items().name();
+            if ("object".equals(itemTypeName)) {
+                itemTypeName = typeDeclaration.items().type();
+            }
+
+            if ("object".equals(itemTypeName)) {
+
+                throw new GenerationException("unable to create type array item of type object (or maybe an inline array type ?)");
+            }
+
+            return ParameterizedTypeName.get(ClassName.get(List.class), TypeDeclarationType.calculateTypeName(itemTypeName, typeDeclaration.items(), generationContext, type).box());
+        } else {
+
+            // so we are an array declared
+            return javaClassName(generationContext, type);
         }
-
-        if ( "object".equals(itemTypeName)) {
-
-            throw new GenerationException("unable to create type array item of type object (or maybe an inline array type ?)");
-        }
-
-        return ParameterizedTypeName.get(ClassName.get(List.class), TypeDeclarationType.calculateTypeName(itemTypeName, typeDeclaration.items(), generationContext, type).box());
     }
 
     @Override
