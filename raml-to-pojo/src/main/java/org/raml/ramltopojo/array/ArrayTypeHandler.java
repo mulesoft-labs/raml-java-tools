@@ -69,9 +69,20 @@ public class ArrayTypeHandler implements TypeHandler {
         ArrayPluginContext arrayPluginContext = new ArrayPluginContextImpl(generationContext, preCreationResult);
 
         TypeDeclaration items = typeDeclaration.items();
-        TypeName itemsTypeName = findType(items.name(), items, generationContext).box();
-        TypeSpec.Builder arrayClassBuilder = TypeSpec.classBuilder(className).superclass(ParameterizedTypeName.get(ClassName.get(ArrayList.class), itemsTypeName));
 
+        TypeName itemsTypeName = ClassName.get(Object.class);
+        if ( TypeDeclarationType.isNewInlineType(items) ){
+            Optional<CreationResult> cr = TypeDeclarationType.createInlineType(className, preCreationResult.getJavaName(EventType.IMPLEMENTATION),  Names.typeName(items.type(), "type"), items, generationContext);
+            if ( cr.isPresent() ) {
+                preCreationResult.withInternalType(items.name(), cr.get());
+                itemsTypeName = cr.get().getJavaName(EventType.INTERFACE);
+            }
+        }  else {
+
+            itemsTypeName = findType(items.name(), items, generationContext).box();
+        }
+
+        TypeSpec.Builder arrayClassBuilder = TypeSpec.classBuilder(className).superclass(ParameterizedTypeName.get(ClassName.get(ArrayList.class), itemsTypeName));
         arrayClassBuilder = generationContext.pluginsForArrays(typeDeclaration).classCreated(arrayPluginContext, typeDeclaration, arrayClassBuilder, EventType.INTERFACE);
         return Optional.of(preCreationResult.withInterface(arrayClassBuilder.build()));
     }

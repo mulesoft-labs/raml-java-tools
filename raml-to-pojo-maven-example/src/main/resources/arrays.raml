@@ -7,6 +7,18 @@ types:
     childArray:
       type: array
       items: child
+    inlineChildren:
+      type: array
+      items:
+         type: child
+         properties:
+             last: string
+    inlineStuff:
+      type: array
+      items:
+         type: object
+         properties:
+             last: string
     emptyArrayType:
       type: array
     father:
@@ -26,7 +38,7 @@ types:
 #    mother:
 #      type: object
 #      properties:
-#        children:
+#       children:
 #          type: array
 #          items:
 #            type: object
