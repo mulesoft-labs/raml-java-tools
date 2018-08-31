@@ -1,4 +1,6 @@
 #%RAML 1.0 Library
+uses:
+  ramltopojo: ramltopojo.raml
 types:
     child:
       type: object
@@ -31,17 +33,19 @@ types:
           type: array
           items:
             type: child
-#        complicatedChildren:
-#          type: emptyArrayType
-#          items:
-#            type: child
-#    mother:
-#      type: object
-#      properties:
-#       children:
-#          type: array
-#          items:
-#            type: object
-#            properties:
-#              name: string
+        complicatedChildren:
+          type: emptyArrayType
+          items:
+            type: child
+    mother:
+      type: object
+      properties:
+       smaller:
+          (ramltopojo.types):
+            generateInlineArrayType: true
+          type: array
+          items:
+            type: object
+            properties:
+              name: string
 

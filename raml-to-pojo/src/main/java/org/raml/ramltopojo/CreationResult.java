@@ -83,8 +83,13 @@ public class CreationResult {
 
         for (CreationResult internalType: containingResult.internalTypes.values()) {
 
+            // here I must check to see if the container is an interface, if it is, I must add static.
             createInlineType(internalType);
-            containingResult.interf = containingResult.getInterface().toBuilder().addType(internalType.getInterface()).build();
+            TypeSpec.Builder internalBuilder = internalType.getInterface().toBuilder();
+            if ( internalType.getInterface().kind == TypeSpec.Kind.CLASS) {
+                internalBuilder.addModifiers(Modifier.STATIC);
+            }
+            containingResult.interf = containingResult.getInterface().toBuilder().addType(internalBuilder.build()).build();
             if ( containingResult.getImplementation().isPresent()) {
                 if (internalType.getImplementation().isPresent() ) {
                     containingResult.impl = containingResult.getImplementation().get().toBuilder().addType(

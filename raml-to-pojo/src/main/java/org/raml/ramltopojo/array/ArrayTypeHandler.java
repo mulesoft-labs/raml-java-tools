@@ -11,6 +11,7 @@ import org.raml.ramltopojo.extensions.ArrayPluginContextImpl;
 import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
+import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,7 +83,7 @@ public class ArrayTypeHandler implements TypeHandler {
             itemsTypeName = findType(items.name(), items, generationContext).box();
         }
 
-        TypeSpec.Builder arrayClassBuilder = TypeSpec.classBuilder(className).superclass(ParameterizedTypeName.get(ClassName.get(ArrayList.class), itemsTypeName));
+        TypeSpec.Builder arrayClassBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC).superclass(ParameterizedTypeName.get(ClassName.get(ArrayList.class), itemsTypeName));
         arrayClassBuilder = generationContext.pluginsForArrays(typeDeclaration).classCreated(arrayPluginContext, typeDeclaration, arrayClassBuilder, EventType.INTERFACE);
         return Optional.of(preCreationResult.withInterface(arrayClassBuilder.build()));
     }

@@ -51,14 +51,14 @@ public abstract class Annotations<T> {
         }
     };
 
-//    public static Annotations<Boolean> GENERATE_INLINE_TYPE = new Annotations<Boolean>() {
-//
-//        @Override
-//        public Boolean getWithContext(Annotable target, Annotable... others) {
-//
-//            return getWithDefault(new TypeInstanceAsBooleanFunction(), "generateInlineType", true, target, others);
-//        }
-//    };
+    public static Annotations<Boolean> GENERATE_INLINE_ARRAY_TYPE = new Annotations<Boolean>() {
+
+        @Override
+        public Boolean getWithContext(Annotable target, Annotable... others) {
+
+            return getWithDefault(new TypeInstanceAsBooleanFunction(), "generateInlineArrayType", false, target, others);
+        }
+    };
 
     public static Annotations<String> IMPLEMENTATION_CLASS_NAME = new Annotations<String>() {
 
