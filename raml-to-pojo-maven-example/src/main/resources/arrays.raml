@@ -21,13 +21,19 @@ types:
          type: object
          properties:
              last: string
+
     emptyArrayType:
       type: array
+
     father:
       type: object
       properties:
         others: child[]
         some: string[]
+
+    mother:
+      type: object
+      properties:
         children: childArray
         otherChildren:
           type: array
@@ -37,10 +43,7 @@ types:
           type: emptyArrayType
           items:
             type: child
-    mother:
-      type: object
-      properties:
-       smaller:
+        smaller:
           (ramltopojo.types):
             generateInlineArrayType: true
           type: array

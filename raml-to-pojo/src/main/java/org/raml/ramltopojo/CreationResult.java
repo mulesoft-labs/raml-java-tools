@@ -99,7 +99,8 @@ public class CreationResult {
             } else {
 
                 if ( internalType.getImplementation().isPresent() ) {
-                    containingResult.interf = containingResult.getInterface().toBuilder().addType(internalType.getImplementation().get()).build();
+
+                    containingResult.interf = containingResult.getInterface().toBuilder().addType(internalType.getImplementation().get().toBuilder().addModifiers(Modifier.STATIC).build()).build();
                 }
             }
         }
