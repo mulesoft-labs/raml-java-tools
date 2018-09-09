@@ -112,7 +112,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         @Override
         public boolean shouldCreateInlineType(TypeDeclaration declaration) {
             ArrayTypeDeclaration arrayTypeDeclaration = (ArrayTypeDeclaration) declaration;
-            return Annotations.GENERATE_INLINE_ARRAY_TYPE.get(declaration) && TypeDeclarationType.isNewInlineType(arrayTypeDeclaration.items());
+            return Annotations.GENERATE_INLINE_ARRAY_TYPE.get(declaration) /*&& TypeDeclarationType.isNewInlineType(arrayTypeDeclaration.items())*/;
         }
     },
     UNION {

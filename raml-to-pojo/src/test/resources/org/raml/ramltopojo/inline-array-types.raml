@@ -1,6 +1,22 @@
-#%RAML 1.0 Library
-uses:
-  ramltopojo: ramltopojo.raml
+#%RAML 1.0
+title: Hello World API
+version: v1
+baseUri: https://api.github.com
+annotationTypes:
+    types:
+        allowedTargets: [TypeDeclaration,API]
+        properties:
+            className?:
+                type: string
+            implementationClassName?:
+                type: string
+            usePrimitiveType?:
+                type: boolean
+            generateInlineType?:
+                type: boolean
+            abstract?:
+                type: boolean
+            plugins?: any[]
 types:
     child:
       type: object
@@ -9,6 +25,7 @@ types:
     childArray:
       type: array
       items: child
+
     inlineChildren:
       type: array
       items:
@@ -40,13 +57,13 @@ types:
           items:
             type: child
         complicatedChildren:
-          (ramltopojo.types):
+          (types):
             generateInlineArrayType: true
           type: emptyArrayType
           items:
             type: child
         smaller:
-          (ramltopojo.types):
+          (types):
             generateInlineArrayType: true
           type: array
           items:

@@ -114,6 +114,25 @@ public class TypeDeclarationTypeTest extends UnitTest {
         assertTrue(TypeDeclarationType.isNewInlineType(property));
     }
 
+    @Test
+    public void arraySimpleType() {
+
+        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-array-types.raml"), ".");
+        ObjectTypeDeclaration decl = RamlLoader.findTypes("father", api.types());
+
+        assertFalse(TypeDeclarationType.isNewInlineType(findProperty(decl, "others")));
+        assertFalse(TypeDeclarationType.isNewInlineType(findProperty(decl, "some")));
+    }
+
+    @Test
+    public void inlineArrayOfDifferentArrayType() {
+
+        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-array-types.raml"), ".");
+        ObjectTypeDeclaration decl = RamlLoader.findTypes("mother", api.types());
+
+        assertTrue(TypeDeclarationType.isNewInlineType(findProperty(decl, "complicatedChildren")));
+    }
+
 
     @Test
     public void integerType() {
