@@ -1,7 +1,6 @@
 package foo.foo.impl;
 
-import foo.foo.Mother;
-import foo.foo.MotherImpl;
+import foo.foo.*;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -11,7 +10,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class ArraysTest {
 
-/*
+
     @Test
     public void simpleArrays() throws Exception {
 
@@ -53,7 +52,7 @@ public class ArraysTest {
         smaller.add(i);
         assertEquals(1, mi.getSmaller().size());
     }
-*/
+
 
     @Test
     public void inlinePropertiesComplicated() throws Exception {
