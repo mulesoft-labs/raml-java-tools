@@ -10,6 +10,7 @@ import org.raml.pojotoraml.types.RamlTypeFactory;
 import org.raml.pojotoraml.types.ScalarType;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -57,6 +58,30 @@ public class PojoToRamlImpl implements PojoToRaml {
 
         final String simpleName = adjuster.adjustTypeName(clazz, clazz.getSimpleName());
         return TypeBuilder.type(simpleName);
+    }
+
+    @Override
+    public TypeBuilder name(Type type) {
+
+        if ( type instanceof Class) {
+            return name((Class<?>)type);
+        } else {
+            if ( type instanceof ParameterizedType ) {
+
+                ParameterizedType pt = (ParameterizedType) type;
+                if ( pt.getRawType() instanceof Class && Collection.class.isAssignableFrom((Class)pt.getRawType()) &&  pt.getActualTypeArguments().length == 1) {
+
+                    Class<?> cls = (Class<?>) pt.getActualTypeArguments()[0];
+                    TypeBuilder builder = name(cls);
+                    return TypeBuilder.arrayOf(builder);
+                } else {
+                    throw new IllegalArgumentException("can't parse type " + pt);
+                }
+            } else {
+
+                throw new IllegalArgumentException("can't parse type " + type);
+            }
+        }
     }
 
     private TypeDeclarationBuilder handleSingleType(Class<?> clazz, Map<String, TypeDeclarationBuilder> builtTypes) {
