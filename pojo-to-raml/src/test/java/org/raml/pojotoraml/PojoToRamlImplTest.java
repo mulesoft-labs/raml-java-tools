@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import org.junit.Test;
 import org.raml.builder.RamlDocumentBuilder;
+import org.raml.builder.TypeBuilder;
 import org.raml.builder.TypeDeclarationBuilder;
 import org.raml.pojotoraml.field.FieldClassParser;
 import org.raml.simpleemitter.Emitter;
@@ -15,6 +16,7 @@ import org.raml.v2.internal.impl.commons.RamlHeader;
 import org.raml.yagi.framework.model.NodeModel;
 import org.raml.yagi.framework.nodes.ErrorNode;
 import org.raml.yagi.framework.nodes.Node;
+import org.raml.yagi.framework.nodes.ObjectNode;
 import org.raml.yagi.framework.phase.GrammarPhase;
 
 import javax.annotation.Nullable;
@@ -131,6 +133,16 @@ public class PojoToRamlImplTest {
         emitter.emit(api);
     }
 
+    @Test
+    public void name() throws Exception {
+
+        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), AdjusterFactory.NULL_FACTORY);
+        TypeBuilder builder = pojoToRaml.name(Fun.class.getMethod("stringMethod").getGenericReturnType());
+
+        ObjectNode node = builder.buildNode();
+
+        assertEquals("type: array", node.getChildren().get(0).toString());
+    }
 
     protected Api createApi(Result types) throws IOException {
         RamlDocumentBuilder ramlDocumentBuilder = RamlDocumentBuilder

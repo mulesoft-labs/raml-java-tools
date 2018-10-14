@@ -16,4 +16,9 @@ public class Fun {
     List<SubFun> listOfSubs;
     int[] arrayOfInts;
     SubFun[] arrayOfSubs;
+
+    public List<String> stringMethod() {
+        return null;
+    }
+
 }
