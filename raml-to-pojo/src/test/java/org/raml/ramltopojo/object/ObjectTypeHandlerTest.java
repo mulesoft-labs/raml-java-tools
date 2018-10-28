@@ -17,6 +17,7 @@ import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.testutils.UnitTest;
+import org.raml.testutils.assertj.ListAssert;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
@@ -28,11 +29,15 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
+import static com.squareup.javapoet.Assertions.assertThat;
 import static junit.framework.TestCase.assertNotNull;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.raml.ramltopojo.RamlLoader.findTypes;
@@ -50,6 +55,9 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Mock
     ObjectPluginContext objectPluginContext;
 
+    public void mommy(MethodSpec cp) {
+
+    }
     @Test
     public void simplest() throws Exception {
 
@@ -58,6 +66,25 @@ public class ObjectTypeHandlerTest extends UnitTest {
 
         GenerationContextImpl generationContext = new GenerationContextImpl(api);
         CreationResult r = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+
+        assertThat(r.getInterface())
+                .hasName("Foo");
+
+        ListAssert.listMatches(r.getInterface().methodSpecs,
+
+                (c) -> assertThat(c)
+                        .hasName("getName")
+                        .hasReturnType(ClassName.get(String.class)),
+                (c) -> assertThat(c)
+                        .hasName("setName")
+                        .hasReturnType(ClassName.VOID),
+                (c) -> assertThat(c)
+                        .hasName("getAge")
+                        .hasReturnType(ClassName.INT),
+                (c) -> assertThat(c)
+                        .hasName("setAge")
+                        .hasReturnType(ClassName.VOID));
+
 
         assertThat(r.getInterface(), is(allOf(
                 name(equalTo("Foo")),
