@@ -1,9 +1,6 @@
 package org.raml.ramltopojo.extensions.jaxb;
 
-import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.*;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
@@ -53,13 +50,15 @@ public class JaxbUnionExtension implements UnionTypeHandlerPlugin {
         AnnotationSpec.Builder elementsAnnotation = AnnotationSpec.builder(XmlElements.class);
         for (TypeDeclaration typeDeclaration : union.of()) {
 
+            TypeName unionPossibility = context.unionClass(typeDeclaration).getJavaName(EventType.IMPLEMENTATION);
+
             elementsAnnotation.addMember("value",
                     "$L",
                     AnnotationSpec
                             .builder(XmlElement.class)
                             .addMember("name", "$S", typeDeclaration.name())
                             .addMember("type",
-                                    "$T.class",context.creationResult().getJavaName(EventType.IMPLEMENTATION)
+                                    "$T.class", unionPossibility
                                     )
                             .build());
         }
