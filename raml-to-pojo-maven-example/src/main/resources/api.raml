@@ -7,6 +7,12 @@ uses:
   arrays: arrays.raml
 
 types:
+    dates:
+      (ramltopojo.types):
+        plugins:
+          - name: core.jackson2
+      properties:
+        someDate: datetime
     foo:
       (ramltopojo.types):
           plugins:
