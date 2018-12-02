@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -60,6 +61,18 @@ public class DatesTest {
         StringReader reader = new StringReader("{ \"someDate\": \"2010-07-22T09:34:55-03:30\"}");
         Dates d = mapper.readValue(reader, Dates.class);
         assertEquals(time, d.getSomeDate());
+    }
+
+    @Test
+    public void output() throws Exception {
+
+        ObjectMapper mapper =  new ObjectMapper();
+        DatesImpl impl = new DatesImpl();
+        impl.setSomeDate(time);
+
+        StringWriter writer = new StringWriter();
+        mapper.writeValue(writer, impl);
+        assertEquals("{\"someDate\":\"2010-07-22T13:04:55.000Z\"}", writer.toString());
     }
 
 }
