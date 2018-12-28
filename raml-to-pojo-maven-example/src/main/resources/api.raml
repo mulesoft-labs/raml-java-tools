@@ -7,6 +7,21 @@ uses:
   arrays: arrays.raml
 
 types:
+    withAnArray:
+      (ramltopojo.types):
+        plugins:
+          - name: core.asArray
+      properties:
+          someArray:
+            type: integer[]
+            (ramltopojo.types):
+               plugins:
+                 - name: core.asArray
+          anotherArray:
+            type: dates[]
+            (ramltopojo.types):
+              plugins:
+                - name: core.asArray
     dates:
       (ramltopojo.types):
         plugins:

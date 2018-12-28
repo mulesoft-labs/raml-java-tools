@@ -8,6 +8,7 @@ import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.ArrayPluginContext;
 import org.raml.ramltopojo.extensions.ArrayPluginContextImpl;
+import org.raml.ramltopojo.extensions.ReferencePluginContext;
 import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
@@ -55,10 +56,13 @@ public class ArrayTypeHandler implements TypeHandler {
                 throw new GenerationException("unable to create type array item of type object (or maybe an inline array type ?)");
             }
 
-            return ParameterizedTypeName.get(ClassName.get(List.class), TypeDeclarationType.calculateTypeName(itemTypeName, typeDeclaration.items(), generationContext, type).box());
+            return generationContext.pluginsForReferences(
+                    Utils.allParents(typeDeclaration, new ArrayList<TypeDeclaration>()).toArray(new TypeDeclaration[0]))
+                    .typeName(new ReferencePluginContext() {
+                    }, typeDeclaration, ParameterizedTypeName.get(ClassName.get(List.class), TypeDeclarationType.calculateTypeName(itemTypeName, typeDeclaration.items(), generationContext, type).box()));
         } else {
 
-            // so we are an array declared
+            // so we are an array declared in the types: section.
             return javaClassName(generationContext, type);
         }
     }
