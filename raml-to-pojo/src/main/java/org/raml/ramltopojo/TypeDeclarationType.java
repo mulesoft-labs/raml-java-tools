@@ -11,6 +11,7 @@ import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.array.ArrayTypeHandler;
 import org.raml.ramltopojo.enumeration.EnumerationTypeHandler;
 import org.raml.ramltopojo.extensions.*;
+import org.raml.ramltopojo.nulltype.NullTypeHandler;
 import org.raml.ramltopojo.object.ObjectTypeHandler;
 import org.raml.ramltopojo.references.ReferenceTypeHandler;
 import org.raml.ramltopojo.union.UnionTypeHandler;
@@ -48,7 +49,18 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
   // should prevent problems.
 */
 
+    NULL {
+        @Override
+        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
 
+            return false;
+        }
+
+        @Override
+        public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
+            return new NullTypeHandler(name, typeDeclaration);
+        }
+    },
     OBJECT {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration) {
@@ -325,6 +337,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
             .put(StringTypeDeclaration.class, STRING)
             .put(FileTypeDeclaration.class, FILE)
             .put(AnyTypeDeclaration.class, ANY)
+            .put(NullTypeDeclaration.class, NULL)
             .build();
 
     /**

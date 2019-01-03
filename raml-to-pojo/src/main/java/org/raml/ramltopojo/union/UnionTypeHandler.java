@@ -2,6 +2,7 @@ package org.raml.ramltopojo.union;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.*;
@@ -9,6 +10,7 @@ import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.ramltopojo.extensions.UnionPluginContextImpl;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.NullTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 
@@ -24,6 +26,7 @@ public class UnionTypeHandler implements TypeHandler {
 
     private final String name;
     private final UnionTypeDeclaration union;
+    public static final ClassName NULL_CLASS = ClassName.get(Object.class);
 
     public UnionTypeHandler(String name, UnionTypeDeclaration union) {
         this.name = name;
@@ -71,7 +74,9 @@ public class UnionTypeHandler implements TypeHandler {
     }
 
     private TypeSpec.Builder getImplementation(ClassName interfaceName, GenerationContext generationContext, UnionPluginContext context, CreationResult preCreationResult) {
-        TypeSpec.Builder typeSpec = TypeSpec.classBuilder(preCreationResult.getJavaName(EventType.IMPLEMENTATION)).addModifiers(Modifier.PUBLIC).addSuperinterface(interfaceName);
+        TypeSpec.Builder typeSpec = TypeSpec.classBuilder(preCreationResult.getJavaName(EventType.IMPLEMENTATION))
+                .addModifiers(Modifier.PUBLIC)
+                .addSuperinterface(interfaceName);
 
         FieldSpec.Builder anyType = FieldSpec.builder(Object.class, "anyType", Modifier.PRIVATE);
         anyType = generationContext.pluginsForUnions(union).anyFieldCreated(context, union, typeSpec, anyType, EventType.IMPLEMENTATION);
@@ -80,40 +85,68 @@ public class UnionTypeHandler implements TypeHandler {
             return typeSpec;
         }
 
+        boolean hasNullType = FluentIterable.from(union.of()).anyMatch(new Predicate<TypeDeclaration>() {
+            @Override
+            public boolean apply(@Nullable TypeDeclaration input) {
+                return input instanceof NullTypeDeclaration;
+            }
+        });
+
         typeSpec.addField(anyType.build());
         typeSpec.addMethod(
                 MethodSpec.constructorBuilder()
-                        .addModifiers(Modifier.PRIVATE).addStatement("this.anyType = null")
+                        .addModifiers(hasNullType ? Modifier.PUBLIC: Modifier.PRIVATE).addStatement("this.anyType = null")
 
                         .build());
 
         for (TypeDeclaration unitedType : union.of()) {
 
-            TypeName typeName =  findType(unitedType.name(), unitedType, generationContext).box();
+            TypeName typeName =  unitedType instanceof NullTypeDeclaration ? NULL_CLASS : findType(unitedType.name(), unitedType, generationContext).box();
             String shortened = shorten(typeName);
 
             String fieldName = Names.methodName(unitedType.name());
-            typeSpec
-                    .addMethod(
-                            MethodSpec.constructorBuilder()
-                                    .addParameter(ParameterSpec.builder(typeName, fieldName).build())
-                                    .addModifiers(Modifier.PUBLIC).addStatement("this.anyType = $L", fieldName)
-                                    .build())
-                    .addMethod(
-                            MethodSpec
-                                    .methodBuilder(Names.methodName("get", shortened))
-                                    .addModifiers(Modifier.PUBLIC)
-                                    .returns(typeName)
-                                    .addStatement(
-                                            "if ( !(anyType instanceof  $T)) throw new $T(\"fetching wrong type out of the union: $L\")",
-                                            typeName, IllegalStateException.class, typeName)
-                                    .addStatement("return ($T) anyType", typeName).build())
-                    .addMethod(
-                            MethodSpec.methodBuilder(Names.methodName("is", shortened))
-                                    .addStatement("return anyType instanceof $T", typeName)
-                                    .addModifiers(Modifier.PUBLIC)
-                                    .returns(TypeName.BOOLEAN).build()
-                    ).build();
+            if ( typeName == NULL_CLASS ) {
+
+                typeSpec
+                        .addMethod(
+                                MethodSpec
+                                        .methodBuilder("getNil")
+                                        .addModifiers(Modifier.PUBLIC)
+                                        .returns(typeName)
+                                        .addStatement(
+                                                "if ( !(anyType == null)) throw new $T(\"fetching wrong type out of the union: NullType should be null\")",
+                                                IllegalStateException.class)
+                                        .addStatement("return null").build())
+                        .addMethod(
+                                MethodSpec.methodBuilder("isNil")
+                                        .addStatement("return anyType == null")
+                                        .addModifiers(Modifier.PUBLIC)
+                                        .returns(TypeName.BOOLEAN).build()
+                        ).build();
+
+            } else {
+                typeSpec
+                        .addMethod(
+                                MethodSpec.constructorBuilder()
+                                        .addParameter(ParameterSpec.builder(typeName, fieldName).build())
+                                        .addModifiers(Modifier.PUBLIC).addStatement("this.anyType = $L", fieldName)
+                                        .build())
+                        .addMethod(
+                                MethodSpec
+                                        .methodBuilder(Names.methodName("get", shortened))
+                                        .addModifiers(Modifier.PUBLIC)
+                                        .returns(typeName)
+                                        .addStatement(
+                                                "if ( !(anyType instanceof  $T)) throw new $T(\"fetching wrong type out of the union: $L\")",
+                                                typeName, IllegalStateException.class, typeName)
+                                        .addStatement("return ($T) anyType", typeName).build())
+                        .addMethod(
+                                MethodSpec.methodBuilder(Names.methodName("is", shortened))
+                                        .addStatement("return anyType instanceof $T", typeName)
+                                        .addModifiers(Modifier.PUBLIC)
+                                        .returns(TypeName.BOOLEAN).build()
+                        ).build();
+            }
         }
 
         typeSpec = generationContext.pluginsForUnions(union).classCreated(context, union, typeSpec, EventType.IMPLEMENTATION);
@@ -125,12 +158,19 @@ public class UnionTypeHandler implements TypeHandler {
     }
 
     private TypeSpec.Builder getDeclaration(final GenerationContext generationContext, UnionPluginContext context, CreationResult preCreationResult) {
-        TypeSpec.Builder typeSpec = TypeSpec.interfaceBuilder(preCreationResult.getJavaName(EventType.INTERFACE)).addModifiers(Modifier.PUBLIC);
+
+        TypeSpec.Builder typeSpec = TypeSpec.interfaceBuilder(preCreationResult.getJavaName(EventType.INTERFACE))
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         List<TypeName> names = FluentIterable.from(union.of()).transform(new Function<TypeDeclaration, TypeName>() {
             @Nullable
             @Override
             public TypeName apply(@Nullable TypeDeclaration unitedType) {
-                return findType(unitedType.name(), unitedType, generationContext).box();
+
+                if ( unitedType instanceof NullTypeDeclaration ) {
+                    return NULL_CLASS;
+                } else {
+                    return findType(unitedType.name(), unitedType, generationContext).box();
+                }
             }
         }).toList();
 
@@ -147,19 +187,35 @@ public class UnionTypeHandler implements TypeHandler {
                 throw new GenerationException("ramltopojo currently does not support arrays in unions");
             }
 
-            String shortened = shorten(unitedType);
+            if ( unitedType == NULL_CLASS ) {
 
-            typeSpec
-                    .addMethod(
-                            MethodSpec
-                                    .methodBuilder(Names.methodName("get", shortened))
-                                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                                    .returns(unitedType).build())
-                    .addMethod(
-                            MethodSpec.methodBuilder(Names.methodName("is", shortened))
-                                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                                    .returns(TypeName.BOOLEAN).build()
-                    );
+                typeSpec
+                        .addMethod(
+                                MethodSpec
+                                        .methodBuilder("getNil")
+                                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                                        .returns(unitedType).build())
+                        .addMethod(
+                                MethodSpec.methodBuilder("isNil")
+                                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                                        .returns(TypeName.BOOLEAN).build()
+                        );
+            } else {
+
+                String shortened = shorten(unitedType);
+
+                typeSpec
+                        .addMethod(
+                                MethodSpec
+                                        .methodBuilder(Names.methodName("get", shortened))
+                                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                                        .returns(unitedType).build())
+                        .addMethod(
+                                MethodSpec.methodBuilder(Names.methodName("is", shortened))
+                                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                                        .returns(TypeName.BOOLEAN).build()
+                        );
+            }
         }
         return typeSpec;
     }
