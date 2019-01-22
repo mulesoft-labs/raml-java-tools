@@ -31,8 +31,8 @@ import java.util.List;
 
 import static com.squareup.javapoet.Assertions.assertThat;
 import static junit.framework.TestCase.assertNotNull;
-import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -256,7 +256,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
         assertThat(r.getImplementation().get(), is(allOf(
                 name(equalTo("FooImpl")),
                 fields(containsInAnyOrder(
-                        allOf(fieldName(equalTo("kind")), fieldType(equalTo(ClassName.get(String.class))), initializer(equalTo("\"foo\""))),
+                        allOf(fieldName(equalTo("kind")), fieldType(equalTo(ClassName.get(String.class))), initializer(equalTo("_DISCRIMINATOR_TYPE_NAME"))),
                         allOf(fieldName(equalTo("right")), fieldType(equalTo(ClassName.get(String.class)))),
                         allOf(fieldName(equalTo("name")), fieldType(equalTo(ClassName.get(String.class))))
                 )),
@@ -289,7 +289,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
         assertThat(r.getImplementation().get(), is(allOf(
                 name(equalTo("FooImpl")),
                 fields(containsInAnyOrder(
-                        allOf(fieldName(equalTo("kind")), fieldType(equalTo(ClassName.get(String.class))), initializer(equalTo("\"myOwnValue\""))),
+                        allOf(fieldName(equalTo("kind")), fieldType(equalTo(ClassName.get(String.class))), initializer(equalTo("_DISCRIMINATOR_TYPE_NAME"))),
                         allOf(fieldName(equalTo("right")), fieldType(equalTo(ClassName.get(String.class)))),
                         allOf(fieldName(equalTo("name")), fieldType(equalTo(ClassName.get(String.class))))
                 ))

@@ -17,6 +17,7 @@ import java.util.ArrayList;
  */
 public class ObjectTypeHandler implements TypeHandler {
 
+    public static final String DISCRIMINATOR_TYPE_NAME = "_DISCRIMINATOR_TYPE_NAME";
     private final String name;
     private final ObjectTypeDeclaration objectTypeDeclaration;
 
@@ -31,7 +32,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
         ObjectPluginContext context = new ObjectPluginContextImpl(generationContext, null);
 
-        ObjectTypeHandlerPlugin plugin = generationContext.pluginsForObjects(Utils.allParents(objectTypeDeclaration, new ArrayList<TypeDeclaration>()).toArray(new TypeDeclaration[0]));
+        ObjectTypeHandlerPlugin plugin = generationContext.pluginsForObjects(Utils.allParents(objectTypeDeclaration, new ArrayList<>()).toArray(new TypeDeclaration[0]));
         ClassName className;
         if ( type == EventType.IMPLEMENTATION ) {
             className = generationContext.buildDefaultClassName(Names.typeName(name, "Impl"), EventType.IMPLEMENTATION);
@@ -98,7 +99,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
                 String discriminatorValue = Optional.fromNullable(objectTypeDeclaration.discriminatorValue()).or(objectTypeDeclaration.name());
                 field.addModifiers(Modifier.PRIVATE, Modifier.FINAL)
-                        .initializer(CodeBlock.builder().add("$S", discriminatorValue).build());
+                        .initializer(CodeBlock.builder().add("$L", DISCRIMINATOR_TYPE_NAME).build());
 
             }
             field = generationContext.pluginsForObjects(objectTypeDeclaration, propertyDeclaration).fieldBuilt(objectPluginContext, propertyDeclaration, field, EventType.IMPLEMENTATION);
@@ -200,6 +201,11 @@ public class ObjectTypeHandler implements TypeHandler {
                 typeSpec.addMethod(getMethod.build());
 
                 if (propertyDeclaration.name().equals(discriminator.orNull())) {
+
+                    String discriminatorValue = Optional.fromNullable(objectTypeDeclaration.discriminatorValue()).or(objectTypeDeclaration.name());
+                    typeSpec.addField(
+                            FieldSpec.builder(String.class, DISCRIMINATOR_TYPE_NAME, Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC)
+                                .initializer(CodeBlock.builder().add("$S", discriminatorValue).build()).build());
 
                     continue;
                 }

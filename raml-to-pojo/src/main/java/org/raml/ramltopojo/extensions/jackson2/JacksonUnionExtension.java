@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created. There, you have it.
@@ -130,22 +131,45 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                 .addStatement("$T<String, Object> map = mapper.readValue(jsonParser, Map.class)", Map.class);
 
 
-        for (TypeDeclaration typeDeclaration : union.of()) {
+        List<TypeDeclaration> unionOf = union.of();
 
-            TypeName unionPossibility = unionPluginContext.unionClass(typeDeclaration).getJavaName(EventType.IMPLEMENTATION);
+        for (TypeDeclaration typeDeclaration : unionOf) {
+
 
             String name = Names.methodName("looksLike", typeDeclaration.name());
-            deserialize.addStatement("if ( " + name + "(map) ) return new $T(mapper.convertValue(map, $T.class))",
-                    unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), unionPossibility);
+            if ( typeDeclaration instanceof ObjectTypeDeclaration && ((ObjectTypeDeclaration)typeDeclaration).discriminator() != null ) {
+
+                TypeDeclaration parentType = findParentType(typeDeclaration);
+                TypeName unionPossibility = unionPluginContext.unionClass(typeDeclaration).getJavaName(EventType.INTERFACE);
+                ClassName javaName = unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION);
+                deserialize.addStatement("if ( " + name + "(map) ) return new $T(($T)mapper.convertValue(map, $T.class))",
+                        javaName,  unionPossibility,  unionPluginContext.unionClass(parentType).getJavaName(EventType.INTERFACE));
+            } else {
+                TypeName unionPossibility = unionPluginContext.unionClass(typeDeclaration).getJavaName(EventType.IMPLEMENTATION);
+                deserialize.addStatement("if ( " + name + "(map) ) return new $T(mapper.convertValue(map, $T.class))",
+                        unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), unionPossibility);
+            }
 
             buildLooksLike(builder, typeDeclaration);
         }
+
 
 
         deserialize.addStatement("throw new $T($S + map)", IOException.class, "Can't figure out type of object");
         builder.addMethod(deserialize.build());
 
         typeBuilder.addType(builder.build());
+    }
+
+    private TypeDeclaration findParentType(TypeDeclaration typeDeclaration) {
+
+        if ( typeDeclaration instanceof ObjectTypeDeclaration ) {
+            ObjectTypeDeclaration otd = (ObjectTypeDeclaration) typeDeclaration;
+            return otd.parentTypes().size() > 0 ?otd.parentTypes().get(0):otd;
+        } else {
+
+            return typeDeclaration;
+        }
     }
 
     private void buildLooksLike(TypeSpec.Builder builder, TypeDeclaration typeDeclaration) {
@@ -158,16 +182,31 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
         if (typeDeclaration instanceof ObjectTypeDeclaration) {
 
             ObjectTypeDeclaration otd = (ObjectTypeDeclaration) typeDeclaration;
-            List<String> names = Lists.transform(otd.properties(), new Function<TypeDeclaration, String>() {
+            if ( otd.discriminator() != null ) {
 
-                @Nullable
-                @Override
-                public String apply(@Nullable TypeDeclaration input) {
-                    return "\"" + input.name() + "\"";
-                }
-            });
+                List<String> names = Lists.transform(otd.properties(), new Function<TypeDeclaration, String>() {
 
-            spec.addStatement("return map.keySet().containsAll($T.asList($L))", Arrays.class, Joiner.on(",").join(names));
+                    @Nullable
+                    @Override
+                    public String apply(@Nullable TypeDeclaration input) {
+                        return "\"" + input.name() + "\"";
+                    }
+                });
+
+                spec.addStatement("return map.keySet().containsAll($T.asList($L)) && map.get($S).equals($S)", Arrays.class, Joiner.on(",").join(names), otd.discriminator(), Optional.ofNullable(otd.discriminatorValue()).orElse(otd.name()));
+
+            } else {
+                List<String> names = Lists.transform(otd.properties(), new Function<TypeDeclaration, String>() {
+
+                    @Nullable
+                    @Override
+                    public String apply(@Nullable TypeDeclaration input) {
+                        return "\"" + input.name() + "\"";
+                    }
+                });
+
+                spec.addStatement("return map.keySet().containsAll($T.asList($L))", Arrays.class, Joiner.on(",").join(names));
+            }
         }
 
         spec.addModifiers(Modifier.PRIVATE).returns(TypeName.BOOLEAN);
