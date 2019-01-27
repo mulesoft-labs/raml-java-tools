@@ -122,21 +122,28 @@ types:
           - name: core.jackson2
       type: Ocean | Jungle
 
-#    listElementParent:
-#      type: object
-#      properties:
-#        name: string
-#
-#    listElementChild:
-#      type: listElementParent
-#      properties:
-#        name: string
-#
-#    listHolderParent:
-#      type: object
-#      properties:
-#        elements: listElementParent[]
-#    listHolderChild:
-#      type: listHolderParent
-#      properties:
-#        elements: listElementChild[]
+    listElementParent:
+      type: object
+      properties:
+        name: string
+
+    listElementChild:
+      type: listElementParent
+      properties:
+        name: string
+
+    listHolderParent:
+      type: object
+      (ramltopojo.types):
+        plugins:
+          - name: core.wildcardcollection
+            arguments: [java.lang.Object]
+      properties:
+        elements: listElementParent[]
+        names: string[]
+        id: integer
+
+    listHolderChild:
+      type: listHolderParent
+      properties:
+        elements: listElementChild[]
