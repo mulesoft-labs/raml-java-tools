@@ -147,3 +147,19 @@ types:
       type: listHolderParent
       properties:
         elements: listElementChild[]
+
+    nametypes:
+      type: string
+      (ramltopojo.types):
+        plugins:
+          - name: core.jackson2
+      enum: [up,down]
+
+    elevator:
+      (ramltopojo.types):
+        plugins:
+          - name: core.jackson2
+      type: object
+      properties:
+        name: string
+        direction: nametypes
