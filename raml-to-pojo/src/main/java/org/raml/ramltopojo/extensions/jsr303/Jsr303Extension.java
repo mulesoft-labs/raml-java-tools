@@ -17,6 +17,7 @@ package org.raml.ramltopojo.extensions.jsr303;
 
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.AllTypesPluginHelper;
@@ -35,6 +36,12 @@ public class Jsr303Extension extends AllTypesPluginHelper {
   @Override
   public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration typeDeclaration, FieldSpec.Builder fieldSpec, EventType eventType) {
     AnnotationAdder adder = new AnnotationAdder() {
+
+      @Override
+      public TypeName typeName() {
+        return fieldSpec.build().type;
+      }
+
       @Override
       public void addAnnotation(AnnotationSpec spec) {
         fieldSpec.addAnnotation(spec);
@@ -51,6 +58,12 @@ public class Jsr303Extension extends AllTypesPluginHelper {
   public FieldSpec.Builder anyFieldCreated(UnionPluginContext context, UnionTypeDeclaration union, TypeSpec.Builder typeSpec, FieldSpec.Builder anyType, EventType eventType) {
 
     FacetValidation.addFacetsForBuilt(new AnnotationAdder() {
+
+      @Override
+      public TypeName typeName() {
+        return anyType.build().type;
+      }
+
       @Override
       public void addAnnotation(AnnotationSpec spec) {
 

@@ -1,7 +1,6 @@
 package org.raml.ramltopojo.extensions.jsr303;
 
 import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.EcmaPattern;
 import org.raml.v2.api.model.v10.datamodel.*;
@@ -30,7 +29,7 @@ public class FacetValidation {
 
         if (typeDeclaration instanceof NumberTypeDeclaration) {
 
-        //    addFacetsForNumbers(adder, (NumberTypeDeclaration) typeDeclaration);
+            addFacetsForNumbers(adder, (NumberTypeDeclaration) typeDeclaration);
             return;
         }
 
@@ -111,11 +110,10 @@ public class FacetValidation {
     }
 
 
-    public static void addFacetsForNumbers(FieldSpec.Builder typeSpec, NumberTypeDeclaration typeDeclaration) {
+    public static void addFacetsForNumbers(AnnotationAdder typeSpec, NumberTypeDeclaration typeDeclaration) {
 
-        FieldSpec t = typeSpec.build();
         if (typeDeclaration.minimum() != null) {
-            if (isInteger(t.type)) {
+            if (isInteger(typeSpec.typeName())) {
 
                 typeSpec.addAnnotation(AnnotationSpec.builder(Min.class)
                         .addMember("value", "$L", typeDeclaration.minimum().intValue()).build());
@@ -123,7 +121,7 @@ public class FacetValidation {
         }
 
         if (typeDeclaration.maximum() != null) {
-            if (isInteger(t.type)) {
+            if (isInteger(typeSpec.typeName())) {
 
                 typeSpec.addAnnotation(AnnotationSpec.builder(Max.class)
                         .addMember("value", "$L", typeDeclaration.maximum().intValue()).build());
