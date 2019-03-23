@@ -44,12 +44,13 @@ public class PojoToRamlImplTest {
 
         List<TypeDeclaration> buildTypes = api.types();
 
-        assertEquals(2, buildTypes.size());
-        assertEquals("Fun", buildTypes.get(0).name());
-        assertEquals(7, ((ObjectTypeDeclaration)buildTypes.get(0)).properties().size());
+        assertEquals(3, buildTypes.size());
+        assertEquals("SimpleEnum", buildTypes.get(0).name());
+        assertEquals("Fun", buildTypes.get(1).name());
+        assertEquals(8, ((ObjectTypeDeclaration)buildTypes.get(1)).properties().size());
 
-        assertEquals("SubFun", buildTypes.get(1).name());
-        assertEquals(1, ((ObjectTypeDeclaration)buildTypes.get(1)).properties().size());
+        assertEquals("SubFun", buildTypes.get(2).name());
+        assertEquals(1, ((ObjectTypeDeclaration)buildTypes.get(2)).properties().size());
     }
 
     @Test

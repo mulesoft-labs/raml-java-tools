@@ -95,7 +95,7 @@ public class PojoToRamlImpl implements PojoToRaml {
 
         if ( quickType.isEnum()) {
 
-            return handleEnum(quickType, adjusterFactory.createAdjuster(clazz));
+            return handleEnum(quickType, adjusterFactory.createAdjuster(clazz), builtTypes);
         }
 
         final String simpleName = adjusterFactory.createAdjuster(clazz).adjustTypeName(clazz, clazz.getSimpleName());
@@ -131,7 +131,7 @@ public class PojoToRamlImpl implements PojoToRaml {
         return typeDeclaration;
     }
 
-    private TypeDeclarationBuilder handleEnum(final RamlType quickType, final RamlAdjuster adjuster) {
+    private TypeDeclarationBuilder handleEnum(final RamlType quickType, final RamlAdjuster adjuster, Map<String, TypeDeclarationBuilder> builtTypes) {
 
         Class<? extends Enum> c = (Class<? extends Enum>) quickType.type();
         TypeBuilder typeBuilder = TypeBuilder.type().enumValues(
@@ -144,8 +144,12 @@ public class PojoToRamlImpl implements PojoToRaml {
                 }).toArray(String.class)
         );
 
+
         adjuster.adjustType(quickType.type(), quickType.getRamlSyntax().id(), typeBuilder);
-        return TypeDeclarationBuilder.typeDeclaration(quickType.getRamlSyntax().id()).ofType(typeBuilder);
+        TypeDeclarationBuilder typeDeclarationBuilder = TypeDeclarationBuilder.typeDeclaration(quickType.getRamlSyntax().id()).ofType(typeBuilder);
+
+        builtTypes.put(quickType.getRamlSyntax().id(), typeDeclarationBuilder);
+        return typeDeclarationBuilder;
     }
 
     private TypeBuilder buildSuperType(Class<?> clazz, Map<String, TypeDeclarationBuilder> builtTypes) {
