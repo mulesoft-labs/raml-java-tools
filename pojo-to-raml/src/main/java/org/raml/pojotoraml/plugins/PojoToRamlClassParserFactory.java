@@ -25,6 +25,8 @@ import org.raml.pojotoraml.field.FieldClassParser;
 
 import javax.annotation.Nullable;
 
+import static org.raml.pojotoraml.util.AnnotationFinder.annotationFor;
+
 /**
  * Created. There, you have it.
  */
@@ -51,7 +53,7 @@ public class PojoToRamlClassParserFactory implements ClassParserFactory {
 
     if (parser == null && topPackage != null) {
 
-      RamlGenerators generators = topPackage.getAnnotation(RamlGenerators.class);
+      RamlGenerators generators = annotationFor(topPackage, RamlGenerators.class);
       Optional<ClassParser> classParserOptional =
           FluentIterable.of(generators.value()).filter(new Predicate<RamlGeneratorForClass>() {
 
