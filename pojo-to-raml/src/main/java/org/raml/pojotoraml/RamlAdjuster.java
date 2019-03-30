@@ -40,6 +40,11 @@ public interface RamlAdjuster {
         public TypePropertyBuilder adjustComposedProperty(TypeDeclarationBuilder typeDeclaration, Property property, TypePropertyBuilder typePropertyBuilder) {
             return typePropertyBuilder;
         }
+
+        @Override
+        public TypeBuilder adjustForUnknownPropertyType(Type type) {
+            throw new IllegalArgumentException("cannot parse property of type " + type);
+        }
     }
 
     class Composite implements RamlAdjuster {
@@ -95,6 +100,15 @@ public interface RamlAdjuster {
             }
             return val;
         }
+
+        @Override
+        public TypeBuilder adjustForUnknownPropertyType(Type type) {
+            TypeBuilder val = null;
+            for (RamlAdjuster adjuster : adjusters) {
+                val = adjuster.adjustForUnknownPropertyType(type);
+            }
+            return val;
+        }
     }
 
     /**
@@ -140,4 +154,12 @@ public interface RamlAdjuster {
      * @return
      */
     TypePropertyBuilder adjustComposedProperty(TypeDeclarationBuilder typeDeclaration, Property property, TypePropertyBuilder typePropertyBuilder);
+
+    /**
+     * Should you have a property than contains an unsupported type for RAML, you could handle here.
+     * @param type
+     * @return
+     */
+    TypeBuilder adjustForUnknownPropertyType(Type type);
+
 }

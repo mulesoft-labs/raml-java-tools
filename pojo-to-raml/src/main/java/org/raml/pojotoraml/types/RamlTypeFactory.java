@@ -76,6 +76,6 @@ public class RamlTypeFactory {
             });
         }
 
-        throw new IllegalArgumentException("cannot parse property of type " + type);
+        return adjusterFactory.createAdjuster((Class<?>) type).adjustForUnknownPropertyType(type);
     }
 }
