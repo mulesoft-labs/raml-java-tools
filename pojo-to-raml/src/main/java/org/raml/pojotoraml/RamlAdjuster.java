@@ -42,8 +42,15 @@ public interface RamlAdjuster {
         }
 
         @Override
-        public TypeBuilder adjustForUnknownPropertyType(Type type) {
-            throw new IllegalArgumentException("cannot parse property of type " + type);
+        public TypeBuilder adjustForUnknownType(Type type) {
+            throw new IllegalArgumentException("cannot parse type " + type);
+        }
+
+        @Override
+        public void adjustForUnknownTypeInProperty(Type type, TypeBuilder typeBuilder, TypeDeclarationBuilder builder, Property property) {
+
+            throw new IllegalArgumentException("cannot parse property of type " + type + " for property " + property.name() + " of type " + property.type());
+
         }
     }
 
@@ -102,12 +109,19 @@ public interface RamlAdjuster {
         }
 
         @Override
-        public TypeBuilder adjustForUnknownPropertyType(Type type) {
+        public TypeBuilder adjustForUnknownType(Type type) {
             TypeBuilder val = null;
             for (RamlAdjuster adjuster : adjusters) {
-                val = adjuster.adjustForUnknownPropertyType(type);
+                val = adjuster.adjustForUnknownType(type);
             }
             return val;
+        }
+
+        @Override
+        public void adjustForUnknownTypeInProperty(Type type, TypeBuilder typeBuilder, TypeDeclarationBuilder typeDeclarationBuilder, Property property) {
+            for (RamlAdjuster adjuster : adjusters) {
+                 adjuster.adjustForUnknownTypeInProperty(type, typeBuilder, typeDeclarationBuilder, property);
+            }
         }
     }
 
@@ -160,6 +174,14 @@ public interface RamlAdjuster {
      * @param type
      * @return
      */
-    TypeBuilder adjustForUnknownPropertyType(Type type);
+    TypeBuilder adjustForUnknownType(Type type);
+
+    /**
+     * Should you have a property than contains an unsupported type for RAML, you could handle here.
+     * @param type
+     * @param typeBuilder
+     * @return
+     */
+    void adjustForUnknownTypeInProperty(Type type, TypeBuilder typeBuilder, TypeDeclarationBuilder builder, Property property);
 
 }

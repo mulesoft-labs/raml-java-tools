@@ -15,7 +15,7 @@ import java.util.Collection;
  */
 public class RamlTypeFactory {
 
-    public static RamlType forType(Type type, final ClassParser parser, final AdjusterFactory adjusterFactory) {
+    public static Optional<RamlType> forType(Type type, final ClassParser parser, final AdjusterFactory adjusterFactory) {
 
         if ( type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
@@ -29,14 +29,14 @@ public class RamlTypeFactory {
                 final Class<?> cls = (Class<?>) parameterizedType.getActualTypeArguments()[0];
                 Optional<RamlType> ramlType =  ScalarType.fromType(cls);
 
-                return CollectionRamlType.of(ramlType.or(new Supplier<RamlType>() {
+                return Optional.<RamlType>of(CollectionRamlType.of(ramlType.or(new Supplier<RamlType>() {
                     @Override
                     public RamlType get() {
 
                         RamlAdjuster adjuster = adjusterFactory.createAdjuster(cls);
                         return ComposedRamlType.forClass(cls, adjuster.adjustTypeName(cls, cls.getSimpleName()));
                     }
-                }));
+                })));
             }
         }
 
@@ -45,21 +45,21 @@ public class RamlTypeFactory {
             final Class<?> cls = (Class<?>) type;
             Optional<RamlType> ramlType =  ScalarType.fromType(cls.getComponentType());
 
-            return CollectionRamlType.of(ramlType.or(new Supplier<RamlType>() {
+            return Optional.<RamlType>of(CollectionRamlType.of(ramlType.or(new Supplier<RamlType>() {
                 @Override
                 public RamlType get() {
 
                     RamlAdjuster adjuster = adjusterFactory.createAdjuster(cls.getComponentType());
                     return ComposedRamlType.forClass(cls.getComponentType(), adjuster.adjustTypeName(cls.getComponentType(), cls.getComponentType().getSimpleName()));
                 }
-            }));
+            })));
 
         }
         if ( type instanceof Class && Enum.class.isAssignableFrom((Class<?>) type) ) {
 
             final Class<?> cls = (Class<?>) type;
             RamlAdjuster adjuster = adjusterFactory.createAdjuster(cls);
-            return EnumRamlType.forClass(cls, adjuster.adjustTypeName(cls, cls.getSimpleName()));
+            return Optional.<RamlType>of(EnumRamlType.forClass(cls, adjuster.adjustTypeName(cls, cls.getSimpleName())));
         }
 
         if ( type instanceof Class ) {
@@ -67,15 +67,15 @@ public class RamlTypeFactory {
 
             Optional<RamlType> ramlType =  ScalarType.fromType(cls);
 
-            return ramlType.or(new Supplier<RamlType>() {
+            return Optional.of(ramlType.or(new Supplier<RamlType>() {
                 @Override
                 public RamlType get() {
                     RamlAdjuster adjuster = adjusterFactory.createAdjuster(cls);
                     return ComposedRamlType.forClass(cls, adjuster.adjustTypeName(cls, cls.getSimpleName()));
                 }
-            });
+            }));
         }
 
-        return adjusterFactory.createAdjuster((Class<?>) type).adjustForUnknownPropertyType(type);
+        return Optional.absent();
     }
 }
