@@ -117,7 +117,7 @@ public class PojoToRamlImpl implements PojoToRaml {
 
             if ( ! ramlTypeOptional.isPresent() ) {
 
-                RamlType type = resolveUnknownType(adjusterFactory, clazz, builder, typeDeclaration, property);
+                RamlType type = resolveUnknownTypeInProperty(adjusterFactory, clazz, builder, typeDeclaration, property);
                 if ( type != null) {
 
                     builder.withProperty(TypePropertyBuilder.property(property.name(), type.getRamlSyntax()));
@@ -215,9 +215,9 @@ public class PojoToRamlImpl implements PojoToRaml {
 
     }
 
-    private static RamlType resolveUnknownType(AdjusterFactory adjusterFactory, Class<?> clazz, TypeBuilder typeBuilder, TypeDeclarationBuilder typeDeclarationBuilder, Property property) {
+    private static RamlType resolveUnknownTypeInProperty(AdjusterFactory adjusterFactory, Class<?> clazz, TypeBuilder typeBuilder, TypeDeclarationBuilder typeDeclarationBuilder, Property property) {
 
-        final TypeBuilder tb = adjusterFactory.createAdjuster(clazz).adjustForUnknownType(clazz);
+        final TypeBuilder tb = adjusterFactory.createAdjuster(clazz).adjustForUnknownType(property.type());
         if ( tb != null ) {
 
             return new GeneratedRamlType(clazz, typeBuilder);
