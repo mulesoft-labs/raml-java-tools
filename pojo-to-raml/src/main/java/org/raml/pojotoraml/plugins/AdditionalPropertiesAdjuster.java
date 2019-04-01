@@ -18,7 +18,18 @@ public class AdditionalPropertiesAdjuster extends RamlAdjuster.Helper {
     @Override
     public TypeBuilder adjustForUnknownType(Type type) {
 
-        return null;
+        if (type instanceof ParameterizedType) {
+
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            if ( parameterizedType.getRawType() == Map.class &&
+                    parameterizedType.getActualTypeArguments().length == 2 &&
+                    parameterizedType.getActualTypeArguments()[0].equals(String.class)) {
+
+                return null;
+            }
+        }
+
+        return super.adjustForUnknownType(type);
     }
 
     @Override
