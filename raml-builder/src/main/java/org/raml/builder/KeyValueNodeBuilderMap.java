@@ -5,7 +5,7 @@ import org.raml.yagi.framework.nodes.Node;
 import org.raml.yagi.framework.nodes.ObjectNodeImpl;
 import org.raml.yagi.framework.nodes.StringNodeImpl;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class KeyValueNodeBuilderMap<T extends KeyValueNodeBuilder> {
 
-    private final Map<String, T> map = new HashMap<>();
+    private final Map<String, T> map = new LinkedHashMap<>();
 
     public void addAll(T... builder) {
         for (T t : builder) {
