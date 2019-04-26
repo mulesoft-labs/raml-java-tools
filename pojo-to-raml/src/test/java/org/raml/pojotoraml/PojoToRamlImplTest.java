@@ -51,9 +51,9 @@ public class PojoToRamlImplTest {
         List<TypeDeclaration> buildTypes = api.types();
 
         assertEquals(3, buildTypes.size());
-        assertEquals("Fun", buildTypes.get(0).name());
-        assertEquals("SimpleEnum", buildTypes.get(1).name());
-        assertEquals(9, ((ObjectTypeDeclaration)buildTypes.get(0)).properties().size());
+        assertEquals("SimpleEnum", buildTypes.get(0).name());
+        assertEquals("Fun", buildTypes.get(1).name());
+        assertEquals(9, ((ObjectTypeDeclaration)buildTypes.get(1)).properties().size());
 
         assertEquals("SubFun", buildTypes.get(2).name());
         assertEquals(1, ((ObjectTypeDeclaration)buildTypes.get(2)).properties().size());
@@ -70,8 +70,8 @@ public class PojoToRamlImplTest {
         List<TypeDeclaration> buildTypes = api.types();
 
         assertEquals(2, buildTypes.size());
-        assertEquals("Inheriting", buildTypes.get(0).name());
-        assertEquals("Inherited", buildTypes.get(1).name());
+        assertEquals("Inherited", buildTypes.get(0).name());
+        assertEquals("Inheriting", buildTypes.get(1).name());
     }
 
     @Test
@@ -101,8 +101,8 @@ public class PojoToRamlImplTest {
         List<TypeDeclaration> buildTypes = api.types();
 
         assertEquals(3, buildTypes.size());
-        assertEquals("MultipleInheriting", buildTypes.get(0).name());
-        assertEquals("AnotherInherited", buildTypes.get(1).name());
+        assertEquals("AnotherInherited", buildTypes.get(0).name());
+        assertEquals("MultipleInheriting", buildTypes.get(1).name());
         assertEquals("FirstInherited", buildTypes.get(2).name());
     }
 
