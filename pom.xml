@@ -78,6 +78,11 @@
                 <artifactId>javax.annotation-api</artifactId>
                 <version>1.3.2</version>
             </dependency>
+            <dependency>
+                <groupId>org.raml</groupId>
+                <artifactId>webapi-parser_2.12</artifactId>
+                <version>0.0.2</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <packaging>pom</packaging>
@@ -319,4 +324,14 @@
             <organizationUrl>http://mulesoft.com</organizationUrl>
         </developer>
     </developers>
+    <repositories>
+        <repository>
+            <id>MuleSoftReleases</id>
+            <url>https://repository-master.mulesoft.org/nexus/content/repositories/releases</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 </project>

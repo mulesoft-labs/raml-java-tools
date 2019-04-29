@@ -75,6 +75,10 @@
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.raml</groupId>
+            <artifactId>webapi-parser_2.12</artifactId>
+            <version>0.0.2</version>
+        </dependency>
     </dependencies>
 </project>
