@@ -1,83 +1,125 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.domain.*;
+import amf.client.validate.ValidationReport;
+import com.google.common.collect.Streams;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.raml.testutils.UnitTest;
-import org.raml.v2.api.model.v10.api.Api;
-import org.raml.v2.api.model.v10.api.Library;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
+import webapi.Raml10;
+import webapi.WebApiDocument;
+import webapi.WebApiParser;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
+import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created. There, you have it.
  */
-public class TypeFindersTest extends UnitTest{
-
-    @Mock
-    Api api;
-
-    @Mock
-    TypeDeclaration t1, t2, t3, t4, t5, t6;
-
-    @Mock
-    Library l1, l2, l3;
+public class TypeFindersTest extends UnitTest {
 
     @Before
-    public void before() {
+    public void before() throws ExecutionException, InterruptedException {
 
-        when(l1.name()).thenReturn("l1");
-        when(l2.name()).thenReturn("l2");
-        when(l3.name()).thenReturn("l3");
-    }
-    @Test
-    public void inTypes() {
-        when(api.types()).thenReturn(Arrays.asList(t1, t2, t3));
-
-        Iterable<TypeDeclaration> it = TypeFinders.inTypes().findTypes(api);
-
-        assertThat(it, contains(equalTo(t1), equalTo(t2), equalTo(t3)));
-
+        WebApiParser.init().get();
     }
 
     @Test
-    public void inLibraries() {
-        when(api.uses()).thenReturn(Arrays.asList(l1, l2));
-        when(l1.uses()).thenReturn(Collections.singletonList(l3));
+    public void inTypes() throws Exception {
 
-        when(l1.types()).thenReturn(Collections.singletonList(t1));
-        when(l2.types()).thenReturn(Collections.singletonList(t2));
-        when(l3.types()).thenReturn(Collections.singletonList(t3));
+        List<DomainElement> ts = Arrays.asList(
+                new NodeShape().withName("t1"),
+                new NodeShape().withName("t2"),
+                new NodeShape().withName("t3")
+        );
 
-        Iterable<TypeDeclaration> it = TypeFinders.inLibraries().findTypes(api);
+        WebApiDocument api = (WebApiDocument) new WebApiDocument()
+                .withDeclares(ts);
 
-        System.err.println(it);
-        assertThat(it, containsInAnyOrder(equalTo(t1), equalTo(t2), equalTo(t3)));
+        List<Shape> it = Streams.stream(TypeFinders.inTypes().findTypes(api)).collect(Collectors.toList());
 
+        assertThat(it.size()).isEqualTo(3);
+        assertThat(it.get(0).name().value()).isEqualTo("t1");
+        assertThat(it.get(1).name().value()).isEqualTo("t2");
+        assertThat(it.get(2).name().value()).isEqualTo("t3");
+    }
+
+
+    @Test
+    public void inLibraries() throws ExecutionException, InterruptedException {
+
+        WebApiParser.init().get();
+
+        final WebApiDocument document = (WebApiDocument) Raml10.parse(TypeFindersTest.class.getResource("typefinder-libraries.raml").toString()).get();
+        final ValidationReport report = Raml10.validate(document).get();
+
+        List<Shape> it = Streams.stream(TypeFinders.inLibraries().findTypes(document)).collect(Collectors.toList());
+
+        assertThat(it.size()).isEqualTo(3);
+        assertThat(it.get(0).name().value()).isEqualTo("t1");
+        assertThat(it.get(1).name().value()).isEqualTo("t2");
+        assertThat(it.get(2).name().value()).isEqualTo("t3");
     }
 
     @Test
-    public void everyWhere() {
+    public void inResources() throws ExecutionException, InterruptedException {
 
-        when(api.types()).thenReturn(Arrays.asList(t4, t5, t6));
+        WebApiParser.init().get();
 
-        when(api.uses()).thenReturn(Arrays.asList(l1, l2));
-        when(l1.uses()).thenReturn(Collections.singletonList(l3));
+        WebApiDocument api = (WebApiDocument) new WebApiDocument()
+                .withEncodes(
+                        new WebApi().withEndPoints(
+                                singletonList(
+                                        new EndPoint()
+                                                .withName("/foo")
+                                                .withOperations(
+                                                        singletonList(
+                                                                new Operation()
+                                                                        .withName("post")
+                                                                        .withRequest(
+                                                                                new Request()
+                                                                                .withPayloads(singletonList(new Payload()
+                                                                                        .withMediaType("application/json")
+                                                                                        .withSchema(new NodeShape().withName("request"))
+                                                                                ))
+                                                                        ).withResponses(singletonList(
+                                                                                new Response().withPayloads(singletonList(new Payload()
+                                                                                        .withMediaType("application/json")
+                                                                                        .withSchema(new NodeShape().withName("response"))
+                                                                                )))
+                                                                ))
+                                                        )))
+                );
+        List<Shape> it = Streams.stream(TypeFinders.inResources().findTypes(api)).collect(Collectors.toList());
 
-        when(l1.types()).thenReturn(Collections.singletonList(t1));
-        when(l2.types()).thenReturn(Collections.singletonList(t2));
-        when(l3.types()).thenReturn(Collections.singletonList(t3));
-
-        Iterable<TypeDeclaration> it = TypeFinders.everyWhere().findTypes(api);
-
-        System.err.println(it);
-        assertThat(it, containsInAnyOrder(equalTo(t1), equalTo(t2), equalTo(t3), equalTo(t4), equalTo(t5), equalTo(t6)));
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(it.size()).isEqualTo(2);
+        softly.assertThat(it.get(0).name().value()).isEqualTo("response");
+        softly.assertThat(it.get(1).name().value()).isEqualTo("request");
+        softly.assertAll();
     }
 
+
+    @Test
+    public void everyWhere() throws ExecutionException, InterruptedException {
+
+        final WebApiDocument document = (WebApiDocument) Raml10.parse(TypeFindersTest.class.getResource("typefinder-libraries.raml").toString()).get();
+        List<Shape> it = Streams.stream(TypeFinders.everyWhere().findTypes(document)).collect(Collectors.toList());
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(it.size()).isEqualTo(5);
+        softly.assertThat(it.get(0).name().value()).isEqualTo("foo");
+        softly.assertThat(it.get(1).name().value()).isEqualTo("schema");
+        softly.assertThat(it.get(2).name().value()).isEqualTo("t1");
+        softly.assertThat(it.get(3).name().value()).isEqualTo("t2");
+        softly.assertThat(it.get(4).name().value()).isEqualTo("t3");
+
+        softly.assertAll();
+    }
 }

@@ -1,15 +1,13 @@
 package org.raml.ramltopojo;
 
-import com.google.common.collect.FluentIterable;
-import org.raml.v2.api.model.v10.api.Api;
-import org.raml.v2.api.model.v10.bodies.Response;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
-import org.raml.v2.api.model.v10.methods.Method;
-import org.raml.v2.api.model.v10.resources.Resource;
+import amf.client.model.document.Module;
+import amf.client.model.domain.*;
+import webapi.WebApiDocument;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created. There, you have it.
@@ -18,82 +16,77 @@ public class TypeFinders {
 
     public static TypeFinder inTypes() {
 
-        return new TypeFinder() {
-            @Override
-            public Iterable<TypeDeclaration> findTypes(Api api) {
-
-                return api.types();
-            }
-        };
+        return api -> api.declares().stream().filter(x -> x instanceof Shape).map(x -> (Shape) x).collect(Collectors.toList());
     }
 
     public static TypeFinder inLibraries() {
 
-        return new TypeFinder() {
-            @Override
-            public Iterable<TypeDeclaration> findTypes(Api api) {
-
-                List<TypeDeclaration> foundTypes = new ArrayList<>();
-                Utils.goThroughLibraries(foundTypes, new HashSet<String>(), api.uses());
-                return foundTypes;
-            }
-        };
+        return (api) -> shapesFromLibraries(api)
+                .collect(Collectors.toList()); // need to figure this out.
     }
 
     public static TypeFinder everyWhere() {
 
-        return new TypeFinder() {
-            @Override
-            public Iterable<TypeDeclaration> findTypes(Api api) {
-
-                return FluentIterable.from(api.types())
-                        .append(resourceTypes(api.resources()))
-                        .append(Utils.goThroughLibraries(new ArrayList<TypeDeclaration>(), new HashSet<String>(), api.uses()));
-            }
-        };
+        return (api) -> Stream.concat(
+                Stream.concat(
+                        shapesFromTypes(api),
+                        shapesFromResources(((WebApi) api.encodes()).endPoints())
+                ), shapesFromLibraries(api)
+        ).collect(Collectors.toList());
     }
 
     public static TypeFinder inResources() {
 
-        return new TypeFinder() {
-            @Override
-            public Iterable<TypeDeclaration> findTypes(Api api) {
-                return resourceTypes(api.resources());
-            }
-        };
+        return (api) -> shapesFromResources(((WebApi) api.encodes()).endPoints()).collect(Collectors.toList());
     }
 
-    private static List<TypeDeclaration> resourceTypes(List<Resource> resources) {
 
-        List<TypeDeclaration> declarations = new ArrayList<>();
-        for (Resource resource : resources) {
+    private static Stream<Shape> shapesFromTypes(WebApiDocument api) {
+        return api.declares().stream().filter(x -> x instanceof Shape).map(x -> (Shape) x);
+    }
 
-            resourceTypes(resource.resources());
-            declarations.addAll(resource.uriParameters());
 
-            for (Method method : resource.methods()) {
+    private static Stream<Shape> shapesFromLibraries(WebApiDocument api) {
+        return api.references().stream()
+                .filter(x -> x instanceof Module)
+                .map(x -> (Module) x)
+                .flatMap(x -> x.declares().stream())
+                .filter(x -> x instanceof Shape)
+                .map(x -> (Shape) x);
+    }
 
-                List<TypeDeclaration> methodDeclarations = typesInBodies(resource, method, method.body());
-                declarations.addAll(methodDeclarations);
+
+    private static Stream<Shape> shapesFromResources(List<EndPoint> endPoints) {
+
+        List<Shape> declarations = new ArrayList<>();
+        for (EndPoint endPoint : endPoints) {
+
+            // todo subresources
+            //  resourceTypes(endPoint.());
+            declarations.addAll(endPoint.parameters().stream().map(Parameter::schema).collect(Collectors.toList()));
+
+            for (Operation method : endPoint.operations()) {
+
+                List<Shape> requestShapes = typesInRequests(endPoint, method, new ArrayList<>());
+                declarations.addAll(requestShapes);
             }
         }
 
-        return declarations;
+        return declarations.stream();
     }
 
-    private static List<TypeDeclaration> typesInBodies(Resource resource, Method method, List<TypeDeclaration> body) {
+    private static List<Shape> typesInRequests(EndPoint resource, Operation method, List<Shape> body) {
 
-        List<TypeDeclaration> declarations = new ArrayList<>();
+        List<Shape> declarations = new ArrayList<>(body);
 
-        declarations.addAll(body);
-
-        declarations.addAll(method.queryParameters());
-
-        declarations.addAll(method.headers());
+        //declarations.addAll(method.queryParameters());
 
         for (Response response : method.responses()) {
-            declarations.addAll(response.body());
+            declarations.addAll(response.headers().stream().map(Parameter::schema).collect(Collectors.toList()));
+            declarations.addAll(response.payloads().stream().map(Payload::schema).collect(Collectors.toList()));
         }
+
+        declarations.addAll(method.request().payloads().stream().map(Payload::schema).collect(Collectors.toList()));
 
         return declarations;
     }

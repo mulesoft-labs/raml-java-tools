@@ -1,0 +1,19 @@
+#%RAML 1.0
+title: Hello World API
+version: v1
+baseUri: https://api.github.com
+uses:
+  someType: simple-library.raml
+types:
+  foo:
+    type: object
+    properties:
+      mommy: integer
+
+/some:
+  post:
+    body:
+      application/json:
+        type: object
+        properties:
+          name: string

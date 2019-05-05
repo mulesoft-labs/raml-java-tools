@@ -22,18 +22,20 @@ public class RamlToPojoImpl implements RamlToPojo {
 
         ResultingPojos resultingPojos = new ResultingPojos(generationContext);
 
+/*  TODO JP reactivate when types migrated
         for (TypeDeclaration typeDeclaration : typeFinder.findTypes(generationContext.api())) {
 
             TypeDeclarationType.calculateTypeName(typeDeclaration.name(), typeDeclaration, generationContext, EventType.INTERFACE);
         }
 
         for (TypeDeclaration typeDeclaration : typeFinder.findTypes(generationContext.api())) {
-
+˚
             Optional<CreationResult> spec = TypeDeclarationType.createType(typeDeclaration, generationContext);
             if ( spec.isPresent() ) {
                 resultingPojos.addNewResult(spec.get());
             }
         }
+*/
 
         return resultingPojos;
     }
