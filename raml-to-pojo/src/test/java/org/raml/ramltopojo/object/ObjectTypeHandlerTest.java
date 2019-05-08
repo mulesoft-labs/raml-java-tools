@@ -1,8 +1,5 @@
 package org.raml.ramltopojo.object;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Supplier;
-import com.google.common.collect.FluentIterable;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -23,7 +20,6 @@ import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.net.URL;
 import java.util.Collections;
@@ -494,22 +490,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
         System.err.println(r.internalType("unionOfOthers").getInterface());
     }
     protected GenerationContextImpl createGenerationContext(final Api api) {
-        return new GenerationContextImpl(PluginManager.NULL, api, new TypeFetcher() {
-            @Override
-            public TypeDeclaration fetchType(Api api, final String name) throws GenerationException {
-                return FluentIterable.from(api.types()).firstMatch(new Predicate<TypeDeclaration>() {
-                    @Override
-                    public boolean apply(@Nullable TypeDeclaration input) {
-                        return input.name().equals(name);
-                    }
-                }).or(new Supplier<TypeDeclaration>() {
-                    @Override
-                    public TypeDeclaration get() {
-                        throw new GenerationException("type " + name + " not found");
-                    }
-                });
-            }
-        }, "pojo.pack", Collections.<String>emptyList());
+        return new GenerationContextImpl(PluginManager.NULL, null, null, "pojo.pack", Collections.emptyList());
     }
 
 

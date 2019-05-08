@@ -1,7 +1,5 @@
 package org.raml.pojotoraml;
 
-import com.google.common.base.Function;
-import com.google.common.collect.FluentIterable;
 import org.junit.Test;
 import org.raml.builder.RamlDocumentBuilder;
 import org.raml.builder.TypeBuilder;
@@ -19,11 +17,12 @@ import org.raml.yagi.framework.nodes.Node;
 import org.raml.yagi.framework.nodes.ObjectNode;
 import org.raml.yagi.framework.phase.GrammarPhase;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -70,21 +69,10 @@ public class PojoToRamlImplTest {
     @Test
     public void withMultipleInheritance() throws Exception {
 
-        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(new ClassParserFactory() {
+        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(clazz -> new FieldClassParser() {
             @Override
-            public ClassParser createParser(final Class<?> clazz) {
-                return new FieldClassParser() {
-                    @Override
-                    public Collection<Type> parentClasses(Class<?> sourceClass) {
-                        return FluentIterable.of(clazz.getInterfaces()).transform(new Function<Class<?>, Type>() {
-                            @Nullable
-                            @Override
-                            public Type apply(@Nullable Class<?> aClass) {
-                                return aClass;
-                            }
-                        }).toList();
-                    }
-                };
+            public Collection<Type> parentClasses(Class<?> sourceClass) {
+                return Arrays.stream(clazz.getInterfaces()).collect(Collectors.toList());
             }
         }, AdjusterFactory.NULL_FACTORY);
         Result types =  pojoToRaml.classToRaml(MultipleInheriting.class);

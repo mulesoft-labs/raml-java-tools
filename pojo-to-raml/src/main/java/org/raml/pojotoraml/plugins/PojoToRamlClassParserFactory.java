@@ -15,15 +15,12 @@
  */
 package org.raml.pojotoraml.plugins;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
 import org.raml.pojotoraml.ClassParser;
 import org.raml.pojotoraml.ClassParserFactory;
 import org.raml.pojotoraml.field.FieldClassParser;
 
-import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Created. There, you have it.
@@ -34,6 +31,15 @@ public class PojoToRamlClassParserFactory implements ClassParserFactory {
 
   public PojoToRamlClassParserFactory(Package topPackage) {
     this.topPackage = topPackage;
+  }
+
+  private static ClassParser instantiateClassParser(RamlGeneratorForClass ramlGeneratorForClass) {
+    try {
+      return ramlGeneratorForClass.generator().parser().newInstance();
+    } catch (InstantiationException | IllegalAccessException e) {
+
+      return null;
+    }
   }
 
   @Override
@@ -53,29 +59,13 @@ public class PojoToRamlClassParserFactory implements ClassParserFactory {
 
       RamlGenerators generators = topPackage.getAnnotation(RamlGenerators.class);
       Optional<ClassParser> classParserOptional =
-          FluentIterable.of(generators.value()).filter(new Predicate<RamlGeneratorForClass>() {
+          Arrays.stream(generators.value()).filter(ramlGeneratorForClass -> ramlGeneratorForClass.forClass().equals(clazz))
+                  .findFirst()
+                  .map(PojoToRamlClassParserFactory::instantiateClassParser);
 
-            @Override
-            public boolean apply(@Nullable RamlGeneratorForClass ramlGeneratorForClass) {
-              return ramlGeneratorForClass.forClass().equals(clazz);
-            }
-          }).first().transform(new Function<RamlGeneratorForClass, ClassParser>() {
-
-            @Nullable
-            @Override
-            public ClassParser apply(@Nullable RamlGeneratorForClass ramlGeneratorForClass) {
-              try {
-                return ramlGeneratorForClass.generator().parser().newInstance();
-              } catch (InstantiationException | IllegalAccessException e) {
-
-                return null;
-              }
-            }
-          });
-
-      return classParserOptional.or(new FieldClassParser());
+      return classParserOptional.orElse(new FieldClassParser());
     }
 
-    return Optional.fromNullable(parser).or(new FieldClassParser());
+    return Optional.ofNullable(parser).orElse(new FieldClassParser());
   }
 }

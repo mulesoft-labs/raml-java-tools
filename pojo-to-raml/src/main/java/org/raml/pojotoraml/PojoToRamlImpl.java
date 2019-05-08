@@ -1,7 +1,5 @@
 package org.raml.pojotoraml;
 
-import com.google.common.base.Function;
-import com.google.common.collect.FluentIterable;
 import org.raml.builder.TypeBuilder;
 import org.raml.builder.TypeDeclarationBuilder;
 import org.raml.builder.TypePropertyBuilder;
@@ -13,6 +11,7 @@ import javax.annotation.Nullable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created. There, you have it.
@@ -135,14 +134,13 @@ public class PojoToRamlImpl implements PojoToRaml {
 
         Class<? extends Enum> c = (Class<? extends Enum>) quickType.type();
         TypeBuilder typeBuilder = TypeBuilder.type().enumValues(
-                FluentIterable.of(c.getEnumConstants()).transform(new Function<Enum, String>() {
+                Arrays.stream(c.getEnumConstants()).map(new java.util.function.Function<Enum, String>() {
                     @Nullable
                     @Override
                     public String apply(@Nullable Enum o) {
                         return adjuster.adjustEnumValue(quickType.type(), o.name());
                     }
-                }).toArray(String.class)
-        );
+                }).collect(Collectors.toList()).toArray(new String[0]));
 
         adjuster.adjustType(quickType.type(), quickType.getRamlSyntax().id(), typeBuilder);
         return TypeDeclarationBuilder.typeDeclaration(quickType.getRamlSyntax().id()).ofType(typeBuilder);

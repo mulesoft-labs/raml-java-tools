@@ -1,6 +1,5 @@
 package org.raml.ramltopojo;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.squareup.javapoet.ClassName;
@@ -46,6 +45,7 @@ public class GenerationContextImpl implements GenerationContext {
     @Override
     public CreationResult findCreatedType(String typeName, TypeDeclaration ramlType) {
 
+/*
         if ( knownTypes.containsKey(typeName) ) {
 
             return knownTypes.get(typeName);
@@ -62,6 +62,8 @@ public class GenerationContextImpl implements GenerationContext {
                 return null;
             }
         }
+*/
+        return null;
     }
 
     @Override
