@@ -80,8 +80,8 @@
             </dependency>
             <dependency>
                 <groupId>org.raml</groupId>
-                <artifactId>webapi-parser_2.12</artifactId>
-                <version>0.0.2</version>
+                <artifactId>webapi-parser</artifactId>
+                <version>0.0.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -94,7 +94,9 @@
         <module>raml-parser-tools</module>
         <module>pojo-to-raml</module>
         <module>raml-to-pojo</module>
+<!--
         <module>raml-to-pojo-maven-example</module>
+-->
         <module>raml-to-pojo-maven-plugin</module>
     </modules>
     <build>
@@ -320,12 +322,12 @@
     </developers>
     <repositories>
         <repository>
-            <id>MuleSoftReleases</id>
+            <id>Mulesoft</id>
             <url>https://repository-master.mulesoft.org/nexus/content/repositories/releases</url>
         </repository>
         <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
+            <id>SonatypeSnapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/releases</url>
         </repository>
     </repositories>
 </project>
