@@ -51,7 +51,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
     @Override
     // TODO deal with null interface spec.
-    public Optional<CreationResult> create(GenerationContext generationContext, CreationResult result) {
+    public java.util.Optional<CreationResult> create(GenerationContext generationContext, CreationResult result) {
 
         // I need to createHandler an interface and an implementation.
         ObjectPluginContext context = new ObjectPluginContextImpl(generationContext, result);
@@ -60,9 +60,9 @@ public class ObjectTypeHandler implements TypeHandler {
 
         if ( interfaceSpec == null ) {
 
-            return Optional.absent();
+            return java.util.Optional.empty();
         } else {
-            return Optional.of(result.withInterface(interfaceSpec).withImplementation(implementationSpec));
+            return java.util.Optional.of(result.withInterface(interfaceSpec).withImplementation(implementationSpec));
         }
     }
 
@@ -179,7 +179,7 @@ public class ObjectTypeHandler implements TypeHandler {
             TypeName tn = null;
             if ( TypeDeclarationType.isNewInlineType(propertyDeclaration) ){
 
-                Optional<CreationResult> cr = TypeDeclarationType.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),  Names.typeName(propertyDeclaration.name(), "type"), propertyDeclaration, generationContext);
+                java.util.Optional<CreationResult> cr = TypeDeclarationType.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),  Names.typeName(propertyDeclaration.name(), "type"), null/*propertyDeclaration*/, generationContext);
                 if ( cr.isPresent() ) {
                     result.withInternalType(propertyDeclaration.name(), cr.get());
                     tn = cr.get().getJavaName(EventType.INTERFACE);
@@ -226,6 +226,6 @@ public class ObjectTypeHandler implements TypeHandler {
 
     private TypeName findType(String typeName, TypeDeclaration type, GenerationContext generationContext, EventType eventType) {
 
-        return TypeDeclarationType.calculateTypeName(typeName, type, generationContext,eventType );
+        return TypeDeclarationType.calculateTypeName(typeName, null/*type*/, generationContext,eventType );
     }
 }

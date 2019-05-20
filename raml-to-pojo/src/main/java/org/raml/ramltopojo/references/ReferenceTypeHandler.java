@@ -1,6 +1,6 @@
 package org.raml.ramltopojo.references;
 
-import com.google.common.base.Optional;
+import amf.client.model.domain.Shape;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.*;
@@ -8,17 +8,18 @@ import org.raml.ramltopojo.extensions.ReferencePluginContext;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 /**
  * Created. There, you have it.
  */
 public class ReferenceTypeHandler implements TypeHandler {
 
-    private final TypeDeclaration typeDeclaration;
+    private final Shape typeDeclaration;
     private final Class type;
     private final TypeName referenceName;
 
-    public ReferenceTypeHandler(TypeDeclaration typeDeclaration, Class type, TypeName referenceName) {
+    public ReferenceTypeHandler(Shape typeDeclaration, Class type, TypeName referenceName) {
         this.typeDeclaration = typeDeclaration;
         this.type = type;
         this.referenceName = referenceName;
@@ -33,14 +34,15 @@ public class ReferenceTypeHandler implements TypeHandler {
     public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
 
         return generationContext.pluginsForReferences(
-                    Utils.allParents(typeDeclaration, new ArrayList<TypeDeclaration>()).toArray(new TypeDeclaration[0]))
+                    Utils.allParents(null /*typeDeclaration*/, new ArrayList<TypeDeclaration>()).toArray(new TypeDeclaration[0]))
                 .typeName(new ReferencePluginContext() {
-                }, typeDeclaration, referenceName);
+                }, null /*typeDeclaration*/, referenceName);
+
     }
 
     @Override
     public Optional<CreationResult> create(GenerationContext generationContext, CreationResult preCreationResult) {
 
-        return Optional.absent();
+        return Optional.empty();
     }
 }

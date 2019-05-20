@@ -1,8 +1,9 @@
 package org.raml.ramltopojo;
 
-import com.google.common.base.Optional;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
+
+import java.util.Optional;
 
 /**
  * Created. There, you have it.

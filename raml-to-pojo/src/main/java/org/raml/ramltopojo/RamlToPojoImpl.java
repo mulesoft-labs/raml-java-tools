@@ -1,8 +1,10 @@
 package org.raml.ramltopojo;
 
-import com.google.common.base.Optional;
+import amf.client.model.domain.Shape;
 import com.squareup.javapoet.TypeName;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
+
+import java.util.Optional;
 
 /**
  * Created. There, you have it.
@@ -41,14 +43,12 @@ public class RamlToPojoImpl implements RamlToPojo {
     }
 
     @Override
-    public ResultingPojos buildPojo(TypeDeclaration typeDeclaration) {
+    public ResultingPojos buildPojo(Shape typeDeclaration) {
 
         ResultingPojos resultingPojos = new ResultingPojos(generationContext);
 
         Optional<CreationResult> spec = TypeDeclarationType.createType(typeDeclaration, generationContext);
-        if (spec.isPresent() ) {
-            resultingPojos.addNewResult(spec.get());
-        }
+        spec.ifPresent(resultingPojos::addNewResult);
 
         return resultingPojos;
     }
@@ -59,9 +59,7 @@ public class RamlToPojoImpl implements RamlToPojo {
         ResultingPojos resultingPojos = new ResultingPojos(generationContext);
 
         Optional<CreationResult> spec = TypeDeclarationType.createNamedType(suggestedJavaName, typeDeclaration, generationContext);
-        if ( spec.isPresent() ) {
-            resultingPojos.addNewResult(spec.get());
-        }
+        spec.ifPresent(resultingPojos::addNewResult);
 
         return resultingPojos;
     }
@@ -70,7 +68,7 @@ public class RamlToPojoImpl implements RamlToPojo {
     public TypeName fetchType(String suggestedName, TypeDeclaration typeDeclaration) {
 
 
-        return TypeDeclarationType.calculateTypeName(suggestedName, typeDeclaration, generationContext, EventType.INTERFACE);
+        return TypeDeclarationType.calculateTypeName(suggestedName, null /*typeDeclaration*/, generationContext, EventType.INTERFACE);
     }
 
     public boolean isInline(TypeDeclaration typeDeclaration) {

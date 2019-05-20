@@ -45,7 +45,7 @@ public class EnumerationTypeHandlerTest extends UnitTest {
         when(stringDeclaration.name()).thenReturn("Days");
         when(stringDeclaration.enumValues()).thenReturn(Arrays.asList("one", "two", "three"));
 
-        EnumerationTypeHandler handler = new EnumerationTypeHandler("days", stringDeclaration);
+        EnumerationTypeHandler handler = new EnumerationTypeHandler("days", null /*stringDeclaration*/);
         GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());
         generationContext.newExpectedType("Days", new CreationResult("bar.pack", ClassName.get("bar.pack", "Days"), null));
 
@@ -68,7 +68,7 @@ public class EnumerationTypeHandlerTest extends UnitTest {
         when(integerDeclaration.name()).thenReturn("Time");
         when(integerDeclaration.enumValues()).thenReturn(Arrays.<Number>asList(1, 2, 3));
 
-        EnumerationTypeHandler handler = new EnumerationTypeHandler("time", integerDeclaration);
+        EnumerationTypeHandler handler = new EnumerationTypeHandler("time", null /*integerDeclaration*/);
         GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());
         generationContext.newExpectedType("Time", new CreationResult("bar.pack", ClassName.get("bar.pack", "Time"), null));
 

@@ -1,7 +1,5 @@
 package org.raml.ramltopojo;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 import org.junit.Ignore;
@@ -15,8 +13,6 @@ import org.raml.v2.api.model.v10.datamodel.IntegerTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.NumberTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
-
-import javax.annotation.Nullable;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -188,7 +184,7 @@ public class TypeDeclarationTypeTest extends UnitTest {
 
     private void createIntegerTypeNameSetup(TypeDeclaration integerTypeDeclaration, TypeDeclarationType typeDeclarationType) {
         when(context.pluginsForReferences(integerTypeDeclaration)).thenReturn(plugin);
-        TypeHandler handler = typeDeclarationType.createHandler("foo", TypeDeclarationType.INTEGER, integerTypeDeclaration);
+        TypeHandler handler = typeDeclarationType.createHandler("foo", TypeDeclarationType.INTEGER, null /*integerTypeDeclaration*/);
         TypeName tn = handler.javaClassReference(context, EventType.INTERFACE);
     }
 
@@ -202,13 +198,9 @@ public class TypeDeclarationTypeTest extends UnitTest {
         assertTrue(TypeDeclarationType.isNewInlineType(property));
     }
 
+    @Deprecated() /* return optional.....*/
     protected TypeDeclaration findProperty(ObjectTypeDeclaration decl, final String propertyName) {
-        return FluentIterable.from(decl.properties()).firstMatch(new Predicate<TypeDeclaration>() {
-            @Override
-            public boolean apply(@Nullable TypeDeclaration input) {
-                return propertyName.equals(input.name());
-            }
-        }).get();
+        return decl.properties().stream().filter(input -> propertyName.equals(input.name())).findFirst().orElse(null);
     }
 
 }

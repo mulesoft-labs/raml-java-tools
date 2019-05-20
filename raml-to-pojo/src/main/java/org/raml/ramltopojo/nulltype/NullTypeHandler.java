@@ -1,13 +1,14 @@
 package org.raml.ramltopojo.nulltype;
 
-import com.google.common.base.Optional;
+import amf.client.model.domain.Shape;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.CreationResult;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.GenerationContext;
 import org.raml.ramltopojo.TypeHandler;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
+
+import java.util.Optional;
 
 /**
  * Created. There, you have it.
@@ -15,9 +16,9 @@ import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 public class NullTypeHandler implements TypeHandler {
 
     private final String name;
-    private final TypeDeclaration typeDeclaration;
+    private final Shape typeDeclaration;
 
-    public NullTypeHandler(String name, TypeDeclaration typeDeclaration) {
+    public NullTypeHandler(String name, Shape typeDeclaration) {
 
         this.name = name;
         this.typeDeclaration = typeDeclaration;
@@ -35,6 +36,6 @@ public class NullTypeHandler implements TypeHandler {
 
     @Override
     public Optional<CreationResult> create(GenerationContext generationContext, CreationResult preCreationResult) {
-        return Optional.absent();
+        return Optional.empty();
     }
 }

@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.domain.Shape;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.squareup.javapoet.ClassName;
@@ -45,13 +46,13 @@ public class GenerationContextImpl implements GenerationContext {
     @Override
     public CreationResult findCreatedType(String typeName, TypeDeclaration ramlType) {
 
-/*
+
         if ( knownTypes.containsKey(typeName) ) {
 
             return knownTypes.get(typeName);
         } else {
 
-            TypeDeclaration typeDeclaration = typeFetcher.fetchType(api, typeName);
+            Shape typeDeclaration = typeFetcher.fetchType(null /*api*/, typeName);
             Optional<CreationResult> result =  TypeDeclarationType.createType(typeDeclaration, this);
 
             // todo fix this.
@@ -62,8 +63,6 @@ public class GenerationContextImpl implements GenerationContext {
                 return null;
             }
         }
-*/
-        return null;
     }
 
     @Override

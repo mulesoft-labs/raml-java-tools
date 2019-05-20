@@ -1,8 +1,12 @@
 package org.raml.ramltopojo.enumeration;
 
-import com.google.common.base.Optional;
-import com.squareup.javapoet.*;
-import org.raml.ramltopojo.*;
+import amf.client.model.domain.Shape;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.TypeName;
+import org.raml.ramltopojo.CreationResult;
+import org.raml.ramltopojo.EventType;
+import org.raml.ramltopojo.GenerationContext;
+import org.raml.ramltopojo.TypeHandler;
 import org.raml.ramltopojo.extensions.EnumerationPluginContext;
 import org.raml.ramltopojo.extensions.EnumerationPluginContextImpl;
 import org.raml.v2.api.model.v10.datamodel.IntegerTypeDeclaration;
@@ -10,9 +14,8 @@ import org.raml.v2.api.model.v10.datamodel.NumberTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
-import javax.lang.model.element.Modifier;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created. There, you have it.
@@ -20,9 +23,9 @@ import java.util.List;
 public class EnumerationTypeHandler implements TypeHandler {
 
     private final String name;
-    private final TypeDeclaration typeDeclaration;
+    private final Shape typeDeclaration;
 
-    public EnumerationTypeHandler(String name, TypeDeclaration stringTypeDeclaration) {
+    public EnumerationTypeHandler(String name, Shape stringTypeDeclaration) {
         this.name = name;
         this.typeDeclaration = stringTypeDeclaration;
     }
@@ -31,7 +34,8 @@ public class EnumerationTypeHandler implements TypeHandler {
     public ClassName javaClassName(GenerationContext generationContext, EventType type) {
 
         EnumerationPluginContext enumerationPluginContext = new EnumerationPluginContextImpl(generationContext, null);
-        return generationContext.pluginsForEnumerations(Utils.allParents(typeDeclaration, new ArrayList<TypeDeclaration>()).toArray(new TypeDeclaration[0])).className(enumerationPluginContext, typeDeclaration, generationContext.buildDefaultClassName(Names.typeName(name), EventType.INTERFACE), EventType.INTERFACE);
+// migration        return generationContext.pluginsForEnumerations(Utils.allParents(typeDeclaration, new ArrayList<TypeDeclaration>()).toArray(new TypeDeclaration[0])).className(enumerationPluginContext, typeDeclaration, generationContext.buildDefaultClassName(Names.typeName(name), EventType.INTERFACE), EventType.INTERFACE);
+        return null;
     }
 
     @Override
@@ -42,6 +46,7 @@ public class EnumerationTypeHandler implements TypeHandler {
     @Override
     public Optional<CreationResult> create(GenerationContext generationContext, CreationResult preCreationResult) {
 
+/*
         Class cls = (typeDeclaration instanceof StringTypeDeclaration)?String.class:Number.class;
 
         FieldSpec.Builder field = FieldSpec.builder(ClassName.get(cls), "name").addModifiers(Modifier.PRIVATE);
@@ -60,7 +65,7 @@ public class EnumerationTypeHandler implements TypeHandler {
                 );
         enumBuilder = generationContext.pluginsForEnumerations(typeDeclaration).classCreated(enumerationPluginContext, typeDeclaration, enumBuilder, EventType.INTERFACE);
         if ( enumBuilder == null ) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         for (Object value : pullEnumValues(typeDeclaration)) {
@@ -83,6 +88,8 @@ public class EnumerationTypeHandler implements TypeHandler {
         }
 
         return Optional.of(preCreationResult.withInterface(enumBuilder.build()));
+*/
+        return Optional.empty();
     }
 
     List pullEnumValues(TypeDeclaration typeDeclaration) {

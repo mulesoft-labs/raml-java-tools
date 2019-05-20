@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.domain.Shape;
 import com.squareup.javapoet.TypeName;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
@@ -9,7 +10,7 @@ import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 public interface RamlToPojo {
 
     ResultingPojos buildPojos();
-    ResultingPojos buildPojo(TypeDeclaration typeDeclaration);
+    ResultingPojos buildPojo(Shape typeDeclaration);
     ResultingPojos buildPojo(String suggestedJavaName, TypeDeclaration typeDeclaration);
 
     TypeName fetchType(String suggestedName, TypeDeclaration typeDeclaration);

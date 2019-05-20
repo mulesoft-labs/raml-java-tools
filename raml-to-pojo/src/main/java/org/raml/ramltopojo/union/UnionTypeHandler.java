@@ -1,7 +1,6 @@
 package org.raml.ramltopojo.union;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.squareup.javapoet.*;
@@ -18,6 +17,7 @@ import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created. There, you have it.
@@ -67,7 +67,7 @@ public class UnionTypeHandler implements TypeHandler {
 
         if ( interf == null ) {
 
-            return Optional.absent();
+            return Optional.empty();
         } else {
             return Optional.of(preCreationResult.withInterface(interf.build()).withImplementation(impl.build()));
         }
@@ -233,6 +233,6 @@ public class UnionTypeHandler implements TypeHandler {
 
     private TypeName findType(String typeName, TypeDeclaration type, GenerationContext generationContext) {
 
-        return TypeDeclarationType.calculateTypeName(typeName, type, generationContext, EventType.INTERFACE);
+        return TypeDeclarationType.calculateTypeName(typeName, null /*type*/, generationContext, EventType.INTERFACE);
     }
 }

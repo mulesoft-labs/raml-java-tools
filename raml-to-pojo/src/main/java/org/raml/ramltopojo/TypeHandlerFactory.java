@@ -1,11 +1,11 @@
 package org.raml.ramltopojo;
 
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
+import amf.client.model.domain.Shape;
 
 /**
  * Created. There, you have it.
  */
 public interface TypeHandlerFactory {
 
-    TypeHandler createHandler(String name, TypeDeclarationType type, TypeDeclaration typeDeclaration);
+    TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration);
 }

@@ -50,7 +50,7 @@ public class ObjectPluginContextImpl implements ObjectPluginContext {
 
     @Override
     public TypeName forProperty(TypeDeclaration typeDeclaration) {
-        return TypeDeclarationType.calculateTypeName("", typeDeclaration, generationContext, EventType.INTERFACE);
+        return TypeDeclarationType.calculateTypeName("", null /*typeDeclaration*/, generationContext, EventType.INTERFACE);
     }
 
     @Override

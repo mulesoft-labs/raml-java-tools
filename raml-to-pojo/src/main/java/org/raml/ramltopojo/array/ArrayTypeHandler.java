@@ -1,6 +1,5 @@
 package org.raml.ramltopojo.array;
 
-import com.google.common.base.Optional;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
@@ -15,6 +14,7 @@ import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created. There, you have it.
@@ -59,7 +59,7 @@ public class ArrayTypeHandler implements TypeHandler {
             return generationContext.pluginsForReferences(
                     Utils.allParents(typeDeclaration, new ArrayList<TypeDeclaration>()).toArray(new TypeDeclaration[0]))
                     .typeName(new ReferencePluginContext() {
-                    }, typeDeclaration, ParameterizedTypeName.get(ClassName.get(List.class), TypeDeclarationType.calculateTypeName(itemTypeName, typeDeclaration.items(), generationContext, type).box()));
+                    }, typeDeclaration, ParameterizedTypeName.get(ClassName.get(List.class), TypeDeclarationType.calculateTypeName(itemTypeName, null /*typeDeclaration.items()*/, generationContext, type).box()));
         } else {
 
             // so we are an array declared in the types: section.
@@ -77,7 +77,7 @@ public class ArrayTypeHandler implements TypeHandler {
 
         TypeName itemsTypeName = ClassName.get(Object.class);
         if ( TypeDeclarationType.isNewInlineType(items) ){
-            Optional<CreationResult> cr = TypeDeclarationType.createInlineType(className, preCreationResult.getJavaName(EventType.IMPLEMENTATION),  Names.typeName(items.type(), "type"), items, generationContext);
+            Optional<CreationResult> cr = TypeDeclarationType.createInlineType(className, preCreationResult.getJavaName(EventType.IMPLEMENTATION),  Names.typeName(items.type(), "type"), null /*items*/, generationContext);
             if ( cr.isPresent() ) {
                 preCreationResult.withInternalType(items.name(), cr.get());
                 itemsTypeName = cr.get().getJavaName(EventType.INTERFACE);
@@ -94,7 +94,7 @@ public class ArrayTypeHandler implements TypeHandler {
 
     private TypeName findType(String typeName, TypeDeclaration type, GenerationContext generationContext) {
 
-        return TypeDeclarationType.calculateTypeName(typeName, type, generationContext, EventType.INTERFACE);
+        return TypeDeclarationType.calculateTypeName(typeName, null /*type*/, generationContext, EventType.INTERFACE);
     }
 
 }
