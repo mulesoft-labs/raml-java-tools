@@ -2,6 +2,7 @@ package org.raml.ramltopojo;
 
 import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.v2.api.model.v10.api.Api;
+import webapi.WebApiDocument;
 
 import java.util.Collections;
 import java.util.List;
@@ -12,12 +13,12 @@ import java.util.List;
 public class RamlToPojoBuilder {
 
 
-    private final Api api;
+    private final WebApiDocument api;
     private String packageName = "";
     private TypeFetcher typeFetcher;
     private TypeFinder typeFinder;
 
-    public RamlToPojoBuilder(Api api) {
+    public RamlToPojoBuilder(WebApiDocument api) {
 
         this.api = api;
     }

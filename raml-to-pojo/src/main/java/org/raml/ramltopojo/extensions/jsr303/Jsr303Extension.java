@@ -15,6 +15,7 @@
  */
 package org.raml.ramltopojo.extensions.jsr303;
 
+import amf.client.model.domain.UnionShape;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.TypeName;
@@ -24,7 +25,6 @@ import org.raml.ramltopojo.extensions.AllTypesPluginHelper;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 
 import static org.raml.ramltopojo.extensions.jsr303.FacetValidation.addAnnotations;
 
@@ -55,7 +55,7 @@ public class Jsr303Extension extends AllTypesPluginHelper {
 
 
   @Override
-  public FieldSpec.Builder anyFieldCreated(UnionPluginContext context, UnionTypeDeclaration union, TypeSpec.Builder typeSpec, FieldSpec.Builder anyType, EventType eventType) {
+  public FieldSpec.Builder anyFieldCreated(UnionPluginContext context, UnionShape union, TypeSpec.Builder typeSpec, FieldSpec.Builder anyType, EventType eventType) {
 
     FacetValidation.addFacetsForBuilt(new AnnotationAdder() {
 

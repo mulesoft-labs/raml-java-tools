@@ -1,7 +1,7 @@
 package org.raml.ramltopojo.extensions;
 
+import amf.client.model.domain.Shape;
 import com.squareup.javapoet.TypeName;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,14 +15,14 @@ public interface ReferenceTypeHandlerPlugin {
     class Helper implements ReferenceTypeHandlerPlugin {
 
         @Override
-        public TypeName typeName(ReferencePluginContext referencePluginContext, TypeDeclaration ramlType, TypeName currentSuggestion) {
+        public TypeName typeName(ReferencePluginContext referencePluginContext, Shape ramlType, TypeName currentSuggestion) {
 
             return currentSuggestion;
         }
     }
 
 
-    TypeName typeName(ReferencePluginContext referencePluginContext, TypeDeclaration ramlType, TypeName currentSuggestion);
+    TypeName typeName(ReferencePluginContext referencePluginContext, Shape ramlType, TypeName currentSuggestion);
 
     class Composite implements ReferenceTypeHandlerPlugin {
 
@@ -34,7 +34,7 @@ public interface ReferenceTypeHandlerPlugin {
         }
 
         @Override
-        public TypeName typeName(ReferencePluginContext referencePluginContext, TypeDeclaration ramlType, TypeName currentSuggestion) {
+        public TypeName typeName(ReferencePluginContext referencePluginContext, Shape ramlType, TypeName currentSuggestion) {
             for (ReferenceTypeHandlerPlugin plugin : plugins) {
                 currentSuggestion = plugin.typeName(referencePluginContext, ramlType, currentSuggestion);
             }

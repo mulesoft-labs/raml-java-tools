@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.domain.Shape;
 import org.raml.v2.api.model.v10.api.Library;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
@@ -11,7 +12,7 @@ import java.util.Set;
  */
 public class Utils {
 
-    public static Class<?> declarationType(TypeDeclaration typeDeclaration) {
+    public static Class<?> declarationType(Shape typeDeclaration) {
 
         return typeDeclaration.getClass().getInterfaces()[0];
     }
@@ -36,10 +37,10 @@ public class Utils {
         return foundTypes;
     }
 
-    static public  List<TypeDeclaration> allParents(TypeDeclaration target, List<TypeDeclaration> found) {
+    static public  List<Shape> allParents(Shape target, List<Shape> found) {
 
         found.add(target);
-        for (TypeDeclaration typeDeclaration : target.parentTypes()) {
+        for (Shape typeDeclaration : target.inherits()) {
             allParents(typeDeclaration, found);
         }
 

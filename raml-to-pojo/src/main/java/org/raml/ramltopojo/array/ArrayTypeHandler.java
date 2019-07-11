@@ -1,5 +1,7 @@
 package org.raml.ramltopojo.array;
 
+import amf.client.model.domain.ArrayShape;
+import amf.client.model.domain.Shape;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
@@ -8,8 +10,6 @@ import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.ArrayPluginContext;
 import org.raml.ramltopojo.extensions.ArrayPluginContextImpl;
 import org.raml.ramltopojo.extensions.ReferencePluginContext;
-import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
@@ -22,9 +22,9 @@ import java.util.Optional;
 public class ArrayTypeHandler implements TypeHandler {
 
     private final String name;
-    private final ArrayTypeDeclaration typeDeclaration;
+    private final ArrayShape typeDeclaration;
 
-    public ArrayTypeHandler(String name, ArrayTypeDeclaration arrayTypeDeclaration) {
+    public ArrayTypeHandler(String name, ArrayShape arrayTypeDeclaration) {
         this.name = name;
         this.typeDeclaration = arrayTypeDeclaration;
     }
@@ -34,8 +34,8 @@ public class ArrayTypeHandler implements TypeHandler {
 
         ArrayPluginContext arrayPluginContext = new ArrayPluginContextImpl(generationContext, null);
         return generationContext.pluginsForArrays(
-                Utils.allParents(typeDeclaration, new ArrayList<TypeDeclaration>())
-                        .toArray(new TypeDeclaration[0]))
+                Utils.allParents(typeDeclaration, new ArrayList<Shape>())
+                        .toArray(new Shape[0]))
                         .className(
                                 arrayPluginContext,
                                 typeDeclaration,
@@ -46,9 +46,9 @@ public class ArrayTypeHandler implements TypeHandler {
     public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
 
         if ( name.contains("[") || name.equals("array")) {
-            String itemTypeName = typeDeclaration.items().name();
+            String itemTypeName = typeDeclaration.items().name().value();
             if ("object".equals(itemTypeName)) {
-                itemTypeName = typeDeclaration.items().type();
+                itemTypeName = typeDeclaration.items().name().value();
             }
 
             if ("object".equals(itemTypeName)) {
@@ -57,9 +57,9 @@ public class ArrayTypeHandler implements TypeHandler {
             }
 
             return generationContext.pluginsForReferences(
-                    Utils.allParents(typeDeclaration, new ArrayList<TypeDeclaration>()).toArray(new TypeDeclaration[0]))
+                    Utils.allParents(typeDeclaration, new ArrayList<>()).toArray(new Shape[0]))
                     .typeName(new ReferencePluginContext() {
-                    }, typeDeclaration, ParameterizedTypeName.get(ClassName.get(List.class), TypeDeclarationType.calculateTypeName(itemTypeName, null /*typeDeclaration.items()*/, generationContext, type).box()));
+                    }, typeDeclaration, ParameterizedTypeName.get(ClassName.get(List.class), TypeDeclarationType.calculateTypeName(itemTypeName, typeDeclaration.items(), generationContext, type).box()));
         } else {
 
             // so we are an array declared in the types: section.
@@ -73,18 +73,18 @@ public class ArrayTypeHandler implements TypeHandler {
         ClassName className = preCreationResult.getJavaName(EventType.INTERFACE);
         ArrayPluginContext arrayPluginContext = new ArrayPluginContextImpl(generationContext, preCreationResult);
 
-        TypeDeclaration items = typeDeclaration.items();
+        Shape items = typeDeclaration.items();
 
         TypeName itemsTypeName = ClassName.get(Object.class);
         if ( TypeDeclarationType.isNewInlineType(items) ){
-            Optional<CreationResult> cr = TypeDeclarationType.createInlineType(className, preCreationResult.getJavaName(EventType.IMPLEMENTATION),  Names.typeName(items.type(), "type"), null /*items*/, generationContext);
+            Optional<CreationResult> cr = TypeDeclarationType.createInlineType(className, preCreationResult.getJavaName(EventType.IMPLEMENTATION),  Names.typeName(items.name().value(), "type"), null /*items*/, generationContext);
             if ( cr.isPresent() ) {
-                preCreationResult.withInternalType(items.name(), cr.get());
+                preCreationResult.withInternalType(items.name().value(), cr.get());
                 itemsTypeName = cr.get().getJavaName(EventType.INTERFACE);
             }
         }  else {
 
-            itemsTypeName = findType(items.name(), items, generationContext).box();
+            itemsTypeName = findType(items.name().value(), items, generationContext).box();
         }
 
         TypeSpec.Builder arrayClassBuilder = TypeSpec.classBuilder(className).addModifiers(Modifier.PUBLIC).superclass(ParameterizedTypeName.get(ClassName.get(ArrayList.class), itemsTypeName));
@@ -92,9 +92,9 @@ public class ArrayTypeHandler implements TypeHandler {
         return Optional.of(preCreationResult.withInterface(arrayClassBuilder.build()));
     }
 
-    private TypeName findType(String typeName, TypeDeclaration type, GenerationContext generationContext) {
+    private TypeName findType(String typeName, Shape type, GenerationContext generationContext) {
 
-        return TypeDeclarationType.calculateTypeName(typeName, null /*type*/, generationContext, EventType.INTERFACE);
+        return TypeDeclarationType.calculateTypeName(typeName, type, generationContext, EventType.INTERFACE);
     }
 
 }

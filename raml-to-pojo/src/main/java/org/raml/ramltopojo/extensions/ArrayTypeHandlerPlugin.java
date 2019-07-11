@@ -1,9 +1,9 @@
 package org.raml.ramltopojo.extensions;
 
+import amf.client.model.domain.Shape;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EventType;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,18 +17,18 @@ public interface ArrayTypeHandlerPlugin {
     class Helper implements ArrayTypeHandlerPlugin {
 
         @Override
-        public ClassName className(ArrayPluginContext enumerationPluginContext, TypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+        public ClassName className(ArrayPluginContext enumerationPluginContext, Shape ramlType, ClassName currentSuggestion, EventType eventType) {
             return currentSuggestion;
         }
 
         @Override
-        public TypeSpec.Builder classCreated(ArrayPluginContext enumerationPluginContext, TypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+        public TypeSpec.Builder classCreated(ArrayPluginContext enumerationPluginContext, Shape ramlType, TypeSpec.Builder incoming, EventType eventType) {
             return incoming;
         }
     }
 
-    ClassName className(ArrayPluginContext enumerationPluginContext, TypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType);
-    TypeSpec.Builder classCreated(ArrayPluginContext enumerationPluginContext, TypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType);
+    ClassName className(ArrayPluginContext enumerationPluginContext, Shape ramlType, ClassName currentSuggestion, EventType eventType);
+    TypeSpec.Builder classCreated(ArrayPluginContext enumerationPluginContext, Shape ramlType, TypeSpec.Builder incoming, EventType eventType);
 
     class Composite implements ArrayTypeHandlerPlugin {
 
@@ -40,7 +40,7 @@ public interface ArrayTypeHandlerPlugin {
         }
 
         @Override
-        public ClassName className(ArrayPluginContext enumerationPluginContext, TypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+        public ClassName className(ArrayPluginContext enumerationPluginContext, Shape ramlType, ClassName currentSuggestion, EventType eventType) {
             for (ArrayTypeHandlerPlugin plugin : plugins) {
                 currentSuggestion = plugin.className(enumerationPluginContext, ramlType, currentSuggestion, eventType);
             }
@@ -49,7 +49,7 @@ public interface ArrayTypeHandlerPlugin {
         }
 
         @Override
-        public TypeSpec.Builder classCreated(ArrayPluginContext enumerationPluginContext, TypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+        public TypeSpec.Builder classCreated(ArrayPluginContext enumerationPluginContext, Shape ramlType, TypeSpec.Builder incoming, EventType eventType) {
 
             for (ArrayTypeHandlerPlugin plugin : plugins) {
                 if ( incoming == null ) {

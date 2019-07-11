@@ -1,5 +1,7 @@
 package org.raml.ramltopojo.extensions;
 
+import amf.client.model.domain.Shape;
+import amf.client.model.domain.UnionShape;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
@@ -7,7 +9,6 @@ import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EventType;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 
 /**
  * Created. There, you have it.
@@ -45,17 +46,17 @@ public class AllTypesPluginHelper implements ObjectTypeHandlerPlugin, UnionTypeH
     }
 
     @Override
-    public ClassName className(UnionPluginContext unionPluginContext, UnionTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+    public ClassName className(UnionPluginContext unionPluginContext, UnionShape ramlType, ClassName currentSuggestion, EventType eventType) {
         return unionTypeHandlerPlugin.className(unionPluginContext, ramlType, currentSuggestion, eventType);
     }
 
     @Override
-    public TypeSpec.Builder classCreated(UnionPluginContext unionPluginContext, UnionTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+    public TypeSpec.Builder classCreated(UnionPluginContext unionPluginContext, UnionShape ramlType, TypeSpec.Builder incoming, EventType eventType) {
         return unionTypeHandlerPlugin.classCreated(unionPluginContext, ramlType, incoming, eventType);
     }
 
     @Override
-    public FieldSpec.Builder anyFieldCreated(UnionPluginContext context, UnionTypeDeclaration union, TypeSpec.Builder typeSpec, FieldSpec.Builder anyType, EventType eventType) {
+    public FieldSpec.Builder anyFieldCreated(UnionPluginContext context, UnionShape union, TypeSpec.Builder typeSpec, FieldSpec.Builder anyType, EventType eventType) {
         return unionTypeHandlerPlugin.anyFieldCreated(context, union, typeSpec, anyType, eventType);
     }
 
@@ -80,12 +81,12 @@ public class AllTypesPluginHelper implements ObjectTypeHandlerPlugin, UnionTypeH
     }
 
     @Override
-    public ClassName className(ArrayPluginContext arrayPluginContext, TypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+    public ClassName className(ArrayPluginContext arrayPluginContext, Shape ramlType, ClassName currentSuggestion, EventType eventType) {
         return arrayTypeHandlerPlugin.className(arrayPluginContext, ramlType, currentSuggestion, eventType);
     }
 
     @Override
-    public TypeSpec.Builder classCreated(ArrayPluginContext arrayPluginContext, TypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+    public TypeSpec.Builder classCreated(ArrayPluginContext arrayPluginContext, Shape ramlType, TypeSpec.Builder incoming, EventType eventType) {
         return arrayTypeHandlerPlugin.classCreated(arrayPluginContext, ramlType, incoming, eventType);
     }
 }

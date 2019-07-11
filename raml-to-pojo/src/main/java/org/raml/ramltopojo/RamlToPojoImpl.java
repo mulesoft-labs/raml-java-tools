@@ -24,20 +24,18 @@ public class RamlToPojoImpl implements RamlToPojo {
 
         ResultingPojos resultingPojos = new ResultingPojos(generationContext);
 
-/*  TODO JP reactivate when types migrated
-        for (TypeDeclaration typeDeclaration : typeFinder.findTypes(generationContext.api())) {
+///*  TODO JP reactivate when types migrated
+        for (Shape typeDeclaration : typeFinder.findTypes(generationContext.api())) {
 
-            TypeDeclarationType.calculateTypeName(typeDeclaration.name(), typeDeclaration, generationContext, EventType.INTERFACE);
+            TypeDeclarationType.calculateTypeName(typeDeclaration.name().value(), typeDeclaration, generationContext, EventType.INTERFACE);
         }
 
-        for (TypeDeclaration typeDeclaration : typeFinder.findTypes(generationContext.api())) {
-˚
+        for (Shape typeDeclaration : typeFinder.findTypes(generationContext.api())) {
+
             Optional<CreationResult> spec = TypeDeclarationType.createType(typeDeclaration, generationContext);
-            if ( spec.isPresent() ) {
-                resultingPojos.addNewResult(spec.get());
-            }
+            spec.ifPresent(resultingPojos::addNewResult);
         }
-*/
+//*/
 
         return resultingPojos;
     }
@@ -71,7 +69,7 @@ public class RamlToPojoImpl implements RamlToPojo {
         return TypeDeclarationType.calculateTypeName(suggestedName, null /*typeDeclaration*/, generationContext, EventType.INTERFACE);
     }
 
-    public boolean isInline(TypeDeclaration typeDeclaration) {
+    public boolean isInline(Shape typeDeclaration) {
 
         return TypeDeclarationType.isNewInlineType(typeDeclaration);
     }

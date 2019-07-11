@@ -1,8 +1,9 @@
 package org.raml.ramltopojo.extensions.jackson1;
 
-import com.google.common.base.Function;
+import amf.client.model.domain.Shape;
+import amf.client.model.domain.TupleShape;
+import amf.client.model.domain.UnionShape;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import com.squareup.javapoet.*;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonParser;
@@ -18,16 +19,13 @@ import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.Names;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 
-import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created. There, you have it.
@@ -35,16 +33,16 @@ import java.util.Map;
 public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
 
     @Override
-    public ClassName className(UnionPluginContext unionPluginContext, UnionTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+    public ClassName className(UnionPluginContext unionPluginContext, UnionShape ramlType, ClassName currentSuggestion, EventType eventType) {
         return currentSuggestion;
     }
 
     @Override
-    public TypeSpec.Builder classCreated(UnionPluginContext unionPluginContext, UnionTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+    public TypeSpec.Builder classCreated(UnionPluginContext unionPluginContext, UnionShape ramlType, TypeSpec.Builder incoming, EventType eventType) {
 
         ClassName deserializer =
                 ClassName.get("", unionPluginContext.creationResult().getJavaName(EventType.INTERFACE).simpleName(),
-                        Names.typeName(ramlType.name(), "deserializer"));
+                        Names.typeName(ramlType.name().value(), "deserializer"));
 
         ClassName serializer =
                 ClassName.get("", unionPluginContext.creationResult().getJavaName(EventType.INTERFACE).simpleName(),
@@ -61,7 +59,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
         return incoming;
     }
 
-    private void createSerializer(ClassName serializerName, UnionTypeDeclaration union, TypeSpec.Builder typeBuilder, EventType eventType) {
+    private void createSerializer(ClassName serializerName, UnionShape union, TypeSpec.Builder typeBuilder, EventType eventType) {
 
         if ( eventType == EventType.IMPLEMENTATION) {
             return;
@@ -85,10 +83,10 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                 .addException(IOException.class)
                 .addException(JsonProcessingException.class);
 
-        for (TypeDeclaration typeDeclaration : union.of()) {
+        for (Shape typeDeclaration : union.anyOf()) {
 
-            String isMethod = Names.methodName("is", typeDeclaration.name());
-            String getMethod = Names.methodName("get", typeDeclaration.name());
+            String isMethod = Names.methodName("is", typeDeclaration.name().value());
+            String getMethod = Names.methodName("get", typeDeclaration.name().value());
             serialize.beginControlFlow("if ( object." + isMethod + "())");
             serialize.addStatement("jsonGenerator.writeObject(object." + getMethod + "())");
             serialize.addStatement("return");
@@ -101,7 +99,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
         typeBuilder.addType(builder.build());
     }
 
-    private void createDeserializer(UnionPluginContext unionPluginContext, ClassName serializerName, UnionTypeDeclaration union, TypeSpec.Builder typeBuilder, EventType eventType) {
+    private void createDeserializer(UnionPluginContext unionPluginContext, ClassName serializerName, UnionShape union, TypeSpec.Builder typeBuilder, EventType eventType) {
 
         if ( eventType == EventType.IMPLEMENTATION) {
             return;
@@ -130,11 +128,11 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                 .addStatement("$T<String, Object> map = mapper.readValue(jsonParser, Map.class)", Map.class);
 
 
-        for (TypeDeclaration typeDeclaration : union.of()) {
+        for (Shape typeDeclaration : union.anyOf()) {
 
             TypeName unionPossibility = unionPluginContext.unionClass(typeDeclaration).getJavaName(EventType.IMPLEMENTATION);
 
-            String name = Names.methodName("looksLike", typeDeclaration.name());
+            String name = Names.methodName("looksLike", typeDeclaration.name().value());
             deserialize.addStatement("if ( " + name + "(map) ) return new $T(mapper.convertValue(map, $T.class))",
                     unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), unionPossibility);
 
@@ -148,24 +146,17 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
         typeBuilder.addType(builder.build());
     }
 
-    private void buildLooksLike(TypeSpec.Builder builder, TypeDeclaration typeDeclaration) {
+    private void buildLooksLike(TypeSpec.Builder builder, Shape typeDeclaration) {
 
-        String name = Names.methodName("looksLike", typeDeclaration.name());
+        String name = Names.methodName("looksLike", typeDeclaration.name().value());
         MethodSpec.Builder spec =
                 MethodSpec.methodBuilder(name).addParameter(ParameterizedTypeName.get(ClassName.get(Map.class),
                         ClassName.get(String.class),
                         ClassName.get(Object.class)), "map");
-        if (typeDeclaration instanceof ObjectTypeDeclaration) {
+        if (typeDeclaration instanceof TupleShape) {
 
-            ObjectTypeDeclaration otd = (ObjectTypeDeclaration) typeDeclaration;
-            List<String> names = Lists.transform(otd.properties(), new Function<TypeDeclaration, String>() {
-
-                @Nullable
-                @Override
-                public String apply(@Nullable TypeDeclaration input) {
-                    return "\"" + input.name() + "\"";
-                }
-            });
+            TupleShape otd = (TupleShape) typeDeclaration;
+            List<String> names = otd.items().stream().map(input -> "\"" + input.name() + "\"").collect(Collectors.toList());
 
             spec.addStatement("return map.keySet().containsAll($T.asList($L))", Arrays.class, Joiner.on(",").join(names));
         }

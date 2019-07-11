@@ -1,7 +1,7 @@
 package org.raml.ramltopojo.extensions;
 
+import amf.client.model.domain.Shape;
 import org.raml.ramltopojo.CreationResult;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 /**
  * Created. There, you have it.
@@ -9,5 +9,5 @@ import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 public interface UnionPluginContext {
 
     CreationResult creationResult();
-    CreationResult unionClass(TypeDeclaration ramlType);
+    CreationResult unionClass(Shape ramlType);
 }

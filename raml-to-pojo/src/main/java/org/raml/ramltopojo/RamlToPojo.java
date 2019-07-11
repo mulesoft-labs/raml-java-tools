@@ -14,5 +14,5 @@ public interface RamlToPojo {
     ResultingPojos buildPojo(String suggestedJavaName, TypeDeclaration typeDeclaration);
 
     TypeName fetchType(String suggestedName, TypeDeclaration typeDeclaration);
-    boolean isInline(TypeDeclaration typeDeclaration);
+    boolean isInline(Shape typeDeclaration);
 }

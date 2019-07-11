@@ -1,8 +1,8 @@
 package org.raml.ramltopojo.extensions;
 
+import amf.client.model.domain.Shape;
 import org.raml.ramltopojo.CreationResult;
 import org.raml.ramltopojo.GenerationContext;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 
 /**
@@ -24,7 +24,7 @@ public class UnionPluginContextImpl implements UnionPluginContext {
     }
 
     @Override
-    public CreationResult unionClass(TypeDeclaration ramlType) {
-        return generationContext.findCreatedType(ramlType.name(), ramlType);
+    public CreationResult unionClass(Shape ramlType) {
+        return generationContext.findCreatedType(ramlType.name().value(), ramlType);
     }
 }

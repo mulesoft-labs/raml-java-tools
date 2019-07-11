@@ -1,9 +1,9 @@
 package org.raml.ramltopojo.extensions.tools;
 
+import amf.client.model.domain.Shape;
 import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.extensions.ReferencePluginContext;
 import org.raml.ramltopojo.extensions.ReferenceTypeHandlerPlugin;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ public class BoxType implements ReferenceTypeHandlerPlugin {
     }
 
     @Override
-    public TypeName typeName(ReferencePluginContext referencePluginContext, TypeDeclaration ramlType, TypeName currentSuggestion) {
+    public TypeName typeName(ReferencePluginContext referencePluginContext, Shape ramlType, TypeName currentSuggestion) {
 
         return currentSuggestion.box();
     }

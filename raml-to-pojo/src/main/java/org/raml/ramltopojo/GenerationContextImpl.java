@@ -11,6 +11,7 @@ import org.raml.ramltopojo.extensions.*;
 import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
+import webapi.WebApiDocument;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -23,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GenerationContextImpl implements GenerationContext {
 
     private final PluginManager pluginManager;
-    private final Api api;
+    private final WebApiDocument api;
     private final TypeFetcher typeFetcher;
     private final ConcurrentHashMap<String, CreationResult> knownTypes = new ConcurrentHashMap<>();
     private final SetMultimap<String, String> childTypes = HashMultimap.create();
@@ -35,7 +36,7 @@ public class GenerationContextImpl implements GenerationContext {
         this(PluginManager.NULL, api, TypeFetchers.NULL_FETCHER, "", Collections.<String>emptyList());
     }
 
-    public GenerationContextImpl(PluginManager pluginManager, Api api, TypeFetcher typeFetcher, String defaultPackage, List<String> basePlugins) {
+    public GenerationContextImpl(PluginManager pluginManager, WebApiDocument api, TypeFetcher typeFetcher, String defaultPackage, List<String> basePlugins) {
         this.pluginManager = pluginManager;
         this.api = api;
         this.typeFetcher = typeFetcher;
@@ -44,7 +45,7 @@ public class GenerationContextImpl implements GenerationContext {
     }
 
     @Override
-    public CreationResult findCreatedType(String typeName, TypeDeclaration ramlType) {
+    public CreationResult findCreatedType(String typeName, Shape ramlType) {
 
 
         if ( knownTypes.containsKey(typeName) ) {
@@ -197,7 +198,7 @@ public class GenerationContextImpl implements GenerationContext {
     }
 
     @Override
-    public UnionTypeHandlerPlugin pluginsForUnions(TypeDeclaration... typeDeclarations) {
+    public UnionTypeHandlerPlugin pluginsForUnions(Shape... typeDeclarations) {
         List<PluginDef> data = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, typeDeclarations);
         Set<UnionTypeHandlerPlugin> plugins = new HashSet<>();
         loadBasePlugins(plugins, UnionTypeHandlerPlugin.class);
@@ -221,7 +222,7 @@ public class GenerationContextImpl implements GenerationContext {
 
 
     @Override
-    public Api api() {
+    public WebApiDocument api() {
         return api;
     }
 }

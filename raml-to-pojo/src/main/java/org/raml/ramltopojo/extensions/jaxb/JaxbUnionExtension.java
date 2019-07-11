@@ -1,11 +1,11 @@
 package org.raml.ramltopojo.extensions.jaxb;
 
+import amf.client.model.domain.Shape;
+import amf.client.model.domain.UnionShape;
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 
 import javax.xml.bind.annotation.*;
 
@@ -15,15 +15,15 @@ import javax.xml.bind.annotation.*;
 public class JaxbUnionExtension implements UnionTypeHandlerPlugin {
 
     @Override
-    public ClassName className(UnionPluginContext unionPluginContext, UnionTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+    public ClassName className(UnionPluginContext unionPluginContext, UnionShape ramlType, ClassName currentSuggestion, EventType eventType) {
         return currentSuggestion;
     }
 
     @Override
-    public TypeSpec.Builder classCreated(UnionPluginContext unionPluginContext, UnionTypeDeclaration type, TypeSpec.Builder builder, EventType eventType) {
+    public TypeSpec.Builder classCreated(UnionPluginContext unionPluginContext, UnionShape type, TypeSpec.Builder builder, EventType eventType) {
 
-        String namespace = type.xml() != null && type.xml().namespace() != null ? type.xml().namespace() : "##default";
-        String name = type.xml() != null && type.xml().name() != null ? type.xml().name() : type.name();
+        String namespace = type.xmlSerialization() != null && type.xmlSerialization().namespace() != null ? type.xmlSerialization().namespace().value() : "##default";
+        String name = type.xmlSerialization() != null && type.xmlSerialization().name() != null ? type.xmlSerialization().name().value() : type.name().value();
 
         if (eventType == EventType.IMPLEMENTATION) {
             builder.addAnnotation(AnnotationSpec.builder(XmlAccessorType.class)
@@ -45,10 +45,10 @@ public class JaxbUnionExtension implements UnionTypeHandlerPlugin {
     }
 
     @Override
-    public FieldSpec.Builder anyFieldCreated(UnionPluginContext context, UnionTypeDeclaration union, TypeSpec.Builder typeSpec, FieldSpec.Builder anyType, EventType eventType) {
+    public FieldSpec.Builder anyFieldCreated(UnionPluginContext context, UnionShape union, TypeSpec.Builder typeSpec, FieldSpec.Builder anyType, EventType eventType) {
 
         AnnotationSpec.Builder elementsAnnotation = AnnotationSpec.builder(XmlElements.class);
-        for (TypeDeclaration typeDeclaration : union.of()) {
+        for (Shape typeDeclaration : union.anyOf()) {
 
             TypeName unionPossibility = context.unionClass(typeDeclaration).getJavaName(EventType.IMPLEMENTATION);
 

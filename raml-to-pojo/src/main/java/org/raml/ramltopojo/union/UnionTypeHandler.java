@@ -1,8 +1,9 @@
 package org.raml.ramltopojo.union;
 
+import amf.client.model.domain.NilShape;
+import amf.client.model.domain.Shape;
+import amf.client.model.domain.UnionShape;
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
@@ -10,14 +11,13 @@ import org.raml.ramltopojo.extensions.UnionPluginContextImpl;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.NullTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 
 import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created. There, you have it.
@@ -25,10 +25,10 @@ import java.util.Optional;
 public class UnionTypeHandler implements TypeHandler {
 
     private final String name;
-    private final UnionTypeDeclaration union;
+    private final UnionShape union;
     public static final ClassName NULL_CLASS = ClassName.get(Object.class);
 
-    public UnionTypeHandler(String name, UnionTypeDeclaration union) {
+    public UnionTypeHandler(String name, UnionShape union) {
         this.name = name;
         this.union = union;
     }
@@ -38,7 +38,7 @@ public class UnionTypeHandler implements TypeHandler {
 
         UnionPluginContext context = new UnionPluginContextImpl(generationContext, null);
 
-        UnionTypeHandlerPlugin plugin = generationContext.pluginsForUnions(Utils.allParents(union, new ArrayList<TypeDeclaration>()).toArray(new TypeDeclaration[0]));
+        UnionTypeHandlerPlugin plugin = generationContext.pluginsForUnions(Utils.allParents(union, new ArrayList<>()).toArray(new Shape[0]));
         ClassName className;
         if ( type == EventType.IMPLEMENTATION ) {
             className = generationContext.buildDefaultClassName(Names.typeName(name, "Impl"), EventType.IMPLEMENTATION);
@@ -85,12 +85,7 @@ public class UnionTypeHandler implements TypeHandler {
             return typeSpec;
         }
 
-        boolean hasNullType = FluentIterable.from(union.of()).anyMatch(new Predicate<TypeDeclaration>() {
-            @Override
-            public boolean apply(@Nullable TypeDeclaration input) {
-                return input instanceof NullTypeDeclaration;
-            }
-        });
+        boolean hasNullType = union.anyOf().stream().anyMatch(input -> input instanceof NilShape);
 
         typeSpec.addField(anyType.build());
         typeSpec.addMethod(
@@ -99,12 +94,12 @@ public class UnionTypeHandler implements TypeHandler {
 
                         .build());
 
-        for (TypeDeclaration unitedType : union.of()) {
+        for (Shape unitedType : union.anyOf()) {
 
-            TypeName typeName =  unitedType instanceof NullTypeDeclaration ? NULL_CLASS : findType(unitedType.name(), unitedType, generationContext).box();
+            TypeName typeName =  unitedType instanceof NullTypeDeclaration ? NULL_CLASS : findType(unitedType.name().value(), unitedType, generationContext).box();
             String shortened = shorten(typeName);
 
-            String fieldName = Names.methodName(unitedType.name());
+            String fieldName = Names.methodName(unitedType.name().value());
             if ( typeName == NULL_CLASS ) {
 
                 typeSpec
@@ -161,18 +156,18 @@ public class UnionTypeHandler implements TypeHandler {
 
         TypeSpec.Builder typeSpec = TypeSpec.interfaceBuilder(preCreationResult.getJavaName(EventType.INTERFACE))
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-        List<TypeName> names = FluentIterable.from(union.of()).transform(new Function<TypeDeclaration, TypeName>() {
+        List<TypeName> names = union.anyOf().stream().map(new Function<Shape, TypeName>() {
             @Nullable
             @Override
-            public TypeName apply(@Nullable TypeDeclaration unitedType) {
+            public TypeName apply(@Nullable Shape unitedType) {
 
-                if ( unitedType instanceof NullTypeDeclaration ) {
+                if (unitedType instanceof NullTypeDeclaration) {
                     return NULL_CLASS;
                 } else {
-                    return findType(unitedType.name(), unitedType, generationContext).box();
+                    return findType(unitedType.name().value(), unitedType, generationContext).box();
                 }
             }
-        }).toList();
+        }).collect(Collectors.toList());
 
         typeSpec = generationContext.pluginsForUnions(union).classCreated(context, union, typeSpec, EventType.INTERFACE);
         if ( typeSpec == null ) {
@@ -231,8 +226,8 @@ public class UnionTypeHandler implements TypeHandler {
         }
     }
 
-    private TypeName findType(String typeName, TypeDeclaration type, GenerationContext generationContext) {
+    private TypeName findType(String typeName, Shape type, GenerationContext generationContext) {
 
-        return TypeDeclarationType.calculateTypeName(typeName, null /*type*/, generationContext, EventType.INTERFACE);
+        return TypeDeclarationType.calculateTypeName(typeName,type, generationContext, EventType.INTERFACE);
     }
 }

@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.extensions.tools;
 
+import amf.client.model.domain.UnionShape;
 import com.squareup.javapoet.ClassName;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.AllTypesPluginHelper;
@@ -8,7 +9,6 @@ import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class SeparatePackagesPlugin extends AllTypesPluginHelper {
     }
 
     @Override
-    public ClassName className(UnionPluginContext unionPluginContext, UnionTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+    public ClassName className(UnionPluginContext unionPluginContext, UnionShape ramlType, ClassName currentSuggestion, EventType eventType) {
         return fixName(currentSuggestion, eventType);
     }
 

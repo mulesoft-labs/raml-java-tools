@@ -1,6 +1,8 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.domain.ArrayShape;
 import amf.client.model.domain.Shape;
+import amf.client.model.domain.UnionShape;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.squareup.javapoet.ClassName;
@@ -13,8 +15,8 @@ import org.raml.ramltopojo.nulltype.NullTypeHandler;
 import org.raml.ramltopojo.object.ObjectTypeHandler;
 import org.raml.ramltopojo.references.ReferenceTypeHandler;
 import org.raml.ramltopojo.union.UnionTypeHandler;
-import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.*;
+import webapi.WebApiDocument;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,7 +52,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
 
     NULL {
         @Override
-        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+        public boolean shouldCreateInlineType(Shape declaration) {
 
             return false;
         }
@@ -68,9 +70,9 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
 
 
         @Override
-        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+        public boolean shouldCreateInlineType(Shape declaration) {
 
-            List<TypeDeclaration> extended = declaration.parentTypes();
+            List<Shape> extended = declaration.inherits();
 
             if ( extended.size() > 1) {
 
@@ -79,6 +81,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
 
             Set<String> allExtendedProps;
 
+            // TODO certqinly we can do better here.
             if ( extended.size() == 1  && extended.get(0).name().equals("object")) {
 
                 allExtendedProps = Collections.emptySet();
@@ -100,37 +103,37 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
-            return "string".equals(declaration.type()) || "number".equals(declaration.type()) || "integer".equals(declaration.type());
+        public boolean shouldCreateInlineType(Shape declaration) {
+            return "string".equals(declaration.name().value()) || "number".equals(declaration.name().value()) || "integer".equals(declaration.name().value());
         }
     },
     ARRAY {
         @Override
         public TypeHandler createHandler(String name, final TypeDeclarationType type, final Shape typeDeclaration) {
 
-            final ArrayTypeDeclaration arrayTypeDeclaration = (ArrayTypeDeclaration) typeDeclaration;
+            final ArrayShape arrayTypeDeclaration = (ArrayShape) typeDeclaration;
 
             return new ArrayTypeHandler(name, arrayTypeDeclaration);
         }
 
         @Override
-        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
-            ArrayTypeDeclaration arrayTypeDeclaration = (ArrayTypeDeclaration) declaration;
-            return Annotations.GENERATE_INLINE_ARRAY_TYPE.get(declaration) /*&& TypeDeclarationType.isNewInlineType(arrayTypeDeclaration.items())*/;
+        public boolean shouldCreateInlineType(Shape declaration) {
+            ArrayShape arrayTypeDeclaration = (ArrayShape) declaration;
+            return Annotations.GENERATE_INLINE_ARRAY_TYPE.get(null); // TODO:  should be arrayTypeDeclaration
         }
     },
     UNION {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration) {
 
-            return new UnionTypeHandler(name, (UnionTypeDeclaration) typeDeclaration);
+            return new UnionTypeHandler(name, (UnionShape) typeDeclaration);
         }
 
         @Override
-        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+        public boolean shouldCreateInlineType(Shape declaration) {
 
             // this seems wrong.
-            return declaration.name().contains("|") || declaration.type().contains("|");
+            return declaration instanceof UnionShape;
         }
     },
     INTEGER {
@@ -148,7 +151,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public boolean shouldCreateInlineType(TypeDeclaration originalTypeDeclaration) {
+        public boolean shouldCreateInlineType(Shape originalTypeDeclaration) {
             IntegerTypeDeclaration declaration = (IntegerTypeDeclaration) originalTypeDeclaration;
 
             if ( ! declaration.enumValues().isEmpty() ) {
@@ -168,7 +171,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+        public boolean shouldCreateInlineType(Shape declaration) {
             return false;
         }
     },
@@ -180,7 +183,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+        public boolean shouldCreateInlineType(Shape declaration) {
             return false;
         }
     },
@@ -191,7 +194,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+        public boolean shouldCreateInlineType(Shape declaration) {
             return false;
         }
     },
@@ -202,7 +205,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+        public boolean shouldCreateInlineType(Shape declaration) {
             return false;
         }
     },
@@ -213,7 +216,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+        public boolean shouldCreateInlineType(Shape declaration) {
             return false;
         }
     },
@@ -232,7 +235,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public boolean shouldCreateInlineType(TypeDeclaration originalTypeDeclaration) {
+        public boolean shouldCreateInlineType(Shape originalTypeDeclaration) {
 
             NumberTypeDeclaration declaration = (NumberTypeDeclaration) originalTypeDeclaration;
 
@@ -259,7 +262,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public boolean shouldCreateInlineType(TypeDeclaration originalTypeDeclaration) {
+        public boolean shouldCreateInlineType(Shape originalTypeDeclaration) {
 
             StringTypeDeclaration declaration = (StringTypeDeclaration) originalTypeDeclaration;
 
@@ -279,7 +282,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+        public boolean shouldCreateInlineType(Shape declaration) {
             return false;
         }
     },
@@ -290,7 +293,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public boolean shouldCreateInlineType(TypeDeclaration declaration) {
+        public boolean shouldCreateInlineType(Shape declaration) {
             return false;
         }
     };
@@ -306,7 +309,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
             .put("int", TypeName.INT).build();
 
 
-    public abstract boolean shouldCreateInlineType(TypeDeclaration declaration);
+    public abstract boolean shouldCreateInlineType(Shape declaration);
 
     private static Map<Class, TypeDeclarationType> ramlToType = ImmutableMap.<Class, TypeDeclarationType>builder()
             .put(ObjectTypeDeclaration.class, OBJECT)
@@ -399,7 +402,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         return typeName;
     }
 
-    public static boolean isNewInlineType(TypeDeclaration declaration) {
+    public static boolean isNewInlineType(Shape declaration) {
         return ramlToType.get(Utils.declarationType(declaration)).shouldCreateInlineType(declaration);
     }
 
@@ -455,17 +458,17 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public UnionTypeHandlerPlugin pluginsForUnions(TypeDeclaration... typeDeclarations) {
+        public UnionTypeHandlerPlugin pluginsForUnions(Shape... typeDeclarations) {
             return context.pluginsForUnions(typeDeclarations);
         }
 
         @Override
-        public ArrayTypeHandlerPlugin pluginsForArrays(TypeDeclaration... typeDeclarations) {
+        public ArrayTypeHandlerPlugin pluginsForArrays(Shape... typeDeclarations) {
             return context.pluginsForArrays(typeDeclarations);
         }
 
         @Override
-        public Api api() {
+        public WebApiDocument api() {
             return context.api();
         }
 
@@ -484,7 +487,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public ReferenceTypeHandlerPlugin pluginsForReferences(TypeDeclaration... typeDeclarations) {
+        public ReferenceTypeHandlerPlugin pluginsForReferences(Shape... typeDeclarations) {
             return context.pluginsForReferences(typeDeclarations);
         }
 

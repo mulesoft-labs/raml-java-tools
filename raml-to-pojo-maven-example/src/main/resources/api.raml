@@ -7,159 +7,183 @@ uses:
   arrays: arrays.raml
 
 types:
-    withAnArray:
-      properties:
-          someArray:
-            type: integer[]
-            (ramltopojo.types):
-               plugins:
-                 - name: core.asArray
-          anotherArray:
-            type: dates[]
-            (ramltopojo.types):
-              plugins:
-                - name: core.asArray
-    nilUnionType:
-      type: string|nil
-    unionProperty:
-      properties:
-        goo: string|nil
-        declared: nilUnionType
-    dates:
-      (ramltopojo.types):
-        plugins:
-          - name: core.jackson2
-      properties:
-        someDate: datetime
-    foo:
-      (ramltopojo.types):
-          plugins:
-            - name: core.equalsAndHashCode
-            - name: core.jsr303
-            - name: core.jackson2
-      type: object
-      discriminatorValue: myOwnValue
-      properties:
-        name:
-          type: string
-          pattern: a\[a-z\]b
-        goo:
-          type: object
-          properties:
-            glue: boolean
-            flue:
-              type: object
-              properties:
-                another: string
-    eater:
-      (ramltopojo.types):
-        plugins:
-          - name: core.equalsAndHashCode
-            arguments: [name]
-          - name: core.toString
+#    withAnArray:
+#      properties:
+#          someArray:
+#            type: integer[]
+#            (ramltopojo.types):
+#               plugins:
+#                 - name: core.asArray
+#          anotherArray:
+#            type: dates[]
+#            (ramltopojo.types):
+#              plugins:
+#                - name: core.asArray
+##    nilUnionType:
+##      type: string|nil
+##    unionProperty:
+##      properties:
+##        goo: string|nil
+##        declared: nilUnionType
+#    dates:
+#      (ramltopojo.types):
+#        plugins:
 #          - name: core.jackson2
+#      properties:
+#        someDate: datetime
+#    foo:
+#      (ramltopojo.types):
+#          plugins:
+#            - name: core.equalsAndHashCode
+#            - name: core.jsr303
+#            - name: core.jackson2
+#      type: object
+#      discriminatorValue: myOwnValue
+#      properties:
+#        name:
+#          type: string
+#          pattern: a\[a-z\]b
+#        goo:
+#          type: object
+#          properties:
+#            glue: boolean
+#            flue:
+#              type: object
+#              properties:
+#                another: string
+#    eater:
+#      (ramltopojo.types):
+#        plugins:
+#          - name: core.equalsAndHashCode
+#            arguments: [name]
+#          - name: core.toString
+##          - name: core.jackson2
+#      type: object
+#      discriminatorValue: myOwnValue
+#      properties:
+#        name: string
+#        count: integer
+#        other: foo
+#    addPropsVerification:
+#      (ramltopojo.types):
+#        plugins:
+#          - name: core.jackson2
+#      type: object
+#      discriminatorValue: myOwnValue
+#      properties:
+#        name: string
+#        /note\d+/: string
+#
+#    OceanAnimal:
+#      (ramltopojo.types):
+#        plugins:
+#          - name: core.jackson2
+#      type: object
+#      properties:
+#        numberOfFins: integer
+#    JungleAnimal:
+#      (ramltopojo.types):
+#        plugins:
+#          - name: core.jackson2
+#      type: object
+#      properties:
+#        numberOfSpots: integer
+#
+#    BiomeBase:
+#      (ramltopojo.types):
+#        plugins:
+#          - name: core.jackson2
+#      discriminator: kind
+#      type: object
+#      properties:
+#        id: integer
+#        name: string
+#        kind: string
+#
+#    Ocean:
+#      (ramltopojo.types):
+#        plugins:
+#          - name: core.jackson2
+#      type: BiomeBase
+#      properties:
+#        animals: OceanAnimal[]
+#
+#    Jungle:
+#      (ramltopojo.types):
+#        plugins:
+#          - name: core.jackson2
+#      type: BiomeBase
+#      properties:
+#        animals: JungleAnimal[]
+#
+#    Biome:
+#      (ramltopojo.types):
+#        plugins:
+#          - name: core.jackson2
+#      type: Ocean | Jungle
+#
+#    listElementParent:
+#      type: object
+#      properties:
+#        name: string
+#
+#    listElementChild:
+#      type: listElementParent
+#      properties:
+#        name: string
+#
+#    listHolderParent:
+#      type: object
+#      (ramltopojo.types):
+#        plugins:
+#          - name: core.wildcardcollection
+#            arguments: [java.lang.Object]
+#      properties:
+#        elements: listElementParent[]
+#        names: string[]
+#        id: integer
+#
+#    listHolderChild:
+#      type: listHolderParent
+#      properties:
+#        elements: listElementChild[]
+#
+#    nametypes:
+#      type: string
+#      (ramltopojo.types):
+#        plugins:
+#          - name: core.jackson2
+#      enum: [up,down]
+#
+#    elevator:
+#      (ramltopojo.types):
+#        plugins:
+#          - name: core.jackson2
+#      type: object
+#      properties:
+#        name: string
+#        direction: nametypes
+
+    PetResponseTypeXXXXX:
       type: object
-      discriminatorValue: myOwnValue
       properties:
-        name: string
-        count: integer
-        other: foo
-    addPropsVerification:
-      (ramltopojo.types):
-        plugins:
-          - name: core.jackson2
-      type: object
-      discriminatorValue: myOwnValue
-      properties:
-        name: string
-        /note\d+/: string
+        myPet:
+          type: Animal
 
-    OceanAnimal:
-      (ramltopojo.types):
-        plugins:
-          - name: core.jackson2
-      type: object
-      properties:
-        numberOfFins: integer
-    JungleAnimal:
-      (ramltopojo.types):
-        plugins:
-          - name: core.jackson2
-      type: object
-      properties:
-        numberOfSpots: integer
+    Animal:
+        type: object
+        discriminator: animalType
+        properties:
+          animalType: string
 
-    BiomeBase:
-      (ramltopojo.types):
-        plugins:
-          - name: core.jackson2
-      discriminator: kind
-      type: object
-      properties:
-        id: integer
-        name: string
-        kind: string
+    Cat:
+        type: Animal
+        discriminatorValue: CAT
+        properties:
+          legs: integer
 
-    Ocean:
-      (ramltopojo.types):
-        plugins:
-          - name: core.jackson2
-      type: BiomeBase
-      properties:
-        animals: OceanAnimal[]
-
-    Jungle:
-      (ramltopojo.types):
-        plugins:
-          - name: core.jackson2
-      type: BiomeBase
-      properties:
-        animals: JungleAnimal[]
-
-    Biome:
-      (ramltopojo.types):
-        plugins:
-          - name: core.jackson2
-      type: Ocean | Jungle
-
-    listElementParent:
-      type: object
-      properties:
-        name: string
-
-    listElementChild:
-      type: listElementParent
-      properties:
-        name: string
-
-    listHolderParent:
-      type: object
-      (ramltopojo.types):
-        plugins:
-          - name: core.wildcardcollection
-            arguments: [java.lang.Object]
-      properties:
-        elements: listElementParent[]
-        names: string[]
-        id: integer
-
-    listHolderChild:
-      type: listHolderParent
-      properties:
-        elements: listElementChild[]
-
-    nametypes:
-      type: string
-      (ramltopojo.types):
-        plugins:
-          - name: core.jackson2
-      enum: [up,down]
-
-    elevator:
-      (ramltopojo.types):
-        plugins:
-          - name: core.jackson2
-      type: object
-      properties:
-        name: string
-        direction: nametypes
+    Fish:
+        type: Animal
+        discriminatorValue: FISH
+        properties:
+          fins: integer

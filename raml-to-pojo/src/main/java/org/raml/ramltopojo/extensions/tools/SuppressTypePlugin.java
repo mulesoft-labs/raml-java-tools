@@ -15,6 +15,7 @@
  */
 package org.raml.ramltopojo.extensions.tools;
 
+import amf.client.model.domain.UnionShape;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.AllTypesPluginHelper;
@@ -23,7 +24,6 @@ import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 
 /**
  * Created by Jean-Philippe Belanger on 3/7/17. Just potential zeroes and ones
@@ -36,7 +36,7 @@ public class SuppressTypePlugin extends AllTypesPluginHelper {
   }
 
   @Override
-  public TypeSpec.Builder classCreated(UnionPluginContext unionPluginContext, UnionTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+  public TypeSpec.Builder classCreated(UnionPluginContext unionPluginContext, UnionShape ramlType, TypeSpec.Builder incoming, EventType eventType) {
     return null;
   }
 
