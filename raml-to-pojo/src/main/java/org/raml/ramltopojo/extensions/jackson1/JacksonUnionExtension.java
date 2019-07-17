@@ -1,9 +1,11 @@
 package org.raml.ramltopojo.extensions.jackson1;
 
+import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.Shape;
-import amf.client.model.domain.TupleShape;
 import amf.client.model.domain.UnionShape;
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.squareup.javapoet.*;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonParser;
@@ -25,7 +27,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Created. There, you have it.
@@ -153,10 +154,10 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                 MethodSpec.methodBuilder(name).addParameter(ParameterizedTypeName.get(ClassName.get(Map.class),
                         ClassName.get(String.class),
                         ClassName.get(Object.class)), "map");
-        if (typeDeclaration instanceof TupleShape) {
+        if (typeDeclaration instanceof NodeShape) {
 
-            TupleShape otd = (TupleShape) typeDeclaration;
-            List<String> names = otd.items().stream().map(input -> "\"" + input.name() + "\"").collect(Collectors.toList());
+            NodeShape otd = (NodeShape) typeDeclaration;
+            List<String> names = Lists.transform(otd.properties(), (Function<Shape, String>) input -> "\"" + input.name().value() + "\"");
 
             spec.addStatement("return map.keySet().containsAll($T.asList($L))", Arrays.class, Joiner.on(",").join(names));
         }

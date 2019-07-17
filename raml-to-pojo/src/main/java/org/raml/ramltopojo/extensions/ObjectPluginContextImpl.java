@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.extensions;
 
+import amf.client.model.domain.Shape;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.squareup.javapoet.TypeName;
@@ -44,8 +45,8 @@ public class ObjectPluginContextImpl implements ObjectPluginContext {
     }
 
     @Override
-    public CreationResult dependentType(TypeDeclaration items) {
-        return generationContext.findCreatedType(items.name(), items);
+    public CreationResult dependentType(Shape items) {
+        return generationContext.findCreatedType(items.name().value(), items);
     }
 
     @Override

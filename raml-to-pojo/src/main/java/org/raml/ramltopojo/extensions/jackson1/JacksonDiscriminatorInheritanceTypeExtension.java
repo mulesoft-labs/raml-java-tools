@@ -20,8 +20,6 @@ import com.squareup.javapoet.TypeSpec;
 import org.codehaus.jackson.annotate.JsonSubTypes;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.annotate.JsonTypeName;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
-import org.raml.ramltopojo.Annotations;
 import org.raml.ramltopojo.CreationResult;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
@@ -80,12 +78,14 @@ public class JacksonDiscriminatorInheritanceTypeExtension extends ObjectTypeHand
     }
 
 
+/* TODO
     if (!Annotations.ABSTRACT.get(otr)) {
 
       typeSpec.addAnnotation(AnnotationSpec.builder(JsonDeserialize.class)
               .addMember("as", "$T.class", objectPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION))
               .build());
     }
+*/
 
 
     return typeSpec;

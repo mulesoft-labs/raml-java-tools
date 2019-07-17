@@ -15,12 +15,11 @@
  */
 package org.raml.ramltopojo;
 
+import amf.client.model.Annotable;
+import amf.client.model.domain.DomainExtension;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import org.raml.v2.api.model.v10.common.Annotable;
 import org.raml.v2.api.model.v10.datamodel.TypeInstance;
-import org.raml.v2.api.model.v10.datamodel.TypeInstanceProperty;
-import org.raml.v2.api.model.v10.declarations.AnnotationRef;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -117,7 +116,7 @@ public abstract class Annotations<T> {
 
         for (Annotable target : targets) {
 
-            AnnotationRef annotationRef = Annotations.findRef(target, annotationName);
+            DomainExtension annotationRef = Annotations.findRef(target, annotationName);
             if (annotationRef == null) {
 
                 continue;
@@ -143,7 +142,7 @@ public abstract class Annotations<T> {
 
         for (Annotable target : targets) {
 
-            AnnotationRef annotationRef = Annotations.findRef(target, annotationName);
+            DomainExtension annotationRef = Annotations.findRef(target, annotationName);
             if (annotationRef == null) {
 
                 continue;
@@ -158,17 +157,13 @@ public abstract class Annotations<T> {
         return finalList;
     }
 
-    private static <T> Object findProperty(AnnotationRef annotationRef, String propName, Function<TypeInstance, T> convert) {
+    private static <T> Object findProperty(DomainExtension annotationRef, String propName, Function<TypeInstance, T> convert) {
 
 
         // annotationRef.structuredValue().properties().get(0).values().get(0).value()
-        for (TypeInstanceProperty typeInstanceProperty : annotationRef.structuredValue().properties()) {
-            if (typeInstanceProperty.name().equalsIgnoreCase(propName)) {
-                if (typeInstanceProperty.isArray()) {
-                    return toValueList(convert, typeInstanceProperty.values());
-                } else {
-                    return convert.apply(typeInstanceProperty.value());
-                }
+        for (DomainExtension typeInstanceProperty : annotationRef.customDomainProperties()) {
+            if (typeInstanceProperty.name().value().equalsIgnoreCase(propName)) {
+                    return null; // todo return toValueList(convert, typeInstanceProperty.productIterator().);
             }
         }
 
@@ -187,12 +182,12 @@ public abstract class Annotations<T> {
         });
     }
 
-    public static AnnotationRef findRef(Annotable annotable, String annotation) {
+    public static DomainExtension findRef(Annotable annotable, String annotation) {
 
-        for (AnnotationRef annotationRef : annotable.annotations()) {
-            if (annotationRef.annotation().name().equalsIgnoreCase(annotation)) {
+        for (DomainExtension extension : annotable.annotations().custom()) {
+            if (extension.name().value().equalsIgnoreCase(annotation)) {
 
-                return annotationRef;
+                return extension;
             }
         }
 

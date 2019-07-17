@@ -9,7 +9,6 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.extensions.*;
 import org.raml.ramltopojo.plugin.PluginManager;
-import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import webapi.WebApiDocument;
 
@@ -32,7 +31,7 @@ public class GenerationContextImpl implements GenerationContext {
     private final List<String> basePlugins;
     private Map<String, TypeSpec> supportClasses = new HashMap<>();
 
-    public GenerationContextImpl(Api api) {
+    public GenerationContextImpl(WebApiDocument api) {
         this(PluginManager.NULL, api, TypeFetchers.NULL_FETCHER, "", Collections.<String>emptyList());
     }
 
@@ -112,9 +111,9 @@ public class GenerationContextImpl implements GenerationContext {
         }
     }
 
-    private<T> void loadBasePlugins(Set<T> plugins, Class<T> pluginType, TypeDeclaration... typeDeclarations) {
+    private<T> void loadBasePlugins(Set<T> plugins, Class<T> pluginType, Shape... typeDeclarations) {
 
-        for (TypeDeclaration typeDeclaration : typeDeclarations) {
+        for (Shape typeDeclaration : typeDeclarations) {
 
             if ( Annotations.CLASS_NAME.get(typeDeclaration) != null) {
 
@@ -159,7 +158,7 @@ public class GenerationContextImpl implements GenerationContext {
     }
 
     @Override
-    public ObjectTypeHandlerPlugin pluginsForObjects(TypeDeclaration... typeDeclarations) {
+    public ObjectTypeHandlerPlugin pluginsForObjects(Shape... typeDeclarations) {
 
         List<PluginDef> data = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, typeDeclarations);
         //System.err.println("annotation defined plugins for " + typeDeclarations[0].name() + "are " + data);
@@ -174,7 +173,7 @@ public class GenerationContextImpl implements GenerationContext {
 
 
     @Override
-    public EnumerationTypeHandlerPlugin pluginsForEnumerations(TypeDeclaration... typeDeclarations) {
+    public EnumerationTypeHandlerPlugin pluginsForEnumerations(Shape... typeDeclarations) {
         List<PluginDef> data = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, typeDeclarations);
         Set<EnumerationTypeHandlerPlugin> plugins = new HashSet<>();
         loadBasePlugins(plugins, EnumerationTypeHandlerPlugin.class);
@@ -186,7 +185,7 @@ public class GenerationContextImpl implements GenerationContext {
     }
 
     @Override
-    public ArrayTypeHandlerPlugin pluginsForArrays(TypeDeclaration... typeDeclarations) {
+    public ArrayTypeHandlerPlugin pluginsForArrays(Shape... typeDeclarations) {
         List<PluginDef> data = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, typeDeclarations);
         Set<ArrayTypeHandlerPlugin> plugins = new HashSet<>();
         loadBasePlugins(plugins, ArrayTypeHandlerPlugin.class);
@@ -209,7 +208,7 @@ public class GenerationContextImpl implements GenerationContext {
     }
 
     @Override
-    public ReferenceTypeHandlerPlugin pluginsForReferences(TypeDeclaration... typeDeclarations) {
+    public ReferenceTypeHandlerPlugin pluginsForReferences(Shape... typeDeclarations) {
 
         List<PluginDef> data = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, typeDeclarations);
         Set<ReferenceTypeHandlerPlugin> plugins = new HashSet<>();

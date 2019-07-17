@@ -18,10 +18,8 @@ package org.raml.ramltopojo.extensions.jackson2;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.TypeSpec;
-import org.raml.ramltopojo.Annotations;
 import org.raml.ramltopojo.CreationResult;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
@@ -80,13 +78,14 @@ public class JacksonDiscriminatorInheritanceTypeExtension extends ObjectTypeHand
     }
 
 
+    /* TODO
     if (!Annotations.ABSTRACT.get(otr)) {
 
       typeSpec.addAnnotation(AnnotationSpec.builder(JsonDeserialize.class)
               .addMember("as", "$T.class", objectPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION))
               .build());
     }
-
+*/
 
     return typeSpec;
   }

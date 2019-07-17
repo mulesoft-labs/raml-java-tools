@@ -428,7 +428,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public CreationResult findCreatedType(String typeName, TypeDeclaration ramlType) {
+        public CreationResult findCreatedType(String typeName, Shape ramlType) {
             return context.findCreatedType(typeName, ramlType);
         }
 
@@ -448,12 +448,12 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public ObjectTypeHandlerPlugin pluginsForObjects(TypeDeclaration... typeDeclarations) {
+        public ObjectTypeHandlerPlugin pluginsForObjects(Shape... typeDeclarations) {
             return context.pluginsForObjects(typeDeclarations);
         }
 
         @Override
-        public EnumerationTypeHandlerPlugin pluginsForEnumerations(TypeDeclaration... typeDeclarations) {
+        public EnumerationTypeHandlerPlugin pluginsForEnumerations(Shape... typeDeclarations) {
             return context.pluginsForEnumerations(typeDeclarations);
         }
 

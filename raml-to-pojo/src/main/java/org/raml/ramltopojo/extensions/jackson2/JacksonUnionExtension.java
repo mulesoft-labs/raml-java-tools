@@ -1,7 +1,7 @@
 package org.raml.ramltopojo.extensions.jackson2;
 
+import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.Shape;
-import amf.client.model.domain.TupleShape;
 import amf.client.model.domain.UnionShape;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -13,7 +13,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.Names;
@@ -26,7 +28,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 /**
  * Created. There, you have it.
@@ -161,8 +163,8 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
 
     private Shape findParentType(Shape typeDeclaration) {
 
-        if ( typeDeclaration instanceof TupleShape) {
-            TupleShape otd = (TupleShape) typeDeclaration;
+        if ( typeDeclaration instanceof NodeShape) {
+            NodeShape otd = (NodeShape) typeDeclaration;
             return otd.inherits().size() > 0 ?otd.inherits().get(0):otd;
         } else {
 
@@ -177,16 +179,17 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                 MethodSpec.methodBuilder(name).addParameter(ParameterizedTypeName.get(ClassName.get(Map.class),
                         ClassName.get(String.class),
                         ClassName.get(Object.class)), "map");
-        if (typeDeclaration instanceof TupleShape) {
+        if (typeDeclaration instanceof NodeShape) {
 
-            TupleShape otd = (TupleShape) typeDeclaration;
-            if ( /* TODO otd.discriminator() != null */ false ) {
+            NodeShape otd = (NodeShape) typeDeclaration;
+            if (  otd.discriminator() != null  ) {
 
-                List<String> names = otd.items().stream().map(input -> "\"" + input.name().value() + "\"").collect(Collectors.toList());
-                spec.addStatement("return map.keySet().containsAll($T.asList($L)) && map.get($S).equals($S)", Arrays.class, Joiner.on(",").join(names),/* TODO otd.discriminator()*/ null, /* Optional.ofNullable(otd.discriminatorValue()).orElse(otd.name())*/ otd.name().value());
+                List<String> names = Lists.transform(otd.properties(), (Function<Shape, String>) input -> "\"" + input.name().value() + "\"");
+
+                spec.addStatement("return map.keySet().containsAll($T.asList($L)) && map.get($S).equals($S)", Arrays.class, Joiner.on(",").join(names), otd.discriminator(), Optional.ofNullable(otd.discriminatorValue()).orElse(otd.name()));
 
             } else {
-                List<String> names = otd.items().stream().map(input -> "\"" + input.name().value() + "\"").collect(Collectors.toList());
+                List<String> names = Lists.transform(otd.properties(), (Function<Shape, String>) input -> "\"" + input.name().value() + "\"");
 
                 spec.addStatement("return map.keySet().containsAll($T.asList($L))", Arrays.class, Joiner.on(",").join(names));
             }

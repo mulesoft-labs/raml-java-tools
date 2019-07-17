@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.extensions.jaxb;
 
+import amf.client.model.domain.ArrayShape;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.TypeName;
@@ -57,7 +58,7 @@ public class JaxbObjectExtension extends ObjectTypeHandlerPlugin.Helper {
                         AnnotationSpec.builder(XmlElementWrapper.class).addMember("name", "$S", name).build()
                 );
 
-                TypeName elementTypeName = objectPluginContext.dependentType(((ArrayTypeDeclaration)property).items()).getJavaName(EventType.IMPLEMENTATION);
+                TypeName elementTypeName = objectPluginContext.dependentType(((ArrayShape)property).items()).getJavaName(EventType.IMPLEMENTATION);
 
                 if (property.xml().attribute() != null && property.xml().attribute()) {
                     fieldSpec.addAnnotation(

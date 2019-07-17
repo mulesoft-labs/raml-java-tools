@@ -1,7 +1,6 @@
 package org.raml.ramltopojo;
 
 import org.raml.ramltopojo.plugin.PluginManager;
-import org.raml.v2.api.model.v10.api.Api;
 import webapi.WebApiDocument;
 
 import java.util.Collections;
@@ -23,7 +22,7 @@ public class RamlToPojoBuilder {
         this.api = api;
     }
 
-    public static RamlToPojoBuilder builder(Api api) {
+    public static RamlToPojoBuilder builder(WebApiDocument api) {
 
         return new RamlToPojoBuilder(api);
     }

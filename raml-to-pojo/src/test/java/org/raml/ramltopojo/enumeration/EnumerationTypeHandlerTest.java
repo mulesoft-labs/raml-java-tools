@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.enumeration;
 
+import amf.client.model.domain.ScalarShape;
 import com.squareup.javapoet.ClassName;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -10,17 +11,13 @@ import org.raml.ramltopojo.TypeFetchers;
 import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.testutils.UnitTest;
 import org.raml.testutils.matchers.FieldSpecMatchers;
-import org.raml.v2.api.model.v10.api.Api;
-import org.raml.v2.api.model.v10.datamodel.IntegerTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
+import webapi.WebApiDocument;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
 import static org.raml.testutils.matchers.TypeSpecMatchers.fields;
 import static org.raml.testutils.matchers.TypeSpecMatchers.name;
 
@@ -30,22 +27,16 @@ import static org.raml.testutils.matchers.TypeSpecMatchers.name;
 public class EnumerationTypeHandlerTest extends UnitTest {
 
     @Mock
-    StringTypeDeclaration stringDeclaration;
-
-    @Mock
-    IntegerTypeDeclaration integerDeclaration;
-
-    @Mock
-    private Api api;
+    private WebApiDocument api;
 
 
     @Test
     public void createString() throws Exception {
 
-        when(stringDeclaration.name()).thenReturn("Days");
-        when(stringDeclaration.enumValues()).thenReturn(Arrays.asList("one", "two", "three"));
+// todo        when(stringDeclaration.name()).thenReturn("Days");
+// todo        when(stringDeclaration.enumValues()).thenReturn(Arrays.asList("one", "two", "three"));
 
-        EnumerationTypeHandler handler = new EnumerationTypeHandler("days", null /*stringDeclaration*/);
+        EnumerationTypeHandler handler = new EnumerationTypeHandler("days", new ScalarShape().withDataType("string").withName("Days"));
         GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());
         generationContext.newExpectedType("Days", new CreationResult("bar.pack", ClassName.get("bar.pack", "Days"), null));
 
@@ -65,10 +56,10 @@ public class EnumerationTypeHandlerTest extends UnitTest {
     @Test
     public void createInteger() throws Exception {
 
-        when(integerDeclaration.name()).thenReturn("Time");
-        when(integerDeclaration.enumValues()).thenReturn(Arrays.<Number>asList(1, 2, 3));
+     // todo   when(integerDeclaration.name()).thenReturn("Time");
+     //   when(integerDeclaration.enumValues()).thenReturn(Arrays.<Number>asList(1, 2, 3));
 
-        EnumerationTypeHandler handler = new EnumerationTypeHandler("time", null /*integerDeclaration*/);
+        EnumerationTypeHandler handler = new EnumerationTypeHandler("time", new ScalarShape().withDataType("integer").withName("Time"));
         GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());
         generationContext.newExpectedType("Time", new CreationResult("bar.pack", ClassName.get("bar.pack", "Time"), null));
 

@@ -1,12 +1,11 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.domain.Shape;
 import org.junit.Test;
 import org.raml.testutils.UnitTest;
-import org.raml.v2.api.model.v10.api.Api;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
+import webapi.Raml10;
+import webapi.WebApiDocument;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,9 +20,9 @@ public class AnnotationsTest extends UnitTest{
 
 
     @Test
-    public void apiAnnotationsReading() throws IOException {
+    public void apiAnnotationsReading() throws Exception {
 
-        Api api = getApi();
+        WebApiDocument api = getApi();
 
         List<PluginDef> defs = Annotations.PLUGINS.get(api);
         assertEquals(2, defs.size());
@@ -34,10 +33,10 @@ public class AnnotationsTest extends UnitTest{
     }
 
     @Test
-    public void typeAnnotationsReading() throws IOException {
+    public void typeAnnotationsReading() throws Exception {
 
-        Api api = getApi();
-        TypeDeclaration fooType = RamlLoader.findTypes("foo", api.types());
+        WebApiDocument api = getApi();
+        Shape fooType = RamlLoader.findShape("foo", api.declares());
 
         List<PluginDef> defs = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, fooType);
         assertEquals(3, defs.size());
@@ -51,20 +50,20 @@ public class AnnotationsTest extends UnitTest{
 
 
     @Test
-    public void abstractAnnotationsReading() throws IOException {
+    public void abstractAnnotationsReading() throws Exception {
 
-        Api api = getApi();
-        TypeDeclaration fooType = RamlLoader.findTypes("foo", api.types());
+        WebApiDocument api = getApi();
+        Shape fooType = RamlLoader.findShape("foo", api.declares());
 
         boolean b  = Annotations.ABSTRACT.get(fooType);
         assertEquals(true, b);
     }
 
     @Test
-    public void simplerTypeAnnotationsReading() throws IOException {
+    public void simplerTypeAnnotationsReading() throws Exception {
 
-        Api api = getApi();
-        TypeDeclaration fooType = RamlLoader.findTypes("too", api.types());
+        WebApiDocument api = getApi();
+        Shape fooType = RamlLoader.findShape("too", api.declares());
 
         List<PluginDef> defs = Annotations.PLUGINS.get(fooType);
         assertEquals(2, defs.size());
@@ -72,9 +71,9 @@ public class AnnotationsTest extends UnitTest{
         assertEquals("core.moo", defs.get(1).getPluginName());
     }
 
-    protected Api getApi() throws IOException {
+    protected WebApiDocument getApi() throws Exception  {
         URL url = this.getClass().getResource("annotations.raml");
-        return RamlLoader.load(url.openStream(), new File(url.getFile()).getAbsolutePath());
+        return (WebApiDocument) Raml10.parse(url.toString()).get();
     }
 
 }

@@ -22,8 +22,8 @@ public interface GenerationContext {
     void newExpectedType(String name, CreationResult creationResult);
     void createTypes(String rootDirectory) throws IOException;
 
-    ObjectTypeHandlerPlugin pluginsForObjects(TypeDeclaration... typeDeclarations);
-    EnumerationTypeHandlerPlugin pluginsForEnumerations(TypeDeclaration... typeDeclarations);
+    ObjectTypeHandlerPlugin pluginsForObjects(Shape... typeDeclarations);
+    EnumerationTypeHandlerPlugin pluginsForEnumerations(Shape... typeDeclarations);
     UnionTypeHandlerPlugin pluginsForUnions(Shape... typeDeclarations);
     ArrayTypeHandlerPlugin pluginsForArrays(Shape... typeDeclarations);
     ReferenceTypeHandlerPlugin pluginsForReferences(Shape... typeDeclarations);

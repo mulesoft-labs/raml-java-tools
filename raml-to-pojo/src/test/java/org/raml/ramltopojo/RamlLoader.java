@@ -1,5 +1,7 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.domain.DomainElement;
+import amf.client.model.domain.Shape;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import org.raml.v2.api.RamlModelBuilder;
@@ -41,4 +43,9 @@ public class RamlLoader {
             }
         }).get();
     }
+
+    public static Shape findShape(final String name, List<DomainElement> types) {
+        return types.stream().filter(x -> x instanceof Shape).map(x -> (Shape)x).filter(input -> input.name().value().equals(name)).findFirst().get();
+    }
+
 }

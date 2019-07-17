@@ -46,7 +46,7 @@ public class EnumerationTypeHandler implements TypeHandler {
     @Override
     public Optional<CreationResult> create(GenerationContext generationContext, CreationResult preCreationResult) {
 
-/*
+/* TODO
         Class cls = (typeDeclaration instanceof StringTypeDeclaration)?String.class:Number.class;
 
         FieldSpec.Builder field = FieldSpec.builder(ClassName.get(cls), "name").addModifiers(Modifier.PRIVATE);

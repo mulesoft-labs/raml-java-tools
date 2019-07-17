@@ -1,16 +1,13 @@
 package org.raml.ramltopojo.object;
 
-import com.google.common.base.Optional;
-import com.squareup.javapoet.*;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectPluginContextImpl;
-import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
-
-import javax.lang.model.element.Modifier;
-import java.util.ArrayList;
 
 /**
  * Created. There, you have it.
@@ -30,6 +27,7 @@ public class ObjectTypeHandler implements TypeHandler {
     @Override
     public ClassName javaClassName(GenerationContext generationContext, EventType type) {
 
+/* TODO
         ObjectPluginContext context = new ObjectPluginContextImpl(generationContext, null);
 
         ObjectTypeHandlerPlugin plugin = generationContext.pluginsForObjects(Utils.allParents(objectTypeDeclaration, new ArrayList<>()).toArray(new TypeDeclaration[0]));
@@ -42,6 +40,8 @@ public class ObjectTypeHandler implements TypeHandler {
         }
 
         return plugin.className(context, objectTypeDeclaration, className, type);
+*/
+        return null;
     }
 
     @Override
@@ -68,7 +68,8 @@ public class ObjectTypeHandler implements TypeHandler {
 
     private TypeSpec createImplementation(ObjectPluginContext objectPluginContext, CreationResult result, GenerationContext generationContext) {
 
-        ClassName className = result.getJavaName(EventType.IMPLEMENTATION);
+ /*      TODO
+       ClassName className = result.getJavaName(EventType.IMPLEMENTATION);
         TypeSpec.Builder typeSpec = TypeSpec
                 .classBuilder(className)
                 .addSuperinterface(result.getJavaName(EventType.INTERFACE))
@@ -136,12 +137,15 @@ public class ObjectTypeHandler implements TypeHandler {
             return null;
         }
 
-        return typeSpec.build();
+        return typeSpec.build();*/
+
+        return null;
     }
 
     private TypeSpec createInterface(ObjectPluginContext objectPluginContext, CreationResult result, GenerationContext generationContext) {
 
-        ClassName interf = result.getJavaName(EventType.INTERFACE);
+ /* TODO
+       ClassName interf = result.getJavaName(EventType.INTERFACE);
         TypeSpec.Builder typeSpec = TypeSpec
                 .interfaceBuilder(interf)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
@@ -179,7 +183,7 @@ public class ObjectTypeHandler implements TypeHandler {
             TypeName tn = null;
             if ( TypeDeclarationType.isNewInlineType(propertyDeclaration) ){
 
-                java.util.Optional<CreationResult> cr = TypeDeclarationType.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),  Names.typeName(propertyDeclaration.name(), "type"), null/*propertyDeclaration*/, generationContext);
+                java.util.Optional<CreationResult> cr = TypeDeclarationType.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),  Names.typeName(propertyDeclaration.name(), "type"), null*//*propertyDeclaration*//*, generationContext);
                 if ( cr.isPresent() ) {
                     result.withInternalType(propertyDeclaration.name(), cr.get());
                     tn = cr.get().getJavaName(EventType.INTERFACE);
@@ -222,6 +226,8 @@ public class ObjectTypeHandler implements TypeHandler {
         }
 
         return typeSpec.build();
+ */
+        return null;
     }
 
     private TypeName findType(String typeName, TypeDeclaration type, GenerationContext generationContext, EventType eventType) {
