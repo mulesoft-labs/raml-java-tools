@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.object;
 
+import amf.client.model.domain.Shape;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -18,9 +19,8 @@ import org.raml.testutils.assertj.ListAssert;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
+import webapi.WebApiDocument;
 
-import java.io.File;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +36,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static org.raml.ramltopojo.RamlLoader.findShape;
 import static org.raml.ramltopojo.RamlLoader.findTypes;
 import static org.raml.testutils.matchers.FieldSpecMatchers.*;
 import static org.raml.testutils.matchers.MethodSpecMatchers.*;
@@ -57,8 +58,8 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Test
     public void simplest() throws Exception {
 
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("simplest-type.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findTypes("foo", api.types()));
+        WebApiDocument api = RamlLoader.load(this.getClass().getResource("simplest-type.raml"));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         GenerationContextImpl generationContext = new GenerationContextImpl(api);
         CreationResult r = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
@@ -116,8 +117,8 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Test
     public void simplestContainingSimpleArray() throws Exception {
 
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("simplest-containing-simple-array.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findTypes("foo", api.types()));
+        WebApiDocument api = RamlLoader.load(this.getClass().getResource("simplest-containing-simple-array.raml"));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         GenerationContextImpl generationContext = new GenerationContextImpl(api);
         CreationResult r = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
@@ -346,8 +347,8 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Test
     public void simplestInternal() throws Exception {
 
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-type.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findTypes("foo", api.types()));
+        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-type.raml"));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         GenerationContextImpl generationContext = new GenerationContextImpl(api);
 
@@ -381,12 +382,12 @@ public class ObjectTypeHandlerTest extends UnitTest {
         });
 
 
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("plugin-test.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findTypes("foo", api.types()));
+        WebApiDocument api = RamlLoader.load(this.getClass().getResource("plugin-test.raml"));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         GenerationContextImpl generationContext = new GenerationContextImpl(api) {
             @Override
-            public ObjectTypeHandlerPlugin pluginsForObjects(TypeDeclaration... typeDeclarations) {
+            public ObjectTypeHandlerPlugin pluginsForObjects(Shape... typeDeclarations) {
                 return mockPlugin;
             }
         };
@@ -404,8 +405,8 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void checkAnnotations() throws Exception {
 
         URL url = this.getClass().getResource("plugin-invocation.raml");
-        Api api = RamlLoader.load(url.openStream(), new File(url.getFile()).getAbsolutePath());
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findTypes("foo", api.types()));
+        WebApiDocument api = RamlLoader.load(url);
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.createPluginManager("org/raml/ramltopojo/object/simple-plugin.properties"), api, TypeFetchers.NULL_FETCHER, "bar.pack", Collections.<String>emptyList());
 

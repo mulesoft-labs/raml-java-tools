@@ -1,7 +1,7 @@
 package org.raml.ramltopojo.union;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
+import amf.client.model.domain.Shape;
+import amf.client.model.domain.UnionShape;
 import com.squareup.javapoet.ClassName;
 import org.junit.Test;
 import org.raml.ramltopojo.CreationResult;
@@ -9,13 +9,11 @@ import org.raml.ramltopojo.GenerationContextImpl;
 import org.raml.ramltopojo.RamlLoader;
 import org.raml.ramltopojo.TypeFetchers;
 import org.raml.ramltopojo.plugin.PluginManager;
-import org.raml.v2.api.model.v10.api.Api;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
+import webapi.WebApiDocument;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -34,8 +32,8 @@ public class UnionTypeHandlerTest {
     @Test
     public void simpleUnion() throws Exception {
 
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("union-type.raml"), ".");
-        UnionTypeHandler handler = new UnionTypeHandler("foo", findTypes("foo", api.types()));
+        WebApiDocument api = RamlLoader.load(this.getClass().getResource("union-type.raml"));
+        UnionTypeHandler handler = new UnionTypeHandler("foo", findTypes("foo", getDeclaredTypes(api)));
 
         GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());
         generationContext.newExpectedType("foo", new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
@@ -81,8 +79,8 @@ public class UnionTypeHandlerTest {
     @Test
     public void primitiveUnion() throws Exception {
 
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("union-primitive-type.raml"), ".");
-        UnionTypeHandler handler = new UnionTypeHandler("foo", findTypes("foo", api.types()));
+        WebApiDocument api = RamlLoader.load(this.getClass().getResource("union-primitive-type.raml"));
+        UnionTypeHandler handler = new UnionTypeHandler("foo", findTypes("foo", getDeclaredTypes(api)));
 
         CreationResult r = handler.create(new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList()), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
@@ -126,22 +124,13 @@ public class UnionTypeHandlerTest {
 
     }
 
-    //@Test(expected = GenerationException.class)
-    public void arrayUnion() throws Exception {
-
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("union-array-type.raml"), ".");
-        UnionTypeHandler handler = new UnionTypeHandler("foo", findTypes("foo", api.types()));
-
-        handler.create(new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack",Collections.<String>emptyList()), null);
+    protected List<Shape> getDeclaredTypes(WebApiDocument api) {
+        return api.declares().stream().filter(x -> x instanceof Shape).map(x -> (Shape) x).collect(Collectors.toList());
     }
 
-    private static UnionTypeDeclaration findTypes(final String name, List<TypeDeclaration> types) {
-        return (UnionTypeDeclaration) FluentIterable.from(types).firstMatch(new Predicate<TypeDeclaration>() {
-            @Override
-            public boolean apply(@Nullable TypeDeclaration input) {
-                return input.name().equals(name);
-            }
-        }).get();
+
+    private static UnionShape findTypes(final String name, List<Shape> types) {
+        return types.stream().filter(input -> input.name().is(name)).map(x -> (UnionShape) x).findFirst().get();
     }
 
 }

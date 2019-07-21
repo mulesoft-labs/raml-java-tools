@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.extensions.jsr303;
 
+import amf.client.model.domain.UnionShape;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -13,7 +14,6 @@ import org.raml.testutils.UnitTest;
 import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.NumberTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 
 import javax.lang.model.element.Modifier;
 import javax.validation.Valid;
@@ -42,7 +42,7 @@ public class Jsr303ExtensionTest extends UnitTest {
     ObjectTypeDeclaration object;
 
     @Mock
-    UnionTypeDeclaration union;
+    UnionShape union;
 
     @Mock
     ObjectPluginContext objectPluginContext;
@@ -174,7 +174,7 @@ public class Jsr303ExtensionTest extends UnitTest {
 
         when(array.minItems()).thenReturn(null);
         when(array.maxItems()).thenReturn(null);
-        when(array.items()).thenReturn(union);
+        // TODO when(array.items()).thenReturn(union);
 
         FieldSpec.Builder builder =
                 FieldSpec.builder(ParameterizedTypeName.get(List.class, String.class), "champ",

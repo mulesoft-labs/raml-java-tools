@@ -13,4 +13,13 @@ annotationTypes:
                 type: boolean
             abstract?:
                 type: boolean
-            plugins?: any[]
+            pluginse?:
+                type: object
+                properties:
+                    plugins:
+                        type: array
+                        items:
+                            type: object
+                            properties:
+                                name: string
+                                arguments: string[]

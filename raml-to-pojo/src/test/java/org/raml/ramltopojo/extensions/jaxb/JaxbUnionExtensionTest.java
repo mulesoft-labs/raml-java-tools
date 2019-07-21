@@ -1,11 +1,11 @@
 package org.raml.ramltopojo.extensions.jaxb;
 
+import amf.client.model.domain.UnionShape;
 import com.squareup.javapoet.*;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.raml.ramltopojo.EventType;
 import org.raml.testutils.UnitTest;
-import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -19,7 +19,7 @@ import static org.junit.Assert.assertSame;
 public class JaxbUnionExtensionTest extends UnitTest {
 
     @Mock
-    UnionTypeDeclaration unionTypeDeclaration;
+    UnionShape unionTypeDeclaration;
 
     @Test
     public void className() {

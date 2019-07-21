@@ -1,6 +1,8 @@
 package org.raml.ramltopojo;
 
 import amf.client.model.domain.Shape;
+import amf.client.validate.ValidationReport;
+import amf.client.validate.ValidationResult;
 import org.junit.Test;
 import org.raml.testutils.UnitTest;
 import webapi.Raml10;
@@ -73,7 +75,16 @@ public class AnnotationsTest extends UnitTest{
 
     protected WebApiDocument getApi() throws Exception  {
         URL url = this.getClass().getResource("annotations.raml");
-        return (WebApiDocument) Raml10.parse(url.toString()).get();
+        WebApiDocument document = (WebApiDocument) Raml10.parse(url.toString()).get();
+
+        ValidationReport report = Raml10.validate(document).get();
+        List<ValidationResult> results = report.results();
+        if ( results.isEmpty()) {
+            return document;
+        } else {
+            results.forEach(r -> System.err.println(r.message()));
+            throw new IllegalArgumentException();
+        }
     }
 
 }
