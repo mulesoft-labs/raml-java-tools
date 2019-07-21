@@ -1,5 +1,8 @@
 package org.raml.ramltopojo.array;
 
+import amf.client.model.domain.ArrayShape;
+import amf.client.model.domain.ScalarShape;
+import amf.client.model.domain.Shape;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
@@ -13,9 +16,6 @@ import org.raml.ramltopojo.extensions.ArrayTypeHandlerPlugin;
 import org.raml.ramltopojo.extensions.ReferencePluginContext;
 import org.raml.ramltopojo.extensions.ReferenceTypeHandlerPlugin;
 import org.raml.testutils.UnitTest;
-import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import java.util.List;
 
@@ -30,10 +30,10 @@ import static org.mockito.Mockito.when;
 public class ArrayTypeHandlerTest extends UnitTest {
 
     @Mock
-    private ArrayTypeDeclaration arrayTypeDeclaration;
+    private ArrayShape arrayTypeDeclaration;
 
     @Mock
-    private TypeDeclaration parentType;
+    private Shape parentType;
 
     @Mock
     private GenerationContext context;
@@ -45,13 +45,13 @@ public class ArrayTypeHandlerTest extends UnitTest {
     private ReferenceTypeHandlerPlugin referencePlugin;
 
     @Mock
-    private StringTypeDeclaration itemType;
+    private ScalarShape itemType;
 
 
     @Before
     public void before() {
-        when(context.pluginsForArrays((TypeDeclaration) any())).thenReturn(arrayTypeHandlerPlugin);
-        when(context.pluginsForReferences((TypeDeclaration) any())).thenReturn(referencePlugin);
+        when(context.pluginsForArrays(any(Shape.class))).thenReturn(arrayTypeHandlerPlugin);
+        when(context.pluginsForReferences(any(Shape.class))).thenReturn(referencePlugin);
         when(arrayTypeDeclaration.items()).thenReturn(itemType);
     }
 
@@ -59,11 +59,11 @@ public class ArrayTypeHandlerTest extends UnitTest {
     public void javaClassReferenceWithString() {
 
 
-        when(referencePlugin.typeName(any(ReferencePluginContext.class), any(TypeDeclaration.class), eq(ParameterizedTypeName.get(List.class, String.class)))).thenReturn(ParameterizedTypeName.get(List.class, String.class));
-        when(referencePlugin.typeName(any(ReferencePluginContext.class), any(TypeDeclaration.class), eq(ClassName.get(String.class)))).thenReturn(ClassName.get(String.class));
+        when(referencePlugin.typeName(any(ReferencePluginContext.class), any(Shape.class), eq(ParameterizedTypeName.get(List.class, String.class)))).thenReturn(ParameterizedTypeName.get(List.class, String.class));
+        when(referencePlugin.typeName(any(ReferencePluginContext.class), any(Shape.class), eq(ClassName.get(String.class)))).thenReturn(ClassName.get(String.class));
 
-        when(itemType.name()).thenReturn("string");
-        when(itemType.type()).thenReturn("string");
+        // todo when(itemType.name()).thenReturn("string");
+        // todo when(itemType.type()).thenReturn("string");
 
         ArrayTypeHandler handler = new ArrayTypeHandler("string[]", arrayTypeDeclaration);
         TypeName tn = handler.javaClassReference(context, EventType.INTERFACE);
@@ -74,10 +74,10 @@ public class ArrayTypeHandlerTest extends UnitTest {
     @Test
     public void javaClassReferenceWithListOfSomething() {
 
-        when(referencePlugin.typeName(any(ReferencePluginContext.class), any(TypeDeclaration.class), eq(ParameterizedTypeName.get(List.class, String.class)))).thenReturn(ParameterizedTypeName.get(ClassName.get(List.class), ClassName.bestGuess("foo.Something")));
-        when(referencePlugin.typeName(any(ReferencePluginContext.class), any(TypeDeclaration.class), (TypeName) any())).thenReturn(ParameterizedTypeName.get(ClassName.get(List.class), ClassName.bestGuess("foo.Something")));
-        when(itemType.name()).thenReturn("Something");
-        when(itemType.type()).thenReturn("object");
+        when(referencePlugin.typeName(any(ReferencePluginContext.class), any(Shape.class), eq(ParameterizedTypeName.get(List.class, String.class)))).thenReturn(ParameterizedTypeName.get(ClassName.get(List.class), ClassName.bestGuess("foo.Something")));
+        when(referencePlugin.typeName(any(ReferencePluginContext.class), any(Shape.class), (TypeName) any())).thenReturn(ParameterizedTypeName.get(ClassName.get(List.class), ClassName.bestGuess("foo.Something")));
+        // todo when(itemType.name()).thenReturn("Something");
+        // todo when(itemType.type()).thenReturn("object");
 
         ArrayTypeHandler handler = new ArrayTypeHandler("Something[]", arrayTypeDeclaration);
         TypeName tn = handler.javaClassReference(context, EventType.INTERFACE);
@@ -89,9 +89,9 @@ public class ArrayTypeHandlerTest extends UnitTest {
     public void javaClassReferenceWithSomethingAsList() {
 
 
-        when(arrayTypeHandlerPlugin.className(any(ArrayPluginContext.class), any(ArrayTypeDeclaration.class), (ClassName) eq(null), eq(EventType.INTERFACE))).thenReturn(ClassName.get("foo", "Something"));
-        when(itemType.name()).thenReturn("Something");
-        when(itemType.type()).thenReturn("object");
+        when(arrayTypeHandlerPlugin.className(any(ArrayPluginContext.class), any(ArrayShape.class), eq(null), eq(EventType.INTERFACE))).thenReturn(ClassName.get("foo", "Something"));
+        // todo when(itemType.name()).thenReturn("Something");
+        // todo when(itemType.type()).thenReturn("object");
 
         ArrayTypeHandler handler = new ArrayTypeHandler("Something", arrayTypeDeclaration);
         TypeName tn = handler.javaClassReference(context, EventType.INTERFACE);
