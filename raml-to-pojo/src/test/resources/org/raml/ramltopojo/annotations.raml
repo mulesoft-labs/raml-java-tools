@@ -1,9 +1,10 @@
 #%RAML 1.0
+#((ObjectNode)((NodeShape) others[0]).customDomainProperties().get(0).extension()).properties() == abstract / plugins
 title: Hello World API
 version: v1
 baseUri: https://api.github.com
 uses:
-#  ramltopojo: ramltopojo.raml
+  ramltopojo: ramltopojo.raml
 (ramltopojo.types):
   plugins:
     - name: core.one
