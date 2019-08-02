@@ -16,21 +16,28 @@
 package org.raml.ramltopojo;
 
 import amf.client.model.Annotable;
+import amf.client.model.domain.ArrayNode;
 import amf.client.model.domain.DomainExtension;
+import amf.client.model.domain.NodeShape;
+import amf.client.model.domain.ObjectNode;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.raml.v2.api.model.v10.datamodel.TypeInstance;
+import webapi.WebApiDocument;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Created by Jean-Philippe Belanger on 1/2/17. Just potential zeroes and ones
  */
 public abstract class Annotations<T> {
+
+    private interface PluginDefSupplier extends Supplier<PluginDef> {
+
+    }
 
     public static Annotations<Boolean> ABSTRACT = new Annotations<Boolean>() {
 
@@ -116,7 +123,7 @@ public abstract class Annotations<T> {
 
         for (Annotable target : targets) {
 
-            DomainExtension annotationRef = Annotations.findRef(target, annotationName);
+            DomainExtension annotationRef = Annotations.findAnnotation(target, annotationName);
             if (annotationRef == null) {
 
                 continue;
@@ -132,29 +139,31 @@ public abstract class Annotations<T> {
         return retval;
     }
 
-    public static <T,R> List<R> evaluateAsList(Function<TypeInstance, T> convert, String annotationName, String parameterName, Annotable mandatory, Annotable... others) {
+    public static List<PluginDef> evaluateAsList(Annotable mandatory, Annotable... others) {
 
         List<Annotable> targets = new ArrayList<>();
         targets.add(mandatory);
         targets.addAll(Arrays.asList(others));
 
-        List<R> finalList = new ArrayList<>();
+        return targets.stream().map(Annotations::toSupplier).flatMap(Collection::stream).collect(Collectors.toList());
+    }
 
-        for (Annotable target : targets) {
+    private static List<PluginDef> toSupplier(Annotable a) {
 
-            DomainExtension annotationRef = Annotations.findRef(target, annotationName);
-            if (annotationRef == null) {
+        if ( a instanceof WebApiDocument ) {
 
-                continue;
-            }
-
-            Object o = findProperty(annotationRef, parameterName, convert);
-            if (o != null) {
-                finalList.addAll((List)o);
-            }
+                ArrayNode arrayNode = (ArrayNode) ((WebApiDocument) a).encodes().customDomainProperties().get(0).extension();
+                return arrayNode.members().stream()
+                        .filter(n -> n instanceof ObjectNode)
+                        .map(n -> (ObjectNode) n)
+                        .map(on -> new PluginDef(
+                                on.properties().get("name").toString(),
+                                ((ArrayNode) on.properties().get("arguments")).members().stream()
+                                        .map(Object::toString).collect(Collectors.toList())))
+                        .collect(Collectors.toList());
         }
 
-        return finalList;
+        return Collections.emptyList();
     }
 
     private static <T> Object findProperty(DomainExtension annotationRef, String propName, Function<TypeInstance, T> convert) {
@@ -182,9 +191,15 @@ public abstract class Annotations<T> {
         });
     }
 
-    public static DomainExtension findRef(Annotable annotable, String annotation) {
+    private static DomainExtension findAnnotation(Annotable annotable, String annotation) {
+
+        // ((ObjectNode)((NodeShape) others[0]).customDomainProperties().get(0).extension()).properties()
+
+        ((NodeShape) annotable).customDomainProperties().stream()
+                .filter(c -> "ramltopojo.types".equals(c.name().value()));
 
         for (DomainExtension extension : annotable.annotations().custom()) {
+
             if (extension.name().value().equalsIgnoreCase(annotation)) {
 
                 return extension;

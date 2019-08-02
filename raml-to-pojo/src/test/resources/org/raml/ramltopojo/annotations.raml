@@ -6,7 +6,6 @@ baseUri: https://api.github.com
 uses:
   ramltopojo: ramltopojo.raml
 (ramltopojo.types):
-  plugins:
     - name: core.one
       arguments: [ foo, bar ]
     - name: core.two
@@ -16,14 +15,12 @@ types:
     foo:
         type: object
         (ramltopojo.types):
-          abstract: true
-          plugins:
             - name: core.foo
               arguments: [ foo, bar ]
         properties:
           name: string
           lastName: string
-    too:
-        type: object
-        (ramltopojo.types):
-          plugins: [core.too, core.moo]
+#    too:
+#        type: object
+#        (ramltopojo.types):
+#          plugins: [core.too, core.moo]
