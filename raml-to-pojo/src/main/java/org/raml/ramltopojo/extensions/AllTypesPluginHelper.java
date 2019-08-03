@@ -30,6 +30,16 @@ public class AllTypesPluginHelper implements ObjectTypeHandlerPlugin, UnionTypeH
     }
 
     @Override
+    public MethodSpec.Builder additionalPropertiesGetter(ObjectPluginContext objectPluginContext, MethodSpec.Builder incoming, EventType eventType) {
+        return objectTypeHandlerPlugin.additionalPropertiesGetter(objectPluginContext, incoming, eventType);
+    }
+
+    @Override
+    public MethodSpec.Builder additionalPropertiesSetter(ObjectPluginContext objectPluginContext, MethodSpec.Builder incoming, EventType eventType) {
+        return objectTypeHandlerPlugin.additionalPropertiesSetter(objectPluginContext, incoming, eventType);
+    }
+
+    @Override
     public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, FieldSpec.Builder incoming, EventType eventType) {
         return objectTypeHandlerPlugin.fieldBuilt(objectPluginContext, declaration, incoming, eventType);
     }
