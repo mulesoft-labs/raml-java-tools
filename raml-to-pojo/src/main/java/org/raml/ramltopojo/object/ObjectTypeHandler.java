@@ -247,7 +247,7 @@ public class ObjectTypeHandler implements TypeHandler {
         MethodSpec.Builder getAdditionalProperties = MethodSpec.methodBuilder("getAdditionalProperties")
                 .returns(ADDITIONAL_PROPERTIES_TYPE).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT);
 
-        MethodSpec.Builder getSpec = generationContext.pluginsForObjects(objectTypeDeclaration).additionalPropertiesGetter(objectPluginContext, getAdditionalProperties, EventType.INTERFACE);
+        MethodSpec.Builder getSpec = generationContext.pluginsForObjects(objectTypeDeclaration).additionalPropertiesGetterBuilt(objectPluginContext, getAdditionalProperties, EventType.INTERFACE);
         if ( getSpec != null ) {
             typeSpec.addMethod(getSpec.build());
         }
@@ -259,7 +259,7 @@ public class ObjectTypeHandler implements TypeHandler {
                 .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(Object.class), "value").build())
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT);
 
-        MethodSpec.Builder setSpec = generationContext.pluginsForObjects(objectTypeDeclaration).additionalPropertiesSetter(objectPluginContext, setAdditionalProperties, EventType.INTERFACE);
+        MethodSpec.Builder setSpec = generationContext.pluginsForObjects(objectTypeDeclaration).additionalPropertiesSetterBuilt(objectPluginContext, setAdditionalProperties, EventType.INTERFACE);
         if ( setSpec != null ) {
             typeSpec.addMethod(setSpec.build());
         }
@@ -270,16 +270,21 @@ public class ObjectTypeHandler implements TypeHandler {
         TypeName newSpec = objectPluginContext.createSupportClass(
                 buildSpecialMap());
 
-        typeSpec.addField(FieldSpec
+        FieldSpec.Builder additionalPropertiesField = FieldSpec
                 .builder(ADDITIONAL_PROPERTIES_TYPE, "additionalProperties", Modifier.PRIVATE)
                 .initializer(
-                        withProperties(newSpec, objectTypeDeclaration).build()).build());
+                        withProperties(newSpec, objectTypeDeclaration).build());
+
+        FieldSpec.Builder fieldSpec = generationContext.pluginsForObjects(objectTypeDeclaration).additionalPropertiesFieldBuilt(objectPluginContext, additionalPropertiesField, EventType.IMPLEMENTATION);
+        if ( fieldSpec != null ) {
+            typeSpec.addField(fieldSpec.build());
+        }
 
         MethodSpec.Builder getAdditionalProperties = MethodSpec.methodBuilder("getAdditionalProperties")
                 .returns(ADDITIONAL_PROPERTIES_TYPE).addModifiers(Modifier.PUBLIC)
                 .addCode("return additionalProperties;\n");
 
-        MethodSpec.Builder getSpec = generationContext.pluginsForObjects(objectTypeDeclaration).additionalPropertiesGetter(objectPluginContext, getAdditionalProperties, EventType.IMPLEMENTATION);
+        MethodSpec.Builder getSpec = generationContext.pluginsForObjects(objectTypeDeclaration).additionalPropertiesGetterBuilt(objectPluginContext, getAdditionalProperties, EventType.IMPLEMENTATION);
         if ( getSpec != null ) {
             typeSpec.addMethod(getSpec.build());
         }
@@ -293,7 +298,7 @@ public class ObjectTypeHandler implements TypeHandler {
                 .addCode(
                         CodeBlock.builder().add("this.additionalProperties.put(key, value);\n").build());
 
-        MethodSpec.Builder setSpec = generationContext.pluginsForObjects(objectTypeDeclaration).additionalPropertiesSetter(objectPluginContext, setAdditionalProperties, EventType.IMPLEMENTATION);
+        MethodSpec.Builder setSpec = generationContext.pluginsForObjects(objectTypeDeclaration).additionalPropertiesSetterBuilt(objectPluginContext, setAdditionalProperties, EventType.IMPLEMENTATION);
         if ( setSpec != null ) {
             typeSpec.addMethod(setSpec.build());
         }

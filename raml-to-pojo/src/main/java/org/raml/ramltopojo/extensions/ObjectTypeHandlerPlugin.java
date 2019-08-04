@@ -47,12 +47,17 @@ public interface ObjectTypeHandlerPlugin {
         }
 
         @Override
-        public MethodSpec.Builder additionalPropertiesGetter(ObjectPluginContext objectPluginContext, MethodSpec.Builder incoming, EventType anInterface) {
+        public MethodSpec.Builder additionalPropertiesGetterBuilt(ObjectPluginContext objectPluginContext, MethodSpec.Builder incoming, EventType anInterface) {
             return incoming;
         }
 
         @Override
-        public MethodSpec.Builder additionalPropertiesSetter(ObjectPluginContext objectPluginContext, MethodSpec.Builder incoming, EventType eventType) {
+        public MethodSpec.Builder additionalPropertiesSetterBuilt(ObjectPluginContext objectPluginContext, MethodSpec.Builder incoming, EventType eventType) {
+            return incoming;
+        }
+
+        @Override
+        public FieldSpec.Builder additionalPropertiesFieldBuilt(ObjectPluginContext objectPluginContext, FieldSpec.Builder incoming, EventType eventType) {
             return incoming;
         }
     }
@@ -62,8 +67,9 @@ public interface ObjectTypeHandlerPlugin {
     FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, FieldSpec.Builder incoming, EventType eventType);
     MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType);
     MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType);
-    MethodSpec.Builder additionalPropertiesGetter(ObjectPluginContext objectPluginContext, MethodSpec.Builder incoming, EventType eventType);
-    MethodSpec.Builder additionalPropertiesSetter(ObjectPluginContext objectPluginContext, MethodSpec.Builder incoming, EventType eventType);
+    MethodSpec.Builder additionalPropertiesGetterBuilt(ObjectPluginContext objectPluginContext, MethodSpec.Builder incoming, EventType eventType);
+    MethodSpec.Builder additionalPropertiesSetterBuilt(ObjectPluginContext objectPluginContext, MethodSpec.Builder incoming, EventType eventType);
+    FieldSpec.Builder additionalPropertiesFieldBuilt(ObjectPluginContext objectPluginContext, FieldSpec.Builder incoming, EventType eventType);
 
     class Composite implements ObjectTypeHandlerPlugin {
 
@@ -133,24 +139,36 @@ public interface ObjectTypeHandlerPlugin {
         }
 
         @Override
-        public MethodSpec.Builder additionalPropertiesGetter(ObjectPluginContext objectPluginContext, MethodSpec.Builder incoming, EventType eventType) {
+        public MethodSpec.Builder additionalPropertiesGetterBuilt(ObjectPluginContext objectPluginContext, MethodSpec.Builder incoming, EventType eventType) {
             for (ObjectTypeHandlerPlugin plugin : plugins) {
                 if ( incoming == null ) {
                     break;
                 }
-                incoming = plugin.additionalPropertiesGetter(objectPluginContext, incoming, eventType);
+                incoming = plugin.additionalPropertiesGetterBuilt(objectPluginContext, incoming, eventType);
             }
 
             return incoming;
         }
 
         @Override
-        public MethodSpec.Builder additionalPropertiesSetter(ObjectPluginContext objectPluginContext, MethodSpec.Builder incoming, EventType eventType) {
+        public MethodSpec.Builder additionalPropertiesSetterBuilt(ObjectPluginContext objectPluginContext, MethodSpec.Builder incoming, EventType eventType) {
             for (ObjectTypeHandlerPlugin plugin : plugins) {
                 if ( incoming == null ) {
                     break;
                 }
-                incoming = plugin.additionalPropertiesSetter(objectPluginContext, incoming, eventType);
+                incoming = plugin.additionalPropertiesSetterBuilt(objectPluginContext, incoming, eventType);
+            }
+
+            return incoming;
+        }
+
+        @Override
+        public FieldSpec.Builder additionalPropertiesFieldBuilt(ObjectPluginContext objectPluginContext, FieldSpec.Builder incoming, EventType eventType) {
+            for (ObjectTypeHandlerPlugin plugin : plugins) {
+                if ( incoming == null ) {
+                    break;
+                }
+                incoming = plugin.additionalPropertiesFieldBuilt(objectPluginContext, incoming, eventType);
             }
 
             return incoming;

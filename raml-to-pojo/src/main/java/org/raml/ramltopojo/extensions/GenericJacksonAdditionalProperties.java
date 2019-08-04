@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.extensions;
 
+import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import org.raml.ramltopojo.EventType;
@@ -28,13 +29,19 @@ public class GenericJacksonAdditionalProperties extends ObjectTypeHandlerPlugin.
 
 
     @Override
-    public MethodSpec.Builder additionalPropertiesGetter(ObjectPluginContext objectPluginContext, MethodSpec.Builder incoming, EventType anInterface) {
+    public MethodSpec.Builder additionalPropertiesGetterBuilt(ObjectPluginContext objectPluginContext, MethodSpec.Builder incoming, EventType anInterface) {
         return incoming.addAnnotation(jsonAnyGetterAnnotation);
     }
 
     @Override
-    public MethodSpec.Builder additionalPropertiesSetter(ObjectPluginContext objectPluginContext, MethodSpec.Builder incoming, EventType eventType) {
+    public MethodSpec.Builder additionalPropertiesSetterBuilt(ObjectPluginContext objectPluginContext, MethodSpec.Builder incoming, EventType eventType) {
 
         return incoming.addAnnotation(jsonAnySetterAnnotation);
+    }
+
+    @Override
+    public FieldSpec.Builder additionalPropertiesFieldBuilt(ObjectPluginContext objectPluginContext, FieldSpec.Builder incoming, EventType eventType) {
+
+        return incoming.addAnnotation(jsonIgnore);
     }
 }
