@@ -136,7 +136,7 @@ public class FacetValidation {
 
     public static boolean isFieldFromBuiltType(TypeDeclaration typeDeclaration) {
 
-        return typeDeclaration instanceof ObjectTypeDeclaration || typeDeclaration instanceof UnionTypeDeclaration;
+        return typeDeclaration instanceof ObjectTypeDeclaration || typeDeclaration instanceof UnionTypeDeclaration || typeDeclaration instanceof JSONTypeDeclaration || typeDeclaration instanceof XMLTypeDeclaration;
     }
 
     private static boolean isInteger(TypeName type) {
