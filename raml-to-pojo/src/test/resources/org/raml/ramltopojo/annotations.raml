@@ -20,7 +20,8 @@ types:
         properties:
           name: string
           lastName: string
-#    too:
-#        type: object
-#        (ramltopojo.types):
-#          plugins: [core.too, core.moo]
+    too:
+        type: object
+        (ramltopojo.types):
+          - name: core.too
+          - name: core.moo

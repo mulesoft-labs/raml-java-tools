@@ -69,8 +69,8 @@ public class AnnotationsTest extends UnitTest{
 
         List<PluginDef> defs = Annotations.PLUGINS.get(fooType);
         assertEquals(2, defs.size());
-        assertEquals("core.too", defs.get(0).getPluginName());
         assertEquals("core.moo", defs.get(1).getPluginName());
+        assertEquals("core.too", defs.get(0).getPluginName());
     }
 
     protected WebApiDocument getApi() throws Exception  {

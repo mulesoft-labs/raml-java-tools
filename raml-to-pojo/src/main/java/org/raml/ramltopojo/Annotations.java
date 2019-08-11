@@ -16,10 +16,7 @@
 package org.raml.ramltopojo;
 
 import amf.client.model.Annotable;
-import amf.client.model.domain.ArrayNode;
-import amf.client.model.domain.DomainExtension;
-import amf.client.model.domain.NodeShape;
-import amf.client.model.domain.ObjectNode;
+import amf.client.model.domain.*;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.raml.v2.api.model.v10.datamodel.TypeInstance;
@@ -29,6 +26,8 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import static java.util.Collections.emptyList;
 
 /**
  * Created by Jean-Philippe Belanger on 1/2/17. Just potential zeroes and ones
@@ -89,7 +88,7 @@ public abstract class Annotations<T> {
 
         @Override
         public List<PluginDef> getWithContext(Annotable target, Annotable... others) {
-            return Annotations.getWithDefaultList(new TypeInstanceToPluginDefFunction(), "plugins", target, others);
+            return Annotations.getWithDefaultList("plugins", target, others);
         }
     };
 
@@ -104,11 +103,12 @@ public abstract class Annotations<T> {
         }
     }
 
-    private static <T,R> List<R> getWithDefaultList(Function<TypeInstance, T> convert, String propName, Annotable target, Annotable... others) {
-        List<R> b = Annotations.evaluateAsList(convert, "types", propName, target, others);
+    private static <T,R> List<PluginDef> getWithDefaultList(String propName, Annotable target, Annotable... others) {
+        //((ObjectNode)((ArrayNode)((NodeShape) others[0]).customDomainProperties().get(0).extension()).members().get(0)).properties().keySet();
+        List<PluginDef> b = Annotations.evaluateAsList(target, others);
         if (b == null) {
 
-            return Collections.emptyList();
+            return emptyList();
         } else {
             return b;
         }
@@ -150,20 +150,34 @@ public abstract class Annotations<T> {
 
     private static List<PluginDef> toSupplier(Annotable a) {
 
+        ArrayNode arrayNode = null;
         if ( a instanceof WebApiDocument ) {
 
-                ArrayNode arrayNode = (ArrayNode) ((WebApiDocument) a).encodes().customDomainProperties().get(0).extension();
-                return arrayNode.members().stream()
-                        .filter(n -> n instanceof ObjectNode)
-                        .map(n -> (ObjectNode) n)
-                        .map(on -> new PluginDef(
-                                on.properties().get("name").toString(),
-                                ((ArrayNode) on.properties().get("arguments")).members().stream()
-                                        .map(Object::toString).collect(Collectors.toList())))
-                        .collect(Collectors.toList());
+            arrayNode = (ArrayNode) getExtension((WebApiDocument) a).orElseGet(DomainExtension::new).extension();
+        } else {
+
+            arrayNode = (ArrayNode) getExtension((NodeShape) a).orElseGet(DomainExtension::new).extension();
         }
 
-        return Collections.emptyList();
+        return arrayNode.members().stream()
+                .filter(n -> n instanceof ObjectNode)
+                .map(n -> (ObjectNode) n)
+                .map(on -> new PluginDef(
+                        ((ScalarNode)on.properties().get("name")).value(),
+                        Optional.ofNullable((ArrayNode) on.properties().get("arguments")).orElseGet(ArrayNode::new).members().stream()
+                                .filter( o -> o instanceof ScalarNode)
+                                .map(o -> ((ScalarNode)o).value())
+                                .collect(Collectors.toList())))
+                .collect(Collectors.toList());
+
+    }
+
+    private static Optional<DomainExtension> getExtension(NodeShape a) {
+        return a.customDomainProperties().stream().filter(x -> x.name().is("ramltopojo.types")).findAny();
+    }
+
+    private static Optional<DomainExtension> getExtension(WebApiDocument a) {
+        return a.encodes().customDomainProperties().stream().filter(x -> x.name().is("ramltopojo.types")).findAny();
     }
 
     private static <T> Object findProperty(DomainExtension annotationRef, String propName, Function<TypeInstance, T> convert) {
