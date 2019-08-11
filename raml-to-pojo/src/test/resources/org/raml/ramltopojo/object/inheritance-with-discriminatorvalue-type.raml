@@ -4,12 +4,14 @@ version: v1
 baseUri: https://api.github.com
 types:
     once:
+      additionalProperties: false
       discriminator: kind
       properties:
         kind: string
         right: string
     foo:
         type: once
+        additionalProperties: false
         discriminatorValue: myOwnValue
         properties:
           name: string

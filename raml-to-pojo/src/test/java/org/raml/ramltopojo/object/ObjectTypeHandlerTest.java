@@ -3,10 +3,7 @@ package org.raml.ramltopojo.object;
 import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 import com.google.common.collect.FluentIterable;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.*;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
@@ -28,6 +25,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static com.squareup.javapoet.Assertions.assertThat;
 import static junit.framework.TestCase.assertNotNull;
@@ -199,6 +197,8 @@ public class ObjectTypeHandlerTest extends UnitTest {
         assertThat(r.getInterface(), is(allOf(
                 name(equalTo("Foo")),
                 methods(containsInAnyOrder(
+                        allOf(methodName(equalTo("getAdditionalProperties")), returnType(equalTo(ParameterizedTypeName.get(Map.class, String.class, Object.class)))),
+                        allOf(methodName(equalTo("setAdditionalProperties")), parameters(contains(type(equalTo(TypeName.get(String.class))), type(equalTo(TypeName.get(Object.class)))))),
                         allOf(methodName(equalTo("getAge")), returnType(equalTo(ClassName.INT))),
                         allOf(methodName(equalTo("setAge")), parameters(contains(type(equalTo(ClassName.INT))))),
                         allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get(String.class)))),
@@ -213,9 +213,12 @@ public class ObjectTypeHandlerTest extends UnitTest {
                 name(equalTo("FooImpl")),
                 fields(containsInAnyOrder(
                         allOf(fieldName(equalTo("name")), fieldType(equalTo(ClassName.get(String.class)))),
-                        allOf(fieldName(equalTo("age")), fieldType(equalTo(ClassName.INT)))
+                        allOf(fieldName(equalTo("age")), fieldType(equalTo(ClassName.INT))),
+                        allOf(fieldName(equalTo("additionalProperties")), fieldType(equalTo(ParameterizedTypeName.get(Map.class, String.class, Object.class))))
                 )),
                 methods(containsInAnyOrder(
+                        allOf(methodName(equalTo("getAdditionalProperties")), returnType(equalTo(ParameterizedTypeName.get(Map.class, String.class, Object.class)))),
+                        allOf(methodName(equalTo("setAdditionalProperties")), parameters(contains(type(equalTo(TypeName.get(String.class))), type(equalTo(TypeName.get(Object.class)))))),
                         allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get(String.class)))),
                         allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get(String.class)))))),
                         allOf(methodName(equalTo("getAge")), returnType(equalTo(ClassName.INT))),
@@ -242,6 +245,8 @@ public class ObjectTypeHandlerTest extends UnitTest {
         assertThat(r.getInterface(), is(allOf(
                 name(equalTo("Foo")),
                 methods(containsInAnyOrder(
+                        allOf(methodName(equalTo("getAdditionalProperties")), returnType(equalTo(ParameterizedTypeName.get(Map.class, String.class, Object.class)))),
+                        allOf(methodName(equalTo("setAdditionalProperties")), parameters(contains(type(equalTo(TypeName.get(String.class))), type(equalTo(TypeName.get(Object.class)))))),
                         allOf(methodName(equalTo("getKind")), returnType(equalTo(ClassName.get(String.class)))),
                         allOf(methodName(equalTo("getRight")), returnType(equalTo(ClassName.get(String.class)))),
                         allOf(methodName(equalTo("setRight")), parameters(contains(type(equalTo(ClassName.get(String.class)))))),
@@ -258,9 +263,12 @@ public class ObjectTypeHandlerTest extends UnitTest {
                 fields(containsInAnyOrder(
                         allOf(fieldName(equalTo("kind")), fieldType(equalTo(ClassName.get(String.class))), initializer(equalTo("_DISCRIMINATOR_TYPE_NAME"))),
                         allOf(fieldName(equalTo("right")), fieldType(equalTo(ClassName.get(String.class)))),
-                        allOf(fieldName(equalTo("name")), fieldType(equalTo(ClassName.get(String.class))))
+                        allOf(fieldName(equalTo("name")), fieldType(equalTo(ClassName.get(String.class)))),
+                        allOf(fieldName(equalTo("additionalProperties")), fieldType(equalTo(ParameterizedTypeName.get(Map.class, String.class, Object.class))))
                 )),
                 methods(containsInAnyOrder(
+                        allOf(methodName(equalTo("getAdditionalProperties")), returnType(equalTo(ParameterizedTypeName.get(Map.class, String.class, Object.class)))),
+                        allOf(methodName(equalTo("setAdditionalProperties")), parameters(contains(type(equalTo(TypeName.get(String.class))), type(equalTo(TypeName.get(Object.class)))))),
                         allOf(methodName(equalTo("getKind")), returnType(equalTo(ClassName.get(String.class)))),
                         allOf(methodName(equalTo("getRight")), returnType(equalTo(ClassName.get(String.class)))),
                         allOf(methodName(equalTo("setRight")), parameters(contains(type(equalTo(ClassName.get(String.class)))))),

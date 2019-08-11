@@ -1,6 +1,8 @@
 package org.raml.ramltopojo.object;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
@@ -9,8 +11,10 @@ import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
+import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Created. There, you have it.
@@ -20,6 +24,10 @@ public class ObjectTypeHandler implements TypeHandler {
     public static final String DISCRIMINATOR_TYPE_NAME = "_DISCRIMINATOR_TYPE_NAME";
     private final String name;
     private final ObjectTypeDeclaration objectTypeDeclaration;
+
+    private static final ParameterizedTypeName ADDITIONAL_PROPERTIES_TYPE = ParameterizedTypeName.get(
+            Map.class, String.class,
+            Object.class);
 
     public ObjectTypeHandler(String name, ObjectTypeDeclaration objectTypeDeclaration) {
         this.name = name;
@@ -131,6 +139,11 @@ public class ObjectTypeHandler implements TypeHandler {
             }
         }
 
+        if ( objectTypeDeclaration.additionalProperties()) {
+
+            handleAdditionalPropertiesImplementation(objectPluginContext, result, generationContext, typeSpec);
+        }
+
         typeSpec = generationContext.pluginsForObjects(objectTypeDeclaration).classCreated(objectPluginContext, objectTypeDeclaration, typeSpec, EventType.IMPLEMENTATION);
         if ( typeSpec == null ) {
             return null;
@@ -221,7 +234,164 @@ public class ObjectTypeHandler implements TypeHandler {
 
         }
 
+        if ( objectTypeDeclaration.additionalProperties()) {
+
+            handleAdditionalPropertiesInterface(objectPluginContext, result, generationContext, typeSpec);
+        }
+
         return typeSpec.build();
+    }
+
+    private void handleAdditionalPropertiesInterface(ObjectPluginContext objectPluginContext, CreationResult result, GenerationContext generationContext, TypeSpec.Builder typeSpec) {
+
+        MethodSpec.Builder getAdditionalProperties = MethodSpec.methodBuilder("getAdditionalProperties")
+                .returns(ADDITIONAL_PROPERTIES_TYPE).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT);
+
+        MethodSpec.Builder getSpec = generationContext.pluginsForObjects(objectTypeDeclaration).additionalPropertiesGetterBuilt(objectPluginContext, getAdditionalProperties, EventType.INTERFACE);
+        if ( getSpec != null ) {
+            typeSpec.addMethod(getSpec.build());
+        }
+
+        MethodSpec.Builder setAdditionalProperties = MethodSpec
+                .methodBuilder("setAdditionalProperties")
+                .returns(TypeName.VOID)
+                .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(String.class), "key").build())
+                .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(Object.class), "value").build())
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT);
+
+        MethodSpec.Builder setSpec = generationContext.pluginsForObjects(objectTypeDeclaration).additionalPropertiesSetterBuilt(objectPluginContext, setAdditionalProperties, EventType.INTERFACE);
+        if ( setSpec != null ) {
+            typeSpec.addMethod(setSpec.build());
+        }
+    }
+
+    private void handleAdditionalPropertiesImplementation(ObjectPluginContext objectPluginContext, CreationResult result, GenerationContext generationContext, TypeSpec.Builder typeSpec) {
+
+        TypeName newSpec = objectPluginContext.createSupportClass(
+                buildSpecialMap());
+
+        FieldSpec.Builder additionalPropertiesField = FieldSpec
+                .builder(ADDITIONAL_PROPERTIES_TYPE, "additionalProperties", Modifier.PRIVATE)
+                .initializer(
+                        withProperties(newSpec, objectTypeDeclaration).build());
+
+        FieldSpec.Builder fieldSpec = generationContext.pluginsForObjects(objectTypeDeclaration).additionalPropertiesFieldBuilt(objectPluginContext, additionalPropertiesField, EventType.IMPLEMENTATION);
+        if ( fieldSpec != null ) {
+            typeSpec.addField(fieldSpec.build());
+        }
+
+        MethodSpec.Builder getAdditionalProperties = MethodSpec.methodBuilder("getAdditionalProperties")
+                .returns(ADDITIONAL_PROPERTIES_TYPE).addModifiers(Modifier.PUBLIC)
+                .addCode("return additionalProperties;\n");
+
+        MethodSpec.Builder getSpec = generationContext.pluginsForObjects(objectTypeDeclaration).additionalPropertiesGetterBuilt(objectPluginContext, getAdditionalProperties, EventType.IMPLEMENTATION);
+        if ( getSpec != null ) {
+            typeSpec.addMethod(getSpec.build());
+        }
+
+        MethodSpec.Builder setAdditionalProperties = MethodSpec
+                .methodBuilder("setAdditionalProperties")
+                .returns(TypeName.VOID)
+                .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(String.class), "key").build())
+                .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(Object.class), "value").build())
+                .addModifiers(Modifier.PUBLIC)
+                .addCode(
+                        CodeBlock.builder().add("this.additionalProperties.put(key, value);\n").build());
+
+        MethodSpec.Builder setSpec = generationContext.pluginsForObjects(objectTypeDeclaration).additionalPropertiesSetterBuilt(objectPluginContext, setAdditionalProperties, EventType.IMPLEMENTATION);
+        if ( setSpec != null ) {
+            typeSpec.addMethod(setSpec.build());
+        }
+
+    }
+
+    private CodeBlock.Builder withProperties(TypeName newSpec, ObjectTypeDeclaration object) {
+
+        List<TypeDeclaration> properties = FluentIterable.from(object.properties()).filter(new Predicate<TypeDeclaration>() {
+            @Override
+            public boolean apply(@Nullable TypeDeclaration property) {
+                return property != null && EcmaPattern.isSlashedPattern(property.name()) && ! EcmaPattern.fromString(property.name()).asJavaPattern().isEmpty();
+            }
+        }).toList();
+
+        if ( properties.size() == 0) {
+
+            return CodeBlock.of("new $T()", newSpec).toBuilder();
+        }
+
+        CodeBlock.Builder cb = CodeBlock.builder().beginControlFlow("new $T()", newSpec).beginControlFlow("");
+        for (TypeDeclaration typeDeclaration : object.properties()) {
+
+            cb.addStatement("addAcceptedPattern($T.compile($S))", Pattern.class, EcmaPattern.fromString(typeDeclaration.name()).asJavaPattern());
+        }
+        return cb.endControlFlow().endControlFlow();
+    }
+
+    protected TypeSpec.Builder buildSpecialMap() {
+        return TypeSpec.classBuilder("ExcludingMap")
+                .superclass(ParameterizedTypeName.get(ClassName.get(HashMap.class), ClassName.get(String.class), ClassName.get(Object.class)))
+                .addField(
+                        FieldSpec.builder(ParameterizedTypeName.get(Set.class, Pattern.class), "additionalProperties")
+                                .initializer(CodeBlock.builder().add(" new $T()", ParameterizedTypeName.get(HashSet.class, Pattern.class)).build())
+                                .build())
+                .addMethod(
+                        MethodSpec.methodBuilder("put")
+                                .addParameter(ClassName.get(String.class), "key")
+                                .addParameter(ClassName.get(Object.class), "value")
+                                .addAnnotation(Override.class)
+                                .addModifiers(Modifier.PUBLIC)
+                                .returns(TypeName.OBJECT)
+                                .beginControlFlow("if ( additionalProperties.size() == 0 ) ")
+                                .addStatement("return super.put(key, value)")
+                                .endControlFlow()
+                                .beginControlFlow("else")
+                                .addStatement("return setProperty(key, value)")
+                                .endControlFlow()
+                                .build())
+                .addMethod(
+                        MethodSpec.methodBuilder("putAll")
+                                .addParameter(ParameterizedTypeName.get(ClassName.get(Map.class), WildcardTypeName.subtypeOf(String.class), WildcardTypeName.subtypeOf(Object.class)), "otherMap")
+                                .addAnnotation(Override.class)
+                                .addModifiers(Modifier.PUBLIC)
+                                .returns(TypeName.VOID)
+                                .addCode(CodeBlock.builder()
+                                        .beginControlFlow("if ( additionalProperties.size() == 0 ) ")
+                                        .addStatement("super.putAll(otherMap)")
+                                        .endControlFlow()
+                                        .beginControlFlow("else")
+                                        .beginControlFlow("for ( String key: otherMap.keySet() )")
+                                        .addStatement("setProperty(key, otherMap.get(key))")
+                                        .endControlFlow()
+                                        .endControlFlow()
+                                        .build())
+                                .build())
+                .addMethod(
+                        MethodSpec.methodBuilder("addAcceptedPattern")
+                                .addParameter(ClassName.get(Pattern.class), "pattern")
+                                .addModifiers(Modifier.PROTECTED)
+                                .returns(TypeName.VOID)
+                                .addCode(CodeBlock.builder().addStatement("additionalProperties.add(pattern)").build())
+                                .build())
+                .addMethod(
+                        MethodSpec.methodBuilder("setProperty")
+                                .addParameter(ClassName.get(String.class), "key")
+                                .addParameter(ClassName.get(Object.class), "value")
+                                .addModifiers(Modifier.PRIVATE)
+                                .returns(TypeName.OBJECT)
+                                .beginControlFlow("if ( additionalProperties.size() == 0 ) ")
+                                .addStatement("return super.put(key, value)")
+                                .endControlFlow()
+                                .beginControlFlow("else")
+                                .beginControlFlow("for ( $T p : additionalProperties)", Pattern.class)
+                                .beginControlFlow("if ( p.matcher(key).matches() )")
+                                .addStatement("return super.put(key, value)")
+                                .endControlFlow()
+                                .endControlFlow()
+                                .addStatement("throw new $T(\"property \" + key + \" is invalid according to RAML type\")", IllegalArgumentException.class)
+                                .endControlFlow()
+                                .build())
+
+                .addModifiers(Modifier.PUBLIC);
     }
 
     private TypeName findType(String typeName, TypeDeclaration type, GenerationContext generationContext, EventType eventType) {
