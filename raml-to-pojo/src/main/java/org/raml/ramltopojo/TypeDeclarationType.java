@@ -27,27 +27,6 @@ import java.util.stream.Stream;
  */
 public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFactory {
 
-    /*
-     private static Map<Class, Class<?>> ramlToType = ImmutableMap.<Class, Class<?>>builder()
-      .put(IntegerTypeDeclaration.class, int.class)
-      .put(BooleanTypeDeclaration.class, boolean.class)
-      .put(DateTimeOnlyTypeDeclaration.class, Date.class)
-      .put(TimeOnlyTypeDeclaration.class, Date.class)
-      .put(DateTimeTypeDeclaration.class, Date.class).put(DateTypeDeclaration.class, Date.class)
-      .put(NumberTypeDeclaration.class, BigDecimal.class)
-      .put(StringTypeDeclaration.class, String.class).put(FileTypeDeclaration.class, File.class)
-      .put(AnyTypeDeclaration.class, Object.class)
-      .build();
-
-  private static Map<String, Class<?>> stringScalarToType = ImmutableMap
-      .<String, Class<?>>builder().put("integer", int.class).put("boolean", boolean.class)
-      .put("date-time", Date.class).put("date", Date.class).put("number", BigDecimal.class)
-      .put("string", String.class).put("file", File.class).build();
-
-  // cheating: I know I only have one table for floats and ints, but the parser
-  // should prevent problems.
-*/
-
     NULL {
         @Override
         public boolean shouldCreateInlineType(Shape declaration) {
@@ -60,10 +39,28 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
             return new NullTypeHandler(name, typeDeclaration);
         }
     },
+    SCALAR {
+
+        @Override
+        public boolean shouldCreateInlineType(Shape declaration) {
+
+            return false;
+        }
+
+        @Override
+        public TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration) {
+
+            ScalarShape scalarShape = (ScalarShape) typeDeclaration;
+            return Optional.ofNullable(
+                    scalarToType(scalarShape.dataType().value()))
+                    .orElseThrow(() -> new GenerationException("no scalar type '" + scalarShape.dataType().value() +"'"))
+                    .createHandler(name, type, typeDeclaration);
+        }
+    },
     OBJECT {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration) {
-            return new ObjectTypeHandler(name, null /* todo should fix */);
+            return new ObjectTypeHandler(name, (NodeShape) null /* todo should fix */);
         }
 
 
@@ -313,18 +310,32 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
             .put(NodeShape.class, OBJECT)
             .put(ArrayShape.class, ARRAY)
             .put(UnionShape.class, UNION)
-//            .put(ScalarShape.class, DATETIME_ONLY)
-//            .put(ScalarShape.class, INTEGER)
-//            .put(ScalarShape.class, BOOLEAN)
-//            .put(ScalarShape.class, TIME_ONLY)
-//            .put(ScalarShape.class, DATETIME)
-//            .put(ScalarShape.class, DATE)
-//            .put(ScalarShape.class, NUMBER)
-            .put(ScalarShape.class, STRING)
+            .put(ScalarShape.class, SCALAR)
             .put(FileShape.class, FILE)
             .put(AnyShape.class, ANY)
             .put(NilShape.class, NULL)
             .build();
+
+    public static TypeDeclarationType ramlToType(Class  scalarType) {
+
+        return ramlToType.get(scalarType);
+    }
+
+    private static Map<String, TypeDeclarationType> scalarTypes = ImmutableMap.<String, TypeDeclarationType>builder()
+            .put("datetime-only", DATETIME_ONLY)
+            .put("integer", INTEGER)
+            .put("boolean", BOOLEAN)
+            .put("time-only", TIME_ONLY)
+            .put("datetime", DATETIME)
+            .put("date-only", DATE)
+            .put("number", NUMBER)
+            .put("string", STRING)
+            .build();
+
+    public static TypeDeclarationType scalarToType(String cls) {
+
+        return scalarTypes.get(cls);
+    }
 
     /**
      * Create the actual type.
@@ -380,7 +391,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
      */
     public static Optional<CreationResult> createInlineType(ClassName containingClassName, ClassName containingImplementation, String name, Shape typeDeclaration, final GenerationContext context) {
 
-        TypeDeclarationType typeDeclarationType = ramlToType.get(null/*Utils.declarationType(typeDeclaration)*/);
+        TypeDeclarationType typeDeclarationType = ramlToType(null /*Utils.declarationType(typeDeclaration)*/);
 
         TypeHandler handler = typeDeclarationType.createHandler(name, typeDeclarationType, typeDeclaration);
         ClassName intf = handler.javaClassName(new InlineGenerationContext(containingClassName, containingClassName, context),  EventType.INTERFACE);
@@ -392,7 +403,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
 
     public static TypeName calculateTypeName(String name, Shape typeDeclaration, GenerationContext context, EventType eventType) {
 
-        TypeDeclarationType typeDeclarationType = ramlToType.get(typeDeclaration.getClass());
+        TypeDeclarationType typeDeclarationType = ramlToType(typeDeclaration.getClass());
 
         TypeHandler handler = typeDeclarationType.createHandler(name, typeDeclarationType, typeDeclaration);
         TypeName typeName = handler.javaClassReference(context, eventType);
@@ -401,7 +412,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     }
 
     public static boolean isNewInlineType(Shape declaration) {
-        return ramlToType.get(Utils.declarationType(declaration)).shouldCreateInlineType(declaration);
+        return ramlToType(Utils.declarationType(declaration)).shouldCreateInlineType(declaration);
     }
 
     private static class InlineGenerationContext implements GenerationContext {
