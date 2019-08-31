@@ -9,7 +9,6 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.extensions.*;
 import org.raml.ramltopojo.plugin.PluginManager;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import webapi.WebApiDocument;
 
 import java.io.IOException;
@@ -81,12 +80,13 @@ public class GenerationContextImpl implements GenerationContext {
         return ClassName.get(defaultPackage, name);
     }
 
-    public void setupTypeHierarchy(TypeDeclaration typeDeclaration) {
+    @Override
+    public void setupTypeHierarchy(Shape typeDeclaration) {
 
-        List<TypeDeclaration> parents = typeDeclaration.parentTypes();
-        for (TypeDeclaration parent : parents) {
+        List<Shape> parents = typeDeclaration.inherits();
+        for (Shape parent : parents) {
             setupTypeHierarchy(parent);
-            childTypes.put(parent.name(), typeDeclaration.name());
+            childTypes.put(parent.name().value(), typeDeclaration.name().value());
         }
     }
 
