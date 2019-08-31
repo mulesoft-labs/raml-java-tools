@@ -1,34 +1,35 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.domain.NodeShape;
 import org.hamcrest.Matchers;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.raml.testutils.UnitTest;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
+import webapi.WebApiParser;
 
 import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.when;
 
 /**
  * Created. There, you have it.
  */
 public class GenerationContextImplTest extends UnitTest{
 
-    @Mock
-    ObjectTypeDeclaration type1, type2, type3, type4;
+    NodeShape type1, type2, type3, type4;
 
     @Test
-    public void setupTypeHierarchy() {
+    public void setupTypeHierarchy() throws ExecutionException, InterruptedException {
 
-        when(type1.parentTypes()).thenReturn(Arrays.<TypeDeclaration>asList(type2, type3));
-        when(type2.parentTypes()).thenReturn(Arrays.<TypeDeclaration>asList(type3, type4));
-        when(type1.name()).thenReturn("type1");
-        when(type2.name()).thenReturn("type2");
-        when(type3.name()).thenReturn("type3");
-        when(type4.name()).thenReturn("type4");
+        WebApiParser.init().get();
+
+        type1 = (NodeShape) new NodeShape().withInheritsObject("object").withName("type1");
+        type2 = (NodeShape) new NodeShape().withInheritsObject("object").withName("type2");
+        type3 = (NodeShape) new NodeShape().withInheritsObject("object").withName("type3");
+        type4 = (NodeShape) new NodeShape().withInheritsObject("object").withName("type4");
+
+        type1 = (NodeShape) type1.withInherits(Arrays.asList(type2, type3));
+        type2 = (NodeShape) type2.withInherits(Arrays.asList(type3, type4));
 
         GenerationContextImpl impl = new GenerationContextImpl(null);
         impl.setupTypeHierarchy(type1);

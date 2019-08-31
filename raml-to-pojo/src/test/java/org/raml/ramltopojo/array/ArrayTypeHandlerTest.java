@@ -1,6 +1,7 @@
 package org.raml.ramltopojo.array;
 
 import amf.client.model.domain.ArrayShape;
+import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.ScalarShape;
 import amf.client.model.domain.Shape;
 import com.squareup.javapoet.ClassName;
@@ -58,12 +59,9 @@ public class ArrayTypeHandlerTest extends UnitTest {
     @Test
     public void javaClassReferenceWithString() {
 
-
+        when(arrayTypeDeclaration.items()).thenReturn(new ScalarShape().withDataType("string"));
         when(referencePlugin.typeName(any(ReferencePluginContext.class), any(Shape.class), eq(ParameterizedTypeName.get(List.class, String.class)))).thenReturn(ParameterizedTypeName.get(List.class, String.class));
         when(referencePlugin.typeName(any(ReferencePluginContext.class), any(Shape.class), eq(ClassName.get(String.class)))).thenReturn(ClassName.get(String.class));
-
-        // todo when(itemType.name()).thenReturn("string");
-        // todo when(itemType.type()).thenReturn("string");
 
         ArrayTypeHandler handler = new ArrayTypeHandler("string[]", arrayTypeDeclaration);
         TypeName tn = handler.javaClassReference(context, EventType.INTERFACE);
@@ -74,10 +72,10 @@ public class ArrayTypeHandlerTest extends UnitTest {
     @Test
     public void javaClassReferenceWithListOfSomething() {
 
+        when(context.buildDefaultClassName(any(), any())).thenReturn(ClassName.OBJECT);
+        when(arrayTypeDeclaration.items()).thenReturn(new NodeShape().withName("Something"));
         when(referencePlugin.typeName(any(ReferencePluginContext.class), any(Shape.class), eq(ParameterizedTypeName.get(List.class, String.class)))).thenReturn(ParameterizedTypeName.get(ClassName.get(List.class), ClassName.bestGuess("foo.Something")));
         when(referencePlugin.typeName(any(ReferencePluginContext.class), any(Shape.class), (TypeName) any())).thenReturn(ParameterizedTypeName.get(ClassName.get(List.class), ClassName.bestGuess("foo.Something")));
-        // todo when(itemType.name()).thenReturn("Something");
-        // todo when(itemType.type()).thenReturn("object");
 
         ArrayTypeHandler handler = new ArrayTypeHandler("Something[]", arrayTypeDeclaration);
         TypeName tn = handler.javaClassReference(context, EventType.INTERFACE);

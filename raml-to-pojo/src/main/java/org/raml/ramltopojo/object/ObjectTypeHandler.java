@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.object;
 
+import amf.client.model.domain.NodeShape;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
@@ -16,18 +17,22 @@ public class ObjectTypeHandler implements TypeHandler {
 
     public static final String DISCRIMINATOR_TYPE_NAME = "_DISCRIMINATOR_TYPE_NAME";
     private final String name;
-    private final ObjectTypeDeclaration objectTypeDeclaration;
+    private final NodeShape objectTypeDeclaration;
 
     public ObjectTypeHandler(String name, ObjectTypeDeclaration objectTypeDeclaration) {
+        this.name = name;
+        this.objectTypeDeclaration = null;
+    }
+
+    public ObjectTypeHandler(String name, NodeShape objectTypeDeclaration) {
         this.name = name;
         this.objectTypeDeclaration = objectTypeDeclaration;
     }
 
-
     @Override
     public ClassName javaClassName(GenerationContext generationContext, EventType type) {
 
-/* TODO
+/* TODO JP
         ObjectPluginContext context = new ObjectPluginContextImpl(generationContext, null);
 
         ObjectTypeHandlerPlugin plugin = generationContext.pluginsForObjects(Utils.allParents(objectTypeDeclaration, new ArrayList<>()).toArray(new TypeDeclaration[0]));
@@ -41,7 +46,8 @@ public class ObjectTypeHandler implements TypeHandler {
 
         return plugin.className(context, objectTypeDeclaration, className, type);
 */
-        return null;
+// todo workajound JP
+        return generationContext.buildDefaultClassName(Names.typeName(name), EventType.INTERFACE);
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.raml.ramltopojo;
 import amf.client.model.domain.Shape;
 import amf.client.validate.ValidationReport;
 import amf.client.validate.ValidationResult;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.raml.testutils.UnitTest;
 import webapi.Raml10;
@@ -51,7 +52,7 @@ public class AnnotationsTest extends UnitTest{
     }
 
 
-    @Test
+    @Test @Ignore
     public void abstractAnnotationsReading() throws Exception {
 
         WebApiDocument api = getApi();

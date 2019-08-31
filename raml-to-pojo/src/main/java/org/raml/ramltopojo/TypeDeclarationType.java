@@ -1,8 +1,6 @@
 package org.raml.ramltopojo;
 
-import amf.client.model.domain.ArrayShape;
-import amf.client.model.domain.Shape;
-import amf.client.model.domain.UnionShape;
+import amf.client.model.domain.*;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.squareup.javapoet.ClassName;
@@ -65,7 +63,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     OBJECT {
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration) {
-            return new ObjectTypeHandler(name, (ObjectTypeDeclaration) typeDeclaration);
+            return new ObjectTypeHandler(name, null /* todo should fix */);
         }
 
 
@@ -252,8 +250,8 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         @Override
         public TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration) {
 
-            StringTypeDeclaration declaration = (StringTypeDeclaration) typeDeclaration;
-            if ( ! declaration.enumValues().isEmpty() ) {
+            ScalarShape declaration = (ScalarShape) typeDeclaration;
+            if ( false ) {
                 return ENUMERATION.createHandler(name, type, typeDeclaration);
             } else {
 
@@ -312,20 +310,20 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     public abstract boolean shouldCreateInlineType(Shape declaration);
 
     private static Map<Class, TypeDeclarationType> ramlToType = ImmutableMap.<Class, TypeDeclarationType>builder()
-            .put(ObjectTypeDeclaration.class, OBJECT)
-            .put(ArrayTypeDeclaration.class, ARRAY)
-            .put(UnionTypeDeclaration.class, UNION)
-            .put(DateTimeOnlyTypeDeclaration.class, DATETIME_ONLY)
-            .put(IntegerTypeDeclaration.class, INTEGER)
-            .put(BooleanTypeDeclaration.class, BOOLEAN)
-            .put(TimeOnlyTypeDeclaration.class, TIME_ONLY)
-            .put(DateTimeTypeDeclaration.class, DATETIME)
-            .put(DateTypeDeclaration.class, DATE)
-            .put(NumberTypeDeclaration.class, NUMBER)
-            .put(StringTypeDeclaration.class, STRING)
-            .put(FileTypeDeclaration.class, FILE)
-            .put(AnyTypeDeclaration.class, ANY)
-            .put(NullTypeDeclaration.class, NULL)
+            .put(NodeShape.class, OBJECT)
+            .put(ArrayShape.class, ARRAY)
+            .put(UnionShape.class, UNION)
+//            .put(ScalarShape.class, DATETIME_ONLY)
+//            .put(ScalarShape.class, INTEGER)
+//            .put(ScalarShape.class, BOOLEAN)
+//            .put(ScalarShape.class, TIME_ONLY)
+//            .put(ScalarShape.class, DATETIME)
+//            .put(ScalarShape.class, DATE)
+//            .put(ScalarShape.class, NUMBER)
+            .put(ScalarShape.class, STRING)
+            .put(FileShape.class, FILE)
+            .put(AnyShape.class, ANY)
+            .put(NilShape.class, NULL)
             .build();
 
     /**
@@ -394,11 +392,11 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
 
     public static TypeName calculateTypeName(String name, Shape typeDeclaration, GenerationContext context, EventType eventType) {
 
-        TypeDeclarationType typeDeclarationType = ramlToType.get(null /*Utils.declarationType(typeDeclaration)*/);
+        TypeDeclarationType typeDeclarationType = ramlToType.get(typeDeclaration.getClass());
 
         TypeHandler handler = typeDeclarationType.createHandler(name, typeDeclarationType, typeDeclaration);
         TypeName typeName = handler.javaClassReference(context, eventType);
-        context.setupTypeHierarchy(null /*typeDeclaration*/);
+        context.setupTypeHierarchy(typeDeclaration);
         return typeName;
     }
 
@@ -492,7 +490,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public void setupTypeHierarchy(TypeDeclaration typeDeclaration) {
+        public void setupTypeHierarchy(Shape typeDeclaration) {
             context.setupTypeHierarchy(typeDeclaration);
         }
     }

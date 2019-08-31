@@ -5,7 +5,6 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.extensions.*;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import webapi.WebApiDocument;
 
 import java.io.IOException;
@@ -28,7 +27,7 @@ public interface GenerationContext {
     ArrayTypeHandlerPlugin pluginsForArrays(Shape... typeDeclarations);
     ReferenceTypeHandlerPlugin pluginsForReferences(Shape... typeDeclarations);
 
-    void setupTypeHierarchy(TypeDeclaration typeDeclaration);
+    void setupTypeHierarchy(Shape typeDeclaration);
     WebApiDocument api();
     Set<String> childClasses(String ramlTypeName);
     ClassName buildDefaultClassName(String name, EventType eventType);
