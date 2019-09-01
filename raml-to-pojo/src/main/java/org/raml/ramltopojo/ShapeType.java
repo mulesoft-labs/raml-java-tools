@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 /**
  * Created. There, you have it.
  */
-public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFactory {
+public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
 
     NULL {
         @Override
@@ -35,7 +35,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
             return new NullTypeHandler(name, typeDeclaration);
         }
     },
@@ -48,7 +48,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
 
             ScalarShape scalarShape = (ScalarShape) typeDeclaration;
             return Optional.ofNullable(
@@ -59,8 +59,8 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     OBJECT {
         @Override
-        public TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration) {
-            return new ObjectTypeHandler(name, (NodeShape) null /* todo should fix */);
+        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
+            return new ObjectTypeHandler(name, (NodeShape) typeDeclaration);
         }
 
 
@@ -83,7 +83,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
             } else {
                 allExtendedProps =
                         extended.stream().filter(ObjectTypeDeclaration.class::isInstance).map(ObjectTypeDeclaration.class::cast)
-                                .flatMap(TypeDeclarationType::pullNames).collect(Collectors.toSet());
+                                .flatMap(ShapeType::pullNames).collect(Collectors.toSet());
             }
 
             Set<String> typePropertyNames = pullNames((ObjectTypeDeclaration) declaration).collect(Collectors.toSet());
@@ -92,7 +92,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     ENUMERATION {
         @Override
-        public TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
 
             return new EnumerationTypeHandler(name, typeDeclaration);
         }
@@ -104,7 +104,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     ARRAY {
         @Override
-        public TypeHandler createHandler(String name, final TypeDeclarationType type, final Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, final ShapeType type, final Shape typeDeclaration) {
 
             final ArrayShape arrayTypeDeclaration = (ArrayShape) typeDeclaration;
 
@@ -114,12 +114,12 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         @Override
         public boolean shouldCreateInlineType(Shape declaration) {
             ArrayShape arrayTypeDeclaration = (ArrayShape) declaration;
-            return Annotations.GENERATE_INLINE_ARRAY_TYPE.get(null); // TODO:  should be arrayTypeDeclaration
+            return Annotations.GENERATE_INLINE_ARRAY_TYPE.get(arrayTypeDeclaration);
         }
     },
     UNION {
         @Override
-        public TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
 
             return new UnionTypeHandler(name, (UnionShape) typeDeclaration);
         }
@@ -133,14 +133,14 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     INTEGER {
         @Override
-        public TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
 
-            NumberTypeDeclaration integerTypeDeclaration = (NumberTypeDeclaration) typeDeclaration;
-            if ( ! integerTypeDeclaration.enumValues().isEmpty() ) {
+            ScalarShape integerTypeDeclaration = (ScalarShape) typeDeclaration;
+            if ( false ) {
                 return ENUMERATION.createHandler(name, type, typeDeclaration);
             } else {
 
-                TypeName typeName = Optional.ofNullable(properType.get(integerTypeDeclaration.format())).orElse(TypeName.INT);
+                TypeName typeName = Optional.ofNullable(properType.get(integerTypeDeclaration.format().value())).orElse(TypeName.INT);
                 return new ReferenceTypeHandler(typeDeclaration, Integer.class, typeName);
             }
         }
@@ -159,7 +159,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     BOOLEAN {
         @Override
-        public TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
 
             return new ReferenceTypeHandler(typeDeclaration, Boolean.class, TypeName.BOOLEAN);
 
@@ -172,7 +172,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     DATE {
         @Override
-        public TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
 
             return new ReferenceTypeHandler(typeDeclaration, Date.class, ClassName.get(Date.class));
         }
@@ -184,7 +184,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     DATETIME {
         @Override
-        public TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
             return new ReferenceTypeHandler(typeDeclaration, Date.class, ClassName.get(Date.class));
         }
 
@@ -195,7 +195,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     TIME_ONLY {
         @Override
-        public TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
             return new ReferenceTypeHandler(typeDeclaration, Date.class, ClassName.get(Date.class));
         }
 
@@ -206,7 +206,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     DATETIME_ONLY {
         @Override
-        public TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
             return new ReferenceTypeHandler(typeDeclaration, Date.class, ClassName.get(Date.class));
         }
 
@@ -217,14 +217,14 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     NUMBER {
         @Override
-        public TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
 
-            NumberTypeDeclaration integerTypeDeclaration = (NumberTypeDeclaration) typeDeclaration;
-            if ( ! integerTypeDeclaration.enumValues().isEmpty() ) {
+            ScalarShape integerTypeDeclaration = (ScalarShape) typeDeclaration;
+            if ( false ) {
                 return ENUMERATION.createHandler(name, type, typeDeclaration);
             } else {
 
-                TypeName typeName = Optional.ofNullable(properType.get(integerTypeDeclaration.format())).orElse(ClassName.get(Number.class));
+                TypeName typeName = Optional.ofNullable(properType.get(integerTypeDeclaration.format().value())).orElse(ClassName.get(Number.class));
                 return new ReferenceTypeHandler(typeDeclaration, Number.class, typeName);
             }
         }
@@ -245,7 +245,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     STRING {
         @Override
-        public TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
 
             ScalarShape declaration = (ScalarShape) typeDeclaration;
             if ( false ) {
@@ -271,7 +271,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     ANY {
         @Override
-        public TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
 
             return new ReferenceTypeHandler(typeDeclaration, Object.class, ClassName.get(Object.class));
         }
@@ -283,7 +283,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
     },
     FILE {
         @Override
-        public TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
             return new ReferenceTypeHandler(typeDeclaration, File.class, ClassName.get(File.class));
         }
 
@@ -306,7 +306,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
 
     public abstract boolean shouldCreateInlineType(Shape declaration);
 
-    private static Map<Class, TypeDeclarationType> ramlToType = ImmutableMap.<Class, TypeDeclarationType>builder()
+    private static Map<Class, ShapeType> ramlToType = ImmutableMap.<Class, ShapeType>builder()
             .put(NodeShape.class, OBJECT)
             .put(ArrayShape.class, ARRAY)
             .put(UnionShape.class, UNION)
@@ -316,12 +316,12 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
             .put(NilShape.class, NULL)
             .build();
 
-    public static TypeDeclarationType ramlToType(Class  scalarType) {
+    public static ShapeType ramlToType(Class  scalarType) {
 
         return ramlToType.get(scalarType);
     }
 
-    private static Map<String, TypeDeclarationType> scalarTypes = ImmutableMap.<String, TypeDeclarationType>builder()
+    private static Map<String, ShapeType> scalarTypes = ImmutableMap.<String, ShapeType>builder()
             .put("datetime-only", DATETIME_ONLY)
             .put("integer", INTEGER)
             .put("boolean", BOOLEAN)
@@ -332,7 +332,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
             .put("string", STRING)
             .build();
 
-    public static TypeDeclarationType scalarToType(String cls) {
+    public static ShapeType scalarToType(String cls) {
 
         return scalarTypes.get(cls);
     }
@@ -346,17 +346,15 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
      */
     public static Optional<CreationResult> createType(Shape typeDeclaration, GenerationContext context) {
 
-    /*    TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
+        ShapeType shapeType = ramlToType.get(Utils.declarationType(typeDeclaration));
 
-        TypeHandler handler = typeDeclarationType.createHandler(typeDeclaration.name(), typeDeclarationType, typeDeclaration);
+        TypeHandler handler = shapeType.createHandler(typeDeclaration.name().value(), shapeType, typeDeclaration);
         ClassName intf = handler.javaClassName(context, EventType.INTERFACE);
         ClassName impl = handler.javaClassName(context, EventType.IMPLEMENTATION);
         CreationResult creationResult = new CreationResult(context.defaultPackage(), intf, impl);
-        context.newExpectedType(typeDeclaration.name(), creationResult);
+        context.newExpectedType(typeDeclaration.name().value(), creationResult);
         context.setupTypeHierarchy(typeDeclaration);
-        return handler.create(context, creationResult);*/
-
-        return Optional.empty();
+        return handler.create(context, creationResult);
     }
 
     /**
@@ -366,20 +364,18 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
      * @param context
      * @return
      */
-    public static Optional<CreationResult> createNamedType(String name, TypeDeclaration typeDeclaration, GenerationContext context) {
+    public static Optional<CreationResult> createNamedType(String name, Shape typeDeclaration, GenerationContext context) {
 
-/*
-        TypeDeclarationType typeDeclarationType = ramlToType.get(Utils.declarationType(typeDeclaration));
 
-        TypeHandler handler = typeDeclarationType.createHandler(name, typeDeclarationType, typeDeclaration);
+        ShapeType shapeType = ramlToType.get(Utils.declarationType(typeDeclaration));
+
+        TypeHandler handler = shapeType.createHandler(name, shapeType, typeDeclaration);
         ClassName intf = handler.javaClassName(context, EventType.INTERFACE);
         ClassName impl = handler.javaClassName(context, EventType.IMPLEMENTATION);
         CreationResult creationResult = new CreationResult(context.defaultPackage(), intf, impl);
         context.newExpectedType(name, creationResult);
         context.setupTypeHierarchy(typeDeclaration);
         return handler.create(context, creationResult);
-*/
-        return Optional.empty();
     }
 
     /**
@@ -391,9 +387,9 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
      */
     public static Optional<CreationResult> createInlineType(ClassName containingClassName, ClassName containingImplementation, String name, Shape typeDeclaration, final GenerationContext context) {
 
-        TypeDeclarationType typeDeclarationType = ramlToType(null /*Utils.declarationType(typeDeclaration)*/);
+        ShapeType shapeType = ramlToType(Utils.declarationType(typeDeclaration));
 
-        TypeHandler handler = typeDeclarationType.createHandler(name, typeDeclarationType, typeDeclaration);
+        TypeHandler handler = shapeType.createHandler(name, shapeType, typeDeclaration);
         ClassName intf = handler.javaClassName(new InlineGenerationContext(containingClassName, containingClassName, context),  EventType.INTERFACE);
         ClassName impl = handler.javaClassName(new InlineGenerationContext(containingClassName, containingImplementation, context), EventType.IMPLEMENTATION);
         CreationResult preCreationResult = new CreationResult("", intf, impl);
@@ -403,9 +399,9 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
 
     public static TypeName calculateTypeName(String name, Shape typeDeclaration, GenerationContext context, EventType eventType) {
 
-        TypeDeclarationType typeDeclarationType = ramlToType(typeDeclaration.getClass());
+        ShapeType shapeType = ramlToType(typeDeclaration.getClass());
 
-        TypeHandler handler = typeDeclarationType.createHandler(name, typeDeclarationType, typeDeclaration);
+        TypeHandler handler = shapeType.createHandler(name, shapeType, typeDeclaration);
         TypeName typeName = handler.javaClassReference(context, eventType);
         context.setupTypeHierarchy(typeDeclaration);
         return typeName;

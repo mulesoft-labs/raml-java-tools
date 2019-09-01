@@ -228,6 +228,6 @@ public class UnionTypeHandler implements TypeHandler {
 
     private TypeName findType(String typeName, Shape type, GenerationContext generationContext) {
 
-        return TypeDeclarationType.calculateTypeName(typeName,type, generationContext, EventType.INTERFACE);
+        return ShapeType.calculateTypeName(typeName,type, generationContext, EventType.INTERFACE);
     }
 }

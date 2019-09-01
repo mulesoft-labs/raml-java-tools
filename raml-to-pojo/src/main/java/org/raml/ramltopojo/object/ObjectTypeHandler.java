@@ -238,6 +238,6 @@ public class ObjectTypeHandler implements TypeHandler {
 
     private TypeName findType(String typeName, TypeDeclaration type, GenerationContext generationContext, EventType eventType) {
 
-        return TypeDeclarationType.calculateTypeName(typeName, null/*type*/, generationContext,eventType );
+        return ShapeType.calculateTypeName(typeName, null/*type*/, generationContext,eventType );
     }
 }

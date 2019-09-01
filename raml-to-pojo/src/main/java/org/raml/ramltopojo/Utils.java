@@ -14,7 +14,7 @@ public class Utils {
 
     public static Class<?> declarationType(Shape typeDeclaration) {
 
-        return typeDeclaration.getClass().getInterfaces()[0];
+        return typeDeclaration.getClass();
     }
 
     static List<TypeDeclaration> goThroughLibraries(List<TypeDeclaration> foundTypes, Set<String> visitedLibraries, List<Library> libraries) {

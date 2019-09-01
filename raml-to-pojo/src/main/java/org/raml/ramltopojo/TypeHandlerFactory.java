@@ -7,5 +7,5 @@ import amf.client.model.domain.Shape;
  */
 public interface TypeHandlerFactory {
 
-    TypeHandler createHandler(String name, TypeDeclarationType type, Shape typeDeclaration);
+    TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration);
 }

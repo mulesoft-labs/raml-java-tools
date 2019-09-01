@@ -2,7 +2,6 @@ package org.raml.ramltopojo;
 
 import amf.client.model.domain.Shape;
 import com.squareup.javapoet.TypeName;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import java.util.Optional;
 
@@ -27,12 +26,12 @@ public class RamlToPojoImpl implements RamlToPojo {
 ///*  TODO JP reactivate when types migrated
         for (Shape typeDeclaration : typeFinder.findTypes(generationContext.api())) {
 
-            TypeDeclarationType.calculateTypeName(typeDeclaration.name().value(), typeDeclaration, generationContext, EventType.INTERFACE);
+            ShapeType.calculateTypeName(typeDeclaration.name().value(), typeDeclaration, generationContext, EventType.INTERFACE);
         }
 
         for (Shape typeDeclaration : typeFinder.findTypes(generationContext.api())) {
 
-            Optional<CreationResult> spec = TypeDeclarationType.createType(typeDeclaration, generationContext);
+            Optional<CreationResult> spec = ShapeType.createType(typeDeclaration, generationContext);
             spec.ifPresent(resultingPojos::addNewResult);
         }
 //*/
@@ -45,32 +44,32 @@ public class RamlToPojoImpl implements RamlToPojo {
 
         ResultingPojos resultingPojos = new ResultingPojos(generationContext);
 
-        Optional<CreationResult> spec = TypeDeclarationType.createType(typeDeclaration, generationContext);
+        Optional<CreationResult> spec = ShapeType.createType(typeDeclaration, generationContext);
         spec.ifPresent(resultingPojos::addNewResult);
 
         return resultingPojos;
     }
 
     @Override
-    public ResultingPojos buildPojo(String suggestedJavaName, TypeDeclaration typeDeclaration) {
+    public ResultingPojos buildPojo(String suggestedJavaName, Shape typeDeclaration) {
 
         ResultingPojos resultingPojos = new ResultingPojos(generationContext);
 
-        Optional<CreationResult> spec = TypeDeclarationType.createNamedType(suggestedJavaName, typeDeclaration, generationContext);
+        Optional<CreationResult> spec = ShapeType.createNamedType(suggestedJavaName, typeDeclaration, generationContext);
         spec.ifPresent(resultingPojos::addNewResult);
 
         return resultingPojos;
     }
 
     @Override
-    public TypeName fetchType(String suggestedName, TypeDeclaration typeDeclaration) {
+    public TypeName fetchType(String suggestedName, Shape typeDeclaration) {
 
 
-        return TypeDeclarationType.calculateTypeName(suggestedName, null /*typeDeclaration*/, generationContext, EventType.INTERFACE);
+        return ShapeType.calculateTypeName(suggestedName, typeDeclaration, generationContext, EventType.INTERFACE);
     }
 
     public boolean isInline(Shape typeDeclaration) {
 
-        return TypeDeclarationType.isNewInlineType(typeDeclaration);
+        return ShapeType.isNewInlineType(typeDeclaration);
     }
 }

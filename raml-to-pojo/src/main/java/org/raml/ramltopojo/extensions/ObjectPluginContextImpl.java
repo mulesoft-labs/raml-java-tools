@@ -8,7 +8,7 @@ import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.CreationResult;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.GenerationContext;
-import org.raml.ramltopojo.TypeDeclarationType;
+import org.raml.ramltopojo.ShapeType;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import javax.annotation.Nullable;
@@ -51,7 +51,7 @@ public class ObjectPluginContextImpl implements ObjectPluginContext {
 
     @Override
     public TypeName forProperty(TypeDeclaration typeDeclaration) {
-        return TypeDeclarationType.calculateTypeName("", null /*typeDeclaration*/, generationContext, EventType.INTERFACE);
+        return ShapeType.calculateTypeName("", null /*typeDeclaration*/, generationContext, EventType.INTERFACE);
     }
 
     @Override

@@ -6,7 +6,6 @@ import amf.client.model.domain.ScalarShape;
 import amf.client.model.domain.Shape;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.raml.ramltopojo.extensions.ReferencePluginContext;
@@ -26,7 +25,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created. There, you have it.
  */
-public class TypeDeclarationTypeTest extends UnitTest {
+public class ShapeTypeTest extends UnitTest {
 
     @Mock
     ScalarShape integerTypeDeclaration;
@@ -48,7 +47,7 @@ public class TypeDeclarationTypeTest extends UnitTest {
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "internalInt");
 
-        assertFalse(TypeDeclarationType.isNewInlineType(property));
+        assertFalse(ShapeType.isNewInlineType(property.range()));
     }
 
 
@@ -59,7 +58,7 @@ public class TypeDeclarationTypeTest extends UnitTest {
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "unextended");
 
-        assertFalse(TypeDeclarationType.isNewInlineType(property));
+        assertFalse(ShapeType.isNewInlineType(property.range()));
     }
 
     @Test
@@ -69,7 +68,7 @@ public class TypeDeclarationTypeTest extends UnitTest {
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "extendedFromOne");
 
-        assertFalse(TypeDeclarationType.isNewInlineType(property));
+        assertFalse(ShapeType.isNewInlineType(property.range()));
     }
 
     @Test
@@ -79,7 +78,7 @@ public class TypeDeclarationTypeTest extends UnitTest {
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "extendedFromOneWithExtraProperty");
 
-        assertTrue(TypeDeclarationType.isNewInlineType(property));
+        assertTrue(ShapeType.isNewInlineType(property.range()));
     }
 
     @Test
@@ -89,7 +88,7 @@ public class TypeDeclarationTypeTest extends UnitTest {
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "objectWithExtraProperty");
 
-        assertTrue(TypeDeclarationType.isNewInlineType(property));
+        assertTrue(ShapeType.isNewInlineType(property.range()));
     }
 
     @Test
@@ -99,7 +98,7 @@ public class TypeDeclarationTypeTest extends UnitTest {
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "multiInheritanceWithExtraProperty");
 
-        assertTrue(TypeDeclarationType.isNewInlineType(property));
+        assertTrue(ShapeType.isNewInlineType(property.range()));
     }
 
     @Test
@@ -109,7 +108,7 @@ public class TypeDeclarationTypeTest extends UnitTest {
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "multiInheritanceWithoutExtraProperty");
 
-        assertTrue(TypeDeclarationType.isNewInlineType(property));
+        assertTrue(ShapeType.isNewInlineType(property.range()));
     }
 
     @Test
@@ -118,8 +117,8 @@ public class TypeDeclarationTypeTest extends UnitTest {
         WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-array-types.raml"));
         NodeShape decl = RamlLoader.findShape("father", api.declares());
 
-        assertFalse(TypeDeclarationType.isNewInlineType(findProperty(decl, "others")));
-        assertFalse(TypeDeclarationType.isNewInlineType(findProperty(decl, "some")));
+        assertFalse(ShapeType.isNewInlineType(findProperty(decl, "others").range()));
+        assertFalse(ShapeType.isNewInlineType(findProperty(decl, "some").range()));
     }
 
     @Test
@@ -128,14 +127,14 @@ public class TypeDeclarationTypeTest extends UnitTest {
         WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-array-types.raml"));
         NodeShape decl = RamlLoader.findShape("mother", api.declares());
 
-        assertTrue(TypeDeclarationType.isNewInlineType(findProperty(decl, "complicatedChildren")));
+        assertTrue(ShapeType.isNewInlineType(findProperty(decl, "complicatedChildren").range()));
     }
 
 
     @Test
     public void integerType() {
 
-        createIntegerTypeNameSetup(integerTypeDeclaration, TypeDeclarationType.INTEGER);
+        createIntegerTypeNameSetup(new ScalarShape().withDataType("integer"), ShapeType.INTEGER);
 
         verify(plugin).typeName(any(ReferencePluginContext.class), any(Shape.class), eq(TypeName.INT));
     }
@@ -143,8 +142,7 @@ public class TypeDeclarationTypeTest extends UnitTest {
     @Test
     public void integerTypeWithByteFormat() {
 
-        // todo when(integerTypeDeclaration.format()).thenReturn(new StrField("int8"));
-        createIntegerTypeNameSetup(integerTypeDeclaration, TypeDeclarationType.INTEGER);
+        createIntegerTypeNameSetup(new ScalarShape().withFormat("int8").withDataType("integer"), ShapeType.INTEGER);
 
         verify(plugin).typeName(any(ReferencePluginContext.class), any(Shape.class), eq(TypeName.BYTE));
     }
@@ -152,8 +150,7 @@ public class TypeDeclarationTypeTest extends UnitTest {
     @Test
     public void integerTypeWithDoubleFormat() {
 
-        // todo when(integerTypeDeclaration.format()).thenReturn("double");
-        createIntegerTypeNameSetup(integerTypeDeclaration, TypeDeclarationType.INTEGER);
+        createIntegerTypeNameSetup(new ScalarShape().withFormat("double").withDataType("integer"), ShapeType.INTEGER);
 
         verify(plugin).typeName(any(ReferencePluginContext.class), any(Shape.class), eq(TypeName.DOUBLE));
     }
@@ -161,7 +158,7 @@ public class TypeDeclarationTypeTest extends UnitTest {
     @Test
     public void numberType() {
 
-        createIntegerTypeNameSetup(numberTypeDeclaration, TypeDeclarationType.NUMBER);
+        createIntegerTypeNameSetup(new ScalarShape().withDataType("number"), ShapeType.NUMBER);
 
         verify(plugin).typeName(any(ReferencePluginContext.class), any(Shape.class), eq(ClassName.get(Number.class)));
     }
@@ -169,8 +166,7 @@ public class TypeDeclarationTypeTest extends UnitTest {
     @Test
     public void numberTypeWithByteFormat() {
 
-        // todo when(numberTypeDeclaration.format()).thenReturn("int8");
-        createIntegerTypeNameSetup(numberTypeDeclaration, TypeDeclarationType.NUMBER);
+        createIntegerTypeNameSetup(new ScalarShape().withFormat("int8").withDataType("number"), ShapeType.NUMBER);
 
         verify(plugin).typeName(any(ReferencePluginContext.class), any(Shape.class), eq(TypeName.BYTE));
     }
@@ -178,26 +174,25 @@ public class TypeDeclarationTypeTest extends UnitTest {
     @Test
     public void numberTypeWithDoubleFormat() {
 
-        // todo when(numberTypeDeclaration.format()).thenReturn("double");
-        createIntegerTypeNameSetup(numberTypeDeclaration, TypeDeclarationType.NUMBER);
+        createIntegerTypeNameSetup(new ScalarShape().withFormat("double").withDataType("number"), ShapeType.NUMBER);
 
         verify(plugin).typeName(any(ReferencePluginContext.class), any(Shape.class), eq(TypeName.DOUBLE));
     }
 
-    private void createIntegerTypeNameSetup(ScalarShape integerTypeDeclaration, TypeDeclarationType typeDeclarationType) {
+    private void createIntegerTypeNameSetup(ScalarShape integerTypeDeclaration, ShapeType shapeType) {
         when(context.pluginsForReferences(integerTypeDeclaration)).thenReturn(plugin);
-        TypeHandler handler = typeDeclarationType.createHandler("foo", TypeDeclarationType.INTEGER, null /*integerTypeDeclaration*/);
+        TypeHandler handler = shapeType.createHandler("foo", ShapeType.INTEGER, integerTypeDeclaration);
         TypeName tn = handler.javaClassReference(context, EventType.INTERFACE);
     }
 
-    @Test @Ignore
+    @Test
     public void unionWithExtraPropertiesIsNewInlineType() throws ExecutionException, InterruptedException {
 
         WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-types.raml"));
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "unionWithExtraProperty");
 
-        assertTrue(TypeDeclarationType.isNewInlineType(property));
+        assertTrue(ShapeType.isNewInlineType(property.range()));
     }
 
     @Deprecated() /* return optional.....*/
