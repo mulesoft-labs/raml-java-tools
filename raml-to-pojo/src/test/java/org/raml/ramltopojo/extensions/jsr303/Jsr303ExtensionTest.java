@@ -1,6 +1,6 @@
 package org.raml.ramltopojo.extensions.jsr303;
 
-import amf.client.model.domain.UnionShape;
+import amf.client.model.domain.*;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -11,9 +11,6 @@ import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.testutils.UnitTest;
-import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.NumberTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 
 import javax.lang.model.element.Modifier;
 import javax.validation.Valid;
@@ -25,24 +22,11 @@ import java.math.BigInteger;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
 
 /**
  * Created. There, you have it.
  */
 public class Jsr303ExtensionTest extends UnitTest {
-
-    @Mock
-    NumberTypeDeclaration number;
-
-    @Mock
-    ArrayTypeDeclaration array;
-
-    @Mock
-    ObjectTypeDeclaration object;
-
-    @Mock
-    UnionShape union;
 
     @Mock
     ObjectPluginContext objectPluginContext;
@@ -51,15 +35,19 @@ public class Jsr303ExtensionTest extends UnitTest {
     UnionPluginContext unionPluginContext;
 
 
+    private PropertyShape propertyShapeOfRange(Shape range) {
+
+        return (PropertyShape) new PropertyShape().withRange(range).withName("champ");
+    }
+
     @Test
     public void forInteger() throws Exception {
 
-        setupNumberFacets();
         Jsr303Extension ext = new Jsr303Extension();
         FieldSpec.Builder builder =
                 FieldSpec.builder(ClassName.get(Integer.class), "champ", Modifier.PUBLIC);
 
-        ext.fieldBuilt(objectPluginContext, number, builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(setupNumberFacets(new ScalarShape().withDataType("integer"))), builder, EventType.IMPLEMENTATION);
 
         assertForIntegerNumber(builder);
     }
@@ -68,12 +56,11 @@ public class Jsr303ExtensionTest extends UnitTest {
     @Test
     public void forBigInt() throws Exception {
 
-        setupNumberFacets();
         Jsr303Extension ext = new Jsr303Extension();
         FieldSpec.Builder builder =
                 FieldSpec.builder(ClassName.get(BigInteger.class), "champ", Modifier.PUBLIC);
 
-        ext.fieldBuilt(objectPluginContext, number, builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(setupNumberFacets(new ScalarShape().withDataType("integer"))), builder, EventType.IMPLEMENTATION);
 
         assertForIntegerNumber(builder);
     }
@@ -86,7 +73,7 @@ public class Jsr303ExtensionTest extends UnitTest {
         FieldSpec.Builder builder =
                 FieldSpec.builder(ClassName.get(Double.class), "champ", Modifier.PUBLIC);
 
-        ext.fieldBuilt(objectPluginContext, object, builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(new NodeShape()), builder, EventType.IMPLEMENTATION);
 
         assertEquals(1, builder.build().annotations.size());
         assertEquals(Valid.class.getName(), builder.build().annotations.get(0).type.toString());
@@ -102,7 +89,7 @@ public class Jsr303ExtensionTest extends UnitTest {
         FieldSpec.Builder builder =
                 FieldSpec.builder(ClassName.get(Double.class), "champ", Modifier.PUBLIC);
 
-        ext.anyFieldCreated(unionPluginContext, union, typeBuilder, builder, EventType.IMPLEMENTATION);
+        ext.anyFieldCreated(unionPluginContext, new UnionShape(), typeBuilder, builder, EventType.IMPLEMENTATION);
 
         assertEquals(1, builder.build().annotations.size());
         assertEquals(Valid.class.getName(), builder.build().annotations.get(0).type.toString());
@@ -111,12 +98,11 @@ public class Jsr303ExtensionTest extends UnitTest {
     @Test
     public void forDouble() throws Exception {
 
-        setupNumberFacets();
         Jsr303Extension ext = new Jsr303Extension();
         FieldSpec.Builder builder =
                 FieldSpec.builder(ClassName.get(Double.class), "champ", Modifier.PUBLIC);
 
-        ext.fieldBuilt(objectPluginContext, object, builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(new NodeShape()), builder, EventType.IMPLEMENTATION);
 
         assertEquals(1, builder.build().annotations.size());
         assertEquals(Valid.class.getName(), builder.build().annotations.get(0).type.toString());
@@ -125,15 +111,11 @@ public class Jsr303ExtensionTest extends UnitTest {
     @Test
     public void forArrays() throws Exception {
 
-        when(array.minItems()).thenReturn(3);
-        when(array.maxItems()).thenReturn(5);
-
         FieldSpec.Builder builder =
                 FieldSpec.builder(ParameterizedTypeName.get(List.class, String.class), "champ",
                         Modifier.PUBLIC);
         Jsr303Extension ext = new Jsr303Extension();
-        ext.fieldBuilt(objectPluginContext, array, builder, EventType.IMPLEMENTATION);
-        assertEquals(1, builder.build().annotations.size());
+        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(new ScalarShape()).withMinCount(3).withMaxCount(5), builder, EventType.IMPLEMENTATION);
         assertEquals(Size.class.getName(), builder.build().annotations.get(0).type.toString());
         assertEquals("3", builder.build().annotations.get(0).members.get("min").get(0).toString());
         assertEquals("5", builder.build().annotations.get(0).members.get("max").get(0).toString());
@@ -142,29 +124,22 @@ public class Jsr303ExtensionTest extends UnitTest {
     @Test
     public void forArraysOfStrings() throws Exception {
 
-        when(array.minItems()).thenReturn(null);
-        when(array.maxItems()).thenReturn(null);
-
         FieldSpec.Builder builder =
                 FieldSpec.builder(ParameterizedTypeName.get(List.class, String.class), "champ",
                         Modifier.PUBLIC);
         Jsr303Extension ext = new Jsr303Extension();
-        ext.fieldBuilt(objectPluginContext, array, builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(new ScalarShape()).withMinCount(3).withMaxCount(5), builder, EventType.IMPLEMENTATION);
         assertEquals(0, builder.build().annotations.size());
     }
 
     @Test
     public void forArraysOfObject() throws Exception {
 
-        when(array.minItems()).thenReturn(null);
-        when(array.maxItems()).thenReturn(null);
-        when(array.items()).thenReturn(object);
-
         FieldSpec.Builder builder =
                 FieldSpec.builder(ParameterizedTypeName.get(List.class, String.class), "champ",
                         Modifier.PUBLIC);
         Jsr303Extension ext = new Jsr303Extension();
-        ext.fieldBuilt(objectPluginContext, array, builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(new NodeShape()), builder, EventType.IMPLEMENTATION);
         assertEquals(1, builder.build().annotations.size());
         assertEquals(Valid.class.getName(), builder.build().annotations.get(0).type.toString());
     }
@@ -172,15 +147,11 @@ public class Jsr303ExtensionTest extends UnitTest {
     @Test
     public void forArraysOfUnion() throws Exception {
 
-        when(array.minItems()).thenReturn(null);
-        when(array.maxItems()).thenReturn(null);
-        // TODO when(array.items()).thenReturn(union);
-
         FieldSpec.Builder builder =
                 FieldSpec.builder(ParameterizedTypeName.get(List.class, String.class), "champ",
                         Modifier.PUBLIC);
         Jsr303Extension ext = new Jsr303Extension();
-        ext.fieldBuilt(objectPluginContext, array, builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(new UnionShape()), builder, EventType.IMPLEMENTATION);
         assertEquals(1, builder.build().annotations.size());
         assertEquals(Valid.class.getName(), builder.build().annotations.get(0).type.toString());
     }
@@ -188,14 +159,11 @@ public class Jsr303ExtensionTest extends UnitTest {
     @Test
     public void forArraysMaxOnly() throws Exception {
 
-        when(array.minItems()).thenReturn(null);
-        when(array.maxItems()).thenReturn(5);
-
         FieldSpec.Builder builder =
                 FieldSpec.builder(ParameterizedTypeName.get(List.class, String.class), "champ",
                         Modifier.PUBLIC);
         Jsr303Extension ext = new Jsr303Extension();
-        ext.fieldBuilt(objectPluginContext, array, builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(new ScalarShape()).withMaxCount(5), builder, EventType.IMPLEMENTATION);
         assertEquals(1, builder.build().annotations.size());
         assertEquals(Size.class.getName(), builder.build().annotations.get(0).type.toString());
         assertEquals(1, builder.build().annotations.get(0).members.size());
@@ -205,24 +173,26 @@ public class Jsr303ExtensionTest extends UnitTest {
     @Test
     public void forArraysNotNull() throws Exception {
 
-        when(array.minItems()).thenReturn(null);
-        when(array.maxItems()).thenReturn(null);
-        when(array.required()).thenReturn(true);
+// TODO JP        when(array.required()).thenReturn(true);
 
         FieldSpec.Builder builder =
                 FieldSpec.builder(ParameterizedTypeName.get(List.class, String.class), "champ",
                         Modifier.PUBLIC);
         Jsr303Extension ext = new Jsr303Extension();
-        ext.fieldBuilt(objectPluginContext, array, builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(new ScalarShape()), builder, EventType.IMPLEMENTATION);
         assertEquals(1, builder.build().annotations.size());
         assertEquals(NotNull.class.getName(), builder.build().annotations.get(0).type.toString());
     }
 
 
-    public void setupNumberFacets() {
+    public ScalarShape setupNumberFacets(ScalarShape scalarShape) {
+
+        return scalarShape.withMinimum(13.0).withMaximum(17.0);
+/*
         when(number.minimum()).thenReturn(13.0);
         when(number.maximum()).thenReturn(17.0);
         when(number.required()).thenReturn(true);
+*/
     }
 
     public void assertForIntegerNumber(FieldSpec.Builder builder) {

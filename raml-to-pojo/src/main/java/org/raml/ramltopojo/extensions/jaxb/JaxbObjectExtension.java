@@ -1,18 +1,18 @@
 package org.raml.ramltopojo.extensions.jaxb;
 
 import amf.client.model.domain.ArrayShape;
+import amf.client.model.domain.NodeShape;
+import amf.client.model.domain.PropertyShape;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
-import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Created. There, you have it.
@@ -20,10 +20,16 @@ import javax.xml.bind.annotation.*;
 public class JaxbObjectExtension extends ObjectTypeHandlerPlugin.Helper {
 
     @Override
-    public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration type, TypeSpec.Builder builder, EventType eventType) {
+    public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, NodeShape type, TypeSpec.Builder builder, EventType eventType) {
 
+/*
         String namespace = type.xml() != null && type.xml().namespace() != null ? type.xml().namespace() : "##default";
         String name = type.xml() != null && type.xml().name() != null ? type.xml().name() : type.name();
+*/
+
+        String namespace =  "##default";
+        String name = type.name().value();
+
 
         if (eventType == EventType.IMPLEMENTATION) {
             builder.addAnnotation(AnnotationSpec.builder(XmlAccessorType.class)
@@ -45,11 +51,17 @@ public class JaxbObjectExtension extends ObjectTypeHandlerPlugin.Helper {
     }
 
     @Override
-    public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration property, FieldSpec.Builder fieldSpec, EventType eventType) {
+    public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, PropertyShape property, FieldSpec.Builder fieldSpec, EventType eventType) {
 
-        String namespace = property.xml() != null && property.xml().namespace() != null ? property.xml().namespace() : "##default";
-        String name = property.xml() != null && property.xml().name() != null ? property.xml().name() : property.name();
+/*
+        String namespace = type.xml() != null && type.xml().namespace() != null ? type.xml().namespace() : "##default";
+        String name = type.xml() != null && type.xml().name() != null ? type.xml().name() : type.name();
+*/
 
+        String namespace =  "##default";
+        String name = property.name().value();
+
+/* TODO JP property.xml ?????????????????
         if (eventType == EventType.IMPLEMENTATION) {
 
             if (property.xml() != null && property.xml().wrapped() != null && property.xml().wrapped() && isArray(property)) {
@@ -90,11 +102,12 @@ public class JaxbObjectExtension extends ObjectTypeHandlerPlugin.Helper {
                 }
             }
         }
+*/
 
         return fieldSpec;
     }
 
-    private boolean isArray(TypeDeclaration property) {
-        return property instanceof ArrayTypeDeclaration;
+    private boolean isArray(PropertyShape property) {
+        return property.range() instanceof ArrayShape;
     }
 }

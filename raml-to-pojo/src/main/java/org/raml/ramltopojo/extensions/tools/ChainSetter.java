@@ -15,13 +15,13 @@
  */
 package org.raml.ramltopojo.extensions.tools;
 
+import amf.client.model.domain.PropertyShape;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 
 /**
@@ -30,7 +30,7 @@ import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 public class ChainSetter extends ObjectTypeHandlerPlugin.Helper {
 
   @Override
-  public MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder methodSpec, EventType eventType) {
+  public MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, PropertyShape declaration, MethodSpec.Builder methodSpec, EventType eventType) {
 
     MethodSpec spec = methodSpec.build();
       MethodSpec seen = methodSpec.build();

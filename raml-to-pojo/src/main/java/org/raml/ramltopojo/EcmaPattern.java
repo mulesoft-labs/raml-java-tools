@@ -16,6 +16,7 @@ public class EcmaPattern {
         this.pattern = pattern;
     }
 
+    // TODO use string field ? JP
     public static boolean isSlashedPattern(String name) {
         return ECMA_WITH_SLASHES.matcher(name).matches();
     }

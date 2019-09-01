@@ -1,13 +1,14 @@
 package org.raml.ramltopojo.extensions.javadoc;
 
+import amf.client.model.domain.AnyShape;
+import amf.client.model.domain.Example;
+import amf.client.model.domain.NodeShape;
+import amf.client.model.domain.PropertyShape;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
-import org.raml.v2.api.model.v10.datamodel.ExampleSpec;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 /**
  * Created. There, you have it.
@@ -21,62 +22,44 @@ public class JavadocObjectTypeHandlerPlugin extends ObjectTypeHandlerPlugin.Help
     }
 
     @Override
-    public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, final TypeSpec.Builder incoming, EventType eventType) {
+    public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, NodeShape ramlType, final TypeSpec.Builder incoming, EventType eventType) {
 
         if (ramlType.description() != null) {
             incoming.addJavadoc("$L\n", ramlType.description().value());
         }
 
-        javadocExamples(new JavadocAdder() {
-
-            @Override
-            public void addJavadoc(String format, Object... args) {
-
-                incoming.addJavadoc(format, args);
-            }
-        }, ramlType);
+        javadocExamples(incoming::addJavadoc, ramlType);
 
         return incoming;
     }
 
     @Override
-    public MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, final MethodSpec.Builder incoming, EventType eventType) {
+    public MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, PropertyShape declaration, final MethodSpec.Builder incoming, EventType eventType) {
         if (declaration.description() != null) {
             incoming.addJavadoc("$L\n", declaration.description().value());
         }
 
-        javadocExamples(new JavadocAdder() {
-
-            @Override
-            public void addJavadoc(String format, Object... args) {
-                incoming.addJavadoc(format, args);
-            }
-        }, declaration);
+        javadocExamples(incoming::addJavadoc, (AnyShape) declaration.range());
 
         return incoming;
     }
 
 
-    private void javadocExamples(JavadocAdder adder, TypeDeclaration typeDeclaration) {
-        ExampleSpec example = typeDeclaration.example();
-        if (example != null) {
+    private void javadocExamples(JavadocAdder adder, AnyShape typeDeclaration) {
 
-            javadoc(adder, example);
-        }
-
-        for (ExampleSpec exampleSpec : typeDeclaration.examples()) {
+        for (Example exampleSpec : typeDeclaration.examples()) {
             javadoc(adder, exampleSpec);
         }
     }
 
-    private void javadoc(JavadocAdder adder, ExampleSpec exampleSpec) {
+    private void javadoc(JavadocAdder adder, Example exampleSpec) {
         adder.addJavadoc("Example:\n");
 
         if (exampleSpec.name() != null) {
-            adder.addJavadoc(" $L\n", exampleSpec.name());
+            adder.addJavadoc(" $L\n", exampleSpec.name().value());
         }
 
-        adder.addJavadoc(" $L\n", "<pre>\n{@code\n" + exampleSpec.value() + "\n}</pre>");
+        adder.addJavadoc(" $L\n", "<pre>\n{@code\n" + exampleSpec.value().value() + "\n}</pre>");
     }
 
 }

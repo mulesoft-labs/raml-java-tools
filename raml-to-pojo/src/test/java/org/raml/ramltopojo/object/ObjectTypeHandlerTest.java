@@ -1,6 +1,7 @@
 package org.raml.ramltopojo.object;
 
 import amf.client.model.domain.NodeShape;
+import amf.client.model.domain.PropertyShape;
 import amf.client.model.domain.Shape;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
@@ -17,14 +18,12 @@ import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.testutils.UnitTest;
 import org.raml.testutils.assertj.ListAssert;
-import org.raml.v2.api.model.v10.api.Api;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
 import webapi.WebApiDocument;
 
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static com.squareup.javapoet.Assertions.assertThat;
 import static junit.framework.TestCase.assertNotNull;
@@ -38,7 +37,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.raml.ramltopojo.RamlLoader.findShape;
-import static org.raml.ramltopojo.RamlLoader.findTypes;
 import static org.raml.testutils.matchers.FieldSpecMatchers.*;
 import static org.raml.testutils.matchers.MethodSpecMatchers.*;
 import static org.raml.testutils.matchers.ParameterSpecMatchers.type;
@@ -53,9 +51,6 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Mock
     ObjectPluginContext objectPluginContext;
 
-    public void mommy(MethodSpec cp) {
-
-    }
     @Test
     public void simplest() throws Exception {
 
@@ -155,8 +150,8 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Test
     public void usingComposedTypes() throws Exception {
 
-        final Api api = RamlLoader.load(this.getClass().getResourceAsStream("using-composed-type.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findTypes("foo", api.types()));
+        final WebApiDocument api = RamlLoader.load(this.getClass().getResource("using-composed-type.raml"));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
@@ -186,8 +181,8 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Test
     public void simpleInheritance() throws Exception {
 
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inherited-type.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findTypes("foo", api.types()));
+        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inherited-type.raml"));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
@@ -228,8 +223,8 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Test
     public void inheritanceWithDiscriminator() throws Exception {
 
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inheritance-with-discriminator-type.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findTypes("foo", api.types()));
+        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inheritance-with-discriminator-type.raml"));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
@@ -275,8 +270,8 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Test
     public void inheritanceWithDiscriminatorAndValue() throws Exception {
 
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inheritance-with-discriminatorvalue-type.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findTypes("foo", api.types()));
+        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inheritance-with-discriminatorvalue-type.raml"));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
@@ -299,8 +294,8 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Test
     public void multipleInheritance() throws Exception {
 
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("multiple-inheritance-type.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findTypes("foo", api.types()));
+        WebApiDocument api = RamlLoader.load(this.getClass().getResource("multiple-inheritance-type.raml"));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
@@ -363,19 +358,19 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void pluginCalled() throws Exception {
 
         final ObjectTypeHandlerPlugin mockPlugin = mock(ObjectTypeHandlerPlugin.class);
-        when(mockPlugin.classCreated(ArgumentMatchers.any(ObjectPluginContext.class), ArgumentMatchers.any(ObjectTypeDeclaration.class), ArgumentMatchers.any(TypeSpec.Builder.class), eq(EventType.INTERFACE))).thenAnswer(new Answer<TypeSpec.Builder>() {
+        when(mockPlugin.classCreated(ArgumentMatchers.any(ObjectPluginContext.class), ArgumentMatchers.any(NodeShape.class), ArgumentMatchers.any(TypeSpec.Builder.class), eq(EventType.INTERFACE))).thenAnswer(new Answer<TypeSpec.Builder>() {
             @Override
             public TypeSpec.Builder answer(InvocationOnMock invocation) throws Throwable {
                 return (TypeSpec.Builder) invocation.getArguments()[2];
             }
         });
-        when(mockPlugin.getterBuilt(ArgumentMatchers.any(ObjectPluginContext.class), ArgumentMatchers.any(ObjectTypeDeclaration.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE))).thenAnswer(new Answer<MethodSpec.Builder>() {
+        when(mockPlugin.getterBuilt(ArgumentMatchers.any(ObjectPluginContext.class), ArgumentMatchers.any(PropertyShape.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE))).thenAnswer(new Answer<MethodSpec.Builder>() {
             @Override
             public MethodSpec.Builder answer(InvocationOnMock invocation) throws Throwable {
                 return (MethodSpec.Builder) invocation.getArguments()[2];
             }
         });
-        when(mockPlugin.setterBuilt(ArgumentMatchers.any(ObjectPluginContext.class), ArgumentMatchers.any(ObjectTypeDeclaration.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE))).thenAnswer(new Answer<MethodSpec.Builder>() {
+        when(mockPlugin.setterBuilt(ArgumentMatchers.any(ObjectPluginContext.class), ArgumentMatchers.any(PropertyShape.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE))).thenAnswer(new Answer<MethodSpec.Builder>() {
             @Override
             public MethodSpec.Builder answer(InvocationOnMock invocation) throws Throwable {
                 return (MethodSpec.Builder) invocation.getArguments()[2];
@@ -397,9 +392,9 @@ public class ObjectTypeHandlerTest extends UnitTest {
 
         assertNotNull(r);
         assertFalse(r.getImplementation().isPresent());
-        verify(mockPlugin, times(1)).classCreated(ArgumentMatchers.any(ObjectPluginContext.class), ArgumentMatchers.any(ObjectTypeDeclaration.class), ArgumentMatchers.any(TypeSpec.Builder.class), eq(EventType.INTERFACE));
-        verify(mockPlugin, times(2)).getterBuilt(ArgumentMatchers.any(ObjectPluginContext.class), ArgumentMatchers.any(StringTypeDeclaration.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE));
-        verify(mockPlugin, times(2)).setterBuilt(ArgumentMatchers.any(ObjectPluginContext.class), ArgumentMatchers.any(StringTypeDeclaration.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE));
+        verify(mockPlugin, times(1)).classCreated(ArgumentMatchers.any(ObjectPluginContext.class), ArgumentMatchers.any(NodeShape.class), ArgumentMatchers.any(TypeSpec.Builder.class), eq(EventType.INTERFACE));
+        verify(mockPlugin, times(2)).getterBuilt(ArgumentMatchers.any(ObjectPluginContext.class), ArgumentMatchers.any(PropertyShape.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE));
+        verify(mockPlugin, times(2)).setterBuilt(ArgumentMatchers.any(ObjectPluginContext.class), ArgumentMatchers.any(PropertyShape.class), ArgumentMatchers.any(MethodSpec.Builder.class), eq(EventType.INTERFACE));
     }
 
     @Test
@@ -421,10 +416,10 @@ public class ObjectTypeHandlerTest extends UnitTest {
     }
 
     @Test
-    public void enumerationsInline() {
+    public void enumerationsInline() throws ExecutionException, InterruptedException {
 
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-enumeration.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findTypes("foo", api.types()));
+        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-enumeration.raml") );
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
@@ -453,10 +448,10 @@ public class ObjectTypeHandlerTest extends UnitTest {
     }
 
     @Test
-    public void unionsInline() {
+    public void unionsInline() throws ExecutionException, InterruptedException {
 
-        Api api = RamlLoader.load(this.getClass().getResourceAsStream("inline-union.raml"), ".");
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findTypes("foo", api.types()));
+        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-union.raml"));
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
@@ -491,8 +486,8 @@ public class ObjectTypeHandlerTest extends UnitTest {
 
         System.err.println(r.internalType("unionOfOthers").getInterface());
     }
-    protected GenerationContextImpl createGenerationContext(final Api api) {
-        return new GenerationContextImpl(PluginManager.NULL, null, null, "pojo.pack", Collections.emptyList());
+    protected GenerationContextImpl createGenerationContext(final WebApiDocument api) {
+        return new GenerationContextImpl(PluginManager.NULL, api, null, "pojo.pack", Collections.emptyList());
     }
 
 

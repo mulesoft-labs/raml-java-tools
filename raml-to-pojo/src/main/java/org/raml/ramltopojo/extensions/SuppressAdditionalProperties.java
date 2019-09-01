@@ -15,12 +15,12 @@
  */
 package org.raml.ramltopojo.extensions;
 
+import amf.client.model.domain.NodeShape;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.utils.DefaultTypeCopyHandler;
 import org.raml.ramltopojo.extensions.utils.TypeCopier;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 
 /**
  * Created. There, you have it.
@@ -28,7 +28,7 @@ import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 public class SuppressAdditionalProperties extends ObjectTypeHandlerPlugin.Helper {
 
   @Override
-  public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+  public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, NodeShape ramlType, TypeSpec.Builder incoming, EventType eventType) {
 
     TypeCopier copier = new TypeCopier(new DefaultTypeCopyHandler() {
 

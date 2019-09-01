@@ -15,6 +15,7 @@
  */
 package org.raml.ramltopojo.extensions.jackson1;
 
+import amf.client.model.domain.NodeShape;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.TypeSpec;
 import org.codehaus.jackson.annotate.JsonSubTypes;
@@ -24,7 +25,6 @@ import org.raml.ramltopojo.CreationResult;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 
 /**
  * Created by Jean-Philippe Belanger on 1/1/17. Just potential zeroes and ones
@@ -32,23 +32,21 @@ import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 public class JacksonDiscriminatorInheritanceTypeExtension extends ObjectTypeHandlerPlugin.Helper {
 
   @Override
-  public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, TypeSpec.Builder typeSpec, EventType eventType) {
+  public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, NodeShape ramlType, TypeSpec.Builder typeSpec, EventType eventType) {
 
     if ( eventType == EventType.IMPLEMENTATION) {
       return typeSpec;
     }
 
-    ObjectTypeDeclaration otr = ramlType;
-
-    if (otr.discriminator() != null && objectPluginContext.childClasses(otr.name()).size() > 0) {
+    if (ramlType.discriminator() != null && objectPluginContext.childClasses(ramlType.name().value()).size() > 0) {
 
       typeSpec.addAnnotation(AnnotationSpec.builder(JsonTypeInfo.class)
               .addMember("use", "$T.Id.NAME", JsonTypeInfo.class)
               .addMember("include", "$T.As.EXISTING_PROPERTY", JsonTypeInfo.class)
-              .addMember("property", "$S", otr.discriminator()).build());
+              .addMember("property", "$S", ramlType.discriminator()).build());
 
       AnnotationSpec.Builder subTypes = AnnotationSpec.builder(JsonSubTypes.class);
-      for (CreationResult result : objectPluginContext.childClasses(ramlType.name())) {
+      for (CreationResult result : objectPluginContext.childClasses(ramlType.name().value())) {
 
         subTypes.addMember(
                 "value",
@@ -71,10 +69,10 @@ public class JacksonDiscriminatorInheritanceTypeExtension extends ObjectTypeHand
 
     }
 
-    if (otr.discriminatorValue() != null) {
+    if (ramlType.discriminatorValue() != null) {
 
       typeSpec.addAnnotation(AnnotationSpec.builder(JsonTypeName.class)
-              .addMember("value", "$S", otr.discriminatorValue()).build());
+              .addMember("value", "$S", ramlType.discriminatorValue()).build());
     }
 
 

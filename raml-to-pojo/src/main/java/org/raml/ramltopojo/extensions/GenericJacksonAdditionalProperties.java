@@ -1,18 +1,16 @@
 package org.raml.ramltopojo.extensions;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
+import amf.client.model.domain.NodeShape;
+import amf.client.model.domain.PropertyShape;
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.EcmaPattern;
 import org.raml.ramltopojo.EventType;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
-import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Created. There, you have it.
@@ -34,9 +32,9 @@ public class GenericJacksonAdditionalProperties extends ObjectTypeHandlerPlugin.
     }
 
     @Override
-    public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration obj, TypeSpec.Builder typeSpec, EventType eventType) {
+    public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, NodeShape obj, TypeSpec.Builder typeSpec, EventType eventType) {
 
-        if (!obj.additionalProperties()) {
+        if (false /* TODO JP !obj.additionalProperties()*/) {
 
             return typeSpec;
         }
@@ -88,14 +86,9 @@ public class GenericJacksonAdditionalProperties extends ObjectTypeHandlerPlugin.
         return typeSpec;
     }
 
-    private CodeBlock.Builder withProperties(TypeName newSpec, ObjectTypeDeclaration object) {
+    private CodeBlock.Builder withProperties(TypeName newSpec, NodeShape object) {
 
-        List<TypeDeclaration> properties = FluentIterable.from(object.properties()).filter(new Predicate<TypeDeclaration>() {
-            @Override
-            public boolean apply(@Nullable TypeDeclaration property) {
-                return property != null && EcmaPattern.isSlashedPattern(property.name()) && ! EcmaPattern.fromString(property.name()).asJavaPattern().isEmpty();
-            }
-        }).toList();
+        List<PropertyShape> properties = object.properties().stream().filter(property -> property != null && EcmaPattern.isSlashedPattern(property.name().value()) && !EcmaPattern.fromString(property.name().value()).asJavaPattern().isEmpty()).collect(Collectors.toList());
 
         if ( properties.size() == 0) {
 
@@ -103,9 +96,9 @@ public class GenericJacksonAdditionalProperties extends ObjectTypeHandlerPlugin.
         }
 
         CodeBlock.Builder cb = CodeBlock.builder().beginControlFlow("new $T()", newSpec).beginControlFlow("");
-        for (TypeDeclaration typeDeclaration : object.properties()) {
+        for (PropertyShape typeDeclaration : object.properties()) {
 
-                cb.addStatement("addAcceptedPattern($T.compile($S))", Pattern.class, EcmaPattern.fromString(typeDeclaration.name()).asJavaPattern());
+                cb.addStatement("addAcceptedPattern($T.compile($S))", Pattern.class, EcmaPattern.fromString(typeDeclaration.name().value()).asJavaPattern());
         }
         return cb.endControlFlow().endControlFlow();
     }

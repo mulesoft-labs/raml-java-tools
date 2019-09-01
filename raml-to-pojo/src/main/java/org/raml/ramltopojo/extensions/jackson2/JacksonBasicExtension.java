@@ -15,6 +15,8 @@
  */
 package org.raml.ramltopojo.extensions.jackson2;
 
+import amf.client.model.domain.NodeShape;
+import amf.client.model.domain.PropertyShape;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -27,8 +29,6 @@ import org.raml.ramltopojo.EcmaPattern;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 /**
  * Created by Jean-Philippe Belanger on 12/15/16. Just potential zeroes and ones
@@ -36,7 +36,7 @@ import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 public class JacksonBasicExtension extends ObjectTypeHandlerPlugin.Helper {
 
     @Override
-    public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration obj, TypeSpec.Builder typeSpec, EventType eventType) {
+    public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, NodeShape obj, TypeSpec.Builder typeSpec, EventType eventType) {
 
         if (eventType != EventType.IMPLEMENTATION) {
 
@@ -55,9 +55,9 @@ public class JacksonBasicExtension extends ObjectTypeHandlerPlugin.Helper {
 
 
         AnnotationSpec.Builder builder = AnnotationSpec.builder(JsonPropertyOrder.class);
-        for (TypeDeclaration declaration : obj.properties()) {
+        for (PropertyShape declaration : obj.properties()) {
 
-            if (EcmaPattern.isSlashedPattern(declaration.name())) {
+            if (EcmaPattern.isSlashedPattern(declaration.name().value())) {
 
                 continue;
             }
@@ -72,7 +72,7 @@ public class JacksonBasicExtension extends ObjectTypeHandlerPlugin.Helper {
     }
 
     @Override
-    public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, FieldSpec.Builder fieldSpec, EventType eventType) {
+    public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, PropertyShape declaration, FieldSpec.Builder fieldSpec, EventType eventType) {
         AnnotationSpec.Builder annotation = AnnotationSpec.builder(JsonProperty.class)
                 .addMember("value", "$S", declaration.name());
         if (declaration.defaultValue() != null) {
@@ -84,7 +84,7 @@ public class JacksonBasicExtension extends ObjectTypeHandlerPlugin.Helper {
     }
 
     @Override
-    public MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder methodSpec, EventType eventType) {
+    public MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, PropertyShape declaration, MethodSpec.Builder methodSpec, EventType eventType) {
 
         AnnotationSpec.Builder annotation = AnnotationSpec.builder(JsonProperty.class)
                 .addMember("value", "$S", declaration.name());
@@ -96,7 +96,7 @@ public class JacksonBasicExtension extends ObjectTypeHandlerPlugin.Helper {
     }
 
     @Override
-    public MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder methodSpec, EventType eventType) {
+    public MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, PropertyShape declaration, MethodSpec.Builder methodSpec, EventType eventType) {
         AnnotationSpec.Builder annotation = AnnotationSpec.builder(JsonProperty.class)
                 .addMember("value", "$S", declaration.name());
         if (declaration.defaultValue() != null) {

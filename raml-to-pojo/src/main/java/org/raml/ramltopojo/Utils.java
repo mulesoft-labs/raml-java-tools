@@ -37,7 +37,7 @@ public class Utils {
         return foundTypes;
     }
 
-    static public  List<Shape> allParents(Shape target, List<Shape> found) {
+    static public List<Shape> allParents(Shape target, List<Shape> found) {
 
         found.add(target);
         for (Shape typeDeclaration : target.inherits()) {

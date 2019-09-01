@@ -15,6 +15,7 @@
  */
 package org.raml.ramltopojo.extensions.tools;
 
+import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.UnionShape;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EventType;
@@ -22,7 +23,6 @@ import org.raml.ramltopojo.extensions.AllTypesPluginHelper;
 import org.raml.ramltopojo.extensions.EnumerationPluginContext;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 /**
@@ -31,7 +31,7 @@ import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 public class SuppressTypePlugin extends AllTypesPluginHelper {
 
   @Override
-  public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+  public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, NodeShape ramlType, TypeSpec.Builder incoming, EventType eventType) {
     return null;
   }
 

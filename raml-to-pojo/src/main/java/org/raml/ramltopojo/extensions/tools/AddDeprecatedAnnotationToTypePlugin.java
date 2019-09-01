@@ -15,12 +15,12 @@
  */
 package org.raml.ramltopojo.extensions.tools;
 
+import amf.client.model.domain.NodeShape;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 
 /**
  * Created by Jean-Philippe Belanger on 3/7/17. Just potential zeroes and ones
@@ -28,7 +28,7 @@ import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 public class AddDeprecatedAnnotationToTypePlugin extends ObjectTypeHandlerPlugin.Helper {
 
   @Override
-  public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+  public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, NodeShape ramlType, TypeSpec.Builder incoming, EventType eventType) {
 
     incoming.addAnnotation(AnnotationSpec.builder(Deprecated.class).build());
     return incoming;

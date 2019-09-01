@@ -1,12 +1,12 @@
 package org.raml.ramltopojo.extensions;
 
+import amf.client.model.domain.NodeShape;
+import amf.client.model.domain.PropertyShape;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EventType;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,36 +20,36 @@ public interface ObjectTypeHandlerPlugin {
     class Helper implements ObjectTypeHandlerPlugin {
 
         @Override
-        public ClassName className(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+        public ClassName className(ObjectPluginContext objectPluginContext, NodeShape ramlType, ClassName currentSuggestion, EventType eventType) {
             return currentSuggestion;
         }
 
         @Override
-        public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+        public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, NodeShape ramlType, TypeSpec.Builder incoming, EventType eventType) {
             return incoming;
         }
 
         @Override
-        public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, FieldSpec.Builder incoming, EventType eventType) {
+        public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, PropertyShape declaration, FieldSpec.Builder incoming, EventType eventType) {
             return incoming;
         }
 
         @Override
-        public MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType) {
+        public MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, PropertyShape declaration, MethodSpec.Builder incoming, EventType eventType) {
             return incoming;
         }
 
         @Override
-        public MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType) {
+        public MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, PropertyShape declaration, MethodSpec.Builder incoming, EventType eventType) {
             return incoming;
         }
     }
 
-    ClassName className(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType);
-    TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType);
-    FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, FieldSpec.Builder incoming, EventType eventType);
-    MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType);
-    MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType);
+    ClassName className(ObjectPluginContext objectPluginContext, NodeShape ramlType, ClassName currentSuggestion, EventType eventType);
+    TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, NodeShape ramlType, TypeSpec.Builder incoming, EventType eventType);
+    FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, PropertyShape declaration, FieldSpec.Builder incoming, EventType eventType);
+    MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, PropertyShape declaration, MethodSpec.Builder incoming, EventType eventType);
+    MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, PropertyShape declaration, MethodSpec.Builder incoming, EventType eventType);
 
     class Composite implements ObjectTypeHandlerPlugin {
 
@@ -61,7 +61,7 @@ public interface ObjectTypeHandlerPlugin {
         }
 
         @Override
-        public ClassName className(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+        public ClassName className(ObjectPluginContext objectPluginContext, NodeShape ramlType, ClassName currentSuggestion, EventType eventType) {
             for (ObjectTypeHandlerPlugin plugin : plugins) {
                 currentSuggestion = plugin.className(objectPluginContext, ramlType, currentSuggestion, eventType);
             }
@@ -70,7 +70,7 @@ public interface ObjectTypeHandlerPlugin {
         }
 
         @Override
-        public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, ObjectTypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+        public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, NodeShape ramlType, TypeSpec.Builder incoming, EventType eventType) {
 
             for (ObjectTypeHandlerPlugin plugin : plugins) {
                 if ( incoming == null ) {
@@ -83,7 +83,7 @@ public interface ObjectTypeHandlerPlugin {
         }
 
         @Override
-        public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, FieldSpec.Builder incoming, EventType eventType) {
+        public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, PropertyShape declaration, FieldSpec.Builder incoming, EventType eventType) {
             for (ObjectTypeHandlerPlugin plugin : plugins) {
                 if ( incoming == null ) {
                     break;
@@ -95,7 +95,7 @@ public interface ObjectTypeHandlerPlugin {
         }
 
         @Override
-        public MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType) {
+        public MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, PropertyShape declaration, MethodSpec.Builder incoming, EventType eventType) {
             for (ObjectTypeHandlerPlugin plugin : plugins) {
                 if ( incoming == null ) {
                     break;
@@ -107,7 +107,7 @@ public interface ObjectTypeHandlerPlugin {
         }
 
         @Override
-        public MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType) {
+        public MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, PropertyShape declaration, MethodSpec.Builder incoming, EventType eventType) {
             for (ObjectTypeHandlerPlugin plugin : plugins) {
                 if ( incoming == null ) {
                     break;

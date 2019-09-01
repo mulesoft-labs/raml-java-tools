@@ -15,13 +15,17 @@
  */
 package org.raml.ramltopojo.extensions.jackson1;
 
+import amf.client.model.domain.PropertyShape;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.FieldSpec;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
-import org.raml.v2.api.model.v10.datamodel.*;
+import org.raml.v2.api.model.v10.datamodel.DateTimeOnlyTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.DateTimeTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.DateTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.TimeOnlyTypeDeclaration;
 
 /**
  * Created by Jean-Philippe Belanger on 1/8/17. Just potential zeroes and ones
@@ -29,7 +33,7 @@ import org.raml.v2.api.model.v10.datamodel.*;
 public class JacksonScalarTypeSerialization extends ObjectTypeHandlerPlugin.Helper {
 
   @Override
-  public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration typeDeclaration, FieldSpec.Builder builder, EventType eventType) {
+  public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, PropertyShape typeDeclaration, FieldSpec.Builder builder, EventType eventType) {
     if (typeDeclaration instanceof DateTimeOnlyTypeDeclaration) {
 
       builder.addAnnotation(AnnotationSpec.builder(JsonFormat.class)

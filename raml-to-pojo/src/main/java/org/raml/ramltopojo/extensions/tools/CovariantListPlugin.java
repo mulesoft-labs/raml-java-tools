@@ -1,5 +1,9 @@
 package org.raml.ramltopojo.extensions.tools;
 
+import amf.client.model.domain.ArrayShape;
+import amf.client.model.domain.NodeShape;
+import amf.client.model.domain.PropertyShape;
+import amf.client.model.domain.Shape;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -7,9 +11,6 @@ import com.squareup.javapoet.WildcardTypeName;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
-import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class CovariantListPlugin extends ObjectTypeHandlerPlugin.Helper {
     }
 
     @Override
-    public MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType) {
+    public MethodSpec.Builder getterBuilt(ObjectPluginContext objectPluginContext, PropertyShape declaration, MethodSpec.Builder incoming, EventType eventType) {
 
         if ( eventType == EventType.INTERFACE) {
 
@@ -50,7 +51,7 @@ public class CovariantListPlugin extends ObjectTypeHandlerPlugin.Helper {
     }
 
     @Override
-    public MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, MethodSpec.Builder incoming, EventType eventType) {
+    public MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, PropertyShape declaration, MethodSpec.Builder incoming, EventType eventType) {
 
         if ( eventType == EventType.INTERFACE) {
 
@@ -70,18 +71,18 @@ public class CovariantListPlugin extends ObjectTypeHandlerPlugin.Helper {
         }
     }
 
-    private  boolean isNotTargetDefaultType(ObjectPluginContext objectPluginContext, TypeDeclaration declaration, List<String> arguments) {
-        if (!(declaration instanceof ArrayTypeDeclaration)) {
+    private  boolean isNotTargetDefaultType(ObjectPluginContext objectPluginContext, PropertyShape declaration, List<String> arguments) {
+        if (!(declaration.range() instanceof ArrayShape)) {
 
             return true;
         }
 
-        ArrayTypeDeclaration arrayTypeDeclaration = (ArrayTypeDeclaration) declaration;
-        TypeDeclaration itemTypes = arrayTypeDeclaration.items();
-        if (!(itemTypes instanceof ObjectTypeDeclaration)) {
+        ArrayShape arrayTypeDeclaration = (ArrayShape) declaration.range();
+        Shape itemTypes = arrayTypeDeclaration.items();
+        if (!(itemTypes instanceof NodeShape)) {
 
             return true;
         }
-        return arguments.size() == 0 && objectPluginContext.childClasses(itemTypes.name()).isEmpty();
+        return arguments.size() == 0 && objectPluginContext.childClasses(itemTypes.name().value()).isEmpty();
     }
 }

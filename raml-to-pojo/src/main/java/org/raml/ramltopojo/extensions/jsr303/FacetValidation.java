@@ -1,9 +1,9 @@
 package org.raml.ramltopojo.extensions.jsr303;
 
+import amf.client.model.domain.*;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.EcmaPattern;
-import org.raml.v2.api.model.v10.datamodel.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -15,41 +15,43 @@ import java.math.BigInteger;
  */
 public class FacetValidation {
 
-    public static void addFacetsForAll(AnnotationAdder typeSpec, TypeDeclaration typeDeclaration) {
+    public static void addFacetsForAll(AnnotationAdder typeSpec, PropertyShape typeDeclaration) {
 
-        if (typeDeclaration.required() != null && typeDeclaration.required()) {
+        if (true /*typeDeclaration.required() != null && typeDeclaration.required()*/) {
 
             typeSpec.addAnnotation(AnnotationSpec.builder(NotNull.class).build());
         }
     }
 
-    public static void addAnnotations(TypeDeclaration typeDeclaration, AnnotationAdder adder) {
+    public static void addAnnotations(PropertyShape typeDeclaration, AnnotationAdder adder) {
 
         addFacetsForAll(adder, typeDeclaration);
 
-        if (typeDeclaration instanceof NumberTypeDeclaration) {
+        Shape range = typeDeclaration.range();
+        if ((range instanceof ScalarShape) && "string".equals(((ScalarShape)range).dataType().value())) {
 
-            addFacetsForNumbers(adder, (NumberTypeDeclaration) typeDeclaration);
+            addFacetsForString(adder, (ScalarShape) range);
             return;
         }
 
-        if (typeDeclaration instanceof StringTypeDeclaration) {
+        if (range instanceof ScalarShape) {
 
-            addFacetsForString(adder, (StringTypeDeclaration) typeDeclaration);
+            addFacetsForNumbers(adder, (ScalarShape)range);
+            return;
         }
 
-        if (typeDeclaration instanceof ArrayTypeDeclaration) {
+        if (range instanceof ArrayShape) {
 
-            addFacetsForArray(adder, (ArrayTypeDeclaration) typeDeclaration);
+            addFacetsForArray(adder, (ArrayShape) range);
         }
 
-        if (isFieldFromBuiltType(typeDeclaration)) {
+        if (isFieldFromBuiltType(range)) {
 
             addFacetsForBuilt(adder);
         }
     }
 
-    public static void addFacetsForArray(AnnotationAdder fieldSpec, ArrayTypeDeclaration typeDeclaration) {
+    public static void addFacetsForArray(AnnotationAdder fieldSpec, ArrayShape typeDeclaration) {
 
         if ( isFieldFromBuiltType(typeDeclaration.items()) ) {
 
@@ -79,7 +81,7 @@ public class FacetValidation {
         }
     }
 
-    public static void addFacetsForString(AnnotationAdder typeSpec, StringTypeDeclaration typeDeclaration) {
+    public static void addFacetsForString(AnnotationAdder typeSpec, ScalarShape typeDeclaration) {
 
         AnnotationSpec.Builder minMax = null;
         if (typeDeclaration.minLength() != null) {
@@ -105,18 +107,18 @@ public class FacetValidation {
 
         if ( typeDeclaration.pattern() != null ) {
 
-            typeSpec.addAnnotation(AnnotationSpec.builder(Pattern.class).addMember("regexp", "$S", EcmaPattern.fromString(typeDeclaration.pattern()).asJavaPattern()).build());
+            typeSpec.addAnnotation(AnnotationSpec.builder(Pattern.class).addMember("regexp", "$S", EcmaPattern.fromString(typeDeclaration.pattern().value()).asJavaPattern()).build());
         }
     }
 
 
-    public static void addFacetsForNumbers(AnnotationAdder typeSpec, NumberTypeDeclaration typeDeclaration) {
+    public static void addFacetsForNumbers(AnnotationAdder typeSpec, ScalarShape typeDeclaration) {
 
         if (typeDeclaration.minimum() != null) {
             if (isInteger(typeSpec.typeName())) {
 
                 typeSpec.addAnnotation(AnnotationSpec.builder(Min.class)
-                        .addMember("value", "$L", typeDeclaration.minimum().intValue()).build());
+                        .addMember("value", "$L", typeDeclaration.minimum().value()).build());
             }
         }
 
@@ -124,7 +126,7 @@ public class FacetValidation {
             if (isInteger(typeSpec.typeName())) {
 
                 typeSpec.addAnnotation(AnnotationSpec.builder(Max.class)
-                        .addMember("value", "$L", typeDeclaration.maximum().intValue()).build());
+                        .addMember("value", "$L", typeDeclaration.maximum().value()).build());
             }
         }
     }
@@ -134,9 +136,9 @@ public class FacetValidation {
        fieldSpec.addAnnotation(Valid.class);
     }
 
-    public static boolean isFieldFromBuiltType(TypeDeclaration typeDeclaration) {
+    public static boolean isFieldFromBuiltType(Shape typeDeclaration) {
 
-        return typeDeclaration instanceof ObjectTypeDeclaration || typeDeclaration instanceof UnionTypeDeclaration;
+        return typeDeclaration instanceof UnionShape || typeDeclaration instanceof NodeShape;
     }
 
     private static boolean isInteger(TypeName type) {

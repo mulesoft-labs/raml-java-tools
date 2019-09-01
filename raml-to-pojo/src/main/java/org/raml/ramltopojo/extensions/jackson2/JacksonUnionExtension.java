@@ -21,7 +21,6 @@ import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.Names;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 
 import javax.lang.model.element.Modifier;
 import java.io.IOException;
@@ -135,9 +134,8 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
 
         for (Shape typeDeclaration : unionOf) {
 
-
             String name = Names.methodName("looksLike", typeDeclaration.name().value());
-            if ( typeDeclaration instanceof ObjectTypeDeclaration && ((ObjectTypeDeclaration)typeDeclaration).discriminator() != null ) {
+            if ( typeDeclaration instanceof NodeShape && ((NodeShape)typeDeclaration).discriminator() != null ) {
 
                 Shape parentType = findParentType(typeDeclaration);
                 TypeName unionPossibility = unionPluginContext.unionClass(typeDeclaration).getJavaName(EventType.INTERFACE);
