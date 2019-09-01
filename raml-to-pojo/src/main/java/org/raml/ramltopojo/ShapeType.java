@@ -11,7 +11,6 @@ import org.raml.ramltopojo.nulltype.NullTypeHandler;
 import org.raml.ramltopojo.object.ObjectTypeHandler;
 import org.raml.ramltopojo.references.ReferenceTypeHandler;
 import org.raml.ramltopojo.union.UnionTypeHandler;
-import org.raml.v2.api.model.v10.datamodel.*;
 
 import java.io.File;
 import java.util.*;
@@ -78,11 +77,11 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
                 allExtendedProps = Collections.emptySet();
             } else {
                 allExtendedProps =
-                        extended.stream().filter(ObjectTypeDeclaration.class::isInstance).map(ObjectTypeDeclaration.class::cast)
+                        extended.stream().filter(NodeShape.class::isInstance).map(NodeShape.class::cast)
                                 .flatMap(ShapeType::pullNames).collect(Collectors.toSet());
             }
 
-            Set<String> typePropertyNames = pullNames((ObjectTypeDeclaration) declaration).collect(Collectors.toSet());
+            Set<String> typePropertyNames = pullNames((NodeShape) declaration).collect(Collectors.toSet());
             return !Sets.difference(typePropertyNames, allExtendedProps).isEmpty();
         }
     },
@@ -143,11 +142,11 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
 
         @Override
         public boolean shouldCreateInlineType(Shape originalTypeDeclaration) {
-            IntegerTypeDeclaration declaration = (IntegerTypeDeclaration) originalTypeDeclaration;
+            ScalarShape declaration = (ScalarShape) originalTypeDeclaration;
 
-            if ( ! declaration.enumValues().isEmpty() ) {
+            if (false ) {
 
-                return ENUMERATION.shouldCreateInlineType(originalTypeDeclaration);
+                return ENUMERATION.shouldCreateInlineType(declaration);
             } else {
                 return false;
             }
@@ -228,11 +227,11 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         @Override
         public boolean shouldCreateInlineType(Shape originalTypeDeclaration) {
 
-            NumberTypeDeclaration declaration = (NumberTypeDeclaration) originalTypeDeclaration;
+            ScalarShape declaration = (ScalarShape) originalTypeDeclaration;
 
-            if ( ! declaration.enumValues().isEmpty() ) {
+            if ( false ) {
 
-                return ENUMERATION.shouldCreateInlineType(originalTypeDeclaration);
+                return ENUMERATION.shouldCreateInlineType(declaration);
             } else {
                 return false;
             }
@@ -255,11 +254,11 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         @Override
         public boolean shouldCreateInlineType(Shape originalTypeDeclaration) {
 
-            StringTypeDeclaration declaration = (StringTypeDeclaration) originalTypeDeclaration;
+            ScalarShape declaration = (ScalarShape) originalTypeDeclaration;
 
-            if ( ! declaration.enumValues().isEmpty() ) {
+            if ( false ) {
 
-                return ENUMERATION.shouldCreateInlineType(originalTypeDeclaration);
+                return ENUMERATION.shouldCreateInlineType(declaration);
             } else {
                 return false;
             }
@@ -289,9 +288,9 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         }
     };
 
-    private static Stream<String> pullNames(ObjectTypeDeclaration extending) {
+    private static Stream<String> pullNames(NodeShape extending) {
 
-        return extending.properties().stream().map(TypeDeclaration::name);
+        return extending.properties().stream().map(t -> t.name().value());
     }
 
     private static Map<String, TypeName> properType = ImmutableMap.<String, TypeName>builder()
