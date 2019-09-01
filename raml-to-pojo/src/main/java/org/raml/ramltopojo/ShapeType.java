@@ -5,19 +5,15 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.array.ArrayTypeHandler;
 import org.raml.ramltopojo.enumeration.EnumerationTypeHandler;
-import org.raml.ramltopojo.extensions.*;
 import org.raml.ramltopojo.nulltype.NullTypeHandler;
 import org.raml.ramltopojo.object.ObjectTypeHandler;
 import org.raml.ramltopojo.references.ReferenceTypeHandler;
 import org.raml.ramltopojo.union.UnionTypeHandler;
 import org.raml.v2.api.model.v10.datamodel.*;
-import webapi.WebApiDocument;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -337,65 +333,6 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         return scalarTypes.get(cls);
     }
 
-    /**
-     * Create the actual type.
-     *
-     * @param typeDeclaration
-     * @param context
-     * @return
-     */
-    public static Optional<CreationResult> createType(Shape typeDeclaration, GenerationContext context) {
-
-        ShapeType shapeType = ramlToType.get(Utils.declarationType(typeDeclaration));
-
-        TypeHandler handler = shapeType.createHandler(typeDeclaration.name().value(), shapeType, typeDeclaration);
-        ClassName intf = handler.javaClassName(context, EventType.INTERFACE);
-        ClassName impl = handler.javaClassName(context, EventType.IMPLEMENTATION);
-        CreationResult creationResult = new CreationResult(context.defaultPackage(), intf, impl);
-        context.newExpectedType(typeDeclaration.name().value(), creationResult);
-        context.setupTypeHierarchy(typeDeclaration);
-        return handler.create(context, creationResult);
-    }
-
-    /**
-     * Create the actual type.
-     *
-     * @param typeDeclaration
-     * @param context
-     * @return
-     */
-    public static Optional<CreationResult> createNamedType(String name, Shape typeDeclaration, GenerationContext context) {
-
-
-        ShapeType shapeType = ramlToType.get(Utils.declarationType(typeDeclaration));
-
-        TypeHandler handler = shapeType.createHandler(name, shapeType, typeDeclaration);
-        ClassName intf = handler.javaClassName(context, EventType.INTERFACE);
-        ClassName impl = handler.javaClassName(context, EventType.IMPLEMENTATION);
-        CreationResult creationResult = new CreationResult(context.defaultPackage(), intf, impl);
-        context.newExpectedType(name, creationResult);
-        context.setupTypeHierarchy(typeDeclaration);
-        return handler.create(context, creationResult);
-    }
-
-    /**
-     * Create the actual type.
-     *
-     * @param typeDeclaration
-     * @param context
-     * @return
-     */
-    public static Optional<CreationResult> createInlineType(ClassName containingClassName, ClassName containingImplementation, String name, Shape typeDeclaration, final GenerationContext context) {
-
-        ShapeType shapeType = ramlToType(Utils.declarationType(typeDeclaration));
-
-        TypeHandler handler = shapeType.createHandler(name, shapeType, typeDeclaration);
-        ClassName intf = handler.javaClassName(new InlineGenerationContext(containingClassName, containingClassName, context),  EventType.INTERFACE);
-        ClassName impl = handler.javaClassName(new InlineGenerationContext(containingClassName, containingImplementation, context), EventType.IMPLEMENTATION);
-        CreationResult preCreationResult = new CreationResult("", intf, impl);
-        return handler.create(context, preCreationResult);
-    }
-
 
     public static TypeName calculateTypeName(String name, Shape typeDeclaration, GenerationContext context, EventType eventType) {
 
@@ -411,94 +348,4 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         return ramlToType(Utils.declarationType(declaration)).shouldCreateInlineType(declaration);
     }
 
-    private static class InlineGenerationContext implements GenerationContext {
-        private final ClassName containingDeclaration;
-        private final ClassName containingImplementation;
-        private final GenerationContext context;
-
-        public InlineGenerationContext(ClassName containingDeclaration, ClassName containingImplementation, GenerationContext context) {
-            this.containingDeclaration = containingDeclaration;
-            this.containingImplementation = containingImplementation;
-            this.context = context;
-        }
-
-        @Override
-        public void createSupportTypes(String rootDirectory) throws IOException {
-            context.createSupportTypes(rootDirectory);
-        }
-
-        @Override
-        public TypeName createSupportClass(TypeSpec.Builder newSupportType) {
-            return context.createSupportClass(newSupportType);
-        }
-
-        @Override
-        public CreationResult findCreatedType(String typeName, Shape ramlType) {
-            return context.findCreatedType(typeName, ramlType);
-        }
-
-        @Override
-        public String defaultPackage() {
-            return "";
-        }
-
-        @Override
-        public void newExpectedType(String name, CreationResult creationResult) {
-
-        }
-
-        @Override
-        public void createTypes(String rootDirectory) throws IOException {
-
-        }
-
-        @Override
-        public ObjectTypeHandlerPlugin pluginsForObjects(Shape... typeDeclarations) {
-            return context.pluginsForObjects(typeDeclarations);
-        }
-
-        @Override
-        public EnumerationTypeHandlerPlugin pluginsForEnumerations(Shape... typeDeclarations) {
-            return context.pluginsForEnumerations(typeDeclarations);
-        }
-
-        @Override
-        public UnionTypeHandlerPlugin pluginsForUnions(Shape... typeDeclarations) {
-            return context.pluginsForUnions(typeDeclarations);
-        }
-
-        @Override
-        public ArrayTypeHandlerPlugin pluginsForArrays(Shape... typeDeclarations) {
-            return context.pluginsForArrays(typeDeclarations);
-        }
-
-        @Override
-        public WebApiDocument api() {
-            return context.api();
-        }
-
-        @Override
-        public Set<String> childClasses(String ramlTypeName) {
-            return context.childClasses(ramlTypeName);
-        }
-
-        @Override
-        public ClassName buildDefaultClassName(String name, EventType eventType) {
-            if ( eventType == EventType.INTERFACE ) {
-                return containingDeclaration.nestedClass(name);
-            } else {
-                return containingImplementation.nestedClass(name);
-            }
-        }
-
-        @Override
-        public ReferenceTypeHandlerPlugin pluginsForReferences(Shape... typeDeclarations) {
-            return context.pluginsForReferences(typeDeclarations);
-        }
-
-        @Override
-        public void setupTypeHierarchy(Shape typeDeclaration) {
-            context.setupTypeHierarchy(typeDeclaration);
-        }
-    }
 }
