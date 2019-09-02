@@ -113,29 +113,6 @@ public class GenerationContextImpl implements GenerationContext {
 
     private<T> void loadBasePlugins(Set<T> plugins, Class<T> pluginType, Shape... typeDeclarations) {
 
-        for (Shape typeDeclaration : typeDeclarations) {
-
-            if ( Annotations.CLASS_NAME.get(typeDeclaration) != null) {
-
-                pluginManager.getClassesForName("core.rename", Collections.singletonList(Annotations.CLASS_NAME.get(typeDeclaration)), pluginType);
-            }
-
-            if ( Annotations.IMPLEMENTATION_CLASS_NAME.get(typeDeclaration) != null) {
-
-                pluginManager.getClassesForName("core.renameImplementation", Collections.singletonList(Annotations.IMPLEMENTATION_CLASS_NAME.get(typeDeclaration)), pluginType);
-            }
-
-            if (!Annotations.USE_PRIMITIVE.get(typeDeclaration)) {
-
-                pluginManager.getClassesForName("core.box", Collections.<String>emptyList(), pluginType);
-            }
-
-            if (!Annotations.ABSTRACT.get(typeDeclaration)) {
-
-                pluginManager.getClassesForName("core.makeAbstract", Collections.<String>emptyList(), pluginType);
-            }
-
-        }
         for (String basePlugin : basePlugins) {
             plugins.addAll(pluginManager.getClassesForName(basePlugin, Collections.<String>emptyList(), pluginType));
         }

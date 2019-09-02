@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.Shape;
 import com.squareup.javapoet.TypeName;
 
@@ -68,7 +69,7 @@ public class RamlToPojoImpl implements RamlToPojo {
         return ShapeType.calculateTypeName(suggestedName, typeDeclaration, generationContext, EventType.INTERFACE);
     }
 
-    public boolean isInline(Shape typeDeclaration) {
+    public boolean isInline(AnyShape typeDeclaration) {
 
         return ShapeType.isNewInlineType(typeDeclaration);
     }

@@ -1,21 +1,18 @@
 package org.raml.ramltopojo.enumeration;
 
+import amf.client.model.domain.ScalarNode;
+import amf.client.model.domain.ScalarShape;
 import amf.client.model.domain.Shape;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.TypeName;
-import org.raml.ramltopojo.CreationResult;
-import org.raml.ramltopojo.EventType;
-import org.raml.ramltopojo.GenerationContext;
-import org.raml.ramltopojo.TypeHandler;
+import com.squareup.javapoet.*;
+import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.EnumerationPluginContext;
 import org.raml.ramltopojo.extensions.EnumerationPluginContextImpl;
-import org.raml.v2.api.model.v10.datamodel.IntegerTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.NumberTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
+import javax.lang.model.element.Modifier;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created. There, you have it.
@@ -23,9 +20,9 @@ import java.util.Optional;
 public class EnumerationTypeHandler implements TypeHandler {
 
     private final String name;
-    private final Shape typeDeclaration;
+    private final ScalarShape typeDeclaration;
 
-    public EnumerationTypeHandler(String name, Shape stringTypeDeclaration) {
+    public EnumerationTypeHandler(String name, ScalarShape stringTypeDeclaration) {
         this.name = name;
         this.typeDeclaration = stringTypeDeclaration;
     }
@@ -34,8 +31,7 @@ public class EnumerationTypeHandler implements TypeHandler {
     public ClassName javaClassName(GenerationContext generationContext, EventType type) {
 
         EnumerationPluginContext enumerationPluginContext = new EnumerationPluginContextImpl(generationContext, null);
-// migration        return generationContext.pluginsForEnumerations(Utils.allParents(typeDeclaration, new ArrayList<TypeDeclaration>()).toArray(new TypeDeclaration[0])).className(enumerationPluginContext, typeDeclaration, generationContext.buildDefaultClassName(Names.typeName(name), EventType.INTERFACE), EventType.INTERFACE);
-        return null;
+        return generationContext.pluginsForEnumerations(Utils.allParents(typeDeclaration, new ArrayList<>()).toArray(new Shape[0])).className(enumerationPluginContext, typeDeclaration, generationContext.buildDefaultClassName(Names.typeName(name), EventType.INTERFACE), EventType.INTERFACE);
     }
 
     @Override
@@ -46,8 +42,7 @@ public class EnumerationTypeHandler implements TypeHandler {
     @Override
     public Optional<CreationResult> create(GenerationContext generationContext, CreationResult preCreationResult) {
 
-/* TODO
-        Class cls = (typeDeclaration instanceof StringTypeDeclaration)?String.class:Number.class;
+        Class cls = "string".equals(typeDeclaration.dataType().value())?String.class:Number.class;
 
         FieldSpec.Builder field = FieldSpec.builder(ClassName.get(cls), "name").addModifiers(Modifier.PRIVATE);
         EnumerationPluginContext enumerationPluginContext = new EnumerationPluginContextImpl(generationContext, preCreationResult);
@@ -70,13 +65,13 @@ public class EnumerationTypeHandler implements TypeHandler {
 
         for (Object value : pullEnumValues(typeDeclaration)) {
             TypeSpec.Builder enumValueBuilder;
-            if ( value instanceof String) {
+            if ( cls.equals(String.class)) {
                 enumValueBuilder= TypeSpec.anonymousClassBuilder("$S", value);
                 enumValueBuilder = generationContext.pluginsForEnumerations(typeDeclaration).enumValue(enumerationPluginContext, typeDeclaration, enumValueBuilder, (String)value, EventType.INTERFACE);
             } else {
 
                 enumValueBuilder= TypeSpec.anonymousClassBuilder("$L", value);
-                enumValueBuilder = generationContext.pluginsForEnumerations(typeDeclaration).enumValue(enumerationPluginContext, typeDeclaration, enumValueBuilder, (Number)value, EventType.INTERFACE);
+                enumValueBuilder = generationContext.pluginsForEnumerations(typeDeclaration).enumValue(enumerationPluginContext, typeDeclaration, enumValueBuilder, Integer.parseInt((String) value), EventType.INTERFACE);
             }
             if ( enumValueBuilder == null ) {
                 continue;
@@ -88,18 +83,11 @@ public class EnumerationTypeHandler implements TypeHandler {
         }
 
         return Optional.of(preCreationResult.withInterface(enumBuilder.build()));
-*/
-        return Optional.empty();
     }
 
-    List pullEnumValues(TypeDeclaration typeDeclaration) {
+    // todo fix the double enumeration
+    List<String> pullEnumValues(ScalarShape typeDeclaration) {
 
-        if ( typeDeclaration instanceof  IntegerTypeDeclaration ) {
-            return ((IntegerTypeDeclaration)typeDeclaration).enumValues();
-        } else  if (typeDeclaration instanceof NumberTypeDeclaration) {
-            return ((NumberTypeDeclaration)typeDeclaration).enumValues();
-        } else {
-            return ((StringTypeDeclaration)typeDeclaration).enumValues();
-        }
+        return typeDeclaration.values().stream().map(x -> (ScalarNode) x).map(ScalarNode::value).collect(Collectors.toList());
     }
 }

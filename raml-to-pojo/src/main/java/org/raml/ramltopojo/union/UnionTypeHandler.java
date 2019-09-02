@@ -9,8 +9,6 @@ import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.ramltopojo.extensions.UnionPluginContextImpl;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
-import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.NullTypeDeclaration;
 
 import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
@@ -96,7 +94,7 @@ public class UnionTypeHandler implements TypeHandler {
 
         for (Shape unitedType : union.anyOf()) {
 
-            TypeName typeName =  unitedType instanceof NullTypeDeclaration ? NULL_CLASS : findType(unitedType.name().value(), unitedType, generationContext).box();
+            TypeName typeName =  unitedType instanceof NilShape ? NULL_CLASS : findType(unitedType.name().value(), unitedType, generationContext).box();
             String shortened = shorten(typeName);
 
             String fieldName = Names.methodName(unitedType.name().value());
@@ -161,7 +159,7 @@ public class UnionTypeHandler implements TypeHandler {
             @Override
             public TypeName apply(@Nullable Shape unitedType) {
 
-                if (unitedType instanceof NullTypeDeclaration) {
+                if (unitedType instanceof NilShape) {
                     return NULL_CLASS;
                 } else {
                     return findType(unitedType.name().value(), unitedType, generationContext).box();
@@ -177,7 +175,7 @@ public class UnionTypeHandler implements TypeHandler {
 
         for (TypeName unitedType : names) {
 
-            if ( unitedType instanceof ArrayTypeDeclaration ) {
+            if ( unitedType instanceof ArrayTypeName) {
 
                 throw new GenerationException("ramltopojo currently does not support arrays in unions");
             }

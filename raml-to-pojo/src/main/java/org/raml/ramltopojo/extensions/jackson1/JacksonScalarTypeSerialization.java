@@ -15,17 +15,17 @@
  */
 package org.raml.ramltopojo.extensions.jackson1;
 
+import amf.client.model.StrField;
 import amf.client.model.domain.PropertyShape;
+import amf.client.model.domain.ScalarShape;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.FieldSpec;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
-import org.raml.v2.api.model.v10.datamodel.DateTimeOnlyTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.DateTimeTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.DateTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.TimeOnlyTypeDeclaration;
+
+import java.util.Optional;
 
 /**
  * Created by Jean-Philippe Belanger on 1/8/17. Just potential zeroes and ones
@@ -34,54 +34,49 @@ public class JacksonScalarTypeSerialization extends ObjectTypeHandlerPlugin.Help
 
   @Override
   public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, PropertyShape typeDeclaration, FieldSpec.Builder builder, EventType eventType) {
-    if (typeDeclaration instanceof DateTimeOnlyTypeDeclaration) {
 
-      builder.addAnnotation(AnnotationSpec.builder(JsonFormat.class)
-              .addMember("shape", "$T.STRING", JsonFormat.Shape.class)
-              .addMember("pattern", "$S", "yyyy-MM-dd'T'HH:mm:ss").build());
-    }
 
-    if (typeDeclaration instanceof TimeOnlyTypeDeclaration) {
+    if ( typeDeclaration.range() instanceof ScalarShape) {
+      ScalarShape propertyType = (ScalarShape) typeDeclaration.range();
 
-      builder.addAnnotation(AnnotationSpec.builder(JsonFormat.class)
-              .addMember("shape", "$T.STRING", JsonFormat.Shape.class)
-              .addMember("pattern", "$S", "HH:mm:ss").build());
-    }
-
-    if (typeDeclaration instanceof DateTypeDeclaration) {
-
-      builder.addAnnotation(AnnotationSpec.builder(JsonFormat.class)
-              .addMember("shape", "$T.STRING", JsonFormat.Shape.class)
-              .addMember("pattern", "$S", "yyyy-MM-dd").build());
-    }
-
-    if (typeDeclaration instanceof DateTimeTypeDeclaration) {
-
-      String format = ((DateTimeTypeDeclaration) typeDeclaration).format();
-      if (format != null && "rfc2616".equals(format)) {
+      if ( "datetime-only".equals(propertyType.dataType().value())) {
 
         builder.addAnnotation(AnnotationSpec.builder(JsonFormat.class)
                 .addMember("shape", "$T.STRING", JsonFormat.Shape.class)
-                .addMember("pattern", "$S", "EEE, dd MMM yyyy HH:mm:ss z").build());
-      } else {
+                .addMember("pattern", "$S", "yyyy-MM-dd'T'HH:mm:ss").build());
+      }
+
+      if ( "time-only".equals(propertyType.dataType().value())) {
+
         builder.addAnnotation(AnnotationSpec.builder(JsonFormat.class)
                 .addMember("shape", "$T.STRING", JsonFormat.Shape.class)
-                .addMember("pattern", "$S", "yyyy-MM-dd'T'HH:mm:ssZ").build());
+                .addMember("pattern", "$S", "HH:mm:ss").build());
+      }
+
+      if ( "date".equals(propertyType.dataType().value())) {
+
+        builder.addAnnotation(AnnotationSpec.builder(JsonFormat.class)
+                .addMember("shape", "$T.STRING", JsonFormat.Shape.class)
+                .addMember("pattern", "$S", "yyyy-MM-dd").build());
+      }
+
+      if ( "datetime".equals(propertyType.dataType().value())) {
+
+        // TODO:  do better
+        Optional<String> format = Optional.ofNullable(propertyType.format()).map(StrField::value);
+        if (format.isPresent() && "rfc2616".equals(format.get())) {
+
+          builder.addAnnotation(AnnotationSpec.builder(JsonFormat.class)
+                  .addMember("shape", "$T.STRING", JsonFormat.Shape.class)
+                  .addMember("pattern", "$S", "EEE, dd MMM yyyy HH:mm:ss z").build());
+        } else {
+          builder.addAnnotation(AnnotationSpec.builder(JsonFormat.class)
+                  .addMember("shape", "$T.STRING", JsonFormat.Shape.class)
+                  .addMember("pattern", "$S", "yyyy-MM-dd'T'HH:mm:ssZ").build());
+        }
       }
     }
 
     return builder;
   }
-
-
-/*
-  @Override
-  public void onEnumConstant(CurrentBuild currentBuild, TypeSpec.Builder builder,
-                             TypeDeclaration typeDeclaration, String name) {
-
-
-    builder.addAnnotation(AnnotationSpec.builder(JsonProperty.class).addMember("value", "$S", name)
-        .build());
-  }
-*/
 }

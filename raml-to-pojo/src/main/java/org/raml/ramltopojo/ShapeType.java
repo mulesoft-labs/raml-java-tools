@@ -89,7 +89,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         @Override
         public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
 
-            return new EnumerationTypeHandler(name, typeDeclaration);
+            return new EnumerationTypeHandler(name, (ScalarShape) typeDeclaration);
         }
 
         @Override
@@ -109,7 +109,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         @Override
         public boolean shouldCreateInlineType(Shape declaration) {
             ArrayShape arrayTypeDeclaration = (ArrayShape) declaration;
-            return Annotations.GENERATE_INLINE_ARRAY_TYPE.get(arrayTypeDeclaration);
+            return true;
         }
     },
     UNION {
@@ -343,7 +343,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         return typeName;
     }
 
-    public static boolean isNewInlineType(Shape declaration) {
+    public static boolean isNewInlineType(AnyShape declaration) {
         return ramlToType(Utils.declarationType(declaration)).shouldCreateInlineType(declaration);
     }
 

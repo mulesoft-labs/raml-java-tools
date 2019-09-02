@@ -1,12 +1,12 @@
 package org.raml.ramltopojo.extensions.tools;
 
+import amf.client.model.domain.ArrayShape;
 import amf.client.model.domain.Shape;
 import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.extensions.ReferencePluginContext;
 import org.raml.ramltopojo.extensions.ReferenceTypeHandlerPlugin;
-import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
 
 /**
  * Created. There, you have it.
@@ -24,7 +24,7 @@ public class AsArray implements ReferenceTypeHandlerPlugin {
     @Override
     public TypeName typeName(ReferencePluginContext referencePluginContext, Shape ramlType, TypeName currentSuggestion) {
 
-        if ( ramlType instanceof ArrayTypeDeclaration) {
+        if ( ramlType instanceof ArrayShape) {
             return ArrayTypeName.of(((ParameterizedTypeName)currentSuggestion).typeArguments.get(0).box());
         } else {
 

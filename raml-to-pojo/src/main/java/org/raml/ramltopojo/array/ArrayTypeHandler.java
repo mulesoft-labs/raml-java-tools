@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.array;
 
+import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.ArrayShape;
 import amf.client.model.domain.Shape;
 import com.squareup.javapoet.ClassName;
@@ -83,7 +84,7 @@ public class ArrayTypeHandler implements TypeHandler {
         Shape items = typeDeclaration.items();
 
         TypeName itemsTypeName = ClassName.get(Object.class);
-        if (ShapeType.isNewInlineType(items)) {
+        if (ShapeType.isNewInlineType((AnyShape) items)) {
             Optional<CreationResult> cr = CreationResultFactory.createInlineType(className, preCreationResult.getJavaName(EventType.IMPLEMENTATION), Names.typeName(items.name().value(), "type"), null /*items*/, generationContext);
             if (cr.isPresent()) {
                 preCreationResult.withInternalType(items.name().value(), cr.get());

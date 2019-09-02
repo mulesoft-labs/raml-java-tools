@@ -1,6 +1,7 @@
 package org.raml.ramltopojo.extensions.tools;
 
 import amf.client.model.domain.NodeShape;
+import amf.client.model.domain.Shape;
 import amf.client.model.domain.UnionShape;
 import com.squareup.javapoet.ClassName;
 import org.raml.ramltopojo.EventType;
@@ -8,7 +9,6 @@ import org.raml.ramltopojo.extensions.AllTypesPluginHelper;
 import org.raml.ramltopojo.extensions.EnumerationPluginContext;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class RenameImplementationPlugin extends AllTypesPluginHelper {
     }
 
     @Override
-    public ClassName className(EnumerationPluginContext enumerationPluginContext, TypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+    public ClassName className(EnumerationPluginContext enumerationPluginContext, Shape ramlType, ClassName currentSuggestion, EventType eventType) {
         return changeName(currentSuggestion, eventType);
     }
     @Override

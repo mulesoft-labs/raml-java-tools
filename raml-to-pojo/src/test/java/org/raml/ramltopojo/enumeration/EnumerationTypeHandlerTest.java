@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.raml.ramltopojo.CreationResult;
 import org.raml.ramltopojo.GenerationContextImpl;
+import org.raml.ramltopojo.RamlLoader;
 import org.raml.ramltopojo.TypeFetchers;
 import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.testutils.UnitTest;
@@ -18,6 +19,7 @@ import java.util.Collections;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.junit.Assert.assertThat;
+import static org.raml.ramltopojo.RamlLoader.findShape;
 import static org.raml.testutils.matchers.TypeSpecMatchers.fields;
 import static org.raml.testutils.matchers.TypeSpecMatchers.name;
 
@@ -33,10 +35,9 @@ public class EnumerationTypeHandlerTest extends UnitTest {
     @Test
     public void createString() throws Exception {
 
-// todo        when(stringDeclaration.name()).thenReturn("Days");
-// todo        when(stringDeclaration.enumValues()).thenReturn(Arrays.asList("one", "two", "three"));
-
-        EnumerationTypeHandler handler = new EnumerationTypeHandler("days", new ScalarShape().withDataType("string").withName("Days"));
+        WebApiDocument api = RamlLoader.load(this.getClass().getResource("stringenum.raml"));
+        ScalarShape enumShape = findShape("days", api.declares());
+        EnumerationTypeHandler handler = new EnumerationTypeHandler("days", enumShape);
         GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());
         generationContext.newExpectedType("Days", new CreationResult("bar.pack", ClassName.get("bar.pack", "Days"), null));
 
@@ -56,10 +57,9 @@ public class EnumerationTypeHandlerTest extends UnitTest {
     @Test
     public void createInteger() throws Exception {
 
-     // todo   when(integerDeclaration.name()).thenReturn("Time");
-     //   when(integerDeclaration.enumValues()).thenReturn(Arrays.<Number>asList(1, 2, 3));
-
-        EnumerationTypeHandler handler = new EnumerationTypeHandler("time", new ScalarShape().withDataType("integer").withName("Time"));
+        WebApiDocument api = RamlLoader.load(this.getClass().getResource("stringenum.raml"));
+        ScalarShape enumShape = findShape("time", api.declares());
+        EnumerationTypeHandler handler = new EnumerationTypeHandler("time", enumShape);
         GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());
         generationContext.newExpectedType("Time", new CreationResult("bar.pack", ClassName.get("bar.pack", "Time"), null));
 

@@ -9,7 +9,6 @@ import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EventType;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 /**
  * Created. There, you have it.
@@ -62,22 +61,22 @@ public class AllTypesPluginHelper implements ObjectTypeHandlerPlugin, UnionTypeH
     }
 
     @Override
-    public ClassName className(EnumerationPluginContext enumerationPluginContext, TypeDeclaration ramlType, ClassName currentSuggestion, EventType eventType) {
+    public ClassName className(EnumerationPluginContext enumerationPluginContext, Shape ramlType, ClassName currentSuggestion, EventType eventType) {
         return enumerationTypeHandlerPlugin.className(enumerationPluginContext, ramlType, currentSuggestion, eventType);
     }
 
     @Override
-    public TypeSpec.Builder classCreated(EnumerationPluginContext enumerationPluginContext, TypeDeclaration ramlType, TypeSpec.Builder incoming, EventType eventType) {
+    public TypeSpec.Builder classCreated(EnumerationPluginContext enumerationPluginContext, Shape ramlType, TypeSpec.Builder incoming, EventType eventType) {
         return enumerationTypeHandlerPlugin.classCreated(enumerationPluginContext, ramlType, incoming, eventType);
     }
 
     @Override
-    public TypeSpec.Builder enumValue(EnumerationPluginContext enumerationPluginContext, TypeDeclaration declaration, TypeSpec.Builder incoming, String value, EventType eventType) {
+    public TypeSpec.Builder enumValue(EnumerationPluginContext enumerationPluginContext, Shape declaration, TypeSpec.Builder incoming, String value, EventType eventType) {
         return enumerationTypeHandlerPlugin.enumValue(enumerationPluginContext, declaration, incoming, value, eventType);
     }
 
     @Override
-    public TypeSpec.Builder enumValue(EnumerationPluginContext enumerationPluginContext, TypeDeclaration declaration, TypeSpec.Builder incoming, Number value, EventType eventType) {
+    public TypeSpec.Builder enumValue(EnumerationPluginContext enumerationPluginContext, Shape declaration, TypeSpec.Builder incoming, Number value, EventType eventType) {
         return enumerationTypeHandlerPlugin.enumValue(enumerationPluginContext, declaration, incoming, value, eventType);
     }
 

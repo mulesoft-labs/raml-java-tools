@@ -17,12 +17,8 @@ package org.raml.ramltopojo;
 
 import amf.client.model.Annotable;
 import amf.client.model.domain.*;
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-import org.raml.v2.api.model.v10.datamodel.TypeInstance;
 import webapi.WebApiDocument;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -38,50 +34,6 @@ public abstract class Annotations<T> {
 
     }
 
-    public static Annotations<Boolean> ABSTRACT = new Annotations<Boolean>() {
-
-        @Override
-        public Boolean getWithContext(Annotable target, Annotable... others) {
-
-            return getWithDefault(new TypeInstanceAsBooleanFunction(), "abstract", false, target, others);
-        }
-    };
-
-    public static Annotations<Boolean> USE_PRIMITIVE = new Annotations<Boolean>() {
-
-        @Override
-        public Boolean getWithContext(Annotable target, Annotable... others) {
-
-            return getWithDefault(new TypeInstanceAsBooleanFunction(), "usePrimitiveType", true, target, others);
-        }
-    };
-
-    public static Annotations<Boolean> GENERATE_INLINE_ARRAY_TYPE = new Annotations<Boolean>() {
-
-        @Override
-        public Boolean getWithContext(Annotable target, Annotable... others) {
-
-            return getWithDefault(new TypeInstanceAsBooleanFunction(), "generateInlineArrayType", false, target, others);
-        }
-    };
-
-    public static Annotations<String> IMPLEMENTATION_CLASS_NAME = new Annotations<String>() {
-
-        @Override
-        public String getWithContext(Annotable target, Annotable... others) {
-
-            return getWithDefault(new TypeInstanceAsBooleanFunction(), "implementationClassName", null, target, others);
-        }
-    };
-
-    public static Annotations<String> CLASS_NAME = new Annotations<String>() {
-
-        @Override
-        public String getWithContext(Annotable target, Annotable... others) {
-
-            return getWithDefault(new TypeInstanceAsBooleanFunction(), "className", null, target, others);
-        }
-    };
 
 
     public static Annotations<List<PluginDef>> PLUGINS = new Annotations<List<PluginDef>>() {
@@ -92,16 +44,6 @@ public abstract class Annotations<T> {
         }
     };
 
-
-    private static <T,R> R getWithDefault(Function<TypeInstance, T> convert, String propName, R def, Annotable target, Annotable... others) {
-        R b = Annotations.evaluate(convert, "types", propName, target, others);
-        if (b == null) {
-
-            return def;
-        } else {
-            return b;
-        }
-    }
 
     private static <T,R> List<PluginDef> getWithDefaultList(String propName, Annotable target, Annotable... others) {
         //((ObjectNode)((ArrayNode)((NodeShape) others[0]).customDomainProperties().get(0).extension()).members().get(0)).properties().keySet();
@@ -114,30 +56,6 @@ public abstract class Annotations<T> {
         }
     }
 
-    public static <T,R> R evaluate(Function<TypeInstance, T> convert, String annotationName, String parameterName, Annotable mandatory, Annotable... others) {
-
-        R retval = null;
-        List<Annotable> targets = new ArrayList<>();
-        targets.add(mandatory);
-        targets.addAll(Arrays.asList(others));
-
-        for (Annotable target : targets) {
-
-            DomainExtension annotationRef = Annotations.findAnnotation(target, annotationName);
-            if (annotationRef == null) {
-
-                continue;
-            }
-
-            Object o = findProperty(annotationRef, parameterName, convert);
-            if (o != null) {
-                retval = (R) o;
-            }
-
-        }
-
-        return retval;
-    }
 
     public static List<PluginDef> evaluateAsList(Annotable mandatory, Annotable... others) {
 
@@ -156,10 +74,10 @@ public abstract class Annotations<T> {
             arrayNode = (ArrayNode) getExtension((WebApiDocument) a).orElseGet(DomainExtension::new).extension();
         } else {
 
-            arrayNode = (ArrayNode) getExtension((NodeShape) a).orElseGet(DomainExtension::new).extension();
+            arrayNode = (ArrayNode) getExtension((Shape) a).orElseGet(DomainExtension::new).extension();
         }
 
-        return arrayNode.members().stream()
+        return Optional.ofNullable(arrayNode).orElse(new ArrayNode()).members().stream()
                 .filter(n -> n instanceof ObjectNode)
                 .map(n -> (ObjectNode) n)
                 .map(on -> new PluginDef(
@@ -172,37 +90,12 @@ public abstract class Annotations<T> {
 
     }
 
-    private static Optional<DomainExtension> getExtension(NodeShape a) {
+    private static Optional<DomainExtension> getExtension(Shape a) {
         return a.customDomainProperties().stream().filter(x -> x.name().is("ramltopojo.types")).findAny();
     }
 
     private static Optional<DomainExtension> getExtension(WebApiDocument a) {
         return a.encodes().customDomainProperties().stream().filter(x -> x.name().is("ramltopojo.types")).findAny();
-    }
-
-    private static <T> Object findProperty(DomainExtension annotationRef, String propName, Function<TypeInstance, T> convert) {
-
-
-        // annotationRef.structuredValue().properties().get(0).values().get(0).value()
-        for (DomainExtension typeInstanceProperty : annotationRef.customDomainProperties()) {
-            if (typeInstanceProperty.name().value().equalsIgnoreCase(propName)) {
-                    return null; // todo return toValueList(convert, typeInstanceProperty.productIterator().);
-            }
-        }
-
-        return null;
-    }
-
-    private static <T> List<T> toValueList(final Function<TypeInstance, T> convert, List<TypeInstance> values) {
-
-        return Lists.transform(values, new Function<TypeInstance, T>() {
-
-            @Nullable
-            @Override
-            public T apply(@Nullable TypeInstance input) {
-                return convert.apply(input);
-            }
-        });
     }
 
     private static DomainExtension findAnnotation(Annotable annotable, String annotation) {
@@ -249,48 +142,5 @@ public abstract class Annotations<T> {
     public T get(T def, Annotable type, Annotable... others) {
 
         return getValueWithDefault(def, type, others);
-    }
-
-    private static class TypeInstanceAsStringFunction implements Function<TypeInstance, String> {
-        @Nullable
-        @Override
-        public String apply(@Nullable TypeInstance input) {
-            return (String) input.value();
-        }
-    }
-
-    private static class TypeInstanceAsBooleanFunction implements Function<TypeInstance, Boolean> {
-        @Nullable
-        @Override
-        public Boolean apply(@Nullable TypeInstance input) {
-            return (Boolean) input.value();
-        }
-    }
-
-    private static class TypeInstanceToPluginDefFunction implements Function<TypeInstance, PluginDef> {
-
-        @Override
-        public PluginDef apply(@Nullable TypeInstance input) {
-
-            if (input.properties().size() == 0) {
-
-                return new PluginDef((String) input.value(), Collections.<String>emptyList());
-            } else {
-
-                if ( input.properties().size() == 1 ) {
-
-                    return new PluginDef((String) input.properties().get(0).value().value(), Collections.<String>emptyList());
-                } else {
-                    return new PluginDef((String) input.properties().get(0).value().value(), Lists.transform(input.properties().get(1).values(), new Function<TypeInstance, String>() {
-                                @Nullable
-                                @Override
-                                public String apply(@Nullable TypeInstance input) {
-                                    return (String) input.value();
-                                }
-                            }
-                    ));
-                }
-            }
-        }
     }
 }

@@ -3,7 +3,6 @@ package org.raml.ramltopojo;
 import amf.client.model.domain.Shape;
 import amf.client.validate.ValidationReport;
 import amf.client.validate.ValidationResult;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.raml.testutils.UnitTest;
 import webapi.Raml10;
@@ -49,17 +48,6 @@ public class AnnotationsTest extends UnitTest{
         assertEquals(Arrays.asList("alpha", "gamma"), defs.get(1).getArguments());
         assertEquals("core.foo", defs.get(2).getPluginName());
         assertEquals(Arrays.asList("foo", "bar"), defs.get(2).getArguments());
-    }
-
-
-    @Test @Ignore
-    public void abstractAnnotationsReading() throws Exception {
-
-        WebApiDocument api = getApi();
-        Shape fooType = RamlLoader.findShape("foo", api.declares());
-
-        boolean b  = Annotations.ABSTRACT.get(fooType);
-        assertEquals(true, b);
     }
 
     @Test

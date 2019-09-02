@@ -1,9 +1,6 @@
 package org.raml.ramltopojo;
 
-import amf.client.model.domain.NodeShape;
-import amf.client.model.domain.PropertyShape;
-import amf.client.model.domain.ScalarShape;
-import amf.client.model.domain.Shape;
+import amf.client.model.domain.*;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 import org.junit.Test;
@@ -47,7 +44,7 @@ public class ShapeTypeTest extends UnitTest {
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "internalInt");
 
-        assertFalse(ShapeType.isNewInlineType(property.range()));
+        assertFalse(ShapeType.isNewInlineType((AnyShape) property.range()));
     }
 
 
@@ -58,7 +55,7 @@ public class ShapeTypeTest extends UnitTest {
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "unextended");
 
-        assertFalse(ShapeType.isNewInlineType(property.range()));
+        assertFalse(ShapeType.isNewInlineType((AnyShape) property.range()));
     }
 
     @Test
@@ -68,7 +65,7 @@ public class ShapeTypeTest extends UnitTest {
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "extendedFromOne");
 
-        assertFalse(ShapeType.isNewInlineType(property.range()));
+        assertFalse(ShapeType.isNewInlineType((AnyShape) property.range()));
     }
 
     @Test
@@ -78,7 +75,7 @@ public class ShapeTypeTest extends UnitTest {
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "extendedFromOneWithExtraProperty");
 
-        assertTrue(ShapeType.isNewInlineType(property.range()));
+        assertTrue(ShapeType.isNewInlineType((AnyShape) property.range()));
     }
 
     @Test
@@ -88,7 +85,7 @@ public class ShapeTypeTest extends UnitTest {
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "objectWithExtraProperty");
 
-        assertTrue(ShapeType.isNewInlineType(property.range()));
+        assertTrue(ShapeType.isNewInlineType((AnyShape) property.range()));
     }
 
     @Test
@@ -98,7 +95,7 @@ public class ShapeTypeTest extends UnitTest {
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "multiInheritanceWithExtraProperty");
 
-        assertTrue(ShapeType.isNewInlineType(property.range()));
+        assertTrue(ShapeType.isNewInlineType((AnyShape) property.range()));
     }
 
     @Test
@@ -108,7 +105,7 @@ public class ShapeTypeTest extends UnitTest {
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "multiInheritanceWithoutExtraProperty");
 
-        assertTrue(ShapeType.isNewInlineType(property.range()));
+        assertTrue(ShapeType.isNewInlineType((AnyShape) property.range()));
     }
 
     @Test
@@ -117,8 +114,8 @@ public class ShapeTypeTest extends UnitTest {
         WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-array-types.raml"));
         NodeShape decl = RamlLoader.findShape("father", api.declares());
 
-        assertFalse(ShapeType.isNewInlineType(findProperty(decl, "others").range()));
-        assertFalse(ShapeType.isNewInlineType(findProperty(decl, "some").range()));
+        assertFalse(ShapeType.isNewInlineType((AnyShape) findProperty(decl, "others").range()));
+        assertFalse(ShapeType.isNewInlineType((AnyShape) findProperty(decl, "some").range()));
     }
 
     @Test
@@ -127,7 +124,7 @@ public class ShapeTypeTest extends UnitTest {
         WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-array-types.raml"));
         NodeShape decl = RamlLoader.findShape("mother", api.declares());
 
-        assertTrue(ShapeType.isNewInlineType(findProperty(decl, "complicatedChildren").range()));
+        assertTrue(ShapeType.isNewInlineType((AnyShape) findProperty(decl, "complicatedChildren").range()));
     }
 
 
@@ -192,7 +189,7 @@ public class ShapeTypeTest extends UnitTest {
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "unionWithExtraProperty");
 
-        assertTrue(ShapeType.isNewInlineType(property.range()));
+        assertTrue(ShapeType.isNewInlineType((AnyShape) property.range()));
     }
 
     @Deprecated() /* return optional.....*/

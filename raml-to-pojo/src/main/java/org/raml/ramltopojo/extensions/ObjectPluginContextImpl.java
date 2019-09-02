@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.extensions;
 
+import amf.client.model.domain.PropertyShape;
 import amf.client.model.domain.Shape;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
@@ -9,7 +10,6 @@ import org.raml.ramltopojo.CreationResult;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.GenerationContext;
 import org.raml.ramltopojo.ShapeType;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import javax.annotation.Nullable;
 import java.util.Set;
@@ -50,7 +50,7 @@ public class ObjectPluginContextImpl implements ObjectPluginContext {
     }
 
     @Override
-    public TypeName forProperty(TypeDeclaration typeDeclaration) {
+    public TypeName forProperty(PropertyShape typeDeclaration) {
         return ShapeType.calculateTypeName("", null /*typeDeclaration*/, generationContext, EventType.INTERFACE);
     }
 
