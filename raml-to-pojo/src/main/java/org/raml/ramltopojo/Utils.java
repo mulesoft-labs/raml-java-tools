@@ -1,5 +1,7 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.domain.AnyShape;
+import amf.client.model.domain.PropertyShape;
 import amf.client.model.domain.Shape;
 import org.raml.v2.api.model.v10.api.Library;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
@@ -45,5 +47,10 @@ public class Utils {
         }
 
         return found;
+    }
+
+    static public AnyShape rangeOf(PropertyShape propertyShape) {
+
+        return (AnyShape) propertyShape.range();
     }
 }

@@ -1,7 +1,6 @@
 package org.raml.ramltopojo.object;
 
 import amf.client.model.StrField;
-import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.PropertyShape;
 import amf.client.model.domain.Shape;
@@ -86,7 +85,7 @@ public class ObjectTypeHandler implements TypeHandler {
             }
 
             TypeName tn;
-            if ( ShapeType.isNewInlineType((AnyShape) propertyDeclaration.range()) ){
+            if ( ShapeType.isNewInlineType(Utils.rangeOf(propertyDeclaration)) ){
 
                 CreationResult cr = result.internalType(propertyDeclaration.name().value());
                 tn = cr.getJavaName(EventType.INTERFACE);
@@ -180,7 +179,7 @@ public class ObjectTypeHandler implements TypeHandler {
             }
 
             TypeName tn = null;
-            if ( ShapeType.isNewInlineType((AnyShape) propertyDeclaration.range()) ){
+            if ( ShapeType.isNewInlineType(Utils.rangeOf(propertyDeclaration)) ){
 
                 java.util.Optional<CreationResult> cr = CreationResultFactory.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),  Names.typeName(propertyDeclaration.name().value(), "type"), propertyDeclaration, generationContext);
                 if ( cr.isPresent() ) {

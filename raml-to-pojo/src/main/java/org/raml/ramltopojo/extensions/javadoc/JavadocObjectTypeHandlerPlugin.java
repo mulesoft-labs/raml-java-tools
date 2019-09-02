@@ -7,6 +7,7 @@ import amf.client.model.domain.PropertyShape;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EventType;
+import org.raml.ramltopojo.Utils;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 
@@ -39,7 +40,7 @@ public class JavadocObjectTypeHandlerPlugin extends ObjectTypeHandlerPlugin.Help
             incoming.addJavadoc("$L\n", declaration.description().value());
         }
 
-        javadocExamples(incoming::addJavadoc, (AnyShape) declaration.range());
+        javadocExamples(incoming::addJavadoc, Utils.rangeOf(declaration));
 
         return incoming;
     }
