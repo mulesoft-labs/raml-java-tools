@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.GenerationContext;
+import org.raml.ramltopojo.ScalarTypes;
 import org.raml.ramltopojo.extensions.ArrayPluginContext;
 import org.raml.ramltopojo.extensions.ArrayTypeHandlerPlugin;
 import org.raml.ramltopojo.extensions.ReferencePluginContext;
@@ -59,7 +60,7 @@ public class ArrayTypeHandlerTest extends UnitTest {
     @Test
     public void javaClassReferenceWithString() {
 
-        when(arrayTypeDeclaration.items()).thenReturn(new ScalarShape().withDataType("string"));
+        when(arrayTypeDeclaration.items()).thenReturn(new ScalarShape().withDataType(ScalarTypes.STRING_SCALAR));
         when(referencePlugin.typeName(any(ReferencePluginContext.class), any(Shape.class), eq(ParameterizedTypeName.get(List.class, String.class)))).thenReturn(ParameterizedTypeName.get(List.class, String.class));
         when(referencePlugin.typeName(any(ReferencePluginContext.class), any(Shape.class), eq(ClassName.get(String.class)))).thenReturn(ClassName.get(String.class));
 

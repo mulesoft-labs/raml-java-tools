@@ -8,6 +8,7 @@ import com.squareup.javapoet.TypeSpec;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.raml.ramltopojo.EventType;
+import org.raml.ramltopojo.ScalarTypes;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.testutils.UnitTest;
@@ -48,7 +49,7 @@ public class Jsr303ExtensionTest extends UnitTest {
         FieldSpec.Builder builder =
                 FieldSpec.builder(ClassName.get(Integer.class), "champ", Modifier.PUBLIC);
 
-        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(setupNumberFacets(new ScalarShape().withDataType("integer"))).withMinCount(1), builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(setupNumberFacets(new ScalarShape().withDataType(ScalarTypes.INTEGER_SCALAR))).withMinCount(1), builder, EventType.IMPLEMENTATION);
 
         assertForIntegerNumber(builder);
     }
@@ -61,7 +62,7 @@ public class Jsr303ExtensionTest extends UnitTest {
         FieldSpec.Builder builder =
                 FieldSpec.builder(ClassName.get(BigInteger.class), "champ", Modifier.PUBLIC);
 
-        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(setupNumberFacets(new ScalarShape().withDataType("integer"))).withMinCount(1), builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(setupNumberFacets(new ScalarShape().withDataType(ScalarTypes.INTEGER_SCALAR))).withMinCount(1), builder, EventType.IMPLEMENTATION);
 
         assertForIntegerNumber(builder);
     }

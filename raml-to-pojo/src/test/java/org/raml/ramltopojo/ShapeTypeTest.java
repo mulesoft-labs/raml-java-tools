@@ -134,7 +134,7 @@ public class ShapeTypeTest extends UnitTest {
     @Test
     public void integerType() {
 
-        createIntegerTypeNameSetup(new ScalarShape().withDataType("integer"), ShapeType.INTEGER);
+        createIntegerTypeNameSetup(new ScalarShape().withDataType(ScalarTypes.INTEGER_SCALAR), ShapeType.INTEGER);
 
         verify(plugin).typeName(any(ReferencePluginContext.class), any(Shape.class), eq(TypeName.INT));
     }
@@ -142,7 +142,7 @@ public class ShapeTypeTest extends UnitTest {
     @Test
     public void integerTypeWithByteFormat() {
 
-        createIntegerTypeNameSetup(new ScalarShape().withFormat("int8").withDataType("integer"), ShapeType.INTEGER);
+        createIntegerTypeNameSetup(new ScalarShape().withFormat("int8").withDataType(ScalarTypes.INTEGER_SCALAR), ShapeType.INTEGER);
 
         verify(plugin).typeName(any(ReferencePluginContext.class), any(Shape.class), eq(TypeName.BYTE));
     }
@@ -150,7 +150,7 @@ public class ShapeTypeTest extends UnitTest {
     @Test
     public void integerTypeWithDoubleFormat() {
 
-        createIntegerTypeNameSetup(new ScalarShape().withFormat("double").withDataType("integer"), ShapeType.INTEGER);
+        createIntegerTypeNameSetup(new ScalarShape().withFormat("double").withDataType(ScalarTypes.INTEGER_SCALAR), ShapeType.INTEGER);
 
         verify(plugin).typeName(any(ReferencePluginContext.class), any(Shape.class), eq(TypeName.DOUBLE));
     }
@@ -158,7 +158,7 @@ public class ShapeTypeTest extends UnitTest {
     @Test
     public void numberType() {
 
-        createIntegerTypeNameSetup(new ScalarShape().withDataType("number"), ShapeType.NUMBER);
+        createIntegerTypeNameSetup(new ScalarShape().withDataType(ScalarTypes.NUMBER_SCALAR), ShapeType.NUMBER);
 
         verify(plugin).typeName(any(ReferencePluginContext.class), any(Shape.class), eq(ClassName.get(Number.class)));
     }
@@ -166,7 +166,7 @@ public class ShapeTypeTest extends UnitTest {
     @Test
     public void numberTypeWithByteFormat() {
 
-        createIntegerTypeNameSetup(new ScalarShape().withFormat("int8").withDataType("number"), ShapeType.NUMBER);
+        createIntegerTypeNameSetup(new ScalarShape().withFormat("int8").withDataType(ScalarTypes.NUMBER_SCALAR), ShapeType.NUMBER);
 
         verify(plugin).typeName(any(ReferencePluginContext.class), any(Shape.class), eq(TypeName.BYTE));
     }
@@ -174,7 +174,7 @@ public class ShapeTypeTest extends UnitTest {
     @Test
     public void numberTypeWithDoubleFormat() {
 
-        createIntegerTypeNameSetup(new ScalarShape().withFormat("double").withDataType("number"), ShapeType.NUMBER);
+        createIntegerTypeNameSetup(new ScalarShape().withFormat("double").withDataType(ScalarTypes.NUMBER_SCALAR), ShapeType.NUMBER);
 
         verify(plugin).typeName(any(ReferencePluginContext.class), any(Shape.class), eq(TypeName.DOUBLE));
     }

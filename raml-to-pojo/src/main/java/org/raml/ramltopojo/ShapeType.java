@@ -48,7 +48,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
             ScalarShape scalarShape = (ScalarShape) typeDeclaration;
             return Optional.ofNullable(
                     scalarToType(scalarShape.dataType().value()))
-                    .orElseThrow(() -> new GenerationException("no scalar type '" + scalarShape.dataType().value() +"'"))
+                    .orElseThrow(() -> new GenerationException("no scalar type '" + scalarShape.toRamlDatatype() +"'"))
                     .createHandler(name, type, typeDeclaration);
         }
     },
@@ -317,14 +317,14 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
     }
 
     private static Map<String, ShapeType> scalarTypes = ImmutableMap.<String, ShapeType>builder()
-            .put("datetime-only", DATETIME_ONLY)
-            .put("integer", INTEGER)
-            .put("boolean", BOOLEAN)
-            .put("time-only", TIME_ONLY)
-            .put("datetime", DATETIME)
-            .put("date-only", DATE)
-            .put("number", NUMBER)
-            .put("string", STRING)
+            .put(ScalarTypes.DATETIME_ONLY_SCALAR, DATETIME_ONLY)
+            .put(ScalarTypes.INTEGER_SCALAR, INTEGER)
+            .put(ScalarTypes.BOOLEAN_SCALAR, BOOLEAN)
+            .put(ScalarTypes.TIME_ONLY_SCALAR, TIME_ONLY)
+            .put(ScalarTypes.DATETIME_SCALAR, DATETIME)
+            .put(ScalarTypes.DATE_ONLY_SCALAR, DATE)
+            .put(ScalarTypes.NUMBER_SCALAR, NUMBER)
+            .put(ScalarTypes.STRING_SCALAR, STRING)
             .build();
 
     public static ShapeType scalarToType(String cls) {
