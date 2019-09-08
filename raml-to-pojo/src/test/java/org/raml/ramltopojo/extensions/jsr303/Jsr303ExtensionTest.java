@@ -40,6 +40,7 @@ public class Jsr303ExtensionTest extends UnitTest {
         return (PropertyShape) new PropertyShape().withRange(range).withName("champ");
     }
 
+
     @Test
     public void forInteger() throws Exception {
 
@@ -47,7 +48,7 @@ public class Jsr303ExtensionTest extends UnitTest {
         FieldSpec.Builder builder =
                 FieldSpec.builder(ClassName.get(Integer.class), "champ", Modifier.PUBLIC);
 
-        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(setupNumberFacets(new ScalarShape().withDataType("integer"))), builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(setupNumberFacets(new ScalarShape().withDataType("integer"))).withMinCount(1), builder, EventType.IMPLEMENTATION);
 
         assertForIntegerNumber(builder);
     }
@@ -60,7 +61,7 @@ public class Jsr303ExtensionTest extends UnitTest {
         FieldSpec.Builder builder =
                 FieldSpec.builder(ClassName.get(BigInteger.class), "champ", Modifier.PUBLIC);
 
-        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(setupNumberFacets(new ScalarShape().withDataType("integer"))), builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(setupNumberFacets(new ScalarShape().withDataType("integer"))).withMinCount(1), builder, EventType.IMPLEMENTATION);
 
         assertForIntegerNumber(builder);
     }
@@ -115,7 +116,7 @@ public class Jsr303ExtensionTest extends UnitTest {
                 FieldSpec.builder(ParameterizedTypeName.get(List.class, String.class), "champ",
                         Modifier.PUBLIC);
         Jsr303Extension ext = new Jsr303Extension();
-        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(new ScalarShape()).withMinCount(3).withMaxCount(5), builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(new ArrayShape().withMinItems(3).withMaxItems(5)), builder, EventType.IMPLEMENTATION);
         assertEquals(Size.class.getName(), builder.build().annotations.get(0).type.toString());
         assertEquals("3", builder.build().annotations.get(0).members.get("min").get(0).toString());
         assertEquals("5", builder.build().annotations.get(0).members.get("max").get(0).toString());
@@ -128,7 +129,7 @@ public class Jsr303ExtensionTest extends UnitTest {
                 FieldSpec.builder(ParameterizedTypeName.get(List.class, String.class), "champ",
                         Modifier.PUBLIC);
         Jsr303Extension ext = new Jsr303Extension();
-        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(new ScalarShape()).withMinCount(3).withMaxCount(5), builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(new ArrayShape()), builder, EventType.IMPLEMENTATION);
         assertEquals(0, builder.build().annotations.size());
     }
 
@@ -163,7 +164,7 @@ public class Jsr303ExtensionTest extends UnitTest {
                 FieldSpec.builder(ParameterizedTypeName.get(List.class, String.class), "champ",
                         Modifier.PUBLIC);
         Jsr303Extension ext = new Jsr303Extension();
-        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(new ScalarShape()).withMaxCount(5), builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(new ArrayShape().withMaxItems(5)), builder, EventType.IMPLEMENTATION);
         assertEquals(1, builder.build().annotations.size());
         assertEquals(Size.class.getName(), builder.build().annotations.get(0).type.toString());
         assertEquals(1, builder.build().annotations.get(0).members.size());
@@ -173,13 +174,11 @@ public class Jsr303ExtensionTest extends UnitTest {
     @Test
     public void forArraysNotNull() throws Exception {
 
-// TODO JP        when(array.required()).thenReturn(true);
-
         FieldSpec.Builder builder =
                 FieldSpec.builder(ParameterizedTypeName.get(List.class, String.class), "champ",
                         Modifier.PUBLIC);
         Jsr303Extension ext = new Jsr303Extension();
-        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(new ScalarShape()), builder, EventType.IMPLEMENTATION);
+        ext.fieldBuilt(objectPluginContext, propertyShapeOfRange(new ArrayShape()).withMinCount(1), builder, EventType.IMPLEMENTATION);
         assertEquals(1, builder.build().annotations.size());
         assertEquals(NotNull.class.getName(), builder.build().annotations.get(0).type.toString());
     }

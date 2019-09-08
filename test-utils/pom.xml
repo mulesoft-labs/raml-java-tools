@@ -39,6 +39,10 @@
             <artifactId>assertj-core</artifactId>
             <version>3.11.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.raml</groupId>
+            <artifactId>webapi-parser</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

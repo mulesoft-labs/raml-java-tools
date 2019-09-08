@@ -17,7 +17,7 @@ public class FacetValidation {
 
     public static void addFacetsForAll(AnnotationAdder typeSpec, PropertyShape typeDeclaration) {
 
-        if (true /*typeDeclaration.required() != null && typeDeclaration.required()*/) {
+        if (typeDeclaration.minCount().value() > 0) {
 
             typeSpec.addAnnotation(AnnotationSpec.builder(NotNull.class).build());
         }
@@ -59,13 +59,13 @@ public class FacetValidation {
         }
 
         AnnotationSpec.Builder minMax = null;
-        if (typeDeclaration.minItems() != null) {
+        if (typeDeclaration.minItems().nonNull()) {
 
             minMax =
                     AnnotationSpec.builder(Size.class).addMember("min", "$L", typeDeclaration.minItems());
         }
 
-        if (typeDeclaration.maxItems() != null) {
+        if (typeDeclaration.maxItems().nonNull()) {
 
             if (minMax == null) {
                 minMax =
@@ -118,7 +118,7 @@ public class FacetValidation {
             if (isInteger(typeSpec.typeName())) {
 
                 typeSpec.addAnnotation(AnnotationSpec.builder(Min.class)
-                        .addMember("value", "$L", typeDeclaration.minimum().value()).build());
+                        .addMember("value", "$L", (long)(typeDeclaration.minimum().value())).build());
             }
         }
 
@@ -126,7 +126,7 @@ public class FacetValidation {
             if (isInteger(typeSpec.typeName())) {
 
                 typeSpec.addAnnotation(AnnotationSpec.builder(Max.class)
-                        .addMember("value", "$L", typeDeclaration.maximum().value()).build());
+                        .addMember("value", "$L", (long)(typeDeclaration.maximum().value())).build());
             }
         }
     }
