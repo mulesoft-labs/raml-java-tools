@@ -22,6 +22,7 @@ public class RamlLoader {
         ValidationReport report = Raml10.validate(document).get();
         List<amf.client.validate.ValidationResult> results = report.results();
         if ( results.isEmpty()) {
+
             return document;
         } else {
             results.forEach(r -> System.err.println(r.message()));

@@ -228,7 +228,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
     private TypeName findType(String typeName, PropertyShape type, GenerationContext generationContext, EventType eventType) {
 
-        return ShapeType.calculateTypeName(typeName, type, generationContext,eventType );
+        return ShapeType.calculateTypeName(typeName, type.range(), generationContext,eventType );
     }
 
     private TypeName findType(String typeName, Shape type, GenerationContext generationContext, EventType eventType) {
