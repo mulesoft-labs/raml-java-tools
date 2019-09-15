@@ -18,7 +18,7 @@ deploy:
         script: mvn deploy --settings ~/settings.xml -DskipTests -B -U
         skip_cleanup: true
         on:
-            repo: mulesoft-labs/raml-java-tools
+            repo: raml-org/raml-java-parser
             all_branches: true
             condition: $TRAVIS_BRANCH =~ ^release/[0-9]+.[0-9]+.[0-9]+$
     -
@@ -26,6 +26,6 @@ deploy:
         script: mvn --settings ~/settings.xml org.codehaus.mojo:versions-maven-plugin:2.1:set -DnewVersion=$TRAVIS_TAG; mvn clean deploy --settings ~/settings.xml -DskipTests=true -B -U; mvn clean deploy --settings ~/settings.xml -DskipTests=true -Psonatype -B -U
         skip_cleanup: true
         on:
-            repo: mulesoft-labs/raml-java-tools
+            repo: raml-org/raml-java-parser
             tags: true
             condition: "$TRAVIS_TAG =~ ^[0-9]+.[0-9]+.[0-9]+$"
