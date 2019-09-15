@@ -5,6 +5,7 @@ import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.PropertyShape;
 import amf.client.model.domain.Shape;
 import com.squareup.javapoet.*;
+import org.apache.jena.ext.com.google.common.collect.Streams;
 import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectPluginContextImpl;
@@ -13,6 +14,7 @@ import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created. There, you have it.
@@ -77,7 +79,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
         Optional<String> discriminator = Optional.ofNullable(objectTypeDeclaration.discriminator()).map(StrField::value);
 
-        for (PropertyShape propertyDeclaration : objectTypeDeclaration.properties()) {
+        for (PropertyShape propertyDeclaration : allProperties(objectTypeDeclaration)) {
 
             if ( EcmaPattern.isSlashedPattern(propertyDeclaration.name().value())) {
 
@@ -171,7 +173,7 @@ public class ObjectTypeHandler implements TypeHandler {
             }
         }
 
-        for (PropertyShape propertyDeclaration : objectTypeDeclaration.properties()) {
+        for (PropertyShape propertyDeclaration : allProperties(objectTypeDeclaration)) {
 
             if ( EcmaPattern.isSlashedPattern(propertyDeclaration.name().value())) {
 
@@ -224,6 +226,12 @@ public class ObjectTypeHandler implements TypeHandler {
         }
 
         return typeSpec.build();
+    }
+
+    private Iterable<? extends PropertyShape> allProperties(NodeShape objectTypeDeclaration) {
+
+        return Streams.concat(objectTypeDeclaration.properties().stream(), objectTypeDeclaration.inherits().stream().flatMap(x -> ((NodeShape)x).properties().stream())).collect(Collectors.toList());
+
     }
 
     private TypeName findType(String typeName, PropertyShape type, GenerationContext generationContext, EventType eventType) {

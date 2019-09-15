@@ -18,6 +18,7 @@ import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.testutils.UnitTest;
 import org.raml.testutils.assertj.ListAssert;
+import webapi.Raml10;
 import webapi.WebApiDocument;
 
 import java.net.URL;
@@ -145,6 +146,69 @@ public class ObjectTypeHandlerTest extends UnitTest {
                         allOf(methodName(equalTo("setAges")), parameters(contains(type(equalTo(ParameterizedTypeName.get(List.class, Integer.class))))))
                 ))
         )));
+    }
+
+    @Test
+    public void coo() throws Exception {
+
+        WebApiDocument doc = (WebApiDocument) Raml10.parse("#%RAML 1.0\n" +
+                "title: Hello World API\n" +
+                "version: v1\n" +
+                "baseUri: https://api.github.com\n" +
+                "types:\n" +
+                "    inherited:\n" +
+                "      properties:\n" +
+                "        age: integer\n" +
+                "    foo:\n" +
+                "        type: inherited\n" +
+                "        properties:\n" +
+                "          name: string\n").get();
+
+        System.err.println(((NodeShape)doc.getDeclarationByName("foo").inherits().get(0)).properties());
+        System.err.println(((NodeShape)doc.getDeclarationByName("inherited")).properties());
+    }
+
+    @Test
+    public void coo2() throws Exception {
+
+        WebApiDocument doc = (WebApiDocument) Raml10.parse("#%RAML 1.0\n" +
+                "title: Hello World API\n" +
+                "version: v1\n" +
+                "baseUri: https://api.github.com\n" +
+                "types:\n" +
+                "    inherited:\n" +
+                "      properties:\n" +
+                "        age: integer\n" +
+                "    foo:\n" +
+                "        type: [inherited]\n" +
+                "        properties:\n" +
+                "          name: string\n").get();
+
+        System.err.println(((NodeShape)doc.getDeclarationByName("foo").inherits().get(0)).properties());
+        System.err.println(((NodeShape)doc.getDeclarationByName("inherited")).properties());
+    }
+
+    @Test
+    public void coo3() throws Exception {
+
+        WebApiDocument doc = (WebApiDocument) Raml10.parse("#%RAML 1.0\n" +
+                "title: Hello World API\n" +
+                "version: v1\n" +
+                "baseUri: https://api.github.com\n" +
+                "types:\n" +
+                "    once:\n" +
+                "      properties:\n" +
+                "        right: string\n" +
+                "    twice:\n" +
+                "      properties:\n" +
+                "        left: string\n" +
+                "    foo:\n" +
+                "        type: [once, twice]\n" +
+                "        properties:\n" +
+                "          name: string").get();
+
+        System.err.println(((NodeShape)doc.getDeclarationByName("foo").inherits().get(0)).properties());
+        System.err.println(((NodeShape)doc.getDeclarationByName("once")).properties());
     }
 
     @Test

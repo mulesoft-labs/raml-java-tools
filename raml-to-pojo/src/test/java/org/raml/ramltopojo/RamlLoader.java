@@ -18,12 +18,13 @@ public class RamlLoader {
     public static WebApiDocument load(URL url) throws ExecutionException, InterruptedException {
 
         WebApiDocument document = (WebApiDocument) Raml10.parse(url.toString()).get();
-
         ValidationReport report = Raml10.validate(document).get();
+
         List<amf.client.validate.ValidationResult> results = report.results();
         if ( results.isEmpty()) {
 
-            return document;
+            //return document;
+            return (WebApiDocument) Raml10.parse(url.toString()).get();
         } else {
             results.forEach(r -> System.err.println(r.message()));
             throw new IllegalArgumentException();
