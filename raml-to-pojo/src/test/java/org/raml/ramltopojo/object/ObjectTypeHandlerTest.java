@@ -164,7 +164,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
                 "        properties:\n" +
                 "          name: string\n").get();
 
-        System.err.println(((NodeShape)doc.getDeclarationByName("foo").inherits().get(0)).properties());
+        System.err.println(((NodeShape)doc.getDeclarationByName("foo").inherits().get(0).linkTarget().get()).properties());
         System.err.println(((NodeShape)doc.getDeclarationByName("inherited")).properties());
     }
 
@@ -184,7 +184,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
                 "        properties:\n" +
                 "          name: string\n").get();
 
-        System.err.println(((NodeShape)doc.getDeclarationByName("foo").inherits().get(0)).properties());
+        System.err.println(((NodeShape)doc.getDeclarationByName("foo").inherits().get(0).linkTarget().orElse(doc.getDeclarationByName("foo").inherits().get(0))).properties());
         System.err.println(((NodeShape)doc.getDeclarationByName("inherited")).properties());
     }
 

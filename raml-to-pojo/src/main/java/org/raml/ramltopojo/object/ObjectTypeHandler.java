@@ -77,7 +77,7 @@ public class ObjectTypeHandler implements TypeHandler {
                 .addSuperinterface(result.getJavaName(EventType.INTERFACE))
                 .addModifiers(Modifier.PUBLIC);
 
-        Optional<String> discriminator = Optional.ofNullable(objectTypeDeclaration.discriminator()).map(StrField::value);
+        Optional<String> discriminator = discriminatorName(objectTypeDeclaration);
 
         for (PropertyShape propertyDeclaration : allProperties(objectTypeDeclaration)) {
 
@@ -100,8 +100,6 @@ public class ObjectTypeHandler implements TypeHandler {
             FieldSpec.Builder field = FieldSpec.builder(tn, Names.variableName(propertyDeclaration.name().value())).addModifiers(Modifier.PRIVATE);
             if ( propertyDeclaration.name().value().equals(discriminator.orElse(null))) {
 
-                /* TODO JP why isn't this used */
-                String discriminatorValue = Optional.ofNullable(objectTypeDeclaration.discriminatorValue().value()).orElse(objectTypeDeclaration.name().value());
                 field.addModifiers(Modifier.PRIVATE, Modifier.FINAL)
                         .initializer(CodeBlock.builder().add("$L", DISCRIMINATOR_TYPE_NAME).build());
 
@@ -120,7 +118,7 @@ public class ObjectTypeHandler implements TypeHandler {
                typeSpec.addMethod(getMethod.build());
            }
 
-            if ( propertyDeclaration.name().equals(discriminator.orElse(null))) {
+            if ( propertyDeclaration.name().value().equals(discriminator.orElse(null))) {
 
                 continue;
             }
@@ -154,7 +152,7 @@ public class ObjectTypeHandler implements TypeHandler {
             return null;
         }
 
-        Optional<String> discriminator = Optional.ofNullable(objectTypeDeclaration.discriminator()).map(StrField::value);
+        Optional<String> discriminator = discriminatorName(objectTypeDeclaration);
 
         for (Shape typeDeclaration : objectTypeDeclaration.inherits()) {
 
@@ -230,8 +228,20 @@ public class ObjectTypeHandler implements TypeHandler {
 
     private Iterable<? extends PropertyShape> allProperties(NodeShape objectTypeDeclaration) {
 
-        return Streams.concat(objectTypeDeclaration.properties().stream(), objectTypeDeclaration.inherits().stream().flatMap(x -> ((NodeShape)x).properties().stream())).collect(Collectors.toList());
+        return Streams.concat(
+                objectTypeDeclaration.properties().stream(),
+                objectTypeDeclaration.inherits().stream()
+                        .flatMap(x -> ((NodeShape)x.linkTarget().orElse(x)).properties().stream())).collect(Collectors.toList());
+    }
 
+    private Optional<String> discriminatorName(NodeShape objectTypeDeclaration) {
+
+        Optional<String> s = objectTypeDeclaration.discriminator().option();
+        if ( s.isPresent()) {
+            return s;
+        }
+
+        return objectTypeDeclaration.inherits().stream().map(x -> ((NodeShape)x.linkTarget().orElse(x)).discriminator()).findFirst().map(x -> x.value());
     }
 
     private TypeName findType(String typeName, PropertyShape type, GenerationContext generationContext, EventType eventType) {
