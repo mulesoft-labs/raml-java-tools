@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.raml.testutils.matchers.FieldSpecMatchers.fieldName;
 import static org.raml.testutils.matchers.FieldSpecMatchers.fieldType;
@@ -39,6 +40,11 @@ public class UnionTypeHandlerTest {
         generationContext.newExpectedType("foo", new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
         CreationResult r = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
+
+        assertNotNull(r);
+
+        System.err.println(r.getInterface().toString());
+        System.err.println(r.getImplementation().toString());
 
         assertThat(r.getInterface(), is(allOf(
                 name(equalTo("Foo")),
@@ -82,7 +88,12 @@ public class UnionTypeHandlerTest {
         WebApiDocument api = RamlLoader.load(this.getClass().getResource("union-primitive-type.raml"));
         UnionTypeHandler handler = new UnionTypeHandler("foo", findTypes("foo", getDeclaredTypes(api)));
 
-        CreationResult r = handler.create(new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList()), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+        CreationResult r = handler.create(new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack", Collections.emptyList()), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+
+        assertNotNull(r);
+
+        System.err.println(r.getInterface().toString());
+        System.err.println(r.getImplementation().toString());
 
         assertThat(r.getInterface(), is(allOf(
                 name(equalTo("Foo")),

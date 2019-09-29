@@ -3,6 +3,7 @@ package org.raml.ramltopojo.object;
 import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.PropertyShape;
 import amf.client.model.domain.Shape;
+import amf.client.model.domain.UnionShape;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -209,6 +210,26 @@ public class ObjectTypeHandlerTest extends UnitTest {
 
         System.err.println(((NodeShape)doc.getDeclarationByName("foo").inherits().get(0)).properties());
         System.err.println(((NodeShape)doc.getDeclarationByName("once")).properties());
+    }
+
+    @Test
+    public void coo4() throws Exception {
+
+        WebApiDocument doc = (WebApiDocument) Raml10.parse("#%RAML 1.0\n" +
+                "title: Hello World API\n" +
+                "version: v1\n" +
+                "baseUri: https://api.github.com\n" +
+                "types:\n" +
+                "    first:\n" +
+                "      properties:\n" +
+                "        age: integer\n" +
+                "    second:\n" +
+                "      properties:\n" +
+                "        area: string\n" +
+                "    foo:\n" +
+                "        type: string|number").get();
+
+        System.err.println(((UnionShape)doc.getDeclarationByName("foo").inherits().get(0)).anyOf());
     }
 
     @Test
@@ -520,6 +541,14 @@ public class ObjectTypeHandlerTest extends UnitTest {
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         assertNotNull(r);
+
+        System.err.println(r.getInterface().toString());
+        System.err.println(r.getImplementation().toString());
+
+        System.err.println(r.internalType("unionOfPrimitives").getInterface().toString());
+        System.err.println(r.internalType("unionOfPrimitives").getImplementation().toString());
+
+
         assertThat(r.internalType("unionOfPrimitives").getInterface(), is(allOf(
 
                 name(
