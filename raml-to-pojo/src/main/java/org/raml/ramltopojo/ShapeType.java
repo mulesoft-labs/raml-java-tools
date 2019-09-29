@@ -52,11 +52,16 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         @Override
         public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
 
-            ScalarShape scalarShape = (ScalarShape) typeDeclaration;
-            return Optional.ofNullable(
-                    scalarToType(scalarShape.dataType().value()))
-                    .orElseThrow(() -> new GenerationException("no scalar type '" + scalarShape.toRamlDatatype() +"'"))
-                    .createHandler(name, type, typeDeclaration);
+            ScalarShape declaration = (ScalarShape) typeDeclaration;
+            if ( ! declaration.values().isEmpty() ) {
+
+                return ENUMERATION.createHandler(name, type, typeDeclaration);
+            } else {
+                return Optional.ofNullable(
+                        scalarToType(declaration.dataType().value()))
+                        .orElseThrow(() -> new GenerationException("no scalar type '" + declaration.toRamlDatatype() + "'"))
+                        .createHandler(name, type, typeDeclaration);
+            }
         }
     },
     OBJECT {

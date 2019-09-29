@@ -42,7 +42,7 @@ public class EnumerationTypeHandler implements TypeHandler {
     @Override
     public Optional<CreationResult> create(GenerationContext generationContext, CreationResult preCreationResult) {
 
-        Class cls = "string".equals(typeDeclaration.dataType().value())?String.class:Number.class;
+        Class cls = typeDeclaration.dataType().value().endsWith("string")?String.class:Number.class;
 
         FieldSpec.Builder field = FieldSpec.builder(ClassName.get(cls), "name").addModifiers(Modifier.PRIVATE);
         EnumerationPluginContext enumerationPluginContext = new EnumerationPluginContextImpl(generationContext, preCreationResult);
