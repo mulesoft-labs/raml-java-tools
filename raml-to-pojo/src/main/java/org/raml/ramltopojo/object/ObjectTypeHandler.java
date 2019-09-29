@@ -1,6 +1,7 @@
 package org.raml.ramltopojo.object;
 
 import amf.client.model.StrField;
+import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.PropertyShape;
 import amf.client.model.domain.Shape;
@@ -168,7 +169,7 @@ public class ObjectTypeHandler implements TypeHandler {
             } else {
 
                 throw new GenerationException("ramltopojo does not support inheriting from "
-                        + Utils.declarationType(typeDeclaration) + " name: " + typeDeclaration.name() + " and " + typeDeclaration.name().value());
+                        + Utils.declarationType((AnyShape) typeDeclaration) + " name: " + typeDeclaration.name() + " and " + typeDeclaration.name().value());
             }
         }
 

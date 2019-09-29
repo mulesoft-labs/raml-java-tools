@@ -32,7 +32,7 @@ public class RamlToPojoImpl implements RamlToPojo {
 
         for (Shape typeDeclaration : typeFinder.findTypes(generationContext.api())) {
 
-            Optional<CreationResult> spec = CreationResultFactory.createType(typeDeclaration, generationContext);
+            Optional<CreationResult> spec = CreationResultFactory.createType((AnyShape) typeDeclaration, generationContext);
             spec.ifPresent(resultingPojos::addNewResult);
         }
 //*/
@@ -41,7 +41,7 @@ public class RamlToPojoImpl implements RamlToPojo {
     }
 
     @Override
-    public ResultingPojos buildPojo(Shape typeDeclaration) {
+    public ResultingPojos buildPojo(AnyShape typeDeclaration) {
 
         ResultingPojos resultingPojos = new ResultingPojos(generationContext);
 
@@ -52,7 +52,7 @@ public class RamlToPojoImpl implements RamlToPojo {
     }
 
     @Override
-    public ResultingPojos buildPojo(String suggestedJavaName, Shape typeDeclaration) {
+    public ResultingPojos buildPojo(String suggestedJavaName, AnyShape typeDeclaration) {
 
         ResultingPojos resultingPojos = new ResultingPojos(generationContext);
 

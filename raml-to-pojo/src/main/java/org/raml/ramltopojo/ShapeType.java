@@ -37,9 +37,16 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
     SCALAR {
 
         @Override
-        public boolean shouldCreateInlineType(Shape declaration) {
+        public boolean shouldCreateInlineType(Shape originalDeclaration) {
 
-            return false;
+            ScalarShape declaration = (ScalarShape) originalDeclaration;
+
+            if ( ! declaration.values().isEmpty() ) {
+
+                return ENUMERATION.shouldCreateInlineType(originalDeclaration);
+            } else {
+                return false;
+            }
         }
 
         @Override
@@ -94,7 +101,8 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
 
         @Override
         public boolean shouldCreateInlineType(Shape declaration) {
-            return "string".equals(declaration.name().value()) || "number".equals(declaration.name().value()) || "integer".equals(declaration.name().value());
+        //    return "string".equals(declaration.name().value()) || "number".equals(declaration.name().value()) || "integer".equals(declaration.name().value());
+            return true;
         }
     },
     ARRAY {

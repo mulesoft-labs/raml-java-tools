@@ -14,7 +14,7 @@ import java.util.Set;
  */
 public class Utils {
 
-    public static Class<?> declarationType(Shape typeDeclaration) {
+    public static Class<?> declarationType(AnyShape typeDeclaration) {
 
         return typeDeclaration.getClass();
     }

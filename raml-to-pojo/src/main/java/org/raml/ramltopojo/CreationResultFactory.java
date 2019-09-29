@@ -1,5 +1,7 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.domain.AnyShape;
+import amf.client.model.domain.PropertyShape;
 import amf.client.model.domain.Shape;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
@@ -22,7 +24,7 @@ public class CreationResultFactory {
      * @param context
      * @return
      */
-    public static Optional<CreationResult> createType(Shape typeDeclaration, GenerationContext context) {
+    public static Optional<CreationResult> createType(AnyShape typeDeclaration, GenerationContext context) {
 
         ShapeType shapeType = ShapeType.ramlToType(Utils.declarationType(typeDeclaration));
 
@@ -42,7 +44,7 @@ public class CreationResultFactory {
      * @param context
      * @return
      */
-    public static Optional<CreationResult> createNamedType(String name, Shape typeDeclaration, GenerationContext context) {
+    public static Optional<CreationResult> createNamedType(String name, AnyShape typeDeclaration, GenerationContext context) {
 
         ShapeType shapeType = ShapeType.ramlToType(Utils.declarationType(typeDeclaration));
 
@@ -58,15 +60,15 @@ public class CreationResultFactory {
     /**
      * Create the actual type.
      *
-     * @param typeDeclaration
+     * @param propertyShape
      * @param context
      * @return
      */
-    public static Optional<CreationResult> createInlineType(ClassName containingClassName, ClassName containingImplementation, String name, Shape typeDeclaration, final GenerationContext context) {
+    public static Optional<CreationResult> createInlineType(ClassName containingClassName, ClassName containingImplementation, String name, PropertyShape propertyShape, final GenerationContext context) {
 
-        ShapeType shapeType = ShapeType.ramlToType(Utils.declarationType(typeDeclaration));
+        ShapeType shapeType = ShapeType.ramlToType(Utils.declarationType((AnyShape) propertyShape.range()));
 
-        TypeHandler handler = shapeType.createHandler(name, shapeType, typeDeclaration);
+        TypeHandler handler = shapeType.createHandler(name, shapeType, propertyShape.range());
         ClassName intf = handler.javaClassName(new InlineGenerationContext(containingClassName, containingClassName, context),  EventType.INTERFACE);
         ClassName impl = handler.javaClassName(new InlineGenerationContext(containingClassName, containingImplementation, context), EventType.IMPLEMENTATION);
         CreationResult preCreationResult = new CreationResult("", intf, impl);

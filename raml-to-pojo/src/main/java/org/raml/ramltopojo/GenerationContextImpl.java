@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.Shape;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
@@ -52,7 +53,7 @@ public class GenerationContextImpl implements GenerationContext {
         } else {
 
             Shape typeDeclaration = typeFetcher.fetchType(null /*api*/, typeName);
-            Optional<CreationResult> result =  CreationResultFactory.createType(typeDeclaration, this);
+            Optional<CreationResult> result =  CreationResultFactory.createType((AnyShape) typeDeclaration, this);
 
             // todo fix this.
             if ( result.isPresent() ) {

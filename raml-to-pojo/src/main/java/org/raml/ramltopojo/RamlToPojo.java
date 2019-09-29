@@ -10,8 +10,8 @@ import com.squareup.javapoet.TypeName;
 public interface RamlToPojo {
 
     ResultingPojos buildPojos();
-    ResultingPojos buildPojo(Shape typeDeclaration);
-    ResultingPojos buildPojo(String suggestedJavaName, Shape typeDeclaration);
+    ResultingPojos buildPojo(AnyShape typeDeclaration);
+    ResultingPojos buildPojo(String suggestedJavaName, AnyShape typeDeclaration);
 
     TypeName fetchType(String suggestedName, Shape typeDeclaration);
     boolean isInline(AnyShape typeDeclaration);
