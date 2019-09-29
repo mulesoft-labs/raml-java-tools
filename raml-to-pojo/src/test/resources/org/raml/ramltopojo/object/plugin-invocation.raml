@@ -5,7 +5,8 @@ baseUri: https://api.github.com
 uses:
   ramltopojo: ramltopojo.raml
 (ramltopojo.types):
-  plugins: [core.one]
+  - name: core.one
+    arguments: [ foo, bar ]
 
 types:
     foo:

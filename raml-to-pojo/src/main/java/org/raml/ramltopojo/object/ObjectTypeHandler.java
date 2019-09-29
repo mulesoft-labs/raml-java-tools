@@ -226,6 +226,7 @@ public class ObjectTypeHandler implements TypeHandler {
         return typeSpec.build();
     }
 
+    // TODO get parent classes
     private Iterable<? extends PropertyShape> allProperties(NodeShape objectTypeDeclaration) {
 
         return Streams.concat(
