@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.union;
 
+import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.NilShape;
 import amf.client.model.domain.Shape;
 import amf.client.model.domain.UnionShape;
@@ -92,7 +93,7 @@ public class UnionTypeHandler implements TypeHandler {
 
                         .build());
 
-        for (Shape unitedType : union.anyOf()) {
+        for (AnyShape unitedType : union.anyOf().stream().map(x -> (AnyShape)x).collect(Collectors.toList())) {
 
             TypeName typeName =  unitedType instanceof NilShape ? NULL_CLASS : findType(unitedType.name().value(), unitedType, generationContext).box();
             String shortened = shorten(typeName);
@@ -154,10 +155,10 @@ public class UnionTypeHandler implements TypeHandler {
 
         TypeSpec.Builder typeSpec = TypeSpec.interfaceBuilder(preCreationResult.getJavaName(EventType.INTERFACE))
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-        List<TypeName> names = union.anyOf().stream().map(new Function<Shape, TypeName>() {
+        List<TypeName> names = union.anyOf().stream().map(x -> (AnyShape) x).map(new Function<AnyShape, TypeName>() {
             @Nullable
             @Override
-            public TypeName apply(@Nullable Shape unitedType) {
+            public TypeName apply(@Nullable AnyShape unitedType) {
 
                 if (unitedType instanceof NilShape) {
                     return NULL_CLASS;
@@ -224,8 +225,8 @@ public class UnionTypeHandler implements TypeHandler {
         }
     }
 
-    private TypeName findType(String typeName, Shape type, GenerationContext generationContext) {
+    private TypeName findType(String typeName, AnyShape type, GenerationContext generationContext) {
 
-        return ShapeType.calculateTypeName(typeName,type, generationContext, EventType.INTERFACE);
+        return ShapeType.calculateTypeName(typeName, type, generationContext, EventType.INTERFACE);
     }
 }

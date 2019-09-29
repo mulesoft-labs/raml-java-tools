@@ -1,6 +1,6 @@
 package org.raml.ramltopojo;
 
-import amf.client.model.domain.Shape;
+import amf.client.model.domain.AnyShape;
 import webapi.WebApiDocument;
 
 /**
@@ -8,5 +8,5 @@ import webapi.WebApiDocument;
  */
 public interface TypeFinder {
 
-    Iterable<Shape> findTypes(WebApiDocument api);
+    Iterable<AnyShape> findTypes(WebApiDocument api);
 }

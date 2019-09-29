@@ -13,18 +13,18 @@ import java.util.stream.Stream;
  * Created. There, you have it.
  */
 public class TypeFindingUtils {
-    static Stream<Shape> shapesFromTypes(WebApiDocument api) {
-        return api.declares().stream().filter(x -> x instanceof Shape).map(x -> (Shape) x);
+    static Stream<AnyShape> shapesFromTypes(WebApiDocument api) {
+        return api.declares().stream().filter(x -> x instanceof AnyShape).map(x -> (AnyShape) x);
     }
 
-    static Stream<Shape> shapesFromLibraries(WebApiDocument api) {
+    static Stream<AnyShape> shapesFromLibraries(WebApiDocument api) {
         return api.references().stream()
                 .filter(x -> x instanceof Module)
                 .map(x -> (Module) x)
                 .flatMap(TypeFindingUtils::gettingSubModules)
                 .flatMap(m -> m.declares().stream())
-                .filter(x -> x instanceof Shape)
-                .map(x -> (Shape) x);
+                .filter(x -> x instanceof AnyShape)
+                .map(x -> (AnyShape) x);
     }
 
     static Stream<Module> gettingSubModules(Module module) {
@@ -34,18 +34,18 @@ public class TypeFindingUtils {
                 .map(x -> (Module) x).flatMap(TypeFindingUtils::gettingSubModules));
     }
 
-    static Stream<Shape> shapesFromResources(List<EndPoint> endPoints) {
+    static Stream<AnyShape> shapesFromResources(List<EndPoint> endPoints) {
 
-        List<Shape> declarations = new ArrayList<>();
+        List<AnyShape> declarations = new ArrayList<>();
         for (EndPoint endPoint : endPoints) {
 
             // todo subresources
             //  resourceTypes(endPoint.());
-            declarations.addAll(endPoint.parameters().stream().map(Parameter::schema).collect(Collectors.toList()));
+            declarations.addAll(endPoint.parameters().stream().map(Parameter::schema).filter(x -> x instanceof AnyShape).map(x -> (AnyShape)x).collect(Collectors.toList()));
 
             for (Operation method : endPoint.operations()) {
 
-                List<Shape> requestShapes = typesInRequests(endPoint, method, new ArrayList<>()).collect(Collectors.toList());
+                List<AnyShape> requestShapes = typesInRequests(endPoint, method, new ArrayList<>()).collect(Collectors.toList());
                 declarations.addAll(requestShapes);
             }
         }
@@ -53,18 +53,18 @@ public class TypeFindingUtils {
         return declarations.stream();
     }
 
-    private static Stream<Shape> typesInRequests(EndPoint resource, Operation method, List<Shape> body) {
+    private static Stream<AnyShape> typesInRequests(EndPoint resource, Operation method, List<AnyShape> body) {
 
-        List<Shape> declarations = new ArrayList<>(body);
+        List<AnyShape> declarations = new ArrayList<>(body);
 
         //declarations.addAll(method.queryParameters());
 
         for (Response response : method.responses()) {
-            declarations.addAll(response.headers().stream().map(Parameter::schema).collect(Collectors.toList()));
-            declarations.addAll(response.payloads().stream().map(Payload::schema).collect(Collectors.toList()));
+            declarations.addAll(response.headers().stream().map(Parameter::schema).filter(x -> x instanceof AnyShape).map(x -> (AnyShape)x).collect(Collectors.toList()));
+            declarations.addAll(response.payloads().stream().map(Payload::schema).filter(x -> x instanceof AnyShape).map(x -> (AnyShape)x).collect(Collectors.toList()));
         }
 
-        declarations.addAll(method.request().payloads().stream().map(Payload::schema).collect(Collectors.toList()));
+        declarations.addAll(method.request().payloads().stream().map(Payload::schema).filter(x -> x instanceof AnyShape).map(x -> (AnyShape)x).collect(Collectors.toList()));
 
         return declarations.stream();
     }

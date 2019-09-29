@@ -1,6 +1,6 @@
 package org.raml.ramltopojo;
 
-import amf.client.model.domain.Shape;
+import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.WebApi;
 
 import java.util.stream.Collectors;
@@ -13,7 +13,7 @@ public class TypeFinders {
 
     public static TypeFinder inTypes() {
 
-        return api -> api.declares().stream().filter(x -> x instanceof Shape).map(x -> (Shape) x).collect(Collectors.toList());
+        return api -> api.declares().stream().filter(x -> x instanceof AnyShape).map(x -> (AnyShape) x).collect(Collectors.toList());
     }
 
     public static TypeFinder inLibraries() {

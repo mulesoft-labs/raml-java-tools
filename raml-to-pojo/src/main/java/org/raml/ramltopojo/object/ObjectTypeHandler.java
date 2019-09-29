@@ -156,7 +156,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
         Optional<String> discriminator = discriminatorName(objectTypeDeclaration);
 
-        for (Shape typeDeclaration : objectTypeDeclaration.inherits()) {
+        for (AnyShape typeDeclaration : objectTypeDeclaration.inherits().stream().map(x -> (AnyShape)x).collect(Collectors.toList())) {
 
             if (typeDeclaration instanceof NodeShape) {
 
@@ -251,10 +251,10 @@ public class ObjectTypeHandler implements TypeHandler {
 
     private TypeName findType(String typeName, PropertyShape type, GenerationContext generationContext, EventType eventType) {
 
-        return ShapeType.calculateTypeName(typeName, type.range(), generationContext,eventType );
+        return ShapeType.calculateTypeName(typeName, (AnyShape) type.range(), generationContext,eventType );
     }
 
-    private TypeName findType(String typeName, Shape type, GenerationContext generationContext, EventType eventType) {
+    private TypeName findType(String typeName, AnyShape type, GenerationContext generationContext, EventType eventType) {
 
         return ShapeType.calculateTypeName(typeName, type, generationContext,eventType );
     }

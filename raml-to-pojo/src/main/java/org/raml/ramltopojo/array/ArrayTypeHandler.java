@@ -66,7 +66,7 @@ public class ArrayTypeHandler implements TypeHandler {
                     typeDeclaration,
                     ParameterizedTypeName.get(
                             ClassName.get(List.class),
-                            ShapeType.calculateTypeName(itemTypeName, typeDeclaration.items(), generationContext, type).box())
+                            ShapeType.calculateTypeName(itemTypeName, (AnyShape) typeDeclaration.items(), generationContext, type).box())
             );
         } else {
 
@@ -81,10 +81,10 @@ public class ArrayTypeHandler implements TypeHandler {
         ClassName className = preCreationResult.getJavaName(EventType.INTERFACE);
         ArrayPluginContext arrayPluginContext = new ArrayPluginContextImpl(generationContext, preCreationResult);
 
-        Shape items = typeDeclaration.items();
+        AnyShape items = (AnyShape) typeDeclaration.items();
 
         TypeName itemsTypeName = ClassName.get(Object.class);
-        if (ShapeType.isNewInlineType((AnyShape) items)) {
+        if (ShapeType.isNewInlineType(items)) {
             Optional<CreationResult> cr = CreationResultFactory.createInlineType(className, preCreationResult.getJavaName(EventType.IMPLEMENTATION), Names.typeName(items.name().value(), "type"), null /*items*/, generationContext);
             if (cr.isPresent()) {
                 preCreationResult.withInternalType(items.name().value(), cr.get());
@@ -100,7 +100,7 @@ public class ArrayTypeHandler implements TypeHandler {
         return Optional.of(preCreationResult.withInterface(arrayClassBuilder.build()));
     }
 
-    private TypeName findType(String typeName, Shape type, GenerationContext generationContext) {
+    private TypeName findType(String typeName, AnyShape type, GenerationContext generationContext) {
 
         return ShapeType.calculateTypeName(typeName, type, generationContext, EventType.INTERFACE);
     }

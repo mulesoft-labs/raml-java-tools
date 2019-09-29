@@ -24,20 +24,20 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
 
     NULL {
         @Override
-        public boolean shouldCreateInlineType(Shape declaration) {
+        public boolean shouldCreateInlineType(AnyShape declaration) {
 
             return false;
         }
 
         @Override
-        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
             return new NullTypeHandler(name, typeDeclaration);
         }
     },
     SCALAR {
 
         @Override
-        public boolean shouldCreateInlineType(Shape originalDeclaration) {
+        public boolean shouldCreateInlineType(AnyShape originalDeclaration) {
 
             ScalarShape declaration = (ScalarShape) originalDeclaration;
 
@@ -50,7 +50,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         }
 
         @Override
-        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
 
             ScalarShape scalarShape = (ScalarShape) typeDeclaration;
             return Optional.ofNullable(
@@ -61,13 +61,13 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
     },
     OBJECT {
         @Override
-        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
             return new ObjectTypeHandler(name, (NodeShape) typeDeclaration);
         }
 
 
         @Override
-        public boolean shouldCreateInlineType(Shape declaration) {
+        public boolean shouldCreateInlineType(AnyShape declaration) {
 
             List<Shape> extended = declaration.inherits();
 
@@ -94,20 +94,20 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
     },
     ENUMERATION {
         @Override
-        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
 
             return new EnumerationTypeHandler(name, (ScalarShape) typeDeclaration);
         }
 
         @Override
-        public boolean shouldCreateInlineType(Shape declaration) {
+        public boolean shouldCreateInlineType(AnyShape declaration) {
         //    return "string".equals(declaration.name().value()) || "number".equals(declaration.name().value()) || "integer".equals(declaration.name().value());
             return true;
         }
     },
     ARRAY {
         @Override
-        public TypeHandler createHandler(String name, final ShapeType type, final Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, final ShapeType type, final AnyShape typeDeclaration) {
 
             final ArrayShape arrayTypeDeclaration = (ArrayShape) typeDeclaration;
 
@@ -115,20 +115,20 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         }
 
         @Override
-        public boolean shouldCreateInlineType(Shape declaration) {
+        public boolean shouldCreateInlineType(AnyShape declaration) {
             ArrayShape arrayTypeDeclaration = (ArrayShape) declaration;
             return true;
         }
     },
     UNION {
         @Override
-        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
 
             return new UnionTypeHandler(name, (UnionShape) typeDeclaration);
         }
 
         @Override
-        public boolean shouldCreateInlineType(Shape declaration) {
+        public boolean shouldCreateInlineType(AnyShape declaration) {
 
             // this seems wrong.
             return declaration instanceof UnionShape;
@@ -136,7 +136,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
     },
     INTEGER {
         @Override
-        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
 
             ScalarShape integerTypeDeclaration = (ScalarShape) typeDeclaration;
             if ( false ) {
@@ -149,7 +149,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         }
 
         @Override
-        public boolean shouldCreateInlineType(Shape originalTypeDeclaration) {
+        public boolean shouldCreateInlineType(AnyShape originalTypeDeclaration) {
             ScalarShape declaration = (ScalarShape) originalTypeDeclaration;
 
             if (false ) {
@@ -162,65 +162,65 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
     },
     BOOLEAN {
         @Override
-        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
 
             return new ReferenceTypeHandler(typeDeclaration, Boolean.class, TypeName.BOOLEAN);
 
         }
 
         @Override
-        public boolean shouldCreateInlineType(Shape declaration) {
+        public boolean shouldCreateInlineType(AnyShape declaration) {
             return false;
         }
     },
     DATE {
         @Override
-        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
 
             return new ReferenceTypeHandler(typeDeclaration, Date.class, ClassName.get(Date.class));
         }
 
         @Override
-        public boolean shouldCreateInlineType(Shape declaration) {
+        public boolean shouldCreateInlineType(AnyShape declaration) {
             return false;
         }
     },
     DATETIME {
         @Override
-        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
             return new ReferenceTypeHandler(typeDeclaration, Date.class, ClassName.get(Date.class));
         }
 
         @Override
-        public boolean shouldCreateInlineType(Shape declaration) {
+        public boolean shouldCreateInlineType(AnyShape declaration) {
             return false;
         }
     },
     TIME_ONLY {
         @Override
-        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
             return new ReferenceTypeHandler(typeDeclaration, Date.class, ClassName.get(Date.class));
         }
 
         @Override
-        public boolean shouldCreateInlineType(Shape declaration) {
+        public boolean shouldCreateInlineType(AnyShape declaration) {
             return false;
         }
     },
     DATETIME_ONLY {
         @Override
-        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
             return new ReferenceTypeHandler(typeDeclaration, Date.class, ClassName.get(Date.class));
         }
 
         @Override
-        public boolean shouldCreateInlineType(Shape declaration) {
+        public boolean shouldCreateInlineType(AnyShape declaration) {
             return false;
         }
     },
     NUMBER {
         @Override
-        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
 
             ScalarShape integerTypeDeclaration = (ScalarShape) typeDeclaration;
             if ( false ) {
@@ -233,7 +233,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         }
 
         @Override
-        public boolean shouldCreateInlineType(Shape originalTypeDeclaration) {
+        public boolean shouldCreateInlineType(AnyShape originalTypeDeclaration) {
 
             ScalarShape declaration = (ScalarShape) originalTypeDeclaration;
 
@@ -248,7 +248,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
     },
     STRING {
         @Override
-        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
 
             ScalarShape declaration = (ScalarShape) typeDeclaration;
             if ( false ) {
@@ -260,7 +260,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         }
 
         @Override
-        public boolean shouldCreateInlineType(Shape originalTypeDeclaration) {
+        public boolean shouldCreateInlineType(AnyShape originalTypeDeclaration) {
 
             ScalarShape declaration = (ScalarShape) originalTypeDeclaration;
 
@@ -274,24 +274,24 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
     },
     ANY {
         @Override
-        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
 
             return new ReferenceTypeHandler(typeDeclaration, Object.class, ClassName.get(Object.class));
         }
 
         @Override
-        public boolean shouldCreateInlineType(Shape declaration) {
+        public boolean shouldCreateInlineType(AnyShape declaration) {
             return false;
         }
     },
     FILE {
         @Override
-        public TypeHandler createHandler(String name, ShapeType type, Shape typeDeclaration) {
+        public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
             return new ReferenceTypeHandler(typeDeclaration, File.class, ClassName.get(File.class));
         }
 
         @Override
-        public boolean shouldCreateInlineType(Shape declaration) {
+        public boolean shouldCreateInlineType(AnyShape declaration) {
             return false;
         }
     };
@@ -307,7 +307,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
             .put("int", TypeName.INT).build();
 
 
-    public abstract boolean shouldCreateInlineType(Shape declaration);
+    public abstract boolean shouldCreateInlineType(AnyShape declaration);
 
     private static Map<Class, ShapeType> ramlToType = ImmutableMap.<Class, ShapeType>builder()
             .put(NodeShape.class, OBJECT)
@@ -341,7 +341,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
     }
 
 
-    public static TypeName calculateTypeName(String name, Shape typeDeclaration, GenerationContext context, EventType eventType) {
+    public static TypeName calculateTypeName(String name, AnyShape typeDeclaration, GenerationContext context, EventType eventType) {
 
         ShapeType shapeType = ramlToType(typeDeclaration.getClass());
 
