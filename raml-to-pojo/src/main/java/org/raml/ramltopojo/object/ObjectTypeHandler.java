@@ -94,7 +94,8 @@ public class ObjectTypeHandler implements TypeHandler {
 
             }  else {
 
-                tn = findType(propertyDeclaration.range().name().value(), propertyDeclaration, generationContext, EventType.INTERFACE);
+                Shape domainElement = (Shape) propertyDeclaration.range().linkTarget().orElse(propertyDeclaration.range());
+                tn = findType(domainElement.name().value(), propertyDeclaration, generationContext, EventType.INTERFACE);
             }
 
             FieldSpec.Builder field = FieldSpec.builder(tn, Names.variableName(propertyDeclaration.name().value())).addModifiers(Modifier.PRIVATE);
@@ -188,7 +189,9 @@ public class ObjectTypeHandler implements TypeHandler {
                 }
             }  else {
 
-                tn = findType(propertyDeclaration.range().name().value(), propertyDeclaration, generationContext, EventType.INTERFACE);
+                Shape domainElement = (Shape) propertyDeclaration.range().linkTarget().orElse(propertyDeclaration.range());
+
+                tn = findType(domainElement.name().value(), propertyDeclaration, generationContext, EventType.INTERFACE);
             }
 
             if (tn == null) {
