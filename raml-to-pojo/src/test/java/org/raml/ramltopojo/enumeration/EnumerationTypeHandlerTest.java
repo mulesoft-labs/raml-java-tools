@@ -4,7 +4,6 @@ import amf.client.model.domain.ScalarShape;
 import com.squareup.javapoet.ClassName;
 import org.hamcrest.Matchers;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.raml.ramltopojo.CreationResult;
 import org.raml.ramltopojo.GenerationContextImpl;
 import org.raml.ramltopojo.RamlLoader;
@@ -27,9 +26,6 @@ import static org.raml.testutils.matchers.TypeSpecMatchers.name;
  * Created. There, you have it.
  */
 public class EnumerationTypeHandlerTest extends UnitTest {
-
-    @Mock
-    private WebApiDocument api;
 
 
     @Test

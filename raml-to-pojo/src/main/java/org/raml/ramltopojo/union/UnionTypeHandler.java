@@ -93,7 +93,8 @@ public class UnionTypeHandler implements TypeHandler {
 
                         .build());
 
-        for (AnyShape unitedType : ((UnionShape)union.inherits().get(0)).anyOf().stream().map(x -> (AnyShape)x).collect(Collectors.toList())) {
+        UnionShape unionShape = union.inherits().isEmpty()?union:(UnionShape) union.inherits().get(0);
+        for (AnyShape unitedType : unionShape.anyOf().stream().map(x -> (AnyShape)x).collect(Collectors.toList())) {
 
             TypeName typeName =  unitedType instanceof NilShape ? NULL_CLASS : findType(unitedType.name().value(), unitedType, generationContext).box();
             String shortened = shorten(typeName);
@@ -155,7 +156,8 @@ public class UnionTypeHandler implements TypeHandler {
 
         TypeSpec.Builder typeSpec = TypeSpec.interfaceBuilder(preCreationResult.getJavaName(EventType.INTERFACE))
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-        List<TypeName> names = ((UnionShape)union.inherits().get(0)).anyOf().stream().map(x -> (AnyShape) x).map(new Function<AnyShape, TypeName>() {
+        UnionShape unionShape = union.inherits().isEmpty()?union:(UnionShape) union.inherits().get(0);
+        List<TypeName> names = unionShape.anyOf().stream().map(x -> (AnyShape) x).map(new Function<AnyShape, TypeName>() {
             @Nullable
             @Override
             public TypeName apply(@Nullable AnyShape unitedType) {

@@ -141,7 +141,20 @@ public class UnionTypeHandlerTest {
 
 
     private static UnionShape findTypes(final String name, List<Shape> types) {
-        return types.stream().filter(input -> input.name().is(name)).map(x -> (UnionShape) x).findFirst().get();
+        return types.stream().filter(input -> input.name().is(name)).map(UnionTypeHandlerTest::castAsNecessary).findFirst().get();
+    }
+
+    private static UnionShape castAsNecessary(Shape shape) {
+
+        if ( shape instanceof UnionShape ) {
+
+            return (UnionShape) shape;
+        } else {
+
+            return (UnionShape) shape.inherits().get(0);
+        }
+
+
     }
 
 }
