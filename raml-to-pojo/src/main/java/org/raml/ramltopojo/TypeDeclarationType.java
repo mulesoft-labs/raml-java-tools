@@ -356,7 +356,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         ClassName impl = handler.javaClassName(context, EventType.IMPLEMENTATION);
         CreationResult creationResult = new CreationResult(context.defaultPackage(), intf, impl);
         context.newExpectedType(typeDeclaration.name(), creationResult);
-        context.setupTypeHierarchy(typeDeclaration);
+        context.setupTypeHierarchy(typeDeclaration.name(), typeDeclaration);
         return handler.create(context, creationResult);
     }
 
@@ -376,7 +376,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         ClassName impl = handler.javaClassName(context, EventType.IMPLEMENTATION);
         CreationResult creationResult = new CreationResult(context.defaultPackage(), intf, impl);
         context.newExpectedType(name, creationResult);
-        context.setupTypeHierarchy(typeDeclaration);
+        context.setupTypeHierarchy(name, typeDeclaration);
         return handler.create(context, creationResult);
     }
 
@@ -405,7 +405,7 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
 
         TypeHandler handler = typeDeclarationType.createHandler(name, typeDeclarationType, typeDeclaration);
         TypeName typeName = handler.javaClassReference(context, eventType);
-        context.setupTypeHierarchy(typeDeclaration);
+        context.setupTypeHierarchy(name, typeDeclaration);
         return typeName;
     }
 
@@ -499,8 +499,8 @@ public enum TypeDeclarationType implements TypeHandlerFactory, TypeAnalyserFacto
         }
 
         @Override
-        public void setupTypeHierarchy(TypeDeclaration typeDeclaration) {
-            context.setupTypeHierarchy(typeDeclaration);
+        public void setupTypeHierarchy(String actualName, TypeDeclaration typeDeclaration) {
+            context.setupTypeHierarchy(actualName, typeDeclaration);
         }
     }
 }
