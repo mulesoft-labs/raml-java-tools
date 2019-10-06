@@ -1,0 +1,39 @@
+#%RAML 1.0 Library
+uses:
+  ramltopojo: ramltopojo.raml
+types:
+  PetResponse:
+    (ramltopojo.types):
+      plugins:
+        - name: core.jackson2
+    type: object
+    properties:
+      myPet:
+        type: Animal
+
+  Animal:
+    (ramltopojo.types):
+      plugins:
+        - name: core.jackson2
+    type: object
+    discriminator: animalType
+    properties:
+      animalType: string
+
+  Cat:
+    (ramltopojo.types):
+      plugins:
+        - name: core.jackson2
+    type: Animal
+    discriminatorValue: CAT
+    properties:
+      legs: integer
+
+  Fish:
+    (ramltopojo.types):
+      plugins:
+        - name: core.jackson2
+    type: Animal
+    discriminatorValue: FISH
+    properties:
+      fins: integer

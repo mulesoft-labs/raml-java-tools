@@ -31,7 +31,7 @@ public class GenerationContextImplTest extends UnitTest{
         when(type4.name()).thenReturn("type4");
 
         GenerationContextImpl impl = new GenerationContextImpl(null);
-        impl.setupTypeHierarchy(type1);
+        impl.setupTypeHierarchy("type1", type1);
 
         assertThat(impl.childClasses("type2"), Matchers.contains(Matchers.equalTo("type1")));
 

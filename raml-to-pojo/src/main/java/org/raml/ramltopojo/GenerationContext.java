@@ -27,7 +27,7 @@ public interface GenerationContext {
     ArrayTypeHandlerPlugin pluginsForArrays(TypeDeclaration... typeDeclarations);
     ReferenceTypeHandlerPlugin pluginsForReferences(TypeDeclaration... typeDeclarations);
 
-    void setupTypeHierarchy(TypeDeclaration typeDeclaration);
+    void setupTypeHierarchy(String actualName, TypeDeclaration typeDeclaration);
     Api api();
     Set<String> childClasses(String ramlTypeName);
     ClassName buildDefaultClassName(String name, EventType eventType);

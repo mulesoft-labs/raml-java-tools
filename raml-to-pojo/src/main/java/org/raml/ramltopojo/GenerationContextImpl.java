@@ -80,12 +80,14 @@ public class GenerationContextImpl implements GenerationContext {
         return ClassName.get(defaultPackage, name);
     }
 
-    public void setupTypeHierarchy(TypeDeclaration typeDeclaration) {
+    public void setupTypeHierarchy(String actualName, TypeDeclaration typeDeclaration) {
 
         List<TypeDeclaration> parents = typeDeclaration.parentTypes();
         for (TypeDeclaration parent : parents) {
-            setupTypeHierarchy(parent);
-            childTypes.put(parent.name(), typeDeclaration.name());
+            setupTypeHierarchy(parent.name(), parent);
+            if ( ! parent.name().equals(actualName) ) {
+                childTypes.put(parent.name(), actualName);
+            }
         }
     }
 
