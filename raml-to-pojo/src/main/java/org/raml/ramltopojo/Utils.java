@@ -51,6 +51,10 @@ public class Utils {
 
     static public AnyShape rangeOf(PropertyShape propertyShape) {
 
+        Shape shape = propertyShape.range();
+        if ( shape.getClass().equals(AnyShape.class) && shape.inherits().size() == 1) {
+            return (AnyShape) shape.inherits().get(0);
+        }
         return (AnyShape) propertyShape.range();
     }
 }

@@ -66,9 +66,9 @@ public class CreationResultFactory {
      */
     public static Optional<CreationResult> createInlineType(ClassName containingClassName, ClassName containingImplementation, String name, PropertyShape propertyShape, final GenerationContext context) {
 
-        ShapeType shapeType = ShapeType.ramlToType(Utils.declarationType((AnyShape) propertyShape.range()));
+        ShapeType shapeType = ShapeType.ramlToType(Utils.declarationType(Utils.rangeOf(propertyShape)));
 
-        TypeHandler handler = shapeType.createHandler(name, shapeType, (AnyShape) propertyShape.range());
+        TypeHandler handler = shapeType.createHandler(name, shapeType, Utils.rangeOf(propertyShape));
         ClassName intf = handler.javaClassName(new InlineGenerationContext(containingClassName, containingClassName, context),  EventType.INTERFACE);
         ClassName impl = handler.javaClassName(new InlineGenerationContext(containingClassName, containingImplementation, context), EventType.IMPLEMENTATION);
         CreationResult preCreationResult = new CreationResult("", intf, impl);
