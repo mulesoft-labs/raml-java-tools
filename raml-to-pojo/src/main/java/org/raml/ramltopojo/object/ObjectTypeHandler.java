@@ -6,14 +6,12 @@ import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.PropertyShape;
 import amf.client.model.domain.Shape;
 import com.squareup.javapoet.*;
-import org.apache.jena.ext.com.google.common.collect.Streams;
 import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectPluginContextImpl;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 
 import javax.lang.model.element.Modifier;
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -36,7 +34,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
         ObjectPluginContext context = new ObjectPluginContextImpl(generationContext, null);
 
-        ObjectTypeHandlerPlugin plugin = generationContext.pluginsForObjects(Utils.allParents(objectTypeDeclaration, new ArrayList<>()).toArray(new Shape[0]));
+        ObjectTypeHandlerPlugin plugin = generationContext.pluginsForObjects(Utils.allParents(objectTypeDeclaration).toArray(new Shape[0]));
         ClassName className;
         if ( type == EventType.IMPLEMENTATION ) {
             className = generationContext.buildDefaultClassName(Names.typeName(name, "Impl"), EventType.IMPLEMENTATION);
@@ -80,7 +78,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
         Optional<String> discriminator = discriminatorName(objectTypeDeclaration);
 
-        for (PropertyShape propertyDeclaration : allProperties(objectTypeDeclaration)) {
+        for (PropertyShape propertyDeclaration : Utils.allProperties(objectTypeDeclaration)) {
 
             if ( EcmaPattern.isSlashedPattern(propertyDeclaration.name().value())) {
 
@@ -173,7 +171,7 @@ public class ObjectTypeHandler implements TypeHandler {
             }
         }
 
-        for (PropertyShape propertyDeclaration : allProperties(objectTypeDeclaration)) {
+        for (PropertyShape propertyDeclaration : Utils.allProperties(objectTypeDeclaration)) {
 
             if ( EcmaPattern.isSlashedPattern(propertyDeclaration.name().value())) {
 
@@ -228,15 +226,6 @@ public class ObjectTypeHandler implements TypeHandler {
         }
 
         return typeSpec.build();
-    }
-
-    // TODO get parent classes
-    private Iterable<? extends PropertyShape> allProperties(NodeShape objectTypeDeclaration) {
-
-        return Streams.concat(
-                objectTypeDeclaration.properties().stream(),
-                objectTypeDeclaration.inherits().stream()
-                        .flatMap(x -> ((NodeShape)x.linkTarget().orElse(x)).properties().stream())).collect(Collectors.toList());
     }
 
     private Optional<String> discriminatorName(NodeShape objectTypeDeclaration) {

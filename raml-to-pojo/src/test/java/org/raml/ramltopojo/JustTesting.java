@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutionException;
 public class JustTesting {
 
     // Example of parsing RAML 1.0 file
-    public static void main(String[] args) throws InterruptedException, ExecutionException {
+    public static void main2(String[] args) throws InterruptedException, ExecutionException {
         // Parse the file
         final WebApiDocument result = (WebApiDocument) Raml10.parse(JustTesting.class.getResource("/org/raml/ramltopojo/object/inherited-type.raml").toString()).get();
 
@@ -30,12 +30,11 @@ public class JustTesting {
     }
 
     // Example of parsing RAML 1.0 file
-    public static void main2(String[] args) throws InterruptedException, ExecutionException {
+    public static void main(String[] args) throws InterruptedException, ExecutionException {
         String inp ="#%RAML 1.0\n" +
                 "\n" +
                 "title: ACME Banking HTTP API\n" +
                 "version: 1.0";
-        System.out.println("Input Raml10 string:\n" + inp);
 
         // Parse the string
         WebApiDocument doc = (WebApiDocument) Raml10.parse(inp).get();

@@ -9,7 +9,6 @@ import org.raml.ramltopojo.extensions.EnumerationPluginContext;
 import org.raml.ramltopojo.extensions.EnumerationPluginContextImpl;
 
 import javax.lang.model.element.Modifier;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,7 +30,7 @@ public class EnumerationTypeHandler implements TypeHandler {
     public ClassName javaClassName(GenerationContext generationContext, EventType type) {
 
         EnumerationPluginContext enumerationPluginContext = new EnumerationPluginContextImpl(generationContext, null);
-        return generationContext.pluginsForEnumerations(Utils.allParents(typeDeclaration, new ArrayList<>()).toArray(new Shape[0])).className(enumerationPluginContext, typeDeclaration, generationContext.buildDefaultClassName(Names.typeName(name), EventType.INTERFACE), EventType.INTERFACE);
+        return generationContext.pluginsForEnumerations(Utils.allParents(typeDeclaration).toArray(new Shape[0])).className(enumerationPluginContext, typeDeclaration, generationContext.buildDefaultClassName(Names.typeName(name), EventType.INTERFACE), EventType.INTERFACE);
     }
 
     @Override

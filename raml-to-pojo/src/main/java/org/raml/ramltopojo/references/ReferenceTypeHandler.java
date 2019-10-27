@@ -6,7 +6,6 @@ import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.ReferencePluginContext;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 /**
@@ -33,7 +32,7 @@ public class ReferenceTypeHandler implements TypeHandler {
     public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
 
         return generationContext.pluginsForReferences(
-                    Utils.allParents(typeDeclaration, new ArrayList<>()).toArray(new Shape[0]))
+                    Utils.allParents(typeDeclaration).toArray(new Shape[0]))
                 .typeName(new ReferencePluginContext() {
                 }, typeDeclaration, referenceName);
 

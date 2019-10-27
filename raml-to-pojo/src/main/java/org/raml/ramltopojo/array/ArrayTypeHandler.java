@@ -35,7 +35,7 @@ public class ArrayTypeHandler implements TypeHandler {
 
         ArrayPluginContext arrayPluginContext = new ArrayPluginContextImpl(generationContext, null);
         return generationContext.pluginsForArrays(
-                Utils.allParents(typeDeclaration, new ArrayList<Shape>())
+                Utils.allParents(typeDeclaration)
                         .toArray(new Shape[0]))
                 .className(
                         arrayPluginContext,
@@ -57,7 +57,7 @@ public class ArrayTypeHandler implements TypeHandler {
                 throw new GenerationException("unable to create type array item of type object (or maybe an inline array type ?)");
             }
 
-            List<Shape> shapes = Utils.allParents(typeDeclaration, new ArrayList<>());
+            List<Shape> shapes = Utils.allParents(typeDeclaration);
             ReferencePluginContext referencePluginContext = new ReferencePluginContext() {
             };
             return generationContext.pluginsForReferences(

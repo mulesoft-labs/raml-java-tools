@@ -13,7 +13,6 @@ import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
 
 import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,7 +36,7 @@ public class UnionTypeHandler implements TypeHandler {
 
         UnionPluginContext context = new UnionPluginContextImpl(generationContext, null);
 
-        UnionTypeHandlerPlugin plugin = generationContext.pluginsForUnions(Utils.allParents(union, new ArrayList<>()).toArray(new Shape[0]));
+        UnionTypeHandlerPlugin plugin = generationContext.pluginsForUnions(Utils.allParents(union).toArray(new Shape[0]));
         ClassName className;
         if ( type == EventType.IMPLEMENTATION ) {
             className = generationContext.buildDefaultClassName(Names.typeName(name, "Impl"), EventType.IMPLEMENTATION);
