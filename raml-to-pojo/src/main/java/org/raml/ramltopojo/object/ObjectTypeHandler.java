@@ -94,7 +94,7 @@ public class ObjectTypeHandler implements TypeHandler {
             }  else {
 
                 Shape domainElement = (Shape) propertyDeclaration.range().linkTarget().orElse(propertyDeclaration.range());
-                tn = findType(domainElement.name().value(), propertyDeclaration, generationContext, EventType.INTERFACE);
+                tn = findType(domainElement.name().value(), (AnyShape) domainElement, generationContext, EventType.INTERFACE);
             }
 
             FieldSpec.Builder field = FieldSpec.builder(tn, Names.variableName(propertyDeclaration.name().value())).addModifiers(Modifier.PRIVATE);
@@ -188,9 +188,8 @@ public class ObjectTypeHandler implements TypeHandler {
                 }
             }  else {
 
-                Shape domainElement = (Shape) propertyDeclaration.range().linkTarget().orElse(propertyDeclaration.range());
 
-                tn = findType(domainElement.name().value(), propertyDeclaration, generationContext, EventType.INTERFACE);
+                tn = findType(propertyDeclaration, generationContext, EventType.INTERFACE);
             }
 
             if (tn == null) {
@@ -238,9 +237,11 @@ public class ObjectTypeHandler implements TypeHandler {
         return objectTypeDeclaration.inherits().stream().map(x -> ((NodeShape)x.linkTarget().orElse(x)).discriminator()).findFirst().map(x -> x.value());
     }
 
-    private TypeName findType(String typeName, PropertyShape type, GenerationContext generationContext, EventType eventType) {
+    private TypeName findType(PropertyShape type, GenerationContext generationContext, EventType eventType) {
 
-        return ShapeType.calculateTypeName(typeName, (AnyShape) type.range(), generationContext,eventType );
+        Shape domainElement = (Shape) type.range().linkTarget().orElse(type.range());
+
+        return ShapeType.calculateTypeName(domainElement.name().value(), (AnyShape) domainElement, generationContext,eventType );
     }
 
     private TypeName findType(String typeName, AnyShape type, GenerationContext generationContext, EventType eventType) {

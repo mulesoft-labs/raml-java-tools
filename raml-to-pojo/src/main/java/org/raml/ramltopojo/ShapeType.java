@@ -122,7 +122,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         @Override
         public boolean shouldCreateInlineType(AnyShape declaration) {
             ArrayShape arrayTypeDeclaration = (ArrayShape) declaration;
-            return true;
+            return ShapeType.isNewInlineType((AnyShape) arrayTypeDeclaration.items());
         }
     },
     UNION {
