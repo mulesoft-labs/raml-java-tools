@@ -93,8 +93,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
             }  else {
 
-                Shape domainElement = (Shape) propertyDeclaration.range().linkTarget().orElse(propertyDeclaration.range());
-                tn = findType(domainElement.name().value(), (AnyShape) domainElement, generationContext, EventType.INTERFACE);
+                tn = findType(propertyDeclaration, generationContext, EventType.INTERFACE);
             }
 
             FieldSpec.Builder field = FieldSpec.builder(tn, Names.variableName(propertyDeclaration.name().value())).addModifiers(Modifier.PRIVATE);
@@ -188,7 +187,6 @@ public class ObjectTypeHandler implements TypeHandler {
                 }
             }  else {
 
-
                 tn = findType(propertyDeclaration, generationContext, EventType.INTERFACE);
             }
 
@@ -239,9 +237,9 @@ public class ObjectTypeHandler implements TypeHandler {
 
     private TypeName findType(PropertyShape type, GenerationContext generationContext, EventType eventType) {
 
-        Shape domainElement = (Shape) type.range().linkTarget().orElse(type.range());
+        AnyShape domainElement = Utils.rangeOf(type);
 
-        return ShapeType.calculateTypeName(domainElement.name().value(), (AnyShape) domainElement, generationContext,eventType );
+        return ShapeType.calculateTypeName(domainElement.name().value(), domainElement, generationContext, eventType );
     }
 
     private TypeName findType(String typeName, AnyShape type, GenerationContext generationContext, EventType eventType) {

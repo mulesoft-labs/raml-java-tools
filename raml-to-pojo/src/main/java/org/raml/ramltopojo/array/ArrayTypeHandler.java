@@ -46,10 +46,10 @@ public class ArrayTypeHandler implements TypeHandler {
     @Override
     public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
 
-        if (name.contains("[") || name.equals("array")) {
-            String itemTypeName = typeDeclaration.items().name().value();
+        if (true) {
+            String itemTypeName = Utils.items(typeDeclaration).name().value();
             if ("object".equals(itemTypeName)) {
-                itemTypeName = typeDeclaration.items().name().value();
+                itemTypeName = Utils.items(typeDeclaration).name().value();
             }
 
             if ("object".equals(itemTypeName)) {
@@ -66,7 +66,7 @@ public class ArrayTypeHandler implements TypeHandler {
                     typeDeclaration,
                     ParameterizedTypeName.get(
                             ClassName.get(List.class),
-                            ShapeType.calculateTypeName(itemTypeName, (AnyShape) typeDeclaration.items(), generationContext, type).box())
+                            ShapeType.calculateTypeName(itemTypeName, Utils.items(typeDeclaration), generationContext, type).box())
             );
         } else {
 
@@ -81,7 +81,7 @@ public class ArrayTypeHandler implements TypeHandler {
         ClassName className = preCreationResult.getJavaName(EventType.INTERFACE);
         ArrayPluginContext arrayPluginContext = new ArrayPluginContextImpl(generationContext, preCreationResult);
 
-        AnyShape items = (AnyShape) typeDeclaration.items();
+        AnyShape items = Utils.items(typeDeclaration);
 
         TypeName itemsTypeName = ClassName.get(Object.class);
         if (ShapeType.isNewInlineType(items)) {

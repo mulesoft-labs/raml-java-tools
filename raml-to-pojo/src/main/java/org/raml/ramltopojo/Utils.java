@@ -1,15 +1,13 @@
 package org.raml.ramltopojo;
 
-import amf.client.model.domain.AnyShape;
-import amf.client.model.domain.NodeShape;
-import amf.client.model.domain.PropertyShape;
-import amf.client.model.domain.Shape;
+import amf.client.model.domain.*;
 import org.apache.jena.ext.com.google.common.collect.Streams;
 import org.raml.v2.api.model.v10.api.Library;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -65,6 +63,18 @@ public class Utils {
             return (AnyShape) shape.inherits().get(0);
         }
         return (AnyShape) propertyShape.range();
+    }
+
+    static public AnyShape items(ArrayShape shape) {
+
+        return (AnyShape) Optional.ofNullable(shape.items()).orElseGet(() -> itemsFromInheritance(shape));
+    }
+
+    protected static Shape itemsFromInheritance(ArrayShape shape) {
+        if ( shape.inherits().isEmpty()) {
+            return null;
+        }
+        return ((ArrayShape)shape.inherits().get(0)).items();
     }
 
     public static List<PropertyShape> allProperties(NodeShape objectTypeDeclaration) {

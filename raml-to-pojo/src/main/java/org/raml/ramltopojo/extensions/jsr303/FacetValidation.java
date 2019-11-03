@@ -4,6 +4,7 @@ import amf.client.model.domain.*;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.EcmaPattern;
+import org.raml.ramltopojo.Utils;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -53,7 +54,7 @@ public class FacetValidation {
 
     public static void addFacetsForArray(AnnotationAdder fieldSpec, ArrayShape typeDeclaration) {
 
-        if ( isFieldFromBuiltType(typeDeclaration.items()) ) {
+        if ( isFieldFromBuiltType(Utils.items(typeDeclaration)) ) {
 
             fieldSpec.addAnnotation(Valid.class);
         }

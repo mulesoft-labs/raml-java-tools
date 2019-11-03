@@ -9,6 +9,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.WildcardTypeName;
 import org.raml.ramltopojo.EventType;
+import org.raml.ramltopojo.Utils;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 
@@ -78,7 +79,7 @@ public class CovariantListPlugin extends ObjectTypeHandlerPlugin.Helper {
         }
 
         ArrayShape arrayTypeDeclaration = (ArrayShape) declaration.range();
-        Shape itemTypes = arrayTypeDeclaration.items();
+        Shape itemTypes = Utils.items(arrayTypeDeclaration);
         if (!(itemTypes instanceof NodeShape)) {
 
             return true;

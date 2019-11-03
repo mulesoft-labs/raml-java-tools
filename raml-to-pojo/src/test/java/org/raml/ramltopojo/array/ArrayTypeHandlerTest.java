@@ -10,21 +10,23 @@ import com.squareup.javapoet.TypeName;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.raml.ramltopojo.EventType;
-import org.raml.ramltopojo.GenerationContext;
-import org.raml.ramltopojo.ScalarTypes;
+import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.ArrayPluginContext;
 import org.raml.ramltopojo.extensions.ArrayTypeHandlerPlugin;
 import org.raml.ramltopojo.extensions.ReferencePluginContext;
 import org.raml.ramltopojo.extensions.ReferenceTypeHandlerPlugin;
 import org.raml.testutils.UnitTest;
+import webapi.WebApiDocument;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.raml.ramltopojo.RamlLoader.findShape;
 
 /**
  * Created. There, you have it.
@@ -85,14 +87,42 @@ public class ArrayTypeHandlerTest extends UnitTest {
     }
 
     @Test
+    public void arrayAsType() throws Exception {
+
+        WebApiDocument api = RamlLoader.load(this.getClass().getResource("arrays-generation.raml"));
+        ArrayTypeHandler handler = new ArrayTypeHandler("foo", findShape("typearray", api.declares()));
+
+
+        GenerationContextImpl generationContext = new GenerationContextImpl(api);
+        CreationResult r = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+
+        assertFalse(r.getImplementation().isPresent());
+        assertEquals(r.getInterface().name, "Foo");
+        assertEquals(r.getInterface().superclass, ParameterizedTypeName.get(ClassName.get(ArrayList.class),  ClassName.get(String.class)));
+    }
+
+    @Test
+    public void bracketArrayAsType() throws Exception {
+
+        WebApiDocument api = RamlLoader.load(this.getClass().getResource("arrays-generation.raml"));
+        ArrayTypeHandler handler = new ArrayTypeHandler("foo", findShape("typebracketarray", api.declares()));
+
+
+        GenerationContextImpl generationContext = new GenerationContextImpl(api);
+        CreationResult r = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+
+        assertFalse(r.getImplementation().isPresent());
+        assertEquals(r.getInterface().name, "Foo");
+        assertEquals(r.getInterface().superclass, ParameterizedTypeName.get(ClassName.get(ArrayList.class),  ClassName.get(String.class)));
+    }
+
+    @Test
     public void javaClassReferenceWithSomethingAsList() {
 
-
+        ArrayShape shape = new ArrayShape().withItems(new NodeShape().withName("Something"));
         when(arrayTypeHandlerPlugin.className(any(ArrayPluginContext.class), any(ArrayShape.class), eq(null), eq(EventType.INTERFACE))).thenReturn(ClassName.get("foo", "Something"));
-        // todo when(itemType.name()).thenReturn("Something");
-        // todo when(itemType.type()).thenReturn("object");
 
-        ArrayTypeHandler handler = new ArrayTypeHandler("Something", arrayTypeDeclaration);
+        ArrayTypeHandler handler = new ArrayTypeHandler("Something", shape);
         TypeName tn = handler.javaClassReference(context, EventType.INTERFACE);
         assertEquals("foo.Something", tn.toString());
 
