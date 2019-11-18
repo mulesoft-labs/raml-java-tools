@@ -20,6 +20,15 @@ public class ArraysTest {
         assertEquals(1, childArray.size());
     }
 
+    @Test
+    public void simpleArraysWithBrackets() throws Exception {
+
+        ChildBracketArray childArray = new ChildBracketArray();
+        childArray.add(new ChildBracketArray.ObjectTypeImpl());
+
+        assertEquals(1, childArray.size());
+    }
+
 
     @Test
     public void inlineArraysOfSpecificType() throws Exception {
