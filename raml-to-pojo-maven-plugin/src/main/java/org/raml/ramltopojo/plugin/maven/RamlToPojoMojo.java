@@ -112,7 +112,7 @@ public class RamlToPojoMojo extends AbstractMojo {
             }
 
             final Api api = ramlModelResult.getApiV10();
-            RamlToPojo ramlToPojo = RamlToPojoBuilder.builder(api)
+            RamlToPojo ramlToPojo = RamlToPojoBuilder.builder(null)
                     .inPackage(defaultPackage)
                     .fetchTypes(fromAnywhere())
                     .findTypes(everyWhere()).build(basePlugins);

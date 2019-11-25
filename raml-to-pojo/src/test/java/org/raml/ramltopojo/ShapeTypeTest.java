@@ -117,8 +117,8 @@ public class ShapeTypeTest extends UnitTest {
         WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-array-types.raml"));
         NodeShape decl = RamlLoader.findShape("father", api.declares());
 
-        assertTrue(ShapeType.isNewInlineType(Utils.rangeOf(findProperty(decl, "others"))));
-        assertTrue(ShapeType.isNewInlineType(Utils.rangeOf(findProperty(decl, "some"))));
+        assertFalse(ShapeType.isNewInlineType(Utils.rangeOf(findProperty(decl, "others"))));
+        assertFalse(ShapeType.isNewInlineType(Utils.rangeOf(findProperty(decl, "some"))));
     }
 
     @Test

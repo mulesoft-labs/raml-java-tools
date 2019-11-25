@@ -84,7 +84,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
             Set<String> allExtendedProps;
 
             // TODO certqinly we can do better here.
-            if ( extended.size() == 1  && extended.get(0).name().equals("object")) {
+            if ( extended.size() == 1  && "object".equals(extended.get(0).name().value())) {
 
                 allExtendedProps = Collections.emptySet();
             } else {

@@ -70,7 +70,7 @@ public class Utils {
         return (AnyShape) Optional.ofNullable(shape.items()).orElseGet(() -> itemsFromInheritance(shape));
     }
 
-    protected static Shape itemsFromInheritance(ArrayShape shape) {
+    private static Shape itemsFromInheritance(ArrayShape shape) {
         if ( shape.inherits().isEmpty()) {
             return null;
         }

@@ -87,6 +87,6 @@ public class EnumerationTypeHandler implements TypeHandler {
     // todo fix the double enumeration
     List<String> pullEnumValues(ScalarShape typeDeclaration) {
 
-        return typeDeclaration.values().stream().map(x -> (ScalarNode) x).map(ScalarNode::value).collect(Collectors.toList());
+        return typeDeclaration.values().stream().map(x -> (ScalarNode) x).map(x -> x.value().value()).collect(Collectors.toList());
     }
 }

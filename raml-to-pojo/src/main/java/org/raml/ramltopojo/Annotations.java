@@ -81,10 +81,10 @@ public abstract class Annotations<T> {
                 .filter(n -> n instanceof ObjectNode)
                 .map(n -> (ObjectNode) n)
                 .map(on -> new PluginDef(
-                        ((ScalarNode)on.properties().get("name")).value(),
+                        ((ScalarNode)on.properties().get("name")).value().value(),
                         Optional.ofNullable((ArrayNode) on.properties().get("arguments")).orElseGet(ArrayNode::new).members().stream()
                                 .filter( o -> o instanceof ScalarNode)
-                                .map(o -> ((ScalarNode)o).value())
+                                .map(o -> ((ScalarNode)o).value().value())
                                 .collect(Collectors.toList())))
                 .collect(Collectors.toList());
 
