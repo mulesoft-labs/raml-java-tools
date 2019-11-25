@@ -78,7 +78,7 @@ public class ArrayTypeHandlerTest extends UnitTest {
         when(context.buildDefaultClassName(any(), any())).thenReturn(ClassName.OBJECT);
         when(arrayTypeDeclaration.items()).thenReturn(new NodeShape().withName("Something"));
         when(referencePlugin.typeName(any(ReferencePluginContext.class), any(Shape.class), eq(ParameterizedTypeName.get(List.class, String.class)))).thenReturn(ParameterizedTypeName.get(ClassName.get(List.class), ClassName.bestGuess("foo.Something")));
-        when(referencePlugin.typeName(any(ReferencePluginContext.class), any(Shape.class), (TypeName) any())).thenReturn(ParameterizedTypeName.get(ClassName.get(List.class), ClassName.bestGuess("foo.Something")));
+        when(referencePlugin.typeName(any(ReferencePluginContext.class), any(Shape.class), any())).thenReturn(ParameterizedTypeName.get(ClassName.get(List.class), ClassName.bestGuess("foo.Something")));
 
         ArrayTypeHandler handler = new ArrayTypeHandler("Something[]", arrayTypeDeclaration);
         TypeName tn = handler.javaClassReference(context, EventType.INTERFACE);
