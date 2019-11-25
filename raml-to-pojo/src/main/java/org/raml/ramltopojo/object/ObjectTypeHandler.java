@@ -239,7 +239,8 @@ public class ObjectTypeHandler implements TypeHandler {
 
         AnyShape domainElement = Utils.rangeOf(type);
 
-        return ShapeType.calculateTypeName(domainElement.name().value(), domainElement, generationContext, eventType );
+
+        return ShapeType.calculateTypeName(Utils.nameOf(domainElement), domainElement, generationContext, eventType );
     }
 
     private TypeName findType(String typeName, AnyShape type, GenerationContext generationContext, EventType eventType) {

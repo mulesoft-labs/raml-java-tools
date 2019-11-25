@@ -56,6 +56,17 @@ public class Utils {
         return found;
     }
 
+    static public String nameOf(AnyShape anyShape) {
+
+        if ( anyShape.linkTarget().isPresent() ) {
+
+            AnyShape shape = (AnyShape) anyShape.linkTarget().get();
+            return shape.name().value();
+        } else {
+
+            return anyShape.name().value();
+        }
+    }
     static public AnyShape rangeOf(PropertyShape propertyShape) {
 
         Shape shape = propertyShape.range();

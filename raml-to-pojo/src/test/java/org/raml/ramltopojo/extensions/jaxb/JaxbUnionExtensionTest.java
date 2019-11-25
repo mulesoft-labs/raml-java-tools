@@ -2,8 +2,8 @@ package org.raml.ramltopojo.extensions.jaxb;
 
 import amf.client.model.domain.UnionShape;
 import com.squareup.javapoet.*;
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.raml.ramltopojo.EventType;
 import org.raml.testutils.UnitTest;
 
@@ -18,8 +18,13 @@ import static org.junit.Assert.assertSame;
  */
 public class JaxbUnionExtensionTest extends UnitTest {
 
-    @Mock
     UnionShape unionTypeDeclaration;
+
+    @Before
+    public void before() {
+
+        unionTypeDeclaration = (UnionShape) new UnionShape().withName("buildClass");
+    }
 
     @Test
     public void className() {
@@ -43,7 +48,7 @@ public class JaxbUnionExtensionTest extends UnitTest {
                 .hasName("my.BuiltClass");
         AnnotationSpecAssert.assertThat(buildClass.annotations.get(0)).hasType(ClassName.get(XmlRootElement.class));
 
-        assertEquals("null", builder.build().annotations.get(0).members.get("name").get(0).toString());
+        assertEquals("\"buildClass\"", builder.build().annotations.get(0).members.get("name").get(0).toString());
         assertEquals("\"##default\"", builder.build().annotations.get(0).members.get("namespace").get(0).toString());
     }
 
@@ -63,7 +68,7 @@ public class JaxbUnionExtensionTest extends UnitTest {
         assertEquals("javax.xml.bind.annotation.XmlAccessType.FIELD", builder.build().annotations.get(0).members.get("value").get(0).toString());
 
         AnnotationSpecAssert.assertThat(buildClass.annotations.get(1)).hasType(ClassName.get(XmlRootElement.class));
-        assertEquals("null", builder.build().annotations.get(1).members.get("name").get(0).toString());
+        assertEquals("\"buildClass\"", builder.build().annotations.get(1).members.get("name").get(0).toString());
         assertEquals("\"##default\"", builder.build().annotations.get(1).members.get("namespace").get(0).toString());
     }
 
