@@ -474,13 +474,14 @@ public class ObjectTypeHandlerTest extends UnitTest {
         assertThat(r.internalType("unionOfPrimitives").getInterface(), is(allOf(
 
                 name(
-                        is(equalTo("UnionOfPrimitivesType"))
+                        is(equalTo("StringIntegerUnion"))
                 ),
                 methods(containsInAnyOrder(
-                        allOf(methodName(equalTo("getInteger")), returnType(equalTo(ClassName.get(Integer.class)))),
-                        allOf(methodName(equalTo("isInteger")), returnType(equalTo(ClassName.get(Boolean.class).unbox()))),
+                        allOf(methodName(equalTo("getUnionType")), returnType(equalTo(ClassName.get("bar.pack", "Foo.StringIntegerUnion.UnionType")))),
+                        allOf(methodName(equalTo("isString")), returnType(equalTo(ClassName.get(Boolean.class).unbox()))),
                         allOf(methodName(equalTo("getString")), returnType(equalTo(ClassName.get(String.class)))),
-                        allOf(methodName(equalTo("isString")), returnType(equalTo(ClassName.get(Boolean.class).unbox())))
+                        allOf(methodName(equalTo("isInteger")), returnType(equalTo(ClassName.get(Boolean.class).unbox()))),
+                        allOf(methodName(equalTo("getInteger")), returnType(equalTo(ClassName.get(Integer.class))))
                 ))
 
         )));
@@ -488,13 +489,14 @@ public class ObjectTypeHandlerTest extends UnitTest {
         assertThat(r.internalType("unionOfOthers").getInterface(), is(allOf(
 
                 name(
-                        is(equalTo("UnionOfOthersType"))
+                        is(equalTo("OneTwoUnion"))
                 ),
                 methods(contains(
-                        allOf(methodName(equalTo("getOne")), returnType(equalTo(ClassName.get("pojo.pack", "One")))),
+                        allOf(methodName(equalTo("getUnionType")), returnType(equalTo(ClassName.get("bar.pack", "Foo.OneTwoUnion.UnionType")))),
                         allOf(methodName(equalTo("isOne")), returnType(equalTo(ClassName.get(Boolean.class).unbox()))),
-                        allOf(methodName(equalTo("getTwo")), returnType(equalTo(ClassName.get("pojo.pack", "Two")))),
-                        allOf(methodName(equalTo("isTwo")), returnType(equalTo(ClassName.get(Boolean.class).unbox())))
+                        allOf(methodName(equalTo("getOne")), returnType(equalTo(ClassName.get("pojo.pack", "One")))),
+                        allOf(methodName(equalTo("isTwo")), returnType(equalTo(ClassName.get(Boolean.class).unbox()))),
+                        allOf(methodName(equalTo("getTwo")), returnType(equalTo(ClassName.get("pojo.pack", "Two"))))
                 ))
 
         )));

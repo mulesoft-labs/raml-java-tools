@@ -1,9 +1,12 @@
 package org.raml.ramltopojo.extensions;
 
 import org.raml.ramltopojo.CreationResult;
+import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.GenerationContext;
+import org.raml.ramltopojo.TypeDeclarationType;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
+import com.squareup.javapoet.TypeName;
 
 /**
  * Created. There, you have it.
@@ -21,6 +24,12 @@ public class UnionPluginContextImpl implements UnionPluginContext {
     public CreationResult creationResult() {
 
         return result;
+    }
+
+    @Override
+    public TypeName findType(String typeName, TypeDeclaration type) {
+
+        return TypeDeclarationType.calculateTypeName(typeName, type, generationContext, EventType.INTERFACE);
     }
 
     @Override

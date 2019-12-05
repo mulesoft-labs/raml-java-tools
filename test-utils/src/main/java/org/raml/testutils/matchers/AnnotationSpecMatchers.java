@@ -1,12 +1,9 @@
 /*
  * Copyright 2013-2017 (c) MuleSoft, Inc.
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
@@ -17,6 +14,8 @@ package org.raml.testutils.matchers;
 
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.TypeName;
+
 import org.hamcrest.Description;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
@@ -27,32 +26,43 @@ import org.hamcrest.TypeSafeMatcher;
  */
 public class AnnotationSpecMatchers {
 
-  public static Matcher<AnnotationSpec> hasMember(final String member) {
+    public static <K extends TypeName> Matcher<AnnotationSpec> annotationType(Matcher<K> match) {
 
-    return new TypeSafeMatcher<AnnotationSpec>() {
+        return new FeatureMatcher<AnnotationSpec, K>(match, "annotation type", "annotation type") {
 
-      @Override
-      protected boolean matchesSafely(AnnotationSpec item) {
-        return item.members.containsKey(member);
-      }
+            @Override
+            protected K featureValueOf(AnnotationSpec actual) {
+                return (K) actual.type;
+            }
+        };
+    }
 
-      @Override
-      public void describeTo(Description description) {
+    public static Matcher<AnnotationSpec> hasMember(final String member) {
 
-        description.appendText("has member " + member);
-      }
-    };
-  }
+        return new TypeSafeMatcher<AnnotationSpec>() {
 
-  public static Matcher<AnnotationSpec> member(final String member, Matcher<Iterable<? extends CodeBlock>> memberMatcher) {
+            @Override
+            protected boolean matchesSafely(AnnotationSpec item) {
+                return item.members.containsKey(member);
+            }
 
-    return new FeatureMatcher<AnnotationSpec, Iterable<? extends CodeBlock>>(memberMatcher, "member", "member") {
+            @Override
+            public void describeTo(Description description) {
 
-      @Override
-      protected Iterable<? extends CodeBlock> featureValueOf(AnnotationSpec actual) {
+                description.appendText("has member " + member);
+            }
+        };
+    }
 
-        return actual.members.get(member);
-      }
-    };
-  }
+    public static Matcher<AnnotationSpec> member(final String member, Matcher<Iterable<? extends CodeBlock>> memberMatcher) {
+
+        return new FeatureMatcher<AnnotationSpec, Iterable<? extends CodeBlock>>(memberMatcher, "member", "member") {
+
+            @Override
+            protected Iterable<? extends CodeBlock> featureValueOf(AnnotationSpec actual) {
+
+                return actual.members.get(member);
+            }
+        };
+    }
 }
