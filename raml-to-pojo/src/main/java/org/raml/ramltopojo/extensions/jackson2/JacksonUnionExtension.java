@@ -204,9 +204,23 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
 
             } else if (typeDeclaration instanceof IntegerTypeDeclaration) {
 
-                deserialize.beginControlFlow("if (node.isInt())");
-                deserialize.addStatement("return new $T(node.asInt())", unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION));
-                deserialize.endControlFlow();
+                if (typeName.box().equals(TypeName.LONG.box())) {
+                    deserialize.beginControlFlow("if (node.isLong())");
+                    deserialize.addStatement("return new $T(node.asLong())", unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION));
+                    deserialize.endControlFlow();
+                }
+
+                if (typeName.box().equals(TypeName.INT.box())) {
+                    deserialize.beginControlFlow("if (node.isInt())");
+                    deserialize.addStatement("return new $T(node.asInt())", unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION));
+                    deserialize.endControlFlow();
+                }
+
+                if (typeName.box().equals(TypeName.SHORT.box())) {
+                    deserialize.beginControlFlow("if (node.isShort())");
+                    deserialize.addStatement("return new $T(mapper.treeToValue(node, $T.class)", unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), typeName);
+                    deserialize.endControlFlow();
+                }
 
             } else if (typeDeclaration instanceof StringTypeDeclaration) {
 
