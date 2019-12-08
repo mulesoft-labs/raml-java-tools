@@ -10,6 +10,7 @@ import org.raml.ramltopojo.extensions.ObjectPluginContextImpl;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 
 import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
@@ -95,6 +96,14 @@ public class ObjectTypeHandler implements TypeHandler {
             if ( TypeDeclarationType.isNewInlineType(propertyDeclaration) ){
 
                 CreationResult cr = result.internalType(propertyDeclaration.name());
+                if (cr.getImplementation().isPresent()) {
+
+                    // we need a special handling for property unions, they need to be added as inline types
+                    if (propertyDeclaration instanceof UnionTypeDeclaration) {
+                        TypeSpec.Builder innerTypeSpecImpl = cr.getImplementation().get().toBuilder();
+                        typeSpec.addType(innerTypeSpecImpl.addModifiers(Modifier.PUBLIC, Modifier.STATIC).build());
+                    }
+                }
                 tn = cr.getJavaName(EventType.INTERFACE);
 
             }  else {
@@ -190,12 +199,27 @@ public class ObjectTypeHandler implements TypeHandler {
             }
 
             TypeName tn = null;
-            if ( TypeDeclarationType.isNewInlineType(propertyDeclaration) ){
+            if ( TypeDeclarationType.isNewInlineType(propertyDeclaration) ) {
 
-                Optional<CreationResult> cr = TypeDeclarationType.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),  Names.typeName(propertyDeclaration.name(), "type"), propertyDeclaration, generationContext);
-                if ( cr.isPresent() ) {
-                    result.withInternalType(propertyDeclaration.name(), cr.get());
-                    tn = cr.get().getJavaName(EventType.INTERFACE);
+                // we need a special handling for property unions, they need to be added as inline types
+                if (propertyDeclaration instanceof UnionTypeDeclaration) {
+
+                    // Inline union naming: string | nil => StringNilUnion
+                    CreationResult cr = TypeDeclarationType.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),
+                        Names.typeName(propertyDeclaration.type(), "union"), propertyDeclaration, generationContext).get();
+                    result.withInternalType(propertyDeclaration.name(), cr);
+                    tn = cr.getJavaName(EventType.INTERFACE);
+
+                    typeSpec.addType(cr.getInterface().toBuilder().addModifiers(Modifier.PUBLIC, Modifier.STATIC).build());
+
+                } else {
+
+                    Optional<CreationResult> cr = TypeDeclarationType.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),
+                        Names.typeName(propertyDeclaration.name(), "type"), propertyDeclaration, generationContext);
+                    if (cr.isPresent()) {
+                        result.withInternalType(propertyDeclaration.name(), cr.get());
+                        tn = cr.get().getJavaName(EventType.INTERFACE);
+                    }
                 }
             }  else {
 

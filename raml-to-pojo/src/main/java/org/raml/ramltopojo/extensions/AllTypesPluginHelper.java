@@ -70,6 +70,11 @@ public class AllTypesPluginHelper implements ObjectTypeHandlerPlugin, UnionTypeH
     }
 
     @Override
+    public FieldSpec.Builder fieldBuilt(UnionPluginContext unionPluginContext, TypeDeclaration ramlType, FieldSpec.Builder fieldSpec, EventType eventType) {
+    	return unionTypeHandlerPlugin.fieldBuilt(unionPluginContext, ramlType, fieldSpec, eventType);
+    }
+
+    @Override
     public FieldSpec.Builder anyFieldCreated(UnionPluginContext context, UnionTypeDeclaration union, TypeSpec.Builder typeSpec, FieldSpec.Builder anyType, EventType eventType) {
         return unionTypeHandlerPlugin.anyFieldCreated(context, union, typeSpec, anyType, eventType);
     }

@@ -1,0 +1,21 @@
+#%RAML 1.0
+title: Hello World API
+version: v1
+baseUri: https://api.github.com
+types:
+  
+    email:
+      type: string
+      minLength: 1
+      pattern: ^/.*$
+      
+    baa:
+      type: object
+      properties:
+        first: integer
+        second: string
+  
+    foo:
+      type: object
+      properties:
+        prop: baa | email | boolean | integer | nil

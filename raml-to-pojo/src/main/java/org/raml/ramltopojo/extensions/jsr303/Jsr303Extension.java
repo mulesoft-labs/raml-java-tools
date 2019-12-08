@@ -28,50 +28,72 @@ import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 
 import static org.raml.ramltopojo.extensions.jsr303.FacetValidation.addAnnotations;
 
+import java.util.Objects;
+
+import javax.validation.constraints.NotNull;
+
 /**
  * Created by Jean-Philippe Belanger on 12/12/16. Just potential zeroes and ones
  */
 public class Jsr303Extension extends AllTypesPluginHelper {
 
-  @Override
-  public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration typeDeclaration, FieldSpec.Builder fieldSpec, EventType eventType) {
-    AnnotationAdder adder = new AnnotationAdder() {
+    @Override
+    public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, TypeDeclaration typeDeclaration, FieldSpec.Builder fieldSpec, EventType eventType) {
+        AnnotationAdder adder = new AnnotationAdder() {
 
-      @Override
-      public TypeName typeName() {
-        return fieldSpec.build().type;
-      }
+            @Override
+            public TypeName typeName() {
+                return fieldSpec.build().type;
+            }
 
-      @Override
-      public void addAnnotation(AnnotationSpec spec) {
-        fieldSpec.addAnnotation(spec);
-      }
-    };
+            @Override
+            public void addAnnotation(AnnotationSpec spec) {
+                fieldSpec.addAnnotation(spec);
+            }
+        };
 
+        addAnnotations(typeDeclaration, adder);
+        return fieldSpec;
+    }
 
-    addAnnotations(typeDeclaration, adder);
-    return fieldSpec;
-  }
+    @Override
+    public FieldSpec.Builder fieldBuilt(UnionPluginContext unionPluginContext, TypeDeclaration ramlType, FieldSpec.Builder fieldSpec, EventType eventType) {
+        AnnotationAdder adder = new AnnotationAdder() {
 
+            @Override
+            public TypeName typeName() {
+                return fieldSpec.build().type;
+            }
 
-  @Override
-  public FieldSpec.Builder anyFieldCreated(UnionPluginContext context, UnionTypeDeclaration union, TypeSpec.Builder typeSpec, FieldSpec.Builder anyType, EventType eventType) {
+            @Override
+            public void addAnnotation(AnnotationSpec spec) {
+                // ignore not null (we are in a union, of course they can be null)
+                if (!Objects.equals(spec.type, TypeName.get(NotNull.class))) {
+                    fieldSpec.addAnnotation(spec);
+                }
+            }
+        };
 
-    FacetValidation.addFacetsForBuilt(new AnnotationAdder() {
+        addAnnotations(ramlType, adder);
+        return fieldSpec;
+    }
 
-      @Override
-      public TypeName typeName() {
-        return anyType.build().type;
-      }
+    @Override
+    public FieldSpec.Builder anyFieldCreated( UnionPluginContext context, UnionTypeDeclaration union, TypeSpec.Builder typeSpec, FieldSpec.Builder anyType, EventType eventType) {
+        FacetValidation.addFacetsForBuilt(new AnnotationAdder() {
 
-      @Override
-      public void addAnnotation(AnnotationSpec spec) {
+            @Override
+            public TypeName typeName() {
+                return anyType.build().type;
+            }
 
-        anyType.addAnnotation(spec);
-      }
-    });
+            @Override
+            public void addAnnotation(AnnotationSpec spec) {
 
-    return anyType;
-  }
+                anyType.addAnnotation(spec);
+            }
+        });
 
+        return anyType;
+    }
 }

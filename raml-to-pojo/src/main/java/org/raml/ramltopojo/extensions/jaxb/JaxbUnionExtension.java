@@ -67,4 +67,9 @@ public class JaxbUnionExtension implements UnionTypeHandlerPlugin {
 
         return anyType;
     }
+
+    @Override
+    public FieldSpec.Builder fieldBuilt(UnionPluginContext context, TypeDeclaration property, FieldSpec.Builder fieldSpec, EventType eventType) {
+        return fieldSpec;
+    }
 }

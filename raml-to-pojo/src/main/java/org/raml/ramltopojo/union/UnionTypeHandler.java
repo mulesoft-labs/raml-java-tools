@@ -1,6 +1,5 @@
 package org.raml.ramltopojo.union;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
@@ -17,7 +16,6 @@ import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created. There, you have it.
@@ -75,15 +73,8 @@ public class UnionTypeHandler implements TypeHandler {
 
     private TypeSpec.Builder getImplementation(ClassName interfaceName, GenerationContext generationContext, UnionPluginContext context, CreationResult preCreationResult) {
         TypeSpec.Builder typeSpec = TypeSpec.classBuilder(preCreationResult.getJavaName(EventType.IMPLEMENTATION))
-                .addModifiers(Modifier.PUBLIC)
-                .addSuperinterface(interfaceName);
-
-        FieldSpec.Builder anyType = FieldSpec.builder(Object.class, "anyType", Modifier.PRIVATE);
-        anyType = generationContext.pluginsForUnions(union).anyFieldCreated(context, union, typeSpec, anyType, EventType.IMPLEMENTATION);
-        if ( anyType == null ) {
-
-            return typeSpec;
-        }
+            .addModifiers(Modifier.PUBLIC)
+            .addSuperinterface(interfaceName);
 
         boolean hasNullType = FluentIterable.from(union.of()).anyMatch(new Predicate<TypeDeclaration>() {
             @Override
@@ -92,65 +83,89 @@ public class UnionTypeHandler implements TypeHandler {
             }
         });
 
-        typeSpec.addField(anyType.build());
-        typeSpec.addMethod(
-                MethodSpec.constructorBuilder()
-                        .addModifiers(hasNullType ? Modifier.PUBLIC: Modifier.PRIVATE).addStatement("this.anyType = null")
+        // add enum type field
+        String unionEnumName = "unionType";
+        ClassName unionClassInterfaceName = preCreationResult.getJavaName(EventType.INTERFACE);
+        ClassName unionEnumClassName = unionClassInterfaceName.nestedClass(Names.typeName(unionEnumName));
+        typeSpec.addField(FieldSpec.builder(unionEnumClassName, unionEnumName, Modifier.PRIVATE).build());
 
-                        .build());
+        // build empty constructor
+        MethodSpec.Builder emptyConstructorSpec = MethodSpec.constructorBuilder();
+        if (hasNullType) {
+            emptyConstructorSpec
+                .addModifiers(Modifier.PUBLIC)
+                .addStatement("this.$L = $T.NIL", unionEnumName, unionEnumClassName);
+        } else {
+            emptyConstructorSpec
+            .addModifiers(Modifier.PRIVATE);
+        }
+        typeSpec.addMethod(emptyConstructorSpec.build());
 
+        // build enum getter
+        typeSpec.addMethod(MethodSpec.methodBuilder(Names.methodName("get", unionEnumName))
+            .addModifiers(Modifier.PUBLIC)
+            .addStatement("return this.$L", unionEnumName)
+            .returns(unionEnumClassName)
+            .build());
+
+        // add union members
         for (TypeDeclaration unitedType : union.of()) {
 
-            TypeName typeName =  unitedType instanceof NullTypeDeclaration ? NULL_CLASS : findType(unitedType.name(), unitedType, generationContext).box();
-            String shortened = shorten(typeName);
+            TypeName typeName = unitedType instanceof NullTypeDeclaration ? NULL_CLASS : findType(unitedType.name(), unitedType, generationContext).box();
+            String prettyName = prettyName(unitedType, generationContext);
 
-            String fieldName = Names.methodName(unitedType.name());
-            if ( typeName == NULL_CLASS ) {
+            String fieldName = Names.methodName(prettyName, "value");
+            if (typeName == NULL_CLASS) {
 
                 typeSpec
-                        .addMethod(
-                                MethodSpec
-                                        .methodBuilder("getNil")
-                                        .addModifiers(Modifier.PUBLIC)
-                                        .returns(typeName)
-                                        .addStatement(
-                                                "if ( !(anyType == null)) throw new $T(\"fetching wrong type out of the union: NullType should be null\")",
-                                                IllegalStateException.class)
-                                        .addStatement("return null").build())
-                        .addMethod(
-                                MethodSpec.methodBuilder("isNil")
-                                        .addStatement("return anyType == null")
-                                        .addModifiers(Modifier.PUBLIC)
-                                        .returns(TypeName.BOOLEAN).build()
-                        ).build();
+                    .addMethod(MethodSpec.methodBuilder("isNil")
+                        .addStatement("return this.$L == $T.NIL", unionEnumName, unionEnumClassName)
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(TypeName.BOOLEAN)
+                        .build())
+                    .addMethod(MethodSpec.methodBuilder("getNil")
+                        .addModifiers(Modifier.PUBLIC).returns(typeName)
+                        .addStatement("if (!isNil()) throw new $T(\"fetching wrong type out of the union: NullType should be null\")", IllegalStateException.class)
+                        .addStatement("return null")
+                        .build())
+                .build();
 
             } else {
+
+                // Add value field with annotations (for every valid union member)
+                // This is necessary to support field validations in unions
+                String variableName = Names.variableName(prettyName, "value");
+                FieldSpec.Builder fieldValueSpec = FieldSpec.builder(typeName, variableName, Modifier.PRIVATE);
+                fieldValueSpec = generationContext.pluginsForUnions(union).fieldBuilt(context, unitedType, fieldValueSpec, EventType.IMPLEMENTATION);
+                typeSpec.addField(fieldValueSpec.build());
+
+                // Add constructor(X), isX and getX
+                String enumName = Names.constantName(prettyName);
+                String isName = Names.methodName("is", prettyName);
+                String getName = Names.methodName("get", prettyName);
                 typeSpec
-                        .addMethod(
-                                MethodSpec.constructorBuilder()
-                                        .addParameter(ParameterSpec.builder(typeName, fieldName).build())
-                                        .addModifiers(Modifier.PUBLIC).addStatement("this.anyType = $L", fieldName)
-                                        .build())
-                        .addMethod(
-                                MethodSpec
-                                        .methodBuilder(Names.methodName("get", shortened))
-                                        .addModifiers(Modifier.PUBLIC)
-                                        .returns(typeName)
-                                        .addStatement(
-                                                "if ( !(anyType instanceof  $T)) throw new $T(\"fetching wrong type out of the union: $L\")",
-                                                typeName, IllegalStateException.class, typeName)
-                                        .addStatement("return ($T) anyType", typeName).build())
-                        .addMethod(
-                                MethodSpec.methodBuilder(Names.methodName("is", shortened))
-                                        .addStatement("return anyType instanceof $T", typeName)
-                                        .addModifiers(Modifier.PUBLIC)
-                                        .returns(TypeName.BOOLEAN).build()
-                        ).build();
+                    .addMethod(MethodSpec.constructorBuilder()
+                        .addParameter(ParameterSpec.builder(typeName, fieldName).build())
+                        .addModifiers(Modifier.PUBLIC)
+                        .addStatement("this.$L = $T.$L", unionEnumName, unionEnumClassName, enumName)
+                        .addStatement("this.$L = $L", variableName, fieldName)
+                        .build())
+                    .addMethod(MethodSpec.methodBuilder(isName)
+                        .addStatement("return this.$L == $T.$L", unionEnumName, unionEnumClassName, enumName)
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(TypeName.BOOLEAN)
+                        .build())
+                    .addMethod(MethodSpec.methodBuilder(getName)
+                        .addModifiers(Modifier.PUBLIC).returns(typeName)
+                        .addStatement("if (!$L()) throw new $T(\"fetching wrong type out of the union: $L\")", isName, IllegalStateException.class, typeName)
+                        .addStatement("return this.$L", variableName)
+                        .build())
+                    .build();
             }
         }
 
         typeSpec = generationContext.pluginsForUnions(union).classCreated(context, union, typeSpec, EventType.IMPLEMENTATION);
-        if ( typeSpec == null ) {
+        if (typeSpec == null) {
             return null;
         }
 
@@ -159,80 +174,88 @@ public class UnionTypeHandler implements TypeHandler {
 
     private TypeSpec.Builder getDeclaration(final GenerationContext generationContext, UnionPluginContext context, CreationResult preCreationResult) {
 
-        TypeSpec.Builder typeSpec = TypeSpec.interfaceBuilder(preCreationResult.getJavaName(EventType.INTERFACE))
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-        List<TypeName> names = FluentIterable.from(union.of()).transform(new Function<TypeDeclaration, TypeName>() {
-            @Nullable
-            @Override
-            public TypeName apply(@Nullable TypeDeclaration unitedType) {
-
-                if ( unitedType instanceof NullTypeDeclaration ) {
-                    return NULL_CLASS;
-                } else {
-                    return findType(unitedType.name(), unitedType, generationContext).box();
-                }
-            }
-        }).toList();
+        ClassName unionClassName = preCreationResult.getJavaName(EventType.INTERFACE);
+        TypeSpec.Builder typeSpec = TypeSpec.interfaceBuilder(unionClassName)
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
         typeSpec = generationContext.pluginsForUnions(union).classCreated(context, union, typeSpec, EventType.INTERFACE);
-        if ( typeSpec == null ) {
+        if (typeSpec == null) {
             return null;
         }
 
+        // add enum for all types of union for easy switch statements
+        String unionEnumName = "unionType";
+        ClassName unionEnumClassName = unionClassName.nestedClass(Names.typeName(unionEnumName));
+        TypeSpec.Builder enumTypeSpec = TypeSpec.enumBuilder(unionEnumClassName)
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
-        for (TypeName unitedType : names) {
+        // build enum getter
+        typeSpec.addMethod(MethodSpec.methodBuilder(Names.methodName("get", unionEnumName))
+            .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+            .returns(unionEnumClassName)
+            .build());
 
-            if ( unitedType instanceof ArrayTypeDeclaration ) {
+        for (TypeDeclaration unitedType : union.of()) {
 
-                throw new GenerationException("ramltopojo currently does not support arrays in unions");
-            }
-
-            if ( unitedType == NULL_CLASS ) {
-
-                typeSpec
-                        .addMethod(
-                                MethodSpec
-                                        .methodBuilder("getNil")
-                                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                                        .returns(unitedType).build())
-                        .addMethod(
-                                MethodSpec.methodBuilder("isNil")
-                                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                                        .returns(TypeName.BOOLEAN).build()
-                        );
-            } else {
-
-                String shortened = shorten(unitedType);
-
-                typeSpec
-                        .addMethod(
-                                MethodSpec
-                                        .methodBuilder(Names.methodName("get", shortened))
-                                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                                        .returns(unitedType).build())
-                        .addMethod(
-                                MethodSpec.methodBuilder(Names.methodName("is", shortened))
-                                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                                        .returns(TypeName.BOOLEAN).build()
-                        );
-            }
+        if (unitedType instanceof ArrayTypeDeclaration) {
+            throw new GenerationException("ramltopojo currently does not support arrays in unions");
         }
+
+        TypeName typeName = unitedType instanceof NullTypeDeclaration ? NULL_CLASS: findType(unitedType.name(), unitedType, generationContext).box();
+        String prettyName = prettyName(unitedType, generationContext);
+
+        // add enum name
+        enumTypeSpec.addEnumConstant(Names.constantName(prettyName));
+
+        if (typeName == NULL_CLASS) {
+
+            typeSpec
+                .addMethod(MethodSpec.methodBuilder("isNil")
+                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                    .returns(TypeName.BOOLEAN)
+                    .build())
+                .addMethod(MethodSpec.methodBuilder("getNil")
+                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                    .returns(typeName)
+                    .build());
+
+        } else {
+
+            typeSpec
+                .addMethod(MethodSpec.methodBuilder(Names.methodName("is", prettyName))
+                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                    .returns(TypeName.BOOLEAN)
+                    .build())
+                .addMethod(MethodSpec.methodBuilder(Names.methodName("get", prettyName))
+                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                    .returns(typeName)
+                    .build());
+        }
+        }
+
+        // set enum as inner type
+        typeSpec.addType(enumTypeSpec.build());
+
         return typeSpec;
     }
 
-    private String shorten(TypeName typeName) {
-
-        if ( ! (typeName instanceof ClassName) ) {
-
-            throw new GenerationException(typeName + toString() +  " cannot be shortened reasonably");
+    private String prettyName(TypeDeclaration type, GenerationContext generationContext) {
+        if (type.type() == null) {
+            return type instanceof NullTypeDeclaration ? "nil" : shorten(findType(type.name(), type, generationContext).box());
         } else {
+            return type.name();
+        }
+    }
 
-            return ((ClassName)typeName).simpleName();
+    private String shorten(TypeName typeName) {
+        if (!(typeName instanceof ClassName)) {
+            throw new GenerationException(typeName + toString() + " cannot be shortened reasonably");
+        } else {
+            return ((ClassName) typeName).simpleName();
         }
     }
 
     private TypeName findType(String typeName, TypeDeclaration type, GenerationContext generationContext) {
-
         return TypeDeclarationType.calculateTypeName(typeName, type, generationContext, EventType.INTERFACE);
     }
 }
