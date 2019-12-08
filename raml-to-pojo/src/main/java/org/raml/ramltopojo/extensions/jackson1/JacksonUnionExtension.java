@@ -23,21 +23,7 @@ import org.raml.ramltopojo.Names;
 import org.raml.ramltopojo.Utils;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
-import org.raml.v2.api.model.v10.datamodel.AnyTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.BooleanTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.DateTimeOnlyTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.DateTimeTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.DateTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.FileTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.IntegerTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.NullTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.NumberTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.StringTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.TimeOnlyTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
+import org.raml.v2.api.model.v10.datamodel.*;
 
 import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
@@ -46,16 +32,7 @@ import java.sql.Date;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -187,6 +164,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
             }
         );
 
+        boolean overriden = false;
         for (TypeDeclaration typeDeclaration : sortedTypes) {
 
             // get type name of declaration
@@ -197,6 +175,16 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                 deserialize.beginControlFlow("if (node.isNull())");
                 deserialize.addStatement("return new $T(null)", unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION));
                 deserialize.endControlFlow();
+
+                if (!overriden) {
+                    builder.addMethod(MethodSpec.methodBuilder("getNullValue")
+                            .addModifiers(Modifier.PUBLIC)
+                            .returns(typeBuilderName)
+                            .addStatement("return new $T()", unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION))
+                            .build());
+                    overriden = true;
+                }
+
 
             } else if (typeDeclaration instanceof BooleanTypeDeclaration) {
 

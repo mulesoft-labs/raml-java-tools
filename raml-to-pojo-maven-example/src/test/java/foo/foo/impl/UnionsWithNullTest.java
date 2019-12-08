@@ -31,7 +31,7 @@ public class UnionsWithNullTest {
         assertEquals("somevalue", b.getString());
     }
 
-    //@Test
+    @Test
     public void withNull() throws IOException {
 
         NilUnionTypeImpl nilUnionType = new NilUnionTypeImpl();

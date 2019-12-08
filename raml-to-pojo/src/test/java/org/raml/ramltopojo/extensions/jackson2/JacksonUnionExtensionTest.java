@@ -1,37 +1,23 @@
 package org.raml.ramltopojo.extensions.jackson2;
 
-import static junit.framework.TestCase.assertNotNull;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.raml.testutils.matchers.MethodSpecMatchers.methodName;
-import static org.raml.testutils.matchers.TypeSpecMatchers.methods;
-import static org.raml.testutils.matchers.TypeSpecMatchers.innerTypes;
-import static org.raml.testutils.matchers.TypeSpecMatchers.name;
-import static org.raml.testutils.matchers.TypeSpecMatchers.annotations;
-import static org.raml.testutils.matchers.AnnotationSpecMatchers.annotationType;
-import static org.raml.testutils.matchers.AnnotationSpecMatchers.member;
-import static org.raml.testutils.matchers.CodeBlockMatchers.codeBlockContents;
-
-import java.util.Arrays;
-
-import org.junit.Test;
-import org.raml.ramltopojo.CreationResult;
-import org.raml.ramltopojo.EventType;
-import org.raml.ramltopojo.GenerationException;
-import org.raml.ramltopojo.RamlLoader;
-import org.raml.ramltopojo.RamlToPojo;
-import org.raml.ramltopojo.RamlToPojoBuilder;
-import org.raml.ramltopojo.TypeFetchers;
-import org.raml.ramltopojo.TypeFinders;
-import org.raml.v2.api.model.v10.api.Api;
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.squareup.javapoet.ClassName;
+import org.junit.Test;
+import org.raml.ramltopojo.*;
+import org.raml.v2.api.model.v10.api.Api;
+
+import java.util.Arrays;
+
+import static junit.framework.TestCase.assertNotNull;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
+import static org.raml.testutils.matchers.AnnotationSpecMatchers.annotationType;
+import static org.raml.testutils.matchers.AnnotationSpecMatchers.member;
+import static org.raml.testutils.matchers.CodeBlockMatchers.codeBlockContents;
+import static org.raml.testutils.matchers.MethodSpecMatchers.methodName;
+import static org.raml.testutils.matchers.TypeSpecMatchers.*;
 
 /**
  * Created. There, you have it.
@@ -80,6 +66,7 @@ public class JacksonUnionExtensionTest {
                                 methods(containsInAnyOrder(
                                     allOf(methodName(equalTo("<init>"))),
                                     allOf(methodName(equalTo("isValidObject"))),
+                                    allOf(methodName(equalTo("getNullValue"))),
                                     allOf(methodName(equalTo("deserialize")))
                                 ))
                             ),
