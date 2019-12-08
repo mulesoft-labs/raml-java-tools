@@ -22,8 +22,8 @@ types:
          properties:
              last: string
 
-    emptyArrayType:
-      type: array
+#    emptyArrayType:
+#      type: array
 
     father:
       type: object
@@ -39,15 +39,15 @@ types:
           type: array
           items:
             type: child
-        complicatedChildren:
-          (ramltopojo.types):
-            generateInlineArrayType: true
-          type: emptyArrayType
-          items:
-            type: child
+#        complicatedChildren:
+#          (ramltopojo.types):
+#            generateInlineArrayType: true
+#          type: emptyArrayType
+#          items:
+#            type: child
         smaller:
-          (ramltopojo.types):
-            generateInlineArrayType: true
+#          (ramltopojo.types):
+#            generateInlineArrayType: true
           type: array
           items:
             type: object

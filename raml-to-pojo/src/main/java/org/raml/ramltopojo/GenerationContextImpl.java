@@ -52,7 +52,7 @@ public class GenerationContextImpl implements GenerationContext {
             return knownTypes.get(typeName);
         } else {
 
-            Shape typeDeclaration = typeFetcher.fetchType(null /*api*/, typeName);
+            Shape typeDeclaration = typeFetcher.fetchType(api, typeName);
             Optional<CreationResult> result =  CreationResultFactory.createType((AnyShape) typeDeclaration, this);
 
             // todo fix this.

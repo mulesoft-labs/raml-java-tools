@@ -82,6 +82,11 @@ public class Utils {
     }
 
     private static Shape itemsFromInheritance(ArrayShape shape) {
+        if ( shape.linkTarget().isPresent()) {
+
+            return (Shape) shape.linkTarget().get();
+        }
+
         if ( shape.inherits().isEmpty()) {
             return null;
         }

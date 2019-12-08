@@ -85,7 +85,7 @@ public class ArrayTypeHandler implements TypeHandler {
 
         TypeName itemsTypeName = ClassName.get(Object.class);
         if (ShapeType.isNewInlineType(items)) {
-            Optional<CreationResult> cr = CreationResultFactory.createInlineType(className, preCreationResult.getJavaName(EventType.IMPLEMENTATION), Names.typeName(items.name().value(), "type"), null /*items*/, generationContext);
+            Optional<CreationResult> cr = CreationResultFactory.createInlineType(className, preCreationResult.getJavaName(EventType.IMPLEMENTATION), Names.typeName(items.name().value(), "type"), items, generationContext);
             if (cr.isPresent()) {
                 preCreationResult.withInternalType(items.name().value(), cr.get());
                 itemsTypeName = cr.get().getJavaName(EventType.INTERFACE);
