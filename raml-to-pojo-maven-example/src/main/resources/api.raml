@@ -7,10 +7,6 @@ uses:
   arrays: arrays.raml
   unions: unions.raml
   discriminatorjackson: discriminator-jackson.raml
-#(ramltopojo.types):
-#  plugins:
-#    - name: core.jackson2
-
 types:
     withAnArray:
       properties:
@@ -25,7 +21,10 @@ types:
               plugins:
                 - name: core.asArray
     nilUnionType:
-      type: string|integer
+      (ramltopojo.types):
+        plugins:
+          - name: core.jackson2
+      type: string|nil
     unionProperty:
       properties:
         goo: string|nil

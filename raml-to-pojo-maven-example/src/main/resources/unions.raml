@@ -3,7 +3,34 @@ uses:
   ramltopojo: ramltopojo.raml
 types:
   Dog:
+    (ramltopojo.types):
+      plugins:
+        - name: core.jackson2
     type: object
     properties:
       bark: nil | boolean
       color: string
+  Television:
+    (ramltopojo.types):
+      plugins:
+        - name: core.jackson2
+    type: object
+    properties:
+      color: boolean
+  Projector:
+    (ramltopojo.types):
+      plugins:
+        - name: core.jackson2
+    type: object
+    properties:
+      hanging: boolean
+  Entertainement:
+     (ramltopojo.types):
+      plugins:
+        - name: core.jackson2
+     type: Television | Projector
+  SomeScalar:
+    (ramltopojo.types):
+      plugins:
+        - name: core.jackson2
+    type: string|integer
