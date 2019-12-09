@@ -73,7 +73,11 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                     .addModifiers(Modifier.PUBLIC)
                     .addStatement("super($T.class)", typeBuilderName)
                     .build())
-                .addModifiers(Modifier.PUBLIC);
+                .addField(FieldSpec.builder(TypeName.LONG, "serialVersionUID")
+                    .addModifiers(Modifier.PRIVATE, Modifier.FINAL, Modifier.STATIC)
+                    .initializer("1L")
+                    .build());
+
         MethodSpec.Builder serialize =
             MethodSpec.methodBuilder("serialize")
                 .addModifiers(Modifier.PUBLIC)
@@ -118,7 +122,11 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                     .addModifiers(Modifier.PUBLIC)
                     .addStatement("super($T.class)", typeBuilderName)
                     .build())
-                .addModifiers(Modifier.PUBLIC);
+                .addField(FieldSpec.builder(TypeName.LONG, "serialVersionUID")
+                    .addModifiers(Modifier.PRIVATE, Modifier.FINAL, Modifier.STATIC)
+                    .initializer("1L")
+                    .build());
+
         MethodSpec.Builder deserialize =
             MethodSpec.methodBuilder("deserialize")
                 .addModifiers(Modifier.PUBLIC)

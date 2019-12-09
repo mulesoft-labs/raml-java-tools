@@ -90,7 +90,7 @@ public class UnionTypeHandler implements TypeHandler {
 
         // build empty constructor
         typeSpec.addMethod(MethodSpec.constructorBuilder()
-            .addModifiers(Modifier.PRIVATE)
+            .addModifiers(Modifier.PROTECTED)
             .build());
 
         // build object constructor

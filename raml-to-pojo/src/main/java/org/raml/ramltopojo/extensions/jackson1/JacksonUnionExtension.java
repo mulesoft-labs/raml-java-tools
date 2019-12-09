@@ -78,7 +78,12 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                 .addMethod(MethodSpec.constructorBuilder()
                     .addModifiers(Modifier.PUBLIC)
                     .addStatement("super($T.class)", typeBuilderName)
+                    .build())
+                .addField(FieldSpec.builder(TypeName.LONG, "serialVersionUID")
+                    .addModifiers(Modifier.PRIVATE, Modifier.FINAL, Modifier.STATIC)
+                    .initializer("1L")
                     .build());
+
         MethodSpec.Builder serialize = MethodSpec.methodBuilder("serialize")
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(ParameterSpec.builder(typeBuilderName, "object").build())
@@ -114,17 +119,20 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
 
         ClassName typeBuilderName = ClassName.get("", typeBuilder.build().name);
 
-        TypeSpec.Builder builder = TypeSpec.classBuilder(serializerName)
+        TypeSpec.Builder builder =
+            TypeSpec.classBuilder(serializerName)
                 .addModifiers(Modifier.STATIC, Modifier.PUBLIC)
                 .superclass(ParameterizedTypeName.get(ClassName.get(StdDeserializer.class), typeBuilderName))
-                .addMethod(
-                        MethodSpec.constructorBuilder()
-                                .addModifiers(Modifier.PUBLIC)
-                                .addCode("super($T.class);", typeBuilderName).build()
+                .addMethod(MethodSpec.constructorBuilder()
+                    .addModifiers(Modifier.PUBLIC)
+                    .addCode("super($T.class);", typeBuilderName).build())
+                .addField(FieldSpec.builder(TypeName.LONG, "serialVersionUID")
+                    .addModifiers(Modifier.PRIVATE, Modifier.FINAL, Modifier.STATIC)
+                    .initializer("1L")
+                    .build());;
 
-                ).addModifiers(Modifier.PUBLIC);
-
-        MethodSpec.Builder deserialize = MethodSpec.methodBuilder("deserialize")
+        MethodSpec.Builder deserialize =
+            MethodSpec.methodBuilder("deserialize")
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(ParameterSpec.builder(ClassName.get(JsonParser.class), "jp").build())
                 .addParameter(ParameterSpec.builder(ClassName.get(DeserializationContext.class), "jsonContext").build())
