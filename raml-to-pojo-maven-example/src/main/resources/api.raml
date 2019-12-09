@@ -25,6 +25,11 @@ types:
         plugins:
           - name: core.jackson2
       type: string|nil
+    complexUnion:
+      (ramltopojo.types):
+        plugins:
+          - name: core.jackson2
+      type: boolean|integer|string|nil
     unionProperty:
       properties:
         goo: string|nil

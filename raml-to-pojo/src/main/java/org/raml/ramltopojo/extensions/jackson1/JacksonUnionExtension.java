@@ -2,7 +2,6 @@ package org.raml.ramltopojo.extensions.jackson1;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.squareup.javapoet.*;
 import org.codehaus.jackson.JsonGenerator;
@@ -20,9 +19,9 @@ import org.codehaus.jackson.map.util.StdDateFormat;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.GenerationException;
 import org.raml.ramltopojo.Names;
-import org.raml.ramltopojo.Utils;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
+import org.raml.ramltopojo.union.UnionTypesHelper;
 import org.raml.v2.api.model.v10.datamodel.*;
 
 import javax.annotation.Nullable;
@@ -33,7 +32,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created. There, you have it.
@@ -71,15 +69,6 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
 
         if ( eventType == EventType.IMPLEMENTATION) {
             return;
-        }
-
-        // check if union is ambiguous (duplicate primitive types)
-        if (isAmbiguousUnion(union.of())) {
-            throw new GenerationException(
-                "This union is ambiguous. It's impossible to create a Jackson-Serialization/-Deserialization strategy for ambiguous types: "
-                    + union.of().stream().map(x -> prettyName(x, unionPluginContext)).collect(Collectors.toList())
-                    + ". Use unique primitive types or classes with discriminator to solve this conflict."
-            );
         }
 
         ClassName typeBuilderName = ClassName.get("", typeBuilder.build().name);
@@ -137,35 +126,18 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
 
         MethodSpec.Builder deserialize = MethodSpec.methodBuilder("deserialize")
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(ParameterSpec.builder(ClassName.get(JsonParser.class), "jsonParser").build())
+                .addParameter(ParameterSpec.builder(ClassName.get(JsonParser.class), "jp").build())
                 .addParameter(ParameterSpec.builder(ClassName.get(DeserializationContext.class), "jsonContext").build())
                 .addException(IOException.class)
                 .addException(JsonProcessingException.class)
                 .returns(typeBuilderName)
-                .addStatement("$T mapper  = new $T()", ObjectMapper.class, ObjectMapper.class)
-                .addStatement("$T node = mapper.readTree(jsonParser)", JsonNode.class);
+                .addStatement("$T node = jp.getCodec().readTree(jp)", JsonNode.class);
 
         boolean dateValidation = false;
         boolean objectValidation = false;
+        boolean nullMethod = false;
 
-        // we need to sort types for best deserialization results (int before number,
-        // date before string, ...)
-        List<TypeDeclaration> sortedTypes = new LinkedList<TypeDeclaration>(union.of());
-        Map<Class<? extends TypeDeclaration>, Integer> typePriority = getPriorityTypeMap();
-        Collections.sort(sortedTypes,(t1, t2) -> {
-                // if both types are objects, we first do discriminator objects
-                if (t1 instanceof ObjectTypeDeclaration && t2 instanceof ObjectTypeDeclaration) {
-                    String d1 = ((ObjectTypeDeclaration) t1).discriminator();
-                    String d2 = ((ObjectTypeDeclaration) t2).discriminator();
-                    return d1 != null && d2 != null ? 0 : (d2 == null ? -1 : (d1 == null ? 1 : 0));
-                }
-                // no furhter process needed for other types
-                return Integer.compare(typePriority.get(Utils.declarationType(t1)), typePriority.get(Utils.declarationType(t2)));
-            }
-        );
-
-        boolean overriden = false;
-        for (TypeDeclaration typeDeclaration : sortedTypes) {
+        for (TypeDeclaration typeDeclaration : UnionTypesHelper.sortByPriority(union.of())) {
 
             // get type name of declaration
             TypeName typeName = unionPluginContext.findType(typeDeclaration.name(), typeDeclaration).box();
@@ -176,15 +148,14 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                 deserialize.addStatement("return new $T(null)", unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION));
                 deserialize.endControlFlow();
 
-                if (!overriden) {
+                if (!nullMethod) {
                     builder.addMethod(MethodSpec.methodBuilder("getNullValue")
                             .addModifiers(Modifier.PUBLIC)
                             .returns(typeBuilderName)
-                            .addStatement("return new $T()", unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION))
+                            .addStatement("return new $T(null)", unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION))
                             .build());
-                    overriden = true;
+                    nullMethod = true;
                 }
-
 
             } else if (typeDeclaration instanceof BooleanTypeDeclaration) {
 
@@ -198,18 +169,16 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                     deserialize.beginControlFlow("if (node.isLong())");
                     deserialize.addStatement("return new $T(node.asLong())", unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION));
                     deserialize.endControlFlow();
-                }
-
-                if (typeName.box().equals(TypeName.INT.box())) {
+                } else if (typeName.box().equals(TypeName.INT.box())) {
                     deserialize.beginControlFlow("if (node.isInt())");
                     deserialize.addStatement("return new $T(node.asInt())", unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION));
                     deserialize.endControlFlow();
-                }
-
-                if (typeName.box().equals(TypeName.SHORT.box())) {
+                } else if (typeName.box().equals(TypeName.SHORT.box())) {
                     deserialize.beginControlFlow("if (node.isShort())");
-                    deserialize.addStatement("return new $T(mapper.treeToValue(node, $T.class)", unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), typeName);
+                    deserialize.addStatement("return new $T(jp.getCodec().treeToValue(node, $T.class)", unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), typeName);
                     deserialize.endControlFlow();
+                } else {
+                    throw new GenerationException("Unknown integer type");
                 }
 
             } else if (typeDeclaration instanceof StringTypeDeclaration) {
@@ -221,7 +190,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
             } else if (typeDeclaration instanceof NumberTypeDeclaration) {
 
                 deserialize.beginControlFlow("if (node.isNumber())");
-                deserialize.addStatement("return new $T(mapper.treeToValue(node, $T.class))",
+                deserialize.addStatement("return new $T(jp.getCodec().treeToValue(node, $T.class))",
                     unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), Number.class);
                 deserialize.endControlFlow();
 
@@ -230,6 +199,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                 dateValidation = true;
 
                 deserialize.beginControlFlow("if (node.isTextual() && isValidDate(node.asText(), $T.getDateInstance()))", StdDateFormat.class);
+                deserialize.addStatement("$T mapper = new $T()", ObjectMapper.class, ObjectMapper.class);
                 deserialize.addStatement("mapper.setDateFormat($T.getDateInstance())", StdDateFormat.class);
                 deserialize.addStatement("return new $T(mapper.treeToValue(node, $T.class))",
                     unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), Date.class);
@@ -240,6 +210,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                 dateValidation = true;
 
                 deserialize.beginControlFlow("if (node.isTextual() && isValidDate(node.asText(), $T.getTimeInstance()))", StdDateFormat.class);
+                deserialize.addStatement("$T mapper = new $T()", ObjectMapper.class, ObjectMapper.class);
                 deserialize.addStatement("mapper.setDateFormat($T.getTimeInstance())", StdDateFormat.class);
                 deserialize.addStatement("return new $T(mapper.treeToValue(node, $T.class))",
                     unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), Date.class);
@@ -250,6 +221,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                 dateValidation = true;
 
                 deserialize.beginControlFlow("if (node.isTextual() && isValidDate(node.asText(), $T.getDateTimeInstance()))", StdDateFormat.class);
+                deserialize.addStatement("$T mapper = new $T()", ObjectMapper.class, ObjectMapper.class);
                 deserialize.addStatement("mapper.setDateFormat($T.getDateTimeInstance())", StdDateFormat.class);
                 deserialize.addStatement("return new $T(mapper.treeToValue(node, $T.class))",
                     unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION),Date.class);
@@ -262,12 +234,14 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                 if (Objects.equals("rfc2616", ((DateTimeTypeDeclaration) typeDeclaration).format())) {
                     deserialize.beginControlFlow("if (node.isTextual() && isValidDate(node.asText()), new $T($S)))",
                         SimpleDateFormat.class, "EEE, dd MMM yyyy HH:mm:ss z");
+                    deserialize.addStatement("$T mapper = new $T()", ObjectMapper.class, ObjectMapper.class);
                     deserialize.addStatement("mapper.setDateFormat(new $T($S))", SimpleDateFormat.class, "EEE, dd MMM yyyy HH:mm:ss z");
                     deserialize.addStatement("return new $T(mapper.treeToValue(node, $T.class))",
                         unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), Date.class);
                     deserialize.endControlFlow();
                 } else {
                     deserialize.beginControlFlow("if (node.isTextual() && isValidDate(node.asText()), $T.getDateTimeInstance()))", StdDateFormat.class);
+                    deserialize.addStatement("$T mapper = new $T()", ObjectMapper.class, ObjectMapper.class);
                     deserialize.addStatement("mapper.setDateFormat($T.getDateTimeInstance())", StdDateFormat.class);
                     deserialize.addStatement("return new $T(mapper.treeToValue(node, $T.class))",
                         unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), Date.class);
@@ -280,7 +254,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                 TypeName arrayType = unionPluginContext.findType(arrayTypeDeclaration.name(), arrayTypeDeclaration).box();
 
                 deserialize.beginControlFlow("if (node.isArray())");
-                deserialize.addStatement("return new $T(mapper.treeToValue(node, $T[].class))",
+                deserialize.addStatement("return new $T(jp.getCodec().treeToValue(node, $T[].class))",
                     unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), arrayType);
                 deserialize.endControlFlow();
 
@@ -298,7 +272,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                 });
 
                 deserialize.beginControlFlow("if (node.isObject() && isValidObject(node, $T.asList($L)))", Arrays.class, Joiner.on(",").join(names));
-                deserialize.addStatement("return new $T(mapper.treeToValue(node, $T.class))",
+                deserialize.addStatement("return new $T(jp.getCodec().treeToValue(node, $T.class))",
                     unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), typeName);
                 deserialize.endControlFlow();
 
@@ -334,24 +308,6 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
         typeBuilder.addType(builder.build());
     }
 
-    private Map<Class<? extends TypeDeclaration>, Integer> getPriorityTypeMap() {
-        return new ImmutableMap.Builder<Class<? extends TypeDeclaration>, Integer>().put(NullTypeDeclaration.class, 1)
-            .put(BooleanTypeDeclaration.class, 2)
-            .put(IntegerTypeDeclaration.class, 3)
-            .put(NumberTypeDeclaration.class, 4)
-            .put(DateTypeDeclaration.class, 5)
-            .put(TimeOnlyTypeDeclaration.class, 6)
-            .put(DateTimeOnlyTypeDeclaration.class, 7)
-            .put(DateTimeTypeDeclaration.class, 8)
-            .put(StringTypeDeclaration.class, 9)
-            .put(ObjectTypeDeclaration.class, 10)
-            .put(ArrayTypeDeclaration.class, 11)
-            .put(UnionTypeDeclaration.class, 12)
-            .put(FileTypeDeclaration.class, 13)
-            .put(AnyTypeDeclaration.class, 14)
-            .build();
-    }
-
     private void buildDateValidation(TypeSpec.Builder builder) {
         MethodSpec.Builder spec =
             MethodSpec.methodBuilder("isValidDate").addParameter(ClassName.get(String.class), "value").addParameter(ClassName.get(DateFormat.class), "format");
@@ -371,23 +327,6 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
         spec.addStatement("return list.containsAll(keys)");
         spec.addModifiers(Modifier.PRIVATE).returns(TypeName.BOOLEAN);
         builder.addMethod(spec.build());
-    }
-
-    private boolean isAmbiguousUnion(List<TypeDeclaration> typeDeclarations) {
-        Set<Class<? extends TypeDeclaration>> uniqueTypeSet = new HashSet<>();
-        for (TypeDeclaration typeDeclaration : typeDeclarations) {
-            boolean isUnique = uniqueTypeSet.add(typeDeclaration.getClass());
-            // we already have this type
-            if (!isUnique) {
-                // it's valid to have different object types
-                if (typeDeclaration instanceof ObjectTypeDeclaration) {
-                    continue;
-                }
-                // all primitive types are invalid => ambiguous
-                return true;
-            }
-        }
-        return false;
     }
 
     private String prettyName(TypeDeclaration type, UnionPluginContext unionPluginContext) {
