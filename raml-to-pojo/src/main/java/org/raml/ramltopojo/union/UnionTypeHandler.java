@@ -145,7 +145,7 @@ public class UnionTypeHandler implements TypeHandler {
                 fieldValueSpec = generationContext.pluginsForUnions(union).fieldBuilt(context, unitedType, fieldValueSpec, EventType.IMPLEMENTATION);
                 typeSpec.addField(fieldValueSpec.build());
 
-                String enumName = Names.constantName(prettyName);
+                String enumName = Names.enumName(prettyName);
                 String isName = Names.methodName("is", prettyName);
                 String getName = Names.methodName("get", prettyName);
 
@@ -215,40 +215,40 @@ public class UnionTypeHandler implements TypeHandler {
 
         for (TypeDeclaration unitedType : union.of()) {
 
-        if (unitedType instanceof ArrayTypeDeclaration) {
-            throw new GenerationException("ramltopojo currently does not support arrays in unions");
-        }
+            if (unitedType instanceof ArrayTypeDeclaration) {
+                throw new GenerationException("ramltopojo currently does not support arrays in unions");
+            }
 
-        TypeName typeName = unitedType instanceof NullTypeDeclaration ? NULL_CLASS: findType(unitedType.name(), unitedType, generationContext).box();
-        String prettyName = prettyName(unitedType, generationContext);
+            TypeName typeName = unitedType instanceof NullTypeDeclaration ? NULL_CLASS: findType(unitedType.name(), unitedType, generationContext).box();
+            String prettyName = prettyName(unitedType, generationContext);
 
-        // add enum name
-        enumTypeSpec.addEnumConstant(Names.constantName(prettyName));
+            // add enum name
+            enumTypeSpec.addEnumConstant(Names.enumName(prettyName));
 
-        if (typeName == NULL_CLASS) {
+            if (typeName == NULL_CLASS) {
 
-            typeSpec
-                .addMethod(MethodSpec.methodBuilder("isNil")
-                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                    .returns(TypeName.BOOLEAN)
-                    .build())
-                .addMethod(MethodSpec.methodBuilder("getNil")
-                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                    .returns(typeName)
-                    .build());
+                typeSpec
+                    .addMethod(MethodSpec.methodBuilder("isNil")
+                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                        .returns(TypeName.BOOLEAN)
+                        .build())
+                    .addMethod(MethodSpec.methodBuilder("getNil")
+                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                        .returns(typeName)
+                        .build());
 
-        } else {
+            } else {
 
-            typeSpec
-                .addMethod(MethodSpec.methodBuilder(Names.methodName("is", prettyName))
-                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                    .returns(TypeName.BOOLEAN)
-                    .build())
-                .addMethod(MethodSpec.methodBuilder(Names.methodName("get", prettyName))
-                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                    .returns(typeName)
-                    .build());
-        }
+                typeSpec
+                    .addMethod(MethodSpec.methodBuilder(Names.methodName("is", prettyName))
+                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                        .returns(TypeName.BOOLEAN)
+                        .build())
+                    .addMethod(MethodSpec.methodBuilder(Names.methodName("get", prettyName))
+                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                        .returns(typeName)
+                        .build());
+            }
         }
 
         // set enum as inner type
