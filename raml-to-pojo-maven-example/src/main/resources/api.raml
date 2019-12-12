@@ -189,7 +189,11 @@ types:
         plugins:
           - name: core.jackson2
       type: datetime-only | nil
-      
+    date4Union:
+      (ramltopojo.types):
+        plugins:
+          - name: core.jackson2
+      type: datetime | nil      
     dateUnion:
       (ramltopojo.types):
         plugins:
@@ -199,4 +203,5 @@ types:
         date1: date1Union
         date2: date2Union
         date3: date3Union
+        date4: date4Union
       
