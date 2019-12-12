@@ -6,9 +6,13 @@ import com.squareup.javapoet.ClassName;
 
 import org.junit.Test;
 import org.raml.ramltopojo.CreationResult;
+import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.GenerationContextImpl;
 import org.raml.ramltopojo.RamlLoader;
+import org.raml.ramltopojo.RamlToPojo;
+import org.raml.ramltopojo.RamlToPojoBuilder;
 import org.raml.ramltopojo.TypeFetchers;
+import org.raml.ramltopojo.TypeFinders;
 import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
@@ -16,6 +20,7 @@ import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 
 import javax.annotation.Nullable;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -154,6 +159,16 @@ public class UnionTypeHandlerTest {
             )),
             superInterfaces(contains(allOf(typeName(equalTo(ClassName.get("bar.pack", "Foo"))))))
         )));
+    }
+    
+    @Test
+    public void datesUnion() throws Exception {
+        Api api = RamlLoader.load(this.getClass().getResourceAsStream("union-dates.raml"), ".");
+        RamlToPojo ramlToPojo = new RamlToPojoBuilder(api).fetchTypes(TypeFetchers.fromAnywhere()).findTypes(TypeFinders.everyWhere()).build(Arrays.asList("core.jackson2"));
+        ramlToPojo.buildPojos().creationResults().stream().forEach(x -> {
+            System.err.println(x.getInterface().toString());
+            System.err.println(x.getImplementation().toString());
+        });
     }
 
     private static UnionTypeDeclaration findTypes(final String name, List<TypeDeclaration> types) {

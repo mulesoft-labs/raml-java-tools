@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -95,7 +94,34 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
             String isMethod = Names.methodName("is", name);
             String getMethod = Names.methodName("get", name);
             serialize.beginControlFlow("if ( object." + isMethod + "())");
-            serialize.addStatement("jsonGenerator.writeObject(object." + getMethod + "())");
+                   
+            // Check for dates (special serialization)
+            if (typeDeclaration instanceof DateTypeDeclaration) {
+                
+                serialize.addStatement("new $T().setDateFormat(new $T($S)).writeValue(jsonGenerator, object." + getMethod + "())", ObjectMapper.class, SimpleDateFormat.class, "yyyy-mm-dd");
+           
+            } else if (typeDeclaration instanceof TimeOnlyTypeDeclaration) {
+                
+                serialize.addStatement("new $T().setDateFormat(new $T($S)).writeValue(jsonGenerator, object." + getMethod + "())", ObjectMapper.class, SimpleDateFormat.class, "hh:mm:ss");
+           
+            } else if (typeDeclaration instanceof DateTimeOnlyTypeDeclaration) {
+                
+                serialize.addStatement("new $T().setDateFormat(new $T($S)).writeValue(jsonGenerator, object." + getMethod + "())", ObjectMapper.class, SimpleDateFormat.class, "yyyy-MM-dd'T'HH:mm:ss");
+           
+            } else if (typeDeclaration instanceof DateTimeTypeDeclaration) {
+                
+                if (Objects.equals("rfc2616", ((DateTimeTypeDeclaration) typeDeclaration).format())) {
+                    serialize.addStatement("new $T().setDateFormat(new $T($S)).writeValue(jsonGenerator, object." + getMethod + "())", ObjectMapper.class, SimpleDateFormat.class, "EEE, dd MMM yyyy HH:mm:ss z");
+                } else {                    
+                    serialize.addStatement("new $T().setDateFormat(new $T($S)).writeValue(jsonGenerator, object." + getMethod + "())", ObjectMapper.class, SimpleDateFormat.class, "yyyy-MM-dd'T'HH:mm:ssZ");                
+                }
+                
+            } else {
+                
+                serialize.addStatement("jsonGenerator.writeObject(object." + getMethod + "())");
+                
+            }
+
             serialize.addStatement("return");
             serialize.endControlFlow();
         }
@@ -201,56 +227,31 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
 
             } else if (typeDeclaration instanceof DateTypeDeclaration) {
 
-                dateValidation = true;
-
-                deserialize.beginControlFlow("if (node.isTextual() && isValidDate(node.asText(), $T.getDateInstance()))", StdDateFormat.class);
-                deserialize.addStatement("$T mapper = new $T()", ObjectMapper.class, ObjectMapper.class);
-                deserialize.addStatement("mapper.setDateFormat($T.getDateInstance())", StdDateFormat.class);
-                deserialize.addStatement("return new $T(mapper.treeToValue(node, $T.class))",
-                    unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), Date.class);
-                deserialize.endControlFlow();
+                dateValidation = true;       
+                this.buildDateDeserialize(unionPluginContext, deserialize, "yyyy-mm-dd");
 
             } else if (typeDeclaration instanceof TimeOnlyTypeDeclaration) {
 
-                dateValidation = true;
-
-                deserialize.beginControlFlow("if (node.isTextual() && isValidDate(node.asText(), $T.getTimeInstance()))", StdDateFormat.class);
-                deserialize.addStatement("$T mapper = new $T()", ObjectMapper.class, ObjectMapper.class);
-                deserialize.addStatement("mapper.setDateFormat($T.getTimeInstance())", StdDateFormat.class);
-                deserialize.addStatement("return new $T(mapper.treeToValue(node, $T.class))",
-                    unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), Date.class);
-                deserialize.endControlFlow();
+                dateValidation = true;                    
+                this.buildDateDeserialize(unionPluginContext, deserialize, "hh:mm:ss");
 
             } else if (typeDeclaration instanceof DateTimeOnlyTypeDeclaration) {
 
-                dateValidation = true;
-
-                deserialize.beginControlFlow("if (node.isTextual() && isValidDate(node.asText(), $T.getDateTimeInstance()))", StdDateFormat.class);
-                deserialize.addStatement("$T mapper = new $T()", ObjectMapper.class, ObjectMapper.class);
-                deserialize.addStatement("mapper.setDateFormat($T.getDateTimeInstance())", StdDateFormat.class);
-                deserialize.addStatement("return new $T(mapper.treeToValue(node, $T.class))",
-                    unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION),Date.class);
-                deserialize.endControlFlow();
+                dateValidation = true;               
+                this.buildDateDeserialize(unionPluginContext, deserialize, "yyyy-MM-dd'T'HH:mm:ss");
 
             } else if (typeDeclaration instanceof DateTimeTypeDeclaration) {
 
                 dateValidation = true;
 
                 if (Objects.equals("rfc2616", ((DateTimeTypeDeclaration) typeDeclaration).format())) {
-                    deserialize.beginControlFlow("if (node.isTextual() && isValidDate(node.asText()), new $T($S)))",
-                        SimpleDateFormat.class, "EEE, dd MMM yyyy HH:mm:ss z");
-                    deserialize.addStatement("$T mapper = new $T()", ObjectMapper.class, ObjectMapper.class);
-                    deserialize.addStatement("mapper.setDateFormat(new $T($S))", SimpleDateFormat.class, "EEE, dd MMM yyyy HH:mm:ss z");
-                    deserialize.addStatement("return new $T(mapper.treeToValue(node, $T.class))",
-                        unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), Date.class);
-                    deserialize.endControlFlow();
-                } else {
-                    deserialize.beginControlFlow("if (node.isTextual() && isValidDate(node.asText()), $T.getDateTimeInstance()))", StdDateFormat.class);
-                    deserialize.addStatement("$T mapper = new $T()", ObjectMapper.class, ObjectMapper.class);
-                    deserialize.addStatement("mapper.setDateFormat($T.getDateTimeInstance())", StdDateFormat.class);
-                    deserialize.addStatement("return new $T(mapper.treeToValue(node, $T.class))",
-                        unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), Date.class);
-                    deserialize.endControlFlow();
+                    
+                    this.buildDateDeserialize(unionPluginContext, deserialize, "EEE, dd MMM yyyy HH:mm:ss z");
+                    
+                } else {      
+                    
+                    this.buildDateDeserialize(unionPluginContext, deserialize, "yyyy-MM-dd'T'HH:mm:ssZ");
+                    
                 }
 
             } else if (typeDeclaration instanceof ArrayTypeDeclaration) {
@@ -335,11 +336,25 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
             return typeDeclaration;
         }
     }
+    
+    private void buildDateDeserialize(UnionPluginContext unionPluginContext, MethodSpec.Builder deserialize, String dateFormat) {
+        deserialize.beginControlFlow("if (node.isTextual() && isValidDate(node.asText(), new $T($S)))", SimpleDateFormat.class, dateFormat);
+        deserialize.addStatement("$T mapper = new $T()", ObjectMapper.class, ObjectMapper.class);                                
+        deserialize.addStatement("mapper.setDateFormat(new $T($S))", SimpleDateFormat.class, dateFormat);
+        deserialize.addStatement("return new $T(mapper.treeToValue(node, $T.class))",
+            unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), Date.class);
+        deserialize.endControlFlow();
+    }
 
     private void buildDateValidation(TypeSpec.Builder builder) {
         MethodSpec.Builder spec =
             MethodSpec.methodBuilder("isValidDate").addParameter(ClassName.get(String.class), "value").addParameter(ClassName.get(DateFormat.class), "format");
-        spec.addStatement("try { return format.parse(value) != null; } catch ($T e) { return false; }", ParseException.class);
+        spec.beginControlFlow("try");
+        spec.addStatement("return format.parse(value) != null");
+        spec.endControlFlow();
+        spec.beginControlFlow("catch ($T e)", ParseException.class);
+        spec.addStatement("return false");
+        spec.endControlFlow();
         spec.addModifiers(Modifier.PRIVATE).returns(TypeName.BOOLEAN);
         builder.addMethod(spec.build());
     }

@@ -173,3 +173,30 @@ types:
       properties:
         name: string
         direction: nametypes
+
+    date1Union:
+      (ramltopojo.types):
+        plugins:
+          - name: core.jackson2
+      type: date-only | nil  
+    date2Union:
+      (ramltopojo.types):
+        plugins:
+          - name: core.jackson2
+      type: time-only | nil   
+    date3Union:
+      (ramltopojo.types):
+        plugins:
+          - name: core.jackson2
+      type: datetime-only | nil
+      
+    dateUnion:
+      (ramltopojo.types):
+        plugins:
+          - name: core.jackson2
+      type: object
+      properties:
+        date1: date1Union
+        date2: date2Union
+        date3: date3Union
+      

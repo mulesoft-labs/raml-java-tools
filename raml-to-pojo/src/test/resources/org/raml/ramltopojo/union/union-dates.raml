@@ -1,0 +1,35 @@
+#%RAML 1.0
+title: Hello World API
+version: v1
+baseUri: https://api.github.com
+
+# ------------------------------------------------------------------------------
+# - TYPES
+# ------------------------------------------------------------------------------     
+     
+types:
+ 
+    dateOnlyType:
+      type: date-only
+    timeOnlyType:
+      type: time-only
+    datetimeOnlyType:
+      type: datetime-only
+    datetime3339Type:
+      type: datetime
+      format: rfc3339
+    datetime2616Type:
+      type: datetime
+      format: rfc2616
+      
+      
+    dateUnion1:
+      type: dateOnlyType | nil    
+    dateUnion2:
+      type: timeOnlyType | nil 
+    dateUnion3:
+      type: datetimeOnlyType | nil 
+    dateUnion4:
+      type: datetime3339Type | nil 
+    dateUnion5:
+      type: datetime2616Type | nil
