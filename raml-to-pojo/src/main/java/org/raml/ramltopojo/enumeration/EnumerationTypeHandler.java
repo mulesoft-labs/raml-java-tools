@@ -44,7 +44,7 @@ public class EnumerationTypeHandler implements TypeHandler {
 
         Class cls = (typeDeclaration instanceof StringTypeDeclaration)?String.class:Number.class;
 
-        FieldSpec.Builder field = FieldSpec.builder(ClassName.get(cls), "name").addModifiers(Modifier.PRIVATE);
+        FieldSpec.Builder field = FieldSpec.builder(ClassName.get(cls), "name").addModifiers(Modifier.PROTECTED, Modifier.FINAL);
         EnumerationPluginContext enumerationPluginContext = new EnumerationPluginContextImpl(generationContext, preCreationResult);
 
         ClassName className = preCreationResult.getJavaName(EventType.INTERFACE);

@@ -354,10 +354,13 @@ public class ObjectTypeHandler implements TypeHandler {
     protected TypeSpec.Builder buildSpecialMap() {
         return TypeSpec.classBuilder("ExcludingMap")
                 .superclass(ParameterizedTypeName.get(ClassName.get(HashMap.class), ClassName.get(String.class), ClassName.get(Object.class)))
-                .addField(
-                        FieldSpec.builder(ParameterizedTypeName.get(Set.class, Pattern.class), "additionalProperties")
-                                .initializer(CodeBlock.builder().add(" new $T()", ParameterizedTypeName.get(HashSet.class, Pattern.class)).build())
-                                .build())
+                .addField(FieldSpec.builder(TypeName.LONG, "serialVersionUID")
+                        .addModifiers(Modifier.PRIVATE, Modifier.FINAL, Modifier.STATIC)
+                        .initializer("1L")
+                        .build())
+                .addField(FieldSpec.builder(ParameterizedTypeName.get(Set.class, Pattern.class), "additionalProperties")
+                        .initializer(CodeBlock.builder().add(" new $T()", ParameterizedTypeName.get(HashSet.class, Pattern.class)).build())
+                        .build())
                 .addMethod(
                         MethodSpec.methodBuilder("put")
                                 .addParameter(ClassName.get(String.class), "key")
@@ -383,8 +386,8 @@ public class ObjectTypeHandler implements TypeHandler {
                                         .addStatement("super.putAll(otherMap)")
                                         .endControlFlow()
                                         .beginControlFlow("else")
-                                        .beginControlFlow("for ( String key: otherMap.keySet() )")
-                                        .addStatement("setProperty(key, otherMap.get(key))")
+                                        .beginControlFlow("for ( $T<? extends $T, ?> entry : otherMap.entrySet() )", Map.Entry.class, String.class)
+                                        .addStatement("setProperty(entry.getKey(), entry.getValue())")
                                         .endControlFlow()
                                         .endControlFlow()
                                         .build())

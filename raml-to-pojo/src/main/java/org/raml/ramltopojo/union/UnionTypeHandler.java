@@ -1,8 +1,6 @@
 package org.raml.ramltopojo.union;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
@@ -13,10 +11,9 @@ import org.raml.v2.api.model.v10.datamodel.NullTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 
-import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
-
+import java.util.stream.Collectors;
 /**
  * Created. There, you have it.
  */
@@ -76,12 +73,14 @@ public class UnionTypeHandler implements TypeHandler {
             .addModifiers(Modifier.PUBLIC)
             .addSuperinterface(interfaceName);
 
-        boolean hasNullType = FluentIterable.from(union.of()).anyMatch(new Predicate<TypeDeclaration>() {
-            @Override
-            public boolean apply(@Nullable TypeDeclaration input) {
-                return input instanceof NullTypeDeclaration;
-            }
-        });
+        // check if union is ambiguous (duplicate primitive types could't be handled by constructor)
+        if (UnionTypesHelper.isAmbiguous(union.of(), (x) -> findType(x.name(), x, generationContext))) {
+            throw new GenerationException(
+                "This union is ambiguous. It's impossible to create a correct constructor for ambiguous types: "
+                    + union.of().stream().map(x -> findType(x.name(), x, generationContext)).collect(Collectors.toList())
+                    + ". Use unique primitive types or classes with discriminator to solve this conflict."
+            );
+        }
 
         // add enum type field
         String unionEnumName = "unionType";
@@ -90,16 +89,15 @@ public class UnionTypeHandler implements TypeHandler {
         typeSpec.addField(FieldSpec.builder(unionEnumClassName, unionEnumName, Modifier.PRIVATE).build());
 
         // build empty constructor
-        MethodSpec.Builder emptyConstructorSpec = MethodSpec.constructorBuilder();
-        if (hasNullType) {
-            emptyConstructorSpec
-                .addModifiers(Modifier.PUBLIC)
-                .addStatement("this.$L = $T.NIL", unionEnumName, unionEnumClassName);
-        } else {
-            emptyConstructorSpec
-            .addModifiers(Modifier.PRIVATE);
-        }
-        typeSpec.addMethod(emptyConstructorSpec.build());
+        typeSpec.addMethod(MethodSpec.constructorBuilder()
+            .addModifiers(Modifier.PROTECTED)
+            .build());
+
+        // build object constructor
+        MethodSpec.Builder constructorSpec = MethodSpec.constructorBuilder()
+            .addModifiers(Modifier.PUBLIC)
+            .addParameter(ClassName.get(Object.class), "value");
+        boolean firstConstructorArgument = true;
 
         // build enum getter
         typeSpec.addMethod(MethodSpec.methodBuilder(Names.methodName("get", unionEnumName))
@@ -109,13 +107,22 @@ public class UnionTypeHandler implements TypeHandler {
             .build());
 
         // add union members
-        for (TypeDeclaration unitedType : union.of()) {
+        for (TypeDeclaration unitedType : UnionTypesHelper.sortByPriority(union.of())) {
 
             TypeName typeName = unitedType instanceof NullTypeDeclaration ? NULL_CLASS : findType(unitedType.name(), unitedType, generationContext).box();
             String prettyName = prettyName(unitedType, generationContext);
 
             String fieldName = Names.methodName(prettyName, "value");
             if (typeName == NULL_CLASS) {
+
+                if (firstConstructorArgument) {
+                    constructorSpec.beginControlFlow("if (value == null)");
+                    firstConstructorArgument = false;
+                } else {
+                    constructorSpec.beginControlFlow("else if (value == null)");
+                }
+                constructorSpec.addStatement("this.$L = $T.NIL", unionEnumName, unionEnumClassName);
+                constructorSpec.endControlFlow();
 
                 typeSpec
                     .addMethod(MethodSpec.methodBuilder("isNil")
@@ -134,22 +141,27 @@ public class UnionTypeHandler implements TypeHandler {
 
                 // Add value field with annotations (for every valid union member)
                 // This is necessary to support field validations in unions
-                String variableName = Names.variableName(prettyName, "value");
-                FieldSpec.Builder fieldValueSpec = FieldSpec.builder(typeName, variableName, Modifier.PRIVATE);
+                FieldSpec.Builder fieldValueSpec = FieldSpec.builder(typeName, fieldName, Modifier.PRIVATE);
                 fieldValueSpec = generationContext.pluginsForUnions(union).fieldBuilt(context, unitedType, fieldValueSpec, EventType.IMPLEMENTATION);
                 typeSpec.addField(fieldValueSpec.build());
 
-                // Add constructor(X), isX and getX
-                String enumName = Names.constantName(prettyName);
+                String enumName = Names.enumName(prettyName);
                 String isName = Names.methodName("is", prettyName);
                 String getName = Names.methodName("get", prettyName);
+
+                // add constructor section
+                if (firstConstructorArgument) {
+                    constructorSpec.beginControlFlow("if (value instanceof $T)", typeName);
+                    firstConstructorArgument = false;
+                } else {
+                    constructorSpec.beginControlFlow("else if (value instanceof $T)", typeName);
+                }
+                constructorSpec.addStatement("this.$L = $T.$L", unionEnumName, unionEnumClassName, enumName);
+                constructorSpec.addStatement("this.$L = ($T) value", fieldName, typeName);
+                constructorSpec.endControlFlow();
+
+                // Add isX and getX
                 typeSpec
-                    .addMethod(MethodSpec.constructorBuilder()
-                        .addParameter(ParameterSpec.builder(typeName, fieldName).build())
-                        .addModifiers(Modifier.PUBLIC)
-                        .addStatement("this.$L = $T.$L", unionEnumName, unionEnumClassName, enumName)
-                        .addStatement("this.$L = $L", variableName, fieldName)
-                        .build())
                     .addMethod(MethodSpec.methodBuilder(isName)
                         .addStatement("return this.$L == $T.$L", unionEnumName, unionEnumClassName, enumName)
                         .addModifiers(Modifier.PUBLIC)
@@ -158,11 +170,17 @@ public class UnionTypeHandler implements TypeHandler {
                     .addMethod(MethodSpec.methodBuilder(getName)
                         .addModifiers(Modifier.PUBLIC).returns(typeName)
                         .addStatement("if (!$L()) throw new $T(\"fetching wrong type out of the union: $L\")", isName, IllegalStateException.class, typeName)
-                        .addStatement("return this.$L", variableName)
+                        .addStatement("return this.$L", fieldName)
                         .build())
                     .build();
             }
         }
+
+        // add unknown type exception to constructor spec and build constructor
+        constructorSpec.beginControlFlow("else");
+        constructorSpec.addStatement("throw new $T($S + value)", IllegalArgumentException.class, "Union creation is not supported for given value: ");
+        constructorSpec.endControlFlow();
+        typeSpec.addMethod(constructorSpec.build());
 
         typeSpec = generationContext.pluginsForUnions(union).classCreated(context, union, typeSpec, EventType.IMPLEMENTATION);
         if (typeSpec == null) {
@@ -197,40 +215,40 @@ public class UnionTypeHandler implements TypeHandler {
 
         for (TypeDeclaration unitedType : union.of()) {
 
-        if (unitedType instanceof ArrayTypeDeclaration) {
-            throw new GenerationException("ramltopojo currently does not support arrays in unions");
-        }
+            if (unitedType instanceof ArrayTypeDeclaration) {
+                throw new GenerationException("ramltopojo currently does not support arrays in unions");
+            }
 
-        TypeName typeName = unitedType instanceof NullTypeDeclaration ? NULL_CLASS: findType(unitedType.name(), unitedType, generationContext).box();
-        String prettyName = prettyName(unitedType, generationContext);
+            TypeName typeName = unitedType instanceof NullTypeDeclaration ? NULL_CLASS: findType(unitedType.name(), unitedType, generationContext).box();
+            String prettyName = prettyName(unitedType, generationContext);
 
-        // add enum name
-        enumTypeSpec.addEnumConstant(Names.constantName(prettyName));
+            // add enum name
+            enumTypeSpec.addEnumConstant(Names.enumName(prettyName));
 
-        if (typeName == NULL_CLASS) {
+            if (typeName == NULL_CLASS) {
 
-            typeSpec
-                .addMethod(MethodSpec.methodBuilder("isNil")
-                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                    .returns(TypeName.BOOLEAN)
-                    .build())
-                .addMethod(MethodSpec.methodBuilder("getNil")
-                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                    .returns(typeName)
-                    .build());
+                typeSpec
+                    .addMethod(MethodSpec.methodBuilder("isNil")
+                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                        .returns(TypeName.BOOLEAN)
+                        .build())
+                    .addMethod(MethodSpec.methodBuilder("getNil")
+                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                        .returns(typeName)
+                        .build());
 
-        } else {
+            } else {
 
-            typeSpec
-                .addMethod(MethodSpec.methodBuilder(Names.methodName("is", prettyName))
-                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                    .returns(TypeName.BOOLEAN)
-                    .build())
-                .addMethod(MethodSpec.methodBuilder(Names.methodName("get", prettyName))
-                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                    .returns(typeName)
-                    .build());
-        }
+                typeSpec
+                    .addMethod(MethodSpec.methodBuilder(Names.methodName("is", prettyName))
+                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                        .returns(TypeName.BOOLEAN)
+                        .build())
+                    .addMethod(MethodSpec.methodBuilder(Names.methodName("get", prettyName))
+                        .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                        .returns(typeName)
+                        .build());
+            }
         }
 
         // set enum as inner type
