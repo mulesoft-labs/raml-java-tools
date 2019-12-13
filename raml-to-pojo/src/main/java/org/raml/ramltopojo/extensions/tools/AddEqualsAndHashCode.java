@@ -77,24 +77,22 @@ public class AddEqualsAndHashCode extends AllTypesPluginHelper {
         );
     }
 
-    private String buildEquals(List<FieldSpec> fields) {
-
-        return FluentIterable.from(fields).transform(new Function<FieldSpec, String>() {
+    private List<CodeBlock> buildEquals(List<FieldSpec> fields) {
+    	
+        return FluentIterable.from(fields).transform(new Function<FieldSpec, CodeBlock>() {
             @Nullable
             @Override
-            public String apply(@Nullable FieldSpec fieldSpec) {
+            public CodeBlock apply(@Nullable FieldSpec fieldSpec) {
                 if ( fieldSpec.type.isPrimitive()) {
-                    return CodeBlock.builder().add("(this.$L == other.$L)", fieldSpec.name, fieldSpec.name).build().toString();
+                    return CodeBlock.builder().add("(this.$L == other.$L)", fieldSpec.name, fieldSpec.name).build();
                 } else {
-                    return CodeBlock.builder().add("$T.equals(this.$L, other.$L)", Objects.class, fieldSpec.name, fieldSpec.name).build().toString();
+                    return CodeBlock.builder().add("$T.equals(this.$L, other.$L)", Objects.class, fieldSpec.name, fieldSpec.name).build();
                 }
             }
-        }).join(Joiner.on(" && "));
+        }).toList();
     }
 
     private void createEquals(List<FieldSpec> specs, TypeSpec.Builder incoming) {
-
-        String cb = buildEquals(specs);
 
         MethodSpec.Builder method = MethodSpec.methodBuilder("equals")
                 .addAnnotation(ClassName.get(Override.class)).addModifiers(Modifier.PUBLIC)
@@ -104,7 +102,8 @@ public class AddEqualsAndHashCode extends AllTypesPluginHelper {
                         .addStatement("if (o == null) return false")
                         .addStatement("if (this == o) return true")
                         .addStatement("if (getClass() != o.getClass()) return false").addStatement("$L other = ($L) o", incoming.build().name, incoming.build().name)
-                        .addStatement("return " + cb).build()
+                        .addStatement(CodeBlock.builder().add("return ").add(CodeBlock.join(buildEquals(specs), " && ")).build())
+                        .build()
                 );
         incoming.addMethod(
                 method.build()
