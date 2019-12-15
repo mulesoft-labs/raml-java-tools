@@ -15,7 +15,6 @@ import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.deser.std.StdDeserializer;
 import org.codehaus.jackson.map.ser.std.SerializerBase;
-import org.codehaus.jackson.map.util.StdDateFormat;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.GenerationException;
 import org.raml.ramltopojo.Names;
@@ -103,23 +102,23 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
             
             // Check for dates (special serialization)
             if (typeDeclaration instanceof DateTypeDeclaration) {
-                
-                serialize.addStatement("new $T().setDateFormat(new $T($S)).writeValue(jsonGenerator, object." + getMethod + "())", ObjectMapper.class, SimpleDateFormat.class, "yyyy-mm-dd");
+                CodeBlock cb = createCodeBlockWithFormat(getMethod, "yyyy-mm-dd");
+                serialize.addCode(cb);
            
             } else if (typeDeclaration instanceof TimeOnlyTypeDeclaration) {
                 
-                serialize.addStatement("new $T().setDateFormat(new $T($S)).writeValue(jsonGenerator, object." + getMethod + "())", ObjectMapper.class, SimpleDateFormat.class, "hh:mm:ss");
+                serialize.addCode(createCodeBlockWithFormat(getMethod, "hh:mm:ss"));
            
             } else if (typeDeclaration instanceof DateTimeOnlyTypeDeclaration) {
                 
-                serialize.addStatement("new $T().setDateFormat(new $T($S)).writeValue(jsonGenerator, object." + getMethod + "())", ObjectMapper.class, SimpleDateFormat.class, "yyyy-MM-dd'T'HH:mm:ss");
+                serialize.addCode(createCodeBlockWithFormat(getMethod, "yyyy-MM-dd'T'HH:mm:ss"));
            
             } else if (typeDeclaration instanceof DateTimeTypeDeclaration) {
                 
                 if (Objects.equals("rfc2616", ((DateTimeTypeDeclaration) typeDeclaration).format())) {
-                    serialize.addStatement("new $T().setDateFormat(new $T($S)).writeValue(jsonGenerator, object." + getMethod + "())", ObjectMapper.class, SimpleDateFormat.class, "EEE, dd MMM yyyy HH:mm:ss z");
+                    serialize.addCode(createCodeBlockWithFormat(getMethod,  "EEE, dd MMM yyyy HH:mm:ss z"));
                 } else {                    
-                    serialize.addStatement("new $T().setDateFormat(new $T($S)).writeValue(jsonGenerator, object." + getMethod + "())", ObjectMapper.class, SimpleDateFormat.class, "yyyy-MM-dd'T'HH:mm:ssZ");                
+                    serialize.addCode(createCodeBlockWithFormat(getMethod, "yyyy-MM-dd'T'HH:mm:ssZ"));
                 }
                 
             } else {
@@ -136,6 +135,14 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
 
         builder.addMethod(serialize.build());
         typeBuilder.addType(builder.build());
+    }
+
+    private CodeBlock createCodeBlockWithFormat(String getMethod, String dateTimeFormat) {
+        return CodeBlock.builder()
+                            .addStatement("$T objectMapper = new $T()", ObjectMapper.class, ObjectMapper.class)
+                            .addStatement("objectMapper.setDateFormat(new $T($S))", SimpleDateFormat.class, dateTimeFormat)
+                            .addStatement("objectMapper.writeValue(jsonGenerator, object." + getMethod + "())")
+                            .build();
     }
 
     private void createDeserializer(UnionPluginContext unionPluginContext, ClassName serializerName, UnionTypeDeclaration union, TypeSpec.Builder typeBuilder, EventType eventType) {
@@ -346,7 +353,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                 .addParameter(ClassName.get(JsonNode.class), "node")
                 .addParameter(ParameterizedTypeName.get(List.class, String.class), "keys");
         spec.addStatement("$T<$T> list = new $T<>()", List.class, String.class, ArrayList.class);
-        spec.addStatement("$T<$T> fieldIterator = node.fieldNames()", Iterator.class, String.class);
+        spec.addStatement("$T<$T> fieldIterator = node.getFieldNames()", Iterator.class, String.class);
         spec.addStatement("while (fieldIterator.hasNext()) { list.add(fieldIterator.next()); }");
         spec.addStatement("return list.containsAll(keys)");
         spec.addModifiers(Modifier.PRIVATE).returns(TypeName.BOOLEAN);

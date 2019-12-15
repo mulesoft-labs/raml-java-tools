@@ -2,80 +2,79 @@
 uses:
   ramltopojo: ramltopojo.raml
 types:
-  Dog:
+  DogJ1:
     (ramltopojo.types):
       plugins:
-        - name: core.jackson2
+        - name: core.jackson1
     type: object
     properties:
       bark: nil | boolean
       color: string
-  Television:
+  TelevisionJ1:
     (ramltopojo.types):
       plugins:
-        - name: core.jackson2
+        - name: core.jackson1
     type: object
     properties:
       color: boolean
-  Projector:
+  ProjectorJ1:
     (ramltopojo.types):
       plugins:
-        - name: core.jackson2
+        - name: core.jackson1
     type: object
     properties:
       hanging: boolean
-  Entertainement:
+  EntertainementJ1:
      (ramltopojo.types):
       plugins:
-        - name: core.jackson2
-     type: Television | Projector
-  SomeScalar:
+        - name: core.jackson1
+     type: TelevisionJ1 | ProjectorJ1
+  SomeScalarJ1:
     (ramltopojo.types):
       plugins:
-        - name: core.jackson2
+        - name: core.jackson1
     type: string|integer
-  date1Union:
+  date1UnionJ1:
     (ramltopojo.types):
       plugins:
-        - name: core.jackson2
+        - name: core.jackson1
     type: date-only | nil
-  date2Union:
+  date2UnionJ1:
     (ramltopojo.types):
       plugins:
-        - name: core.jackson2
+        - name: core.jackson1
     type: time-only | nil
-  date3Union:
+  date3UnionJ1:
     (ramltopojo.types):
       plugins:
-        - name: core.jackson2
+        - name: core.jackson1
     type: datetime-only | nil
-  date4Union:
+  date4UnionJ1:
     (ramltopojo.types):
       plugins:
-        - name: core.jackson2
+        - name: core.jackson1
     type: datetime | nil
-  dateUnion:
+  dateUnionJ1:
     (ramltopojo.types):
       plugins:
-        - name: core.jackson2
+        - name: core.jackson1
     type: object
     properties:
-      date1: date1Union
-      date2: date2Union
-      date3: date3Union
-      date4: date4Union
-  nilUnionType:
+      date1: date1UnionJ1
+      date2: date2UnionJ1
+      date3: date3UnionJ1
+      date4: date4UnionJ1
+  nilUnionTypeJ1:
     (ramltopojo.types):
       plugins:
-        - name: core.jackson2
+        - name: core.jackson1
     type: string|nil
-  complexUnion:
+  complexUnionJ1:
     (ramltopojo.types):
       plugins:
-        - name: core.jackson2
+        - name: core.jackson1
     type: boolean|integer|string|nil
-  unionProperty:
+  unionPropertyJ1:
     properties:
       goo: string|nil
-      declared: nilUnionType
-
+      declared: nilUnionTypeJ1

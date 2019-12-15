@@ -1,8 +1,8 @@
 package foo.foo.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import foo.foo.*;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -11,16 +11,16 @@ import java.util.Date;
 
 import static org.junit.Assert.assertTrue;
 
-public class UnionsWithDatesTest {
+public class UnionsWithDatesJacksonOneTest {
 
     @Test
     public void dateTest() throws IOException {
         
-        DateUnion dateUnion = new DateUnionImpl();
-        dateUnion.setDate1(new Date1UnionImpl(new Date(1234567)));
-        dateUnion.setDate2(new Date2UnionImpl(new Date(1234567)));
-        dateUnion.setDate3(new Date3UnionImpl(new Date(1234567)));
-        dateUnion.setDate4(new Date4UnionImpl(new Date(1234567)));
+        DateUnionJ1 dateUnion = new DateUnionJ1Impl();
+        dateUnion.setDate1(new Date1UnionJ1Impl(new Date(1234567)));
+        dateUnion.setDate2(new Date2UnionJ1Impl(new Date(1234567)));
+        dateUnion.setDate3(new Date3UnionJ1Impl(new Date(1234567)));
+        dateUnion.setDate4(new Date4UnionJ1Impl(new Date(1234567)));
         
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(dateUnion);
@@ -32,12 +32,11 @@ public class UnionsWithDatesTest {
         assertTrue(node.get("date4").isTextual() && node.get("date4").asText().equals(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").format(new Date(1234567))));
 
         
-        DateUnion dateUnionTemp = mapper.readValue(json, DateUnion.class);
+        DateUnionJ1 dateUnionTemp = mapper.readValue(json, DateUnionJ1.class);
         
         assertTrue(dateUnionTemp.getDate1().isDate());
         assertTrue(dateUnionTemp.getDate2().isDate());
         assertTrue(dateUnionTemp.getDate3().isDate());
         assertTrue(dateUnionTemp.getDate4().isDate());
     }
-
 }
