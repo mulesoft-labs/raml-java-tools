@@ -3,10 +3,7 @@ package foo.foo.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
-
-import foo.foo.NilUnionType;
-import foo.foo.NilUnionTypeImpl;
-import foo.foo.ComplexUnionImpl;
+import foo.foo.*;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -58,6 +55,21 @@ public class UnionsWithNullTest {
         NilUnionType b = mapper.treeToValue(node, NilUnionType.class);
 
         assertTrue(b.isNil());
+    }
+
+    @Test
+    public void unionProperty() throws IOException {
+
+        UnionPropertyImpl impl = new UnionPropertyImpl();
+        impl.setGoo(new NilStringImpl("hello"));
+        impl.setDeclared(new NilUnionTypeImpl(null));
+
+        ObjectMapper mapper = new ObjectMapper();
+        StringWriter out = new StringWriter();
+
+        mapper.writeValue(out, impl);
+
+        System.err.println("this is " + out);
     }
 
     @Test

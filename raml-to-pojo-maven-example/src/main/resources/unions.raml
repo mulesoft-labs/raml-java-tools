@@ -64,6 +64,11 @@ types:
       date2: date2Union
       date3: date3Union
       date4: date4Union
+  nilString:
+    (ramltopojo.types):
+     plugins:
+      - name: core.jackson2
+    type: string | nil
   nilUnionType:
     (ramltopojo.types):
       plugins:
@@ -75,7 +80,10 @@ types:
         - name: core.jackson2
     type: boolean|integer|string|nil
   unionProperty:
+    (ramltopojo.types):
+      plugins:
+        - name: core.jackson2
     properties:
-      goo: string|nil
+      goo: nilString
       declared: nilUnionType
 
