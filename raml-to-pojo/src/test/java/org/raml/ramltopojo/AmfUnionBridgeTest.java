@@ -51,4 +51,28 @@ public class AmfUnionBridgeTest {
                 .extracting(x -> ((NodeShape)x).name().value()).contains("type1", "type2");
     }
 
+    @Test
+    public void unionOfTypesWithProperties() throws Exception {
+
+        Document doc = AmfParsingFunctions.resolveDocument(
+                "types:\n" +
+                        "    type1:\n" +
+                        "      properties:\n" +
+                        "          name: string\n" +
+                        "    type2:\n" +
+                        "      properties:\n" +
+                        "          age: integer\n" +
+                        "    mytype:\n" +
+                        "       type: type1 | type2\n" +
+                        "       properties:\n" +
+                        "           email: string");
+
+        UnionShape shape = AmfParsingFunctions.findDeclarationByName(doc, "mytype");
+        assertThat(shape.anyOf()).hasSize(2);
+        assertThat(shape.inherits()).hasSize(0);
+        assertThat(shape.customShapeProperties()).hasSize(1);
+        assertThat(shape.anyOf())
+                .hasSize(2)
+                .extracting(x -> ((NodeShape)x).name().value()).contains("type1", "type2");
+    }
 }
