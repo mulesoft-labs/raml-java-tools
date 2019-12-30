@@ -23,7 +23,7 @@ public class AmfInheritanceBridgeTest {
                 "       minLength: 2"
         );
 
-        ScalarShape shape = AmfParsingFunctions.findDeclarationByName(doc);
+        ScalarShape shape = AmfParsingFunctions.findDeclarationByName(doc, "mytype");
         assertThat(shape.inherits()).hasSize(0);
     }
 
@@ -39,7 +39,7 @@ public class AmfInheritanceBridgeTest {
                 "       type: sup\n" +
                 "       minLength: 2");
 
-        ScalarShape shape = (AmfParsingFunctions.findDeclarationByName(doc));
+        ScalarShape shape = (AmfParsingFunctions.findDeclarationByName(doc, "mytype"));
         assertThat(shape.inherits()).hasSize(0);
         assertThat(shape.maxLength().value()).isEqualTo(6);
         assertThat(shape.minLength().value()).isEqualTo(2);
@@ -56,7 +56,7 @@ public class AmfInheritanceBridgeTest {
                 "       type: sup\n" +
                 "       minLength: 2");
 
-        ScalarShape shape = AmfParsingFunctions.findDeclarationByName(doc);
+        ScalarShape shape = AmfParsingFunctions.findDeclarationByName(doc, "mytype");
         assertThat(shape.inherits()).hasSize(0);
         assertThat(shape.maxLength().value()).isEqualTo(6);
         assertThat(shape.minLength().value()).isEqualTo(2);
@@ -72,7 +72,7 @@ public class AmfInheritanceBridgeTest {
                 "    mytype:\n" +
                 "       type: inherited\n");
 
-        NodeShape shape = AmfParsingFunctions.findDeclarationByName(doc);
+        NodeShape shape = AmfParsingFunctions.findDeclarationByName(doc, "mytype");
         assertThat(shape.inherits()).hasSize(0);
 
         assertThat(shape.properties()).hasSize(1).extracting(x -> x.name().value()).contains("age");
@@ -89,7 +89,7 @@ public class AmfInheritanceBridgeTest {
                 "    mytype:\n" +
                 "       type: [inherited]");
 
-        NodeShape shape = AmfParsingFunctions.findDeclarationByName(doc);
+        NodeShape shape = AmfParsingFunctions.findDeclarationByName(doc, "mytype");
         assertThat(shape.inherits()).hasSize(0);
     }
 
@@ -107,7 +107,7 @@ public class AmfInheritanceBridgeTest {
                 "          name: string\n"
         );
 
-        NodeShape shape = AmfParsingFunctions.findDeclarationByName(doc);
+        NodeShape shape = AmfParsingFunctions.findDeclarationByName(doc, "mytype");
         assertThat(shape.inherits()).hasSize(0);
     }
 
@@ -125,7 +125,7 @@ public class AmfInheritanceBridgeTest {
                 "          name: string\n"
         );
 
-        NodeShape shape = AmfParsingFunctions.findDeclarationByName(doc);
+        NodeShape shape = AmfParsingFunctions.findDeclarationByName(doc, "mytype");
         assertThat(shape.properties()).hasSize(2).extracting(x -> x.name().value()).contains("age", "name");
         assertThat(shape.inherits()).hasSize(0);
     }
@@ -147,7 +147,7 @@ public class AmfInheritanceBridgeTest {
                 "          name: string\n"
         );
 
-        NodeShape shape = AmfParsingFunctions.findDeclarationByName(doc);
+        NodeShape shape = AmfParsingFunctions.findDeclarationByName(doc, "mytype");
         assertThat(shape.properties()).hasSize(3).extracting(x -> x.name().value()).contains("age", "color", "name");
         assertThat(shape.inherits()).hasSize(0);
     }
@@ -167,7 +167,7 @@ public class AmfInheritanceBridgeTest {
                 "       type: [inherited, another_inherited]\n"
         );
 
-        NodeShape shape = AmfParsingFunctions.findDeclarationByName(doc);
+        NodeShape shape = AmfParsingFunctions.findDeclarationByName(doc, "mytype");
         assertThat(shape.properties()).hasSize(2).extracting(f -> f.name().value()).contains("age", "color");
         assertThat(shape.inherits()).hasSize(0);
     }

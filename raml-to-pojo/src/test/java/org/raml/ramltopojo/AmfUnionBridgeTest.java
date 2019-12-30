@@ -18,10 +18,10 @@ public class AmfUnionBridgeTest {
 
         Document doc = AmfParsingFunctions.resolveDocument(
                 "types:\n" +
-                "    mytype:\n" +
-                "       type: string | integer");
+                        "    mytype:\n" +
+                        "       type: string | integer");
 
-        UnionShape shape = AmfParsingFunctions.findDeclarationByName(doc);
+        UnionShape shape = AmfParsingFunctions.findDeclarationByName(doc, "mytype");
         assertThat(shape.anyOf()).hasSize(2);
         assertThat(shape.inherits()).hasSize(0);
         assertThat(shape.anyOf())
@@ -43,7 +43,7 @@ public class AmfUnionBridgeTest {
                         "    mytype:\n" +
                         "       type: type1 | type2");
 
-        UnionShape shape = AmfParsingFunctions.findDeclarationByName(doc);
+        UnionShape shape = AmfParsingFunctions.findDeclarationByName(doc, "mytype");
         assertThat(shape.anyOf()).hasSize(2);
         assertThat(shape.inherits()).hasSize(0);
         assertThat(shape.anyOf())
