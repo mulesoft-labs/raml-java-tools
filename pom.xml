@@ -81,7 +81,7 @@
             <dependency>
                 <groupId>org.raml</groupId>
                 <artifactId>webapi-parser</artifactId>
-                <version>0.3.2</version>
+                <version>0.4.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
