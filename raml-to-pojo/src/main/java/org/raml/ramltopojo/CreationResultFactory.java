@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.document.Document;
 import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.PropertyShape;
 import amf.client.model.domain.Shape;
@@ -7,7 +8,6 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.extensions.*;
-import webapi.WebApiDocument;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -148,7 +148,7 @@ public class CreationResultFactory {
         }
 
         @Override
-        public WebApiDocument api() {
+        public Document api() {
             return context.api();
         }
 

@@ -1,7 +1,7 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.document.Document;
 import org.raml.ramltopojo.plugin.PluginManager;
-import webapi.WebApiDocument;
 
 import java.util.Collections;
 import java.util.List;
@@ -12,17 +12,17 @@ import java.util.List;
 public class RamlToPojoBuilder {
 
 
-    private final WebApiDocument api;
+    private final Document api;
     private String packageName = "";
     private TypeFetcher typeFetcher;
     private TypeFinder typeFinder;
 
-    public RamlToPojoBuilder(WebApiDocument api) {
+    public RamlToPojoBuilder(Document api) {
 
         this.api = api;
     }
 
-    public static RamlToPojoBuilder builder(WebApiDocument api) {
+    public static RamlToPojoBuilder builder(Document api) {
 
         return new RamlToPojoBuilder(api);
     }

@@ -38,7 +38,7 @@ public class JacksonDiscriminatorInheritanceTypeExtension extends ObjectTypeHand
       return typeSpec;
     }
 
-    if (ramlType.discriminator() != null && objectPluginContext.childClasses(ramlType.name().value()).size() > 0) {
+    if (!ramlType.discriminator().isNullOrEmpty() && objectPluginContext.childClasses(ramlType.name().value()).size() > 0) {
 
       typeSpec.addAnnotation(AnnotationSpec.builder(JsonTypeInfo.class)
               .addMember("use", "$T.Id.NAME", JsonTypeInfo.class)
@@ -69,7 +69,7 @@ public class JacksonDiscriminatorInheritanceTypeExtension extends ObjectTypeHand
 
     }
 
-    if (ramlType.discriminatorValue() != null) {
+    if (!ramlType.discriminatorValue().isNullOrEmpty()) {
 
       typeSpec.addAnnotation(AnnotationSpec.builder(JsonTypeName.class)
               .addMember("value", "$S", ramlType.discriminatorValue()).build());

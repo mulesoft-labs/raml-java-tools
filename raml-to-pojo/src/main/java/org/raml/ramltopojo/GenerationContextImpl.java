@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.document.Document;
 import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.Shape;
 import com.google.common.collect.HashMultimap;
@@ -10,7 +11,6 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.extensions.*;
 import org.raml.ramltopojo.plugin.PluginManager;
-import webapi.WebApiDocument;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GenerationContextImpl implements GenerationContext {
 
     private final PluginManager pluginManager;
-    private final WebApiDocument api;
+    private final Document api;
     private final TypeFetcher typeFetcher;
     private final ConcurrentHashMap<String, CreationResult> knownTypes = new ConcurrentHashMap<>();
     private final SetMultimap<String, String> childTypes = HashMultimap.create();
@@ -31,11 +31,11 @@ public class GenerationContextImpl implements GenerationContext {
     private final List<String> basePlugins;
     private Map<String, TypeSpec> supportClasses = new HashMap<>();
 
-    public GenerationContextImpl(WebApiDocument api) {
+    public GenerationContextImpl(Document api) {
         this(PluginManager.NULL, api, TypeFetchers.NULL_FETCHER, "", Collections.<String>emptyList());
     }
 
-    public GenerationContextImpl(PluginManager pluginManager, WebApiDocument api, TypeFetcher typeFetcher, String defaultPackage, List<String> basePlugins) {
+    public GenerationContextImpl(PluginManager pluginManager, Document api, TypeFetcher typeFetcher, String defaultPackage, List<String> basePlugins) {
         this.pluginManager = pluginManager;
         this.api = api;
         this.typeFetcher = typeFetcher;
@@ -199,7 +199,7 @@ public class GenerationContextImpl implements GenerationContext {
 
 
     @Override
-    public WebApiDocument api() {
+    public Document api() {
         return api;
     }
 }

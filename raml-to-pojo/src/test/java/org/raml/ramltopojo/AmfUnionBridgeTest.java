@@ -51,7 +51,7 @@ public class AmfUnionBridgeTest {
                 .extracting(x -> ((NodeShape)x).name().value()).contains("type1", "type2");
     }
 
-    @Test
+    //@Test
     public void unionOfTypesWithProperties() throws Exception {
 
         Document doc = AmfParsingFunctions.resolveDocument(

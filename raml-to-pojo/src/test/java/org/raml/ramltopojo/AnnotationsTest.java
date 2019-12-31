@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.document.Document;
 import amf.client.model.domain.Shape;
 import amf.client.validate.ValidationReport;
 import amf.client.validate.ValidationResult;
@@ -24,7 +25,7 @@ public class AnnotationsTest extends UnitTest{
     @Test
     public void apiAnnotationsReading() throws Exception {
 
-        WebApiDocument api = getApi();
+        Document api = getApi();
 
         List<PluginDef> defs = Annotations.PLUGINS.get(api);
         assertEquals(2, defs.size());
@@ -37,7 +38,7 @@ public class AnnotationsTest extends UnitTest{
     @Test
     public void typeAnnotationsReading() throws Exception {
 
-        WebApiDocument api = getApi();
+        Document api = getApi();
         Shape fooType = RamlLoader.findShape("foo", api.declares());
 
         List<PluginDef> defs = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, fooType);
@@ -53,7 +54,7 @@ public class AnnotationsTest extends UnitTest{
     @Test
     public void simplerTypeAnnotationsReading() throws Exception {
 
-        WebApiDocument api = getApi();
+        Document api = getApi();
         Shape fooType = RamlLoader.findShape("too", api.declares());
 
         List<PluginDef> defs = Annotations.PLUGINS.get(fooType);
@@ -62,7 +63,7 @@ public class AnnotationsTest extends UnitTest{
         assertEquals("core.too", defs.get(0).getPluginName());
     }
 
-    protected WebApiDocument getApi() throws Exception  {
+    protected Document getApi() throws Exception  {
         URL url = this.getClass().getResource("annotations.raml");
         WebApiDocument document = (WebApiDocument) Raml10.parse(url.toString()).get();
 

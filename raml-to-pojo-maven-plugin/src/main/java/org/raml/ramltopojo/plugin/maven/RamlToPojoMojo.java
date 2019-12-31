@@ -15,7 +15,10 @@
  */
 package org.raml.ramltopojo.plugin.maven;
 
+import amf.client.model.document.Document;
+import amf.client.resolve.Raml10Resolver;
 import amf.client.validate.ValidationReport;
+import amf.core.resolution.pipelines.ResolutionPipeline;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -106,7 +109,9 @@ public class RamlToPojoMojo extends AbstractMojo {
             List<amf.client.validate.ValidationResult> results = report.results();
             if ( results.isEmpty()) {
 
-                RamlToPojo ramlToPojo = RamlToPojoBuilder.builder((WebApiDocument) Raml10.parse(ramlFile.toURL().toString()).get())
+                WebApiDocument data = (WebApiDocument) Raml10.parse(ramlFile.toURL().toString()).get();
+                Document api = (Document) new Raml10Resolver().resolve(data, ResolutionPipeline.EDITING_PIPELINE());
+                RamlToPojo ramlToPojo = RamlToPojoBuilder.builder(api)
                         .inPackage(defaultPackage)
                         .fetchTypes(fromAnywhere())
                         .findTypes(everyWhere()).build(basePlugins);

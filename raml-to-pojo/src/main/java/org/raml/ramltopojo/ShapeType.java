@@ -59,7 +59,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
             } else {
                 return Optional.ofNullable(
                         scalarToType(declaration.dataType().value()))
-                        .orElseThrow(() -> new GenerationException("no scalar type '" + declaration.toRamlDatatype() + "'"))
+                        .orElseThrow(() -> new GenerationException("no scalar type '" + declaration.name() + "'"))
                         .createHandler(name, type, typeDeclaration);
             }
         }

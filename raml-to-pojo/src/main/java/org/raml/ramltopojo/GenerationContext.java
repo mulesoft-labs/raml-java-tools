@@ -1,11 +1,11 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.document.Document;
 import amf.client.model.domain.Shape;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.extensions.*;
-import webapi.WebApiDocument;
 
 import java.io.IOException;
 import java.util.Set;
@@ -28,7 +28,7 @@ public interface GenerationContext {
     ReferenceTypeHandlerPlugin pluginsForReferences(Shape... typeDeclarations);
 
     void setupTypeHierarchy(Shape typeDeclaration);
-    WebApiDocument api();
+    Document api();
     Set<String> childClasses(String ramlTypeName);
     ClassName buildDefaultClassName(String name, EventType eventType);
 

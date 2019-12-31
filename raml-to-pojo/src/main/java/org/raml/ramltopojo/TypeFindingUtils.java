@@ -1,8 +1,8 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.document.Document;
 import amf.client.model.document.Module;
 import amf.client.model.domain.*;
-import webapi.WebApiDocument;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,11 +13,11 @@ import java.util.stream.Stream;
  * Created. There, you have it.
  */
 public class TypeFindingUtils {
-    static Stream<AnyShape> shapesFromTypes(WebApiDocument api) {
+    static Stream<AnyShape> shapesFromTypes(Document api) {
         return api.declares().stream().filter(x -> x instanceof AnyShape).map(x -> (AnyShape) x);
     }
 
-    static Stream<AnyShape> shapesFromLibraries(WebApiDocument api) {
+    static Stream<AnyShape> shapesFromLibraries(Document api) {
         return api.references().stream()
                 .filter(x -> x instanceof Module)
                 .map(x -> (Module) x)

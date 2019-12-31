@@ -1,8 +1,6 @@
 package org.raml.ramltopojo.extensions.jackson2;
 
-import amf.client.model.domain.NodeShape;
-import amf.client.model.domain.Shape;
-import amf.client.model.domain.UnionShape;
+import amf.client.model.domain.*;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -87,8 +85,20 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
 
         for (Shape typeDeclaration : union.anyOf()) {
 
-            String isMethod = Names.methodName("is", typeDeclaration.name().value());
-            String getMethod = Names.methodName("get", typeDeclaration.name().value());
+            String isMethod; //JP Very wrong.
+            String getMethod;
+            if ( typeDeclaration instanceof ScalarShape ) {
+
+                isMethod = "isBoogie";
+                getMethod = "getBoogie";
+            }  else if ( typeDeclaration instanceof NilShape ) {
+                isMethod = "isNil";
+                getMethod = "getNil";
+            } else {
+
+                isMethod = Names.methodName("is", typeDeclaration.name().value());
+                getMethod = Names.methodName("get", typeDeclaration.name().value());
+            }
             serialize.beginControlFlow("if ( object." + isMethod + "())");
             serialize.addStatement("jsonGenerator.writeObject(object." + getMethod + "())");
             serialize.addStatement("return");
@@ -134,7 +144,17 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
 
         for (Shape typeDeclaration : unionOf) {
 
-            String name = Names.methodName("looksLike", typeDeclaration.name().value());
+            String looksLike; //JP Very wrong.
+            if ( typeDeclaration instanceof ScalarShape ) {
+
+                looksLike = "boogie";
+            }  else if ( typeDeclaration instanceof NilShape ) {
+                looksLike = "nil";
+            } else {
+
+                looksLike = typeDeclaration.name().value();
+            }
+            String name = Names.methodName("looksLike", looksLike);
             if ( typeDeclaration instanceof NodeShape && ((NodeShape)typeDeclaration).discriminator() != null ) {
 
                 Shape parentType = findParentType(typeDeclaration);

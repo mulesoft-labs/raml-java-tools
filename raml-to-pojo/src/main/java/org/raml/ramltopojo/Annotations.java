@@ -16,8 +16,8 @@
 package org.raml.ramltopojo;
 
 import amf.client.model.Annotable;
+import amf.client.model.document.Document;
 import amf.client.model.domain.*;
-import webapi.WebApiDocument;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -69,9 +69,9 @@ public abstract class Annotations<T> {
     private static List<PluginDef> toSupplier(Annotable a) {
 
         ArrayNode arrayNode = null;
-        if ( a instanceof WebApiDocument ) {
+        if ( a instanceof Document) {
 
-            arrayNode = (ArrayNode) getExtension((WebApiDocument) a).orElseGet(DomainExtension::new).extension();
+            arrayNode = (ArrayNode) getExtension((Document) a).orElseGet(DomainExtension::new).extension();
         } else {
 
             arrayNode = (ArrayNode) getExtension((Shape) a).orElseGet(DomainExtension::new).extension();
@@ -94,7 +94,7 @@ public abstract class Annotations<T> {
         return a.customDomainProperties().stream().filter(x -> x.name().is("ramltopojo.types")).findAny();
     }
 
-    private static Optional<DomainExtension> getExtension(WebApiDocument a) {
+    private static Optional<DomainExtension> getExtension(Document a) {
         return a.encodes().customDomainProperties().stream().filter(x -> x.name().is("ramltopojo.types")).findAny();
     }
 

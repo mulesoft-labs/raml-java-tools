@@ -47,7 +47,7 @@ public class JacksonBasicExtension extends ObjectTypeHandlerPlugin.Helper {
         typeSpec.addAnnotation(AnnotationSpec.builder(JsonInclude.class)
                 .addMember("value", "$T.$L", JsonInclude.Include.class, "NON_NULL").build());
 
-        if (obj.discriminatorValue() != null) {
+        if (! obj.discriminatorValue().isNullOrEmpty()) {
 
             typeSpec.addAnnotation(AnnotationSpec.builder(JsonTypeName.class)
                     .addMember("value", "$S", obj.discriminatorValue()).build());
