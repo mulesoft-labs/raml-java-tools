@@ -2,6 +2,7 @@ package org.raml.ramltopojo;
 
 import amf.client.model.document.Document;
 import amf.client.model.domain.AnyShape;
+import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.Shape;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
@@ -83,11 +84,18 @@ public class GenerationContextImpl implements GenerationContext {
 
     public void setupTypeHierarchy(String actualName, AnyShape typeDeclaration) {
 
-        List<AnyShape> parents = Utils.allParents(typeDeclaration);
-        for (AnyShape parent : parents) {
-            setupTypeHierarchy(parent.name().value(), parent);
-            if ( ! parent.name().value().equals(actualName) ) {
-                childTypes.put(parent.name().value(), actualName);
+        if ( typeDeclaration instanceof NodeShape) {
+            List<AnyShape> parents = Utils.allParents(typeDeclaration);
+            for (AnyShape parent : parents) {
+
+                if (parent.name().isNullOrEmpty() || ( parent.name().is(typeDeclaration.name().value()))) {
+                    continue;
+                }
+
+                setupTypeHierarchy(parent.name().value(), parent);
+                if (!parent.name().value().equals(actualName)) {
+                    childTypes.put(parent.name().value(), actualName);
+                }
             }
         }
     }
