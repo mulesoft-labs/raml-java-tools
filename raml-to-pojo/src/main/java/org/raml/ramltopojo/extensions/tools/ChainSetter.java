@@ -32,16 +32,16 @@ public class ChainSetter extends ObjectTypeHandlerPlugin.Helper {
   @Override
   public MethodSpec.Builder setterBuilt(ObjectPluginContext objectPluginContext, PropertyShape declaration, MethodSpec.Builder methodSpec, EventType eventType) {
 
-    MethodSpec spec = methodSpec.build();
+      MethodSpec spec = methodSpec.build();
       MethodSpec seen = methodSpec.build();
       MethodSpec.Builder newBuilder = MethodSpec.methodBuilder("with" + spec.name.substring(3))
           .addModifiers(seen.modifiers)
-          .returns(spec.parameters.get(0).type);
+          .returns(objectPluginContext.creationResult().getJavaName(EventType.INTERFACE));
 
       commonStuffToCopy(seen, newBuilder);
 
       if (eventType == EventType.IMPLEMENTATION) {
-        newBuilder.addStatement("this.$L = $L", spec.name.substring(3).toLowerCase(),  spec.name.substring(3).toLowerCase())
+        newBuilder.addCode(spec.code)
             .addStatement("return this");
 
         return newBuilder;

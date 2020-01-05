@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.extensions.jaxb;
 
+import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.Shape;
 import amf.client.model.domain.UnionShape;
 import com.squareup.javapoet.*;
@@ -50,7 +51,7 @@ public class JaxbUnionExtension implements UnionTypeHandlerPlugin {
         AnnotationSpec.Builder elementsAnnotation = AnnotationSpec.builder(XmlElements.class);
         for (Shape typeDeclaration : union.anyOf()) {
 
-            TypeName unionPossibility = context.unionClass(typeDeclaration).getJavaName(EventType.IMPLEMENTATION);
+            TypeName unionPossibility = context.unionClass((AnyShape) typeDeclaration).getJavaName(EventType.IMPLEMENTATION);
 
             elementsAnnotation.addMember("value",
                     "$L",
@@ -66,5 +67,10 @@ public class JaxbUnionExtension implements UnionTypeHandlerPlugin {
         anyType.addAnnotation(elementsAnnotation.build());
 
         return anyType;
+    }
+
+    @Override
+    public FieldSpec.Builder fieldBuilt(UnionPluginContext context, AnyShape property, FieldSpec.Builder fieldSpec, EventType eventType) {
+        return fieldSpec;
     }
 }

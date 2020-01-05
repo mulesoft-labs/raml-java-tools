@@ -1,9 +1,6 @@
 package org.raml.ramltopojo.extensions;
 
-import amf.client.model.domain.NodeShape;
-import amf.client.model.domain.PropertyShape;
-import amf.client.model.domain.Shape;
-import amf.client.model.domain.UnionShape;
+import amf.client.model.domain.*;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
@@ -31,6 +28,21 @@ public class AllTypesPluginHelper implements ObjectTypeHandlerPlugin, UnionTypeH
     }
 
     @Override
+    public MethodSpec.Builder additionalPropertiesGetterBuilt(ObjectPluginContext objectPluginContext, MethodSpec.Builder incoming, EventType eventType) {
+        return objectTypeHandlerPlugin.additionalPropertiesGetterBuilt(objectPluginContext, incoming, eventType);
+    }
+
+    @Override
+    public MethodSpec.Builder additionalPropertiesSetterBuilt(ObjectPluginContext objectPluginContext, MethodSpec.Builder incoming, EventType eventType) {
+        return objectTypeHandlerPlugin.additionalPropertiesSetterBuilt(objectPluginContext, incoming, eventType);
+    }
+
+    @Override
+    public FieldSpec.Builder additionalPropertiesFieldBuilt(ObjectPluginContext objectPluginContext, FieldSpec.Builder incoming, EventType eventType) {
+        return objectTypeHandlerPlugin.additionalPropertiesFieldBuilt(objectPluginContext, incoming, eventType);
+    }
+
+    @Override
     public FieldSpec.Builder fieldBuilt(ObjectPluginContext objectPluginContext, PropertyShape declaration, FieldSpec.Builder incoming, EventType eventType) {
         return objectTypeHandlerPlugin.fieldBuilt(objectPluginContext, declaration, incoming, eventType);
     }
@@ -53,6 +65,11 @@ public class AllTypesPluginHelper implements ObjectTypeHandlerPlugin, UnionTypeH
     @Override
     public TypeSpec.Builder classCreated(UnionPluginContext unionPluginContext, UnionShape ramlType, TypeSpec.Builder incoming, EventType eventType) {
         return unionTypeHandlerPlugin.classCreated(unionPluginContext, ramlType, incoming, eventType);
+    }
+
+    @Override
+    public FieldSpec.Builder fieldBuilt(UnionPluginContext unionPluginContext, AnyShape ramlType, FieldSpec.Builder fieldSpec, EventType eventType) {
+    	return unionTypeHandlerPlugin.fieldBuilt(unionPluginContext, ramlType, fieldSpec, eventType);
     }
 
     @Override

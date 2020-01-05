@@ -81,13 +81,14 @@ public class GenerationContextImpl implements GenerationContext {
         return ClassName.get(defaultPackage, name);
     }
 
-    @Override
-    public void setupTypeHierarchy(Shape typeDeclaration) {
+    public void setupTypeHierarchy(String actualName, AnyShape typeDeclaration) {
 
-        List<Shape> parents = typeDeclaration.inherits();
-        for (Shape parent : parents) {
-            setupTypeHierarchy(parent);
-            childTypes.put(parent.name().value(), typeDeclaration.name().value());
+        List<TypeDeclaration> parents = typeDeclaration.parentTypes();
+        for (AnyShape parent : parents) {
+            setupTypeHierarchy(parent.name(), parent);
+            if ( ! parent.name().value().equals(actualName) ) {
+                childTypes.put(parent.name(), actualName);
+            }
         }
     }
 

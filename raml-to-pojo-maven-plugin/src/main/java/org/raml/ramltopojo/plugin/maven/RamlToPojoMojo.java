@@ -68,15 +68,15 @@ public class RamlToPojoMojo extends AbstractMojo {
     private File ramlFile;
 
     /**
-     * An array of locations of the RAML file(s).
+     * The base package for the generated POJOs.
      */
     @Parameter(property = "defaultPackage", required = true)
     private String defaultPackage;
 
     /**
-     * An array of locations of the RAML file(s).
+     * TODO
      */
-    @Parameter(property = "defaultPackage", required = false)
+    @Parameter(property = "basePlugins", required = false)
     private List<String> basePlugins;
 
 

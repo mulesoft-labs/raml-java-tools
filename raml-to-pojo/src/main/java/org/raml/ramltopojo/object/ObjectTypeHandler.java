@@ -1,18 +1,19 @@
 package org.raml.ramltopojo.object;
 
 import amf.client.model.StrField;
-import amf.client.model.domain.AnyShape;
-import amf.client.model.domain.NodeShape;
-import amf.client.model.domain.PropertyShape;
-import amf.client.model.domain.Shape;
+import amf.client.model.domain.*;
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectPluginContextImpl;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 
+import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
-import java.util.Optional;
+import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -23,6 +24,10 @@ public class ObjectTypeHandler implements TypeHandler {
     public static final String DISCRIMINATOR_TYPE_NAME = "_DISCRIMINATOR_TYPE_NAME";
     private final String name;
     private final NodeShape objectTypeDeclaration;
+
+    private static final ParameterizedTypeName ADDITIONAL_PROPERTIES_TYPE = ParameterizedTypeName.get(
+            Map.class, String.class,
+            Object.class);
 
     public ObjectTypeHandler(String name, NodeShape objectTypeDeclaration) {
         this.name = name;
@@ -89,6 +94,14 @@ public class ObjectTypeHandler implements TypeHandler {
             if ( ShapeType.isNewInlineType(Utils.rangeOf(propertyDeclaration)) ){
 
                 CreationResult cr = result.internalType(propertyDeclaration.name().value());
+                if (cr.getImplementation().isPresent()) {
+
+                    // we need a special handling for property unions, they need to be added as inline types
+                    if (propertyDeclaration.range() instanceof UnionShape) {
+                        TypeSpec.Builder innerTypeSpecImpl = cr.getImplementation().get().toBuilder();
+                        typeSpec.addType(innerTypeSpecImpl.addModifiers(Modifier.PUBLIC, Modifier.STATIC).build());
+                    }
+                }
                 tn = cr.getJavaName(EventType.INTERFACE);
 
             }  else {
@@ -130,6 +143,11 @@ public class ObjectTypeHandler implements TypeHandler {
             if ( setMethod != null ) {
                 typeSpec.addMethod(setMethod.build());
             }
+        }
+
+        if ( objectTypeDeclaration.additionalPropertiesSchema() != null) {
+
+            handleAdditionalPropertiesImplementation(objectPluginContext, result, generationContext, typeSpec);
         }
 
         typeSpec = generationContext.pluginsForObjects(objectTypeDeclaration).classCreated(objectPluginContext, objectTypeDeclaration, typeSpec, EventType.IMPLEMENTATION);
@@ -180,10 +198,25 @@ public class ObjectTypeHandler implements TypeHandler {
             TypeName tn = null;
             if ( ShapeType.isNewInlineType(Utils.rangeOf(propertyDeclaration)) ){
 
-                java.util.Optional<CreationResult> cr = CreationResultFactory.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),  Names.typeName(propertyDeclaration.name().value(), "type"), propertyDeclaration, generationContext);
-                if ( cr.isPresent() ) {
+                // we need a special handling for property unions, they need to be added as inline types
+                if (propertyDeclaration.range() instanceof UnionShape) {
+
+                    // Inline union naming: string | nil => StringNilUnion
+                    CreationResult cr = ShapeType.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),
+                        Names.typeName(propertyDeclaration.range().name().value(), "union"), propertyDeclaration, generationContext).get();
+                    result.withInternalType(propertyDeclaration.name().value(), cr);
+                    tn = cr.getJavaName(EventType.INTERFACE);
+
+                    typeSpec.addType(cr.getInterface().toBuilder().addModifiers(Modifier.PUBLIC, Modifier.STATIC).build());
+
+                } else {
+
+                    Optional<CreationResult> cr = ShapeType.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),
+                        Names.typeName(propertyDeclaration.name().value(), "type"), propertyDeclaration, generationContext);
+                    if (cr.isPresent()) {
                     result.withInternalType(propertyDeclaration.name().value(), cr.get());
-                    tn = cr.get().getJavaName(EventType.INTERFACE);
+                        tn = cr.get().getJavaName(EventType.INTERFACE);
+                    }
                 }
             }  else {
 
@@ -222,7 +255,167 @@ public class ObjectTypeHandler implements TypeHandler {
 
         }
 
+        if ( objectTypeDeclaration.additionalPropertiesSchema() != null) {
+
+            handleAdditionalPropertiesInterface(objectPluginContext, result, generationContext, typeSpec);
+        }
+
         return typeSpec.build();
+    }
+
+    private void handleAdditionalPropertiesInterface(ObjectPluginContext objectPluginContext, CreationResult result, GenerationContext generationContext, TypeSpec.Builder typeSpec) {
+
+        MethodSpec.Builder getAdditionalProperties = MethodSpec.methodBuilder("getAdditionalProperties")
+                .returns(ADDITIONAL_PROPERTIES_TYPE).addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT);
+
+        MethodSpec.Builder getSpec = generationContext.pluginsForObjects(objectTypeDeclaration).additionalPropertiesGetterBuilt(objectPluginContext, getAdditionalProperties, EventType.INTERFACE);
+        if ( getSpec != null ) {
+            typeSpec.addMethod(getSpec.build());
+        }
+
+        MethodSpec.Builder setAdditionalProperties = MethodSpec
+                .methodBuilder("setAdditionalProperties")
+                .returns(TypeName.VOID)
+                .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(String.class), "key").build())
+                .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(Object.class), "value").build())
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT);
+
+        MethodSpec.Builder setSpec = generationContext.pluginsForObjects(objectTypeDeclaration).additionalPropertiesSetterBuilt(objectPluginContext, setAdditionalProperties, EventType.INTERFACE);
+        if ( setSpec != null ) {
+            typeSpec.addMethod(setSpec.build());
+        }
+    }
+
+    private void handleAdditionalPropertiesImplementation(ObjectPluginContext objectPluginContext, CreationResult result, GenerationContext generationContext, TypeSpec.Builder typeSpec) {
+
+        TypeName newSpec = objectPluginContext.createSupportClass(
+                buildSpecialMap());
+
+        FieldSpec.Builder additionalPropertiesField = FieldSpec
+                .builder(ADDITIONAL_PROPERTIES_TYPE, "additionalProperties", Modifier.PRIVATE)
+                .initializer(
+                        withProperties(newSpec, objectTypeDeclaration).build());
+
+        FieldSpec.Builder fieldSpec = generationContext.pluginsForObjects(objectTypeDeclaration).additionalPropertiesFieldBuilt(objectPluginContext, additionalPropertiesField, EventType.IMPLEMENTATION);
+        if ( fieldSpec != null ) {
+            typeSpec.addField(fieldSpec.build());
+        }
+
+        MethodSpec.Builder getAdditionalProperties = MethodSpec.methodBuilder("getAdditionalProperties")
+                .returns(ADDITIONAL_PROPERTIES_TYPE).addModifiers(Modifier.PUBLIC)
+                .addCode("return additionalProperties;\n");
+
+        MethodSpec.Builder getSpec = generationContext.pluginsForObjects(objectTypeDeclaration).additionalPropertiesGetterBuilt(objectPluginContext, getAdditionalProperties, EventType.IMPLEMENTATION);
+        if ( getSpec != null ) {
+            typeSpec.addMethod(getSpec.build());
+        }
+
+        MethodSpec.Builder setAdditionalProperties = MethodSpec
+                .methodBuilder("setAdditionalProperties")
+                .returns(TypeName.VOID)
+                .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(String.class), "key").build())
+                .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(Object.class), "value").build())
+                .addModifiers(Modifier.PUBLIC)
+                .addCode(
+                        CodeBlock.builder().add("this.additionalProperties.put(key, value);\n").build());
+
+        MethodSpec.Builder setSpec = generationContext.pluginsForObjects(objectTypeDeclaration).additionalPropertiesSetterBuilt(objectPluginContext, setAdditionalProperties, EventType.IMPLEMENTATION);
+        if ( setSpec != null ) {
+            typeSpec.addMethod(setSpec.build());
+        }
+
+    }
+
+    private CodeBlock.Builder withProperties(TypeName newSpec, NodeShape object) {
+
+        List<PropertyShape> properties = FluentIterable.from(object.properties()).filter(new Predicate<PropertyShape>() {
+            @Override
+            public boolean apply(@Nullable PropertyShape property) {
+                return property != null && EcmaPattern.isSlashedPattern(property.name().value()) && ! EcmaPattern.fromString(property.name().value()).asJavaPattern().isEmpty();
+            }
+        }).toList();
+
+        if ( properties.size() == 0) {
+
+            return CodeBlock.of("new $T()", newSpec).toBuilder();
+        }
+
+        CodeBlock.Builder cb = CodeBlock.builder().beginControlFlow("new $T()", newSpec).beginControlFlow("");
+        for (PropertyShape typeDeclaration : object.properties()) {
+
+            cb.addStatement("addAcceptedPattern($T.compile($S))", Pattern.class, EcmaPattern.fromString(typeDeclaration.name().value()).asJavaPattern());
+        }
+        return cb.endControlFlow().endControlFlow();
+    }
+
+    protected TypeSpec.Builder buildSpecialMap() {
+        return TypeSpec.classBuilder("ExcludingMap")
+                .superclass(ParameterizedTypeName.get(ClassName.get(HashMap.class), ClassName.get(String.class), ClassName.get(Object.class)))
+                .addField(FieldSpec.builder(TypeName.LONG, "serialVersionUID")
+                        .addModifiers(Modifier.PRIVATE, Modifier.FINAL, Modifier.STATIC)
+                        .initializer("1L")
+                        .build())
+                .addField(FieldSpec.builder(ParameterizedTypeName.get(Set.class, Pattern.class), "additionalProperties")
+                        .initializer(CodeBlock.builder().add(" new $T()", ParameterizedTypeName.get(HashSet.class, Pattern.class)).build())
+                        .build())
+                .addMethod(
+                        MethodSpec.methodBuilder("put")
+                                .addParameter(ClassName.get(String.class), "key")
+                                .addParameter(ClassName.get(Object.class), "value")
+                                .addAnnotation(Override.class)
+                                .addModifiers(Modifier.PUBLIC)
+                                .returns(TypeName.OBJECT)
+                                .beginControlFlow("if ( additionalProperties.size() == 0 ) ")
+                                .addStatement("return super.put(key, value)")
+                                .endControlFlow()
+                                .beginControlFlow("else")
+                                .addStatement("return setProperty(key, value)")
+                                .endControlFlow()
+                                .build())
+                .addMethod(
+                        MethodSpec.methodBuilder("putAll")
+                                .addParameter(ParameterizedTypeName.get(ClassName.get(Map.class), WildcardTypeName.subtypeOf(String.class), WildcardTypeName.subtypeOf(Object.class)), "otherMap")
+                                .addAnnotation(Override.class)
+                                .addModifiers(Modifier.PUBLIC)
+                                .returns(TypeName.VOID)
+                                .addCode(CodeBlock.builder()
+                                        .beginControlFlow("if ( additionalProperties.size() == 0 ) ")
+                                        .addStatement("super.putAll(otherMap)")
+                                        .endControlFlow()
+                                        .beginControlFlow("else")
+                                        .beginControlFlow("for ( $T<? extends $T, ?> entry : otherMap.entrySet() )", Map.Entry.class, String.class)
+                                        .addStatement("setProperty(entry.getKey(), entry.getValue())")
+                                        .endControlFlow()
+                                        .endControlFlow()
+                                        .build())
+                                .build())
+                .addMethod(
+                        MethodSpec.methodBuilder("addAcceptedPattern")
+                                .addParameter(ClassName.get(Pattern.class), "pattern")
+                                .addModifiers(Modifier.PROTECTED)
+                                .returns(TypeName.VOID)
+                                .addCode(CodeBlock.builder().addStatement("additionalProperties.add(pattern)").build())
+                                .build())
+                .addMethod(
+                        MethodSpec.methodBuilder("setProperty")
+                                .addParameter(ClassName.get(String.class), "key")
+                                .addParameter(ClassName.get(Object.class), "value")
+                                .addModifiers(Modifier.PRIVATE)
+                                .returns(TypeName.OBJECT)
+                                .beginControlFlow("if ( additionalProperties.size() == 0 ) ")
+                                .addStatement("return super.put(key, value)")
+                                .endControlFlow()
+                                .beginControlFlow("else")
+                                .beginControlFlow("for ( $T p : additionalProperties)", Pattern.class)
+                                .beginControlFlow("if ( p.matcher(key).matches() )")
+                                .addStatement("return super.put(key, value)")
+                                .endControlFlow()
+                                .endControlFlow()
+                                .addStatement("throw new $T(\"property \" + key + \" is invalid according to RAML type\")", IllegalArgumentException.class)
+                                .endControlFlow()
+                                .build())
+
+                .addModifiers(Modifier.PUBLIC);
     }
 
     private Optional<String> discriminatorName(NodeShape objectTypeDeclaration) {

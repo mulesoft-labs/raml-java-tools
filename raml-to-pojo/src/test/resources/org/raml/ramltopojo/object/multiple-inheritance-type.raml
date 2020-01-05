@@ -4,13 +4,16 @@ version: v1
 baseUri: https://api.github.com
 types:
     once:
+      additionalProperties: false
       properties:
         right: string
     twice:
+      additionalProperties: false
       properties:
         left: string
     foo:
-        type: [once, twice]
-        properties:
-          name: string
+      additionalProperties: false
+      type: [once, twice]
+      properties:
+        name: string
 

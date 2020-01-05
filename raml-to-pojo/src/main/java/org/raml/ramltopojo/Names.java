@@ -15,6 +15,7 @@
  */
 package org.raml.ramltopojo;
 
+import com.google.common.base.CaseFormat;
 import com.google.common.base.Joiner;
 import org.raml.v2.api.model.v08.bodies.BodyLike;
 import org.raml.v2.api.model.v10.bodies.Response;
@@ -124,7 +125,9 @@ public class Names {
     return buildJavaFriendlyName(value, NameFixer.ALL_UPPER, 0);
   }
 
-
+  public static String enumName(String value) {
+    return CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, buildJavaFriendlyName(value, NameFixer.CAMEL_UPPER, 0));
+  }
 
   public static String javaTypeName(Resource resource, TypeDeclaration declaration) {
     return typeName(resource.resourcePath(), declaration.name());

@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.extensions;
 
+import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.UnionShape;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
@@ -32,11 +33,17 @@ public interface UnionTypeHandlerPlugin {
         public FieldSpec.Builder anyFieldCreated(UnionPluginContext context, UnionShape union, TypeSpec.Builder typeSpec, FieldSpec.Builder anyType, EventType eventType) {
             return anyType;
         }
+
+        @Override
+        public FieldSpec.Builder fieldBuilt(UnionPluginContext context, AnyShape ramlType, FieldSpec.Builder fieldSpec, EventType eventType) {
+            return fieldSpec;
+        }
     }
 
     ClassName className(UnionPluginContext unionPluginContext, UnionShape ramlType, ClassName currentSuggestion, EventType eventType);
     TypeSpec.Builder classCreated(UnionPluginContext unionPluginContext, UnionShape ramlType, TypeSpec.Builder incoming, EventType eventType);
     FieldSpec.Builder anyFieldCreated(UnionPluginContext context, UnionShape union, TypeSpec.Builder typeSpec, FieldSpec.Builder anyType, EventType eventType);
+    FieldSpec.Builder fieldBuilt(UnionPluginContext unionPluginContext, AnyShape ramlType, FieldSpec.Builder fieldSpec, EventType eventType);
 
     class Composite implements UnionTypeHandlerPlugin {
 
@@ -79,6 +86,17 @@ public interface UnionTypeHandlerPlugin {
             }
 
             return anyType;
+        }
+
+        @Override
+        public FieldSpec.Builder fieldBuilt(UnionPluginContext context, AnyShape ramlType, FieldSpec.Builder fieldSpec, EventType eventType) {
+            for (UnionTypeHandlerPlugin plugin : plugins) {
+                if (fieldSpec == null) {
+                    break;
+                }
+                fieldSpec = plugin.fieldBuilt(context, ramlType, fieldSpec, eventType);
+            }
+            return fieldSpec;
         }
     }
 }

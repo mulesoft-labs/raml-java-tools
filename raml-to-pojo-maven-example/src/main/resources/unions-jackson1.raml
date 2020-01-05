@@ -1,0 +1,80 @@
+#%RAML 1.0 Library
+uses:
+  ramltopojo: ramltopojo.raml
+types:
+  DogJ1:
+    (ramltopojo.types):
+      plugins:
+        - name: core.jackson1
+    type: object
+    properties:
+      bark: nil | boolean
+      color: string
+  TelevisionJ1:
+    (ramltopojo.types):
+      plugins:
+        - name: core.jackson1
+    type: object
+    properties:
+      color: boolean
+  ProjectorJ1:
+    (ramltopojo.types):
+      plugins:
+        - name: core.jackson1
+    type: object
+    properties:
+      hanging: boolean
+  EntertainementJ1:
+     (ramltopojo.types):
+      plugins:
+        - name: core.jackson1
+     type: TelevisionJ1 | ProjectorJ1
+  SomeScalarJ1:
+    (ramltopojo.types):
+      plugins:
+        - name: core.jackson1
+    type: string|integer
+  date1UnionJ1:
+    (ramltopojo.types):
+      plugins:
+        - name: core.jackson1
+    type: date-only | nil
+  date2UnionJ1:
+    (ramltopojo.types):
+      plugins:
+        - name: core.jackson1
+    type: time-only | nil
+  date3UnionJ1:
+    (ramltopojo.types):
+      plugins:
+        - name: core.jackson1
+    type: datetime-only | nil
+  date4UnionJ1:
+    (ramltopojo.types):
+      plugins:
+        - name: core.jackson1
+    type: datetime | nil
+  dateUnionJ1:
+    (ramltopojo.types):
+      plugins:
+        - name: core.jackson1
+    type: object
+    properties:
+      date1: date1UnionJ1
+      date2: date2UnionJ1
+      date3: date3UnionJ1
+      date4: date4UnionJ1
+  nilUnionTypeJ1:
+    (ramltopojo.types):
+      plugins:
+        - name: core.jackson1
+    type: string|nil
+  complexUnionJ1:
+    (ramltopojo.types):
+      plugins:
+        - name: core.jackson1
+    type: boolean|integer|string|nil
+  unionPropertyJ1:
+    properties:
+      goo: string|nil
+      declared: nilUnionTypeJ1

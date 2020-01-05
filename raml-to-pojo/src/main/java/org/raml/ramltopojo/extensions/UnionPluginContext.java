@@ -1,6 +1,7 @@
 package org.raml.ramltopojo.extensions;
 
-import amf.client.model.domain.Shape;
+import amf.client.model.domain.AnyShape;
+import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.CreationResult;
 
 /**
@@ -9,5 +10,6 @@ import org.raml.ramltopojo.CreationResult;
 public interface UnionPluginContext {
 
     CreationResult creationResult();
-    CreationResult unionClass(Shape ramlType);
+    CreationResult unionClass(AnyShape ramlType);
+    TypeName findType(String typeName, AnyShape type);
 }

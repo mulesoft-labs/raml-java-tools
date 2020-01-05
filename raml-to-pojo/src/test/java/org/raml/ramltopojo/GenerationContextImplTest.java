@@ -32,7 +32,7 @@ public class GenerationContextImplTest extends UnitTest{
         type2 = (NodeShape) type2.withInherits(Arrays.asList(type3, type4));
 
         GenerationContextImpl impl = new GenerationContextImpl(null);
-        impl.setupTypeHierarchy(type1);
+        impl.setupTypeHierarchy("type1", type1);
 
         assertThat(impl.childClasses("type2"), Matchers.contains(Matchers.equalTo("type1")));
 

@@ -1,9 +1,11 @@
 package org.raml.ramltopojo.extensions;
 
-import amf.client.model.domain.Shape;
+import amf.client.model.domain.AnyShape;
+import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.CreationResult;
+import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.GenerationContext;
-
+import org.raml.ramltopojo.ShapeType;
 
 /**
  * Created. There, you have it.
@@ -24,7 +26,13 @@ public class UnionPluginContextImpl implements UnionPluginContext {
     }
 
     @Override
-    public CreationResult unionClass(Shape ramlType) {
+    public TypeName findType(String typeName, AnyShape type) {
+
+        return ShapeType.calculateTypeName(typeName, type, generationContext, EventType.INTERFACE);
+    }
+
+    @Override
+    public CreationResult unionClass(AnyShape ramlType) {
         return generationContext.findCreatedType(ramlType.name().value(), ramlType);
     }
 }

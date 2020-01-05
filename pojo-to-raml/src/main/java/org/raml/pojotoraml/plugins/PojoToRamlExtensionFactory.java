@@ -20,11 +20,15 @@ package org.raml.pojotoraml.plugins;
 import com.google.common.collect.Streams;
 import org.raml.pojotoraml.RamlAdjuster;
 import org.raml.ramltopojo.plugin.PluginManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.raml.pojotoraml.util.AnnotationFinder.annotationFor;
 
 /**
  * Created. There, you have it.
@@ -34,6 +38,8 @@ public class PojoToRamlExtensionFactory {
     private static PluginManager pluginManager = PluginManager.createPluginManager("META-INF/pojotoraml-plugin.properties");
 
     private final Package topPackage;
+
+  private static final Logger logger = LoggerFactory.getLogger(PojoToRamlExtensionFactory.class);
 
     public PojoToRamlExtensionFactory(Package topPackage) {
         this.topPackage = topPackage;
@@ -51,8 +57,8 @@ public class PojoToRamlExtensionFactory {
         } else {
 
             if (topPackage != null) {
-                RamlGenerators generators = topPackage.getAnnotation(RamlGenerators.class);
-
+        RamlGenerators generators = annotationFor(topPackage, RamlGenerators.class);
+        logger.debug("{} RamlGenerators: {} '{}'\n", "******* ", generators, " *******");
                 // get the generator for the class.
                 java.util.Optional<RamlGenerator> ramlAdjusterOptional =
                         Arrays.stream(generators.value()).filter(ramlGeneratorForClass -> ramlGeneratorForClass.forClass().equals(clazz))

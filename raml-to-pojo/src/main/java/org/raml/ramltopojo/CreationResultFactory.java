@@ -172,8 +172,9 @@ public class CreationResultFactory {
         }
 
         @Override
-        public void setupTypeHierarchy(Shape typeDeclaration) {
-            context.setupTypeHierarchy(typeDeclaration);
+        public void setupTypeHierarchy(String actualName, AnyShape typeDeclaration) {
+
+            context.setupTypeHierarchy(actualName, typeDeclaration);
         }
     }
 
