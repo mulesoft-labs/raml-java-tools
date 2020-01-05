@@ -52,7 +52,7 @@ public class Jsr303Extension extends AllTypesPluginHelper {
             }
         };
 
-        addAnnotations(typeDeclaration, adder);
+        addAnnotations((AnyShape) typeDeclaration.range(), adder);
         return fieldSpec;
     }
 

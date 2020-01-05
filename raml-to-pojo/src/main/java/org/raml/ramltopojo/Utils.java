@@ -41,16 +41,16 @@ public class Utils {
         return foundTypes;
     }
 
-    static public List<Shape> allParents(Shape target) {
+    static public List<AnyShape> allParents(AnyShape target) {
 
         return allParents(target, new ArrayList<>());
     }
 
-    static private List<Shape> allParents(Shape target, List<Shape> found) {
+    static private List<AnyShape> allParents(AnyShape target, List<AnyShape> found) {
 
         found.add(target);
         for (Shape typeDeclaration : target.inherits()) {
-            allParents(typeDeclaration, found);
+            allParents((AnyShape) typeDeclaration, found);
         }
 
         return found;

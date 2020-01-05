@@ -352,7 +352,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
 
         TypeHandler handler = shapeType.createHandler(name, shapeType, typeDeclaration);
         TypeName typeName = handler.javaClassReference(context, eventType);
-        context.setupTypeHierarchy(typeDeclaration);
+        context.setupTypeHierarchy(name, typeDeclaration);
         return typeName;
     }
 

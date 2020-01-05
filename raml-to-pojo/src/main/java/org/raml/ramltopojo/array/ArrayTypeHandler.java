@@ -57,7 +57,7 @@ public class ArrayTypeHandler implements TypeHandler {
                 throw new GenerationException("unable to create type array item of type object (or maybe an inline array type ?)");
             }
 
-            List<Shape> shapes = Utils.allParents(typeDeclaration);
+            List<AnyShape> shapes = Utils.allParents(typeDeclaration);
             ReferencePluginContext referencePluginContext = new ReferencePluginContext() {
             };
             return generationContext.pluginsForReferences(

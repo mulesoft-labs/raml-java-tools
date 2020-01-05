@@ -4,10 +4,14 @@ import amf.client.model.domain.*;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.EcmaPattern;
+import org.raml.ramltopojo.ScalarTypes;
 import org.raml.ramltopojo.Utils;
 
 import javax.validation.Valid;
-import javax.validation.constraints.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -16,37 +20,38 @@ import java.math.BigInteger;
  */
 public class FacetValidation {
 
-    public static void addFacetsForAll(AnnotationAdder typeSpec, PropertyShape typeDeclaration) {
+    public static void addFacetsForAll(AnnotationAdder typeSpec, AnyShape typeDeclaration) {
 
+/* TODO:  for properties only.....
         if (typeDeclaration.minCount().value() > 0) {
 
             typeSpec.addAnnotation(AnnotationSpec.builder(NotNull.class).build());
         }
+*/
     }
 
-    public static void addAnnotations(PropertyShape typeDeclaration, AnnotationAdder adder) {
+    public static void addAnnotations(AnyShape typeDeclaration, AnnotationAdder adder) {
 
         addFacetsForAll(adder, typeDeclaration);
 
-        Shape range = typeDeclaration.range();
-        if ((range instanceof ScalarShape) && "string".equals(((ScalarShape)range).dataType().value())) {
+        if (ScalarTypes.isString(typeDeclaration)) {
 
-            addFacetsForString(adder, (ScalarShape) range);
+            addFacetsForString(adder, (ScalarShape) typeDeclaration);
             return;
         }
 
-        if (range instanceof ScalarShape) {
+        if (ScalarTypes.isNumber(typeDeclaration)) {
 
-            addFacetsForNumbers(adder, (ScalarShape)range);
+            addFacetsForNumbers(adder, (ScalarShape)typeDeclaration);
             return;
         }
 
-        if (range instanceof ArrayShape) {
+        if (typeDeclaration instanceof ArrayShape) {
 
-            addFacetsForArray(adder, (ArrayShape) range);
+            addFacetsForArray(adder, (ArrayShape) typeDeclaration);
         }
 
-        if (isFieldFromBuiltType(range)) {
+        if (isFieldFromBuiltType(typeDeclaration)) {
 
             addFacetsForBuilt(adder);
         }
@@ -139,7 +144,7 @@ public class FacetValidation {
 
     public static boolean isFieldFromBuiltType(Shape typeDeclaration) {
 
-        return typeDeclaration instanceof NodeShape || typeDeclaration instanceof UnionShape || typeDeclaration instanceof JSONTypeDeclaration || typeDeclaration instanceof XMLTypeDeclaration;
+        return typeDeclaration instanceof NodeShape || typeDeclaration instanceof UnionShape || typeDeclaration instanceof SchemaShape;
     }
 
     private static boolean isInteger(TypeName type) {

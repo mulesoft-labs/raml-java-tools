@@ -1,7 +1,6 @@
 package org.raml.ramltopojo.extensions.jackson1;
 
-import amf.client.model.domain.Shape;
-import amf.client.model.domain.UnionShape;
+import amf.client.model.domain.*;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -25,6 +24,7 @@ import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
 import org.raml.ramltopojo.union.UnionTypesHelper;
 import org.raml.v2.api.model.v10.datamodel.*;
 
+import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.sql.Date;
@@ -95,7 +95,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
         for (Shape typeDeclaration : union.anyOf()) {
 
             // use defined type name or primitives names
-            String name = prettyName(typeDeclaration, unionPluginContext);
+            String name = prettyName((AnyShape) typeDeclaration, unionPluginContext);
 
             String isMethod = Names.methodName("is", name);
             String getMethod = Names.methodName("get", name);
@@ -180,10 +180,10 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
         boolean objectValidation = false;
         boolean nullMethod = false;
 
-        for (TypeDeclaration typeDeclaration : UnionTypesHelper.sortByPriority(union.of())) {
+        for (AnyShape typeDeclaration : UnionTypesHelper.sortByPriority(union.anyOf())) {
 
             // get type name of declaration
-            TypeName typeName = unionPluginContext.findType(typeDeclaration.name(), typeDeclaration).box();
+            TypeName typeName = unionPluginContext.findType(typeDeclaration.name().value(), typeDeclaration).box();
 
             if (typeDeclaration instanceof NullTypeDeclaration) {
 
@@ -266,10 +266,10 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
 
                 }
 
-            } else if (typeDeclaration instanceof ArrayTypeDeclaration) {
+            } else if (typeDeclaration instanceof ArrayShape) {
 
-                ArrayTypeDeclaration arrayTypeDeclaration = (ArrayTypeDeclaration) typeDeclaration;
-                TypeName arrayType = unionPluginContext.findType(arrayTypeDeclaration.name(), arrayTypeDeclaration).box();
+                ArrayShape arrayTypeDeclaration = (ArrayShape) typeDeclaration;
+                TypeName arrayType = unionPluginContext.findType(arrayTypeDeclaration.name().value(), arrayTypeDeclaration).box();
 
                 deserialize.beginControlFlow("if (node.isArray())");
                 deserialize.addStatement("return new $T(jp.getCodec().treeToValue(node, $T[].class))",
@@ -361,12 +361,8 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
         builder.addMethod(spec.build());
     }
 
-    private String prettyName(TypeDeclaration type, UnionPluginContext unionPluginContext) {
-        if (type.type() == null) {
-            return type instanceof NullTypeDeclaration ? "nil" : shorten(unionPluginContext.findType(type.name(), type).box());
-        } else {
-            return type.name();
-        }
+    private String prettyName(AnyShape type, UnionPluginContext unionPluginContext) {
+        return type instanceof NilShape ? "nil" : shorten(unionPluginContext.findType(type.name().value(), type).box());
     }
 
     private String shorten(TypeName typeName) {

@@ -19,11 +19,13 @@ import com.squareup.javapoet.*;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.GenerationException;
 import org.raml.ramltopojo.Names;
+import org.raml.ramltopojo.ScalarTypes;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
 import org.raml.ramltopojo.union.UnionTypesHelper;
 import org.raml.v2.api.model.v10.datamodel.*;
 
+import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.sql.Date;
@@ -86,10 +88,10 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                 .addException(IOException.class)
                 .addException(JsonProcessingException.class);
 
-        for (AnyShape typeDeclaration : union.anyOf()) {
+        for (Shape typeDeclaration : union.anyOf()) {
 
             // use defined type name or primitives names
-            String name = prettyName(typeDeclaration, unionPluginContext);
+            String name = prettyName((AnyShape) typeDeclaration, unionPluginContext);
 
             String isMethod = Names.methodName("is", name);
             String getMethod = Names.methodName("get", name);
@@ -167,12 +169,12 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
         boolean objectValidation = false;
         boolean nullMethod = false;
 
-        for (TypeDeclaration typeDeclaration : UnionTypesHelper.sortByPriority(union.of())) {
+        for (AnyShape typeDeclaration : UnionTypesHelper.sortByPriority(union.anyOf())) {
 
             // get type name of declaration
-            TypeName typeName = unionPluginContext.findType(typeDeclaration.name(), typeDeclaration).box();
+            TypeName typeName = unionPluginContext.findType(typeDeclaration.name().value(), typeDeclaration).box();
 
-            if (typeDeclaration instanceof NullTypeDeclaration) {
+            if (typeDeclaration instanceof NilShape) {
 
                 deserialize.beginControlFlow("if (node.isNull())");
                 deserialize.addStatement("return new $T(null)", unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION));
@@ -188,13 +190,13 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                     nullMethod = true;
                 }
 
-            } else if (typeDeclaration instanceof BooleanTypeDeclaration) {
+            } else if (ScalarTypes.isBoolean(typeDeclaration)) {
 
                 deserialize.beginControlFlow("if (node.isBoolean())");
                 deserialize.addStatement("return new $T(node.asBoolean())", unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION));
                 deserialize.endControlFlow();
 
-            } else if (typeDeclaration instanceof IntegerTypeDeclaration) {
+            } else if (ScalarTypes.isInteger(typeDeclaration)) {
 
                 if (typeName.box().equals(TypeName.LONG.box())) {
                     deserialize.beginControlFlow("if (node.isLong())");
@@ -212,35 +214,35 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                     throw new GenerationException("Unknown integer type");
                 }
 
-            } else if (typeDeclaration instanceof StringTypeDeclaration) {
+            } else if (ScalarTypes.isString(typeDeclaration)) {
 
                 deserialize.beginControlFlow("if (node.isTextual())");
                 deserialize.addStatement("return new $T(node.asText())", unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION));
                 deserialize.endControlFlow();
 
-            } else if (typeDeclaration instanceof NumberTypeDeclaration) {
+            } else if (ScalarTypes.isNumber(typeDeclaration)) {
 
                 deserialize.beginControlFlow("if (node.isNumber())");
                 deserialize.addStatement("return new $T(jp.getCodec().treeToValue(node, $T.class))",
                     unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), Number.class);
                 deserialize.endControlFlow();
 
-            } else if (typeDeclaration instanceof DateTypeDeclaration) {
+            } else if (ScalarTypes.isDateOnly(typeDeclaration)) {
 
                 dateValidation = true;
                 this.buildDateDeserialize(unionPluginContext, deserialize, "yyyy-mm-dd");
 
-            } else if (typeDeclaration instanceof TimeOnlyTypeDeclaration) {
+            } else if (ScalarTypes.isTimeOnly(typeDeclaration)) {
 
                 dateValidation = true;
                 this.buildDateDeserialize(unionPluginContext, deserialize, "hh:mm:ss");
 
-            } else if (typeDeclaration instanceof DateTimeOnlyTypeDeclaration) {
+            } else if (ScalarTypes.isDatetimeOnly(typeDeclaration)) {
 
                 dateValidation = true;
                 this.buildDateDeserialize(unionPluginContext, deserialize, "yyyy-MM-dd'T'HH:mm:ss");
 
-            } else if (typeDeclaration instanceof DateTimeTypeDeclaration) {
+            } else if (ScalarTypes.isDateTime(typeDeclaration)) {
 
                 dateValidation = true;
 
@@ -254,26 +256,26 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
 
                 }
 
-            } else if (typeDeclaration instanceof ArrayTypeDeclaration) {
+            } else if (typeDeclaration instanceof ArrayShape) {
 
-                ArrayTypeDeclaration arrayTypeDeclaration = (ArrayTypeDeclaration) typeDeclaration;
-                TypeName arrayType = unionPluginContext.findType(arrayTypeDeclaration.name(), arrayTypeDeclaration).box();
+                ArrayShape arrayTypeDeclaration = (ArrayShape) typeDeclaration;
+                TypeName arrayType = unionPluginContext.findType(arrayTypeDeclaration.name().value(), arrayTypeDeclaration).box();
 
                 deserialize.beginControlFlow("if (node.isArray())");
                 deserialize.addStatement("return new $T(jp.getCodec().treeToValue(node, $T[].class))",
                     unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), arrayType);
                 deserialize.endControlFlow();
 
-            } else if (typeDeclaration instanceof ObjectTypeDeclaration) {
+            } else if (typeDeclaration instanceof NodeShape) {
 
                 objectValidation = true;
-                ObjectTypeDeclaration otd = (ObjectTypeDeclaration) typeDeclaration;
+                NodeShape otd = (NodeShape) typeDeclaration;
 
-                List<String> names = Lists.transform(otd.properties(), new Function<TypeDeclaration, String>() {
+                List<String> names = Lists.transform(otd.properties(), new Function<Shape, String>() {
                     @Nullable
                     @Override
-                    public String apply(@Nullable TypeDeclaration input) {
-                        return "\"" + input.name() + "\"";
+                    public String apply(@Nullable Shape input) {
+                        return "\"" + input.name().value() + "\"";
                     }
                 });
 
@@ -284,7 +286,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                     deserialize.beginControlFlow("if (node.isObject() && isValidObject(node, $T.asList($L)) && $T.equals(node.path($S).asText(), $S))",
                         Arrays.class, Joiner.on(",").join(names), Objects.class, otd.discriminator(), Optional.ofNullable(otd.discriminatorValue()).orElse(otd.name()));
                     deserialize.addStatement("return new $T(($T)jp.getCodec().treeToValue(node, $T.class))",
-                        unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), unionPossibility, unionPluginContext.unionClass(findParentType(typeDeclaration)).getJavaName(EventType.INTERFACE));
+                        unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), unionPossibility, unionPluginContext.unionClass((AnyShape) findParentType(typeDeclaration)).getJavaName(EventType.INTERFACE));
                     deserialize.endControlFlow();
 
                 } else {
@@ -377,7 +379,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
             return "nil";
         } else {
             if ( type.name().isNullOrEmpty()) {
-                shorten(unionPluginContext.findType(type.name().value(), type).box());
+                return shorten(unionPluginContext.findType(type.name().value(), type).box());
             } else {
                 return type.name().value();
             }

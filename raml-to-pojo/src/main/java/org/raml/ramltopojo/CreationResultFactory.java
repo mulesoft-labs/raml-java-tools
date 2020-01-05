@@ -33,7 +33,7 @@ public class CreationResultFactory {
         ClassName impl = handler.javaClassName(context, EventType.IMPLEMENTATION);
         CreationResult creationResult = new CreationResult(context.defaultPackage(), intf, impl);
         context.newExpectedType(typeDeclaration.name().value(), creationResult);
-        context.setupTypeHierarchy(typeDeclaration);
+        context.setupTypeHierarchy(typeDeclaration.name().value(), typeDeclaration);
         return handler.create(context, creationResult);
     }
 
@@ -53,7 +53,7 @@ public class CreationResultFactory {
         ClassName impl = handler.javaClassName(context, EventType.IMPLEMENTATION);
         CreationResult creationResult = new CreationResult(context.defaultPackage(), intf, impl);
         context.newExpectedType(name, creationResult);
-        context.setupTypeHierarchy(typeDeclaration);
+        context.setupTypeHierarchy(typeDeclaration.name().value(), typeDeclaration);
         return handler.create(context, creationResult);
     }
 

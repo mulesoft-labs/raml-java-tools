@@ -1,6 +1,9 @@
 package org.raml.ramltopojo.union;
 
-import com.google.common.base.Optional;
+import amf.client.model.domain.AnyShape;
+import amf.client.model.domain.NilShape;
+import amf.client.model.domain.Shape;
+import amf.client.model.domain.UnionShape;
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
@@ -8,11 +11,8 @@ import org.raml.ramltopojo.extensions.UnionPluginContextImpl;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
 import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.NullTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
 
 import javax.lang.model.element.Modifier;
-import java.util.ArrayList;
 import java.util.stream.Collectors;
 /**
  * Created. There, you have it.
@@ -20,10 +20,10 @@ import java.util.stream.Collectors;
 public class UnionTypeHandler implements TypeHandler {
 
     private final String name;
-    private final UnionTypeDeclaration union;
+    private final UnionShape union;
     public static final ClassName NULL_CLASS = ClassName.get(Object.class);
 
-    public UnionTypeHandler(String name, UnionTypeDeclaration union) {
+    public UnionTypeHandler(String name, UnionShape union) {
         this.name = name;
         this.union = union;
     }
@@ -33,7 +33,7 @@ public class UnionTypeHandler implements TypeHandler {
 
         UnionPluginContext context = new UnionPluginContextImpl(generationContext, null);
 
-        UnionTypeHandlerPlugin plugin = generationContext.pluginsForUnions(Utils.allParents(union, new ArrayList<TypeDeclaration>()).toArray(new TypeDeclaration[0]));
+        UnionTypeHandlerPlugin plugin = generationContext.pluginsForUnions(Utils.allParents(union).toArray(new AnyShape[0]));
         ClassName className;
         if ( type == EventType.IMPLEMENTATION ) {
             className = generationContext.buildDefaultClassName(Names.typeName(name, "Impl"), EventType.IMPLEMENTATION);
@@ -51,7 +51,7 @@ public class UnionTypeHandler implements TypeHandler {
     }
 
     @Override
-    public Optional<CreationResult> create(GenerationContext generationContext, CreationResult preCreationResult) {
+    public java.util.Optional<CreationResult> create(GenerationContext generationContext, CreationResult preCreationResult) {
 
         UnionPluginContext context = new UnionPluginContextImpl(generationContext, preCreationResult);
 
@@ -62,9 +62,9 @@ public class UnionTypeHandler implements TypeHandler {
 
         if ( interf == null ) {
 
-            return Optional.absent();
+            return java.util.Optional.empty();
         } else {
-            return Optional.of(preCreationResult.withInterface(interf.build()).withImplementation(impl.build()));
+            return java.util.Optional.of(preCreationResult.withInterface(interf.build()).withImplementation(impl.build()));
         }
     }
 
@@ -74,10 +74,10 @@ public class UnionTypeHandler implements TypeHandler {
             .addSuperinterface(interfaceName);
 
         // check if union is ambiguous (duplicate primitive types could't be handled by constructor)
-        if (UnionTypesHelper.isAmbiguous(union.of(), (x) -> findType(x.name(), x, generationContext))) {
+        if (UnionTypesHelper.isAmbiguous(union.anyOf(), (x) -> findType(x.name().value(), (AnyShape)x, generationContext))) {
             throw new GenerationException(
                 "This union is ambiguous. It's impossible to create a correct constructor for ambiguous types: "
-                    + union.of().stream().map(x -> findType(x.name(), x, generationContext)).collect(Collectors.toList())
+                    + union.anyOf().stream().map(x -> findType(x.name().value(), (AnyShape)x, generationContext)).collect(Collectors.toList())
                     + ". Use unique primitive types or classes with discriminator to solve this conflict."
             );
         }
@@ -107,9 +107,9 @@ public class UnionTypeHandler implements TypeHandler {
             .build());
 
         // add union members
-        for (TypeDeclaration unitedType : UnionTypesHelper.sortByPriority(union.of())) {
+        for (Shape unitedType : UnionTypesHelper.sortByPriority(union.anyOf())) {
 
-            TypeName typeName = unitedType instanceof NullTypeDeclaration ? NULL_CLASS : findType(unitedType.name(), unitedType, generationContext).box();
+            TypeName typeName = unitedType instanceof NilShape ? NULL_CLASS : findType(unitedType.name().value(), (AnyShape) unitedType, generationContext).box();
             String prettyName = prettyName(unitedType, generationContext);
 
             String fieldName = Names.methodName(prettyName, "value");
@@ -142,7 +142,7 @@ public class UnionTypeHandler implements TypeHandler {
                 // Add value field with annotations (for every valid union member)
                 // This is necessary to support field validations in unions
                 FieldSpec.Builder fieldValueSpec = FieldSpec.builder(typeName, fieldName, Modifier.PRIVATE);
-                fieldValueSpec = generationContext.pluginsForUnions(union).fieldBuilt(context, unitedType, fieldValueSpec, EventType.IMPLEMENTATION);
+                fieldValueSpec = generationContext.pluginsForUnions(union).fieldBuilt(context, (AnyShape) unitedType, fieldValueSpec, EventType.IMPLEMENTATION);
                 typeSpec.addField(fieldValueSpec.build());
 
                 String enumName = Names.enumName(prettyName);
@@ -213,13 +213,13 @@ public class UnionTypeHandler implements TypeHandler {
             .returns(unionEnumClassName)
             .build());
 
-        for (TypeDeclaration unitedType : union.of()) {
+        for (Shape unitedType : union.anyOf()) {
 
             if (unitedType instanceof ArrayTypeDeclaration) {
                 throw new GenerationException("ramltopojo currently does not support arrays in unions");
             }
 
-            TypeName typeName = unitedType instanceof NullTypeDeclaration ? NULL_CLASS: findType(unitedType.name(), unitedType, generationContext).box();
+            TypeName typeName = unitedType instanceof NullTypeDeclaration ? NULL_CLASS: findType(unitedType.name().value(), (AnyShape) unitedType, generationContext).box();
             String prettyName = prettyName(unitedType, generationContext);
 
             // add enum name
@@ -257,12 +257,8 @@ public class UnionTypeHandler implements TypeHandler {
         return typeSpec;
     }
 
-    private String prettyName(TypeDeclaration type, GenerationContext generationContext) {
-        if (type.type() == null) {
-            return type instanceof NullTypeDeclaration ? "nil" : shorten(findType(type.name(), type, generationContext).box());
-        } else {
-            return type.name();
-        }
+    private String prettyName(Shape type, GenerationContext generationContext) {
+        return type instanceof NilShape ? "nil" : shorten(findType(type.name().value(), (AnyShape) type, generationContext).box());
     }
 
     private String shorten(TypeName typeName) {
@@ -273,7 +269,7 @@ public class UnionTypeHandler implements TypeHandler {
         }
     }
 
-    private TypeName findType(String typeName, TypeDeclaration type, GenerationContext generationContext) {
-        return TypeDeclarationType.calculateTypeName(typeName, type, generationContext, EventType.INTERFACE);
+    private TypeName findType(String typeName, AnyShape type, GenerationContext generationContext) {
+        return ShapeType.calculateTypeName(typeName, type, generationContext, EventType.INTERFACE);
     }
 }

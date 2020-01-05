@@ -1,9 +1,6 @@
 package org.raml.ramltopojo;
 
-import amf.client.model.domain.NodeShape;
-import amf.client.model.domain.PropertyShape;
-import amf.client.model.domain.Shape;
-import amf.client.model.domain.UnionShape;
+import amf.client.model.domain.*;
 import org.junit.Before;
 import org.junit.Test;
 import webapi.WebApiDocument;
@@ -36,7 +33,7 @@ public class UtilsTest {
         assertEquals(1, properties.size());
         assertEquals("oneName", properties.get(0).name().value());
 
-        List<Shape> inherited = Utils.allParents(shape);
+        List<AnyShape> inherited = Utils.allParents(shape);
         assertEquals(2, inherited.size());
         assertEquals("inheritsSquareBrackets", inherited.get(0).name().value());
         assertEquals("parentOne", inherited.get(1).name().value());
@@ -68,7 +65,7 @@ public class UtilsTest {
         assertEquals(1, properties.size());
         assertEquals("oneName", properties.get(0).name().value());
 
-        List<Shape> inherited = Utils.allParents(shape);
+        List<AnyShape> inherited = Utils.allParents(shape);
         assertEquals(2, inherited.size());
         assertEquals("inheritsNoBrackets", inherited.get(0).name().value());
         assertEquals("parentOne", inherited.get(1).name().value());

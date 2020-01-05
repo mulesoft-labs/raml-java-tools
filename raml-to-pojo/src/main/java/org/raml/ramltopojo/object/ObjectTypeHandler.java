@@ -202,7 +202,7 @@ public class ObjectTypeHandler implements TypeHandler {
                 if (propertyDeclaration.range() instanceof UnionShape) {
 
                     // Inline union naming: string | nil => StringNilUnion
-                    CreationResult cr = ShapeType.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),
+                    CreationResult cr = CreationResultFactory.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),
                         Names.typeName(propertyDeclaration.range().name().value(), "union"), propertyDeclaration, generationContext).get();
                     result.withInternalType(propertyDeclaration.name().value(), cr);
                     tn = cr.getJavaName(EventType.INTERFACE);
@@ -211,7 +211,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
                 } else {
 
-                    Optional<CreationResult> cr = ShapeType.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),
+                    Optional<CreationResult> cr = CreationResultFactory.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),
                         Names.typeName(propertyDeclaration.name().value(), "type"), propertyDeclaration, generationContext);
                     if (cr.isPresent()) {
                     result.withInternalType(propertyDeclaration.name().value(), cr.get());

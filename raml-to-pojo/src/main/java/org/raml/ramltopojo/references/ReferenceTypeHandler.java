@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.references;
 
+import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.Shape;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
@@ -32,7 +33,7 @@ public class ReferenceTypeHandler implements TypeHandler {
     public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
 
         return generationContext.pluginsForReferences(
-                    Utils.allParents(typeDeclaration).toArray(new Shape[0]))
+                    Utils.allParents((AnyShape) typeDeclaration).toArray(new Shape[0]))
                 .typeName(new ReferencePluginContext() {
                 }, typeDeclaration, referenceName);
 
