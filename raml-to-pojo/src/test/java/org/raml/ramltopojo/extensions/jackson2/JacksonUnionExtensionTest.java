@@ -1,11 +1,11 @@
 package org.raml.ramltopojo.extensions.jackson2;
 
+import amf.client.model.document.Document;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.squareup.javapoet.ClassName;
 import org.junit.Test;
 import org.raml.ramltopojo.*;
-import webapi.WebApiDocument;
 
 import java.util.Arrays;
 
@@ -27,7 +27,7 @@ public class JacksonUnionExtensionTest {
     @Test
     public void complexInlineUnion() throws Exception {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("union-mix-type.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("union-mix-type.raml"));
         RamlToPojo ramlToPojo = new RamlToPojoBuilder(api).fetchTypes(TypeFetchers.fromAnywhere()).findTypes(TypeFinders.everyWhere()).build(Arrays.asList("core.jackson2"));
         CreationResult r = ramlToPojo.buildPojos().creationResults().stream().filter(x -> x.getJavaName(EventType.INTERFACE).simpleName().equals("Foo")).findFirst().get();
 
@@ -80,7 +80,7 @@ public class JacksonUnionExtensionTest {
 
     @Test(expected = GenerationException.class)
     public void ambiguousUnion() throws Exception {
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("union-ambiguous-type.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("union-ambiguous-type.raml"));
         RamlToPojo ramlToPojo = new RamlToPojoBuilder(api).fetchTypes(TypeFetchers.fromAnywhere()).findTypes(TypeFinders.everyWhere()).build(Arrays.asList("core.jackson2"));
         ramlToPojo.buildPojos().creationResults();
     }

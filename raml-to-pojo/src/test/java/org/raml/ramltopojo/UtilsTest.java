@@ -1,9 +1,9 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.document.Document;
 import amf.client.model.domain.*;
 import org.junit.Before;
 import org.junit.Test;
-import webapi.WebApiDocument;
 import webapi.WebApiParser;
 
 import java.util.List;
@@ -26,7 +26,7 @@ public class UtilsTest {
     @Test
     public void inheritedSquareBrackets() throws ExecutionException, InterruptedException {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("type-layout-tests.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("type-layout-tests.raml"));
         NodeShape shape = findShape("inheritsSquareBrackets", api.declares());
 
         List<PropertyShape> properties = Utils.allProperties(shape);
@@ -43,7 +43,7 @@ public class UtilsTest {
     @Test
     public void inheritedSquareBracketsFixGuard() throws ExecutionException, InterruptedException {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("type-layout-tests.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("type-layout-tests.raml"));
         NodeShape shape = findShape("inheritsSquareBrackets", api.declares());
 
         List<PropertyShape> properties = shape.properties();
@@ -58,7 +58,7 @@ public class UtilsTest {
     @Test
     public void inheritedNoSquareBrackets() throws ExecutionException, InterruptedException {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("type-layout-tests.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("type-layout-tests.raml"));
         NodeShape shape = findShape("inheritsNoBrackets", api.declares());
 
         List<PropertyShape> properties = Utils.allProperties(shape);
@@ -74,7 +74,7 @@ public class UtilsTest {
     @Test
     public void inheritedNoSquareBracketsFixGuard() throws ExecutionException, InterruptedException {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("type-layout-tests.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("type-layout-tests.raml"));
         NodeShape shape = findShape("inheritsNoBrackets", api.declares());
 
         List<PropertyShape> properties = shape.properties();
@@ -89,7 +89,7 @@ public class UtilsTest {
     @Test
     public void unionOfScalars() throws ExecutionException, InterruptedException {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("type-layout-tests.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("type-layout-tests.raml"));
         UnionShape shape = findShape("unionOfScalars", api.declares());
 
         assertEquals(2, ((UnionShape)shape.inherits().get(0)).anyOf().size());
@@ -98,7 +98,7 @@ public class UtilsTest {
     @Test
     public void unionOfTypes() throws ExecutionException, InterruptedException {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("type-layout-tests.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("type-layout-tests.raml"));
         NodeShape shape = findShape("unionOfNodes", api.declares());
 
         assertEquals(2, ((UnionShape)shape.inherits().get(0)).anyOf().size());
@@ -107,7 +107,7 @@ public class UtilsTest {
     @Test
     public void unionOfMixed() throws ExecutionException, InterruptedException {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("type-layout-tests.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("type-layout-tests.raml"));
         UnionShape shape = findShape("unionOfMixed", api.declares());
 
         assertEquals(2, ((UnionShape)shape.inherits().get(0)).anyOf().size());

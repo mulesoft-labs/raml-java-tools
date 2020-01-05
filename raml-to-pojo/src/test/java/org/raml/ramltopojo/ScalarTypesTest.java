@@ -1,9 +1,9 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.document.Document;
 import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.ScalarShape;
 import org.junit.Test;
-import webapi.WebApiDocument;
 
 import java.util.concurrent.ExecutionException;
 
@@ -17,7 +17,7 @@ public class ScalarTypesTest {
     @Test
     public void checkScalarTypes() throws ExecutionException, InterruptedException {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("scalar-types.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("scalar-types.raml"));
         NodeShape shape = RamlLoader.findShape("foo", api.declares());
 
         assertEquals(ScalarTypes.INTEGER_SCALAR, rangeOf(shape, "integer").dataType().value());

@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.enumeration;
 
+import amf.client.model.document.Document;
 import amf.client.model.domain.ScalarShape;
 import com.squareup.javapoet.ClassName;
 import org.hamcrest.Matchers;
@@ -11,7 +12,6 @@ import org.raml.ramltopojo.TypeFetchers;
 import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.testutils.UnitTest;
 import org.raml.testutils.matchers.FieldSpecMatchers;
-import webapi.WebApiDocument;
 
 import java.util.Collections;
 
@@ -31,7 +31,7 @@ public class EnumerationTypeHandlerTest extends UnitTest {
     @Test
     public void createString() throws Exception {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("stringenum.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("stringenum.raml"));
         ScalarShape enumShape = findShape("days", api.declares());
         EnumerationTypeHandler handler = new EnumerationTypeHandler("days", enumShape);
         GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());
@@ -53,7 +53,7 @@ public class EnumerationTypeHandlerTest extends UnitTest {
     @Test
     public void createInteger() throws Exception {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("stringenum.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("stringenum.raml"));
         ScalarShape enumShape = findShape("time", api.declares());
         EnumerationTypeHandler handler = new EnumerationTypeHandler("time", enumShape);
         GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());

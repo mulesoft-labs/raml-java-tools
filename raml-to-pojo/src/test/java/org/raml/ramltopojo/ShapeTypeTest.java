@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.document.Document;
 import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.PropertyShape;
 import amf.client.model.domain.ScalarShape;
@@ -12,7 +13,6 @@ import org.mockito.Mock;
 import org.raml.ramltopojo.extensions.ReferencePluginContext;
 import org.raml.ramltopojo.extensions.ReferenceTypeHandlerPlugin;
 import org.raml.testutils.UnitTest;
-import webapi.WebApiDocument;
 
 import java.util.concurrent.ExecutionException;
 
@@ -44,7 +44,7 @@ public class ShapeTypeTest extends UnitTest {
     @Test
     public void internalIntIsNotNewInlineType() throws ExecutionException, InterruptedException {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-types.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("inline-types.raml"));
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "internalInt");
 
@@ -55,7 +55,7 @@ public class ShapeTypeTest extends UnitTest {
     @Test
     public void simpleObjectIsNotNewInlineType() throws ExecutionException, InterruptedException {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-types.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("inline-types.raml"));
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "unextended");
 
@@ -65,7 +65,7 @@ public class ShapeTypeTest extends UnitTest {
     @Test
     public void extendedObjectIsNotNewInlineType() throws ExecutionException, InterruptedException {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-types.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("inline-types.raml"));
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "extendedFromOne");
 
@@ -75,7 +75,7 @@ public class ShapeTypeTest extends UnitTest {
     @Test
     public void extendedObjectWithExtraPropertiesIsNewInlineType() throws ExecutionException, InterruptedException {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-types.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("inline-types.raml"));
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "extendedFromOneWithExtraProperty");
 
@@ -85,7 +85,7 @@ public class ShapeTypeTest extends UnitTest {
     @Test
     public void objectWithExtraPropertiesIsNewInlineType() throws ExecutionException, InterruptedException {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-types.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("inline-types.raml"));
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "objectWithExtraProperty");
 
@@ -95,7 +95,7 @@ public class ShapeTypeTest extends UnitTest {
     @Test
     public void multiInheritanceWithExtraPropertiesIsNewInlineType() throws ExecutionException, InterruptedException {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-types.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("inline-types.raml"));
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "multiInheritanceWithExtraProperty");
 
@@ -105,7 +105,7 @@ public class ShapeTypeTest extends UnitTest {
     @Test
     public void multiInheritanceWithoutExtraPropertiesIsNotNewInlineType() throws ExecutionException, InterruptedException {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-types.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("inline-types.raml"));
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "multiInheritanceWithoutExtraProperty");
 
@@ -115,7 +115,7 @@ public class ShapeTypeTest extends UnitTest {
     @Test
     public void arraySimpleType() throws ExecutionException, InterruptedException {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-array-types.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("inline-array-types.raml"));
         NodeShape decl = RamlLoader.findShape("father", api.declares());
 
         assertFalse(ShapeType.isNewInlineType(Utils.rangeOf(findProperty(decl, "others"))));
@@ -125,7 +125,7 @@ public class ShapeTypeTest extends UnitTest {
     @Test @Ignore("inline testing does't work the same in webapi.")
     public void inlineArrayOfDifferentArrayType() throws ExecutionException, InterruptedException {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-array-types.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("inline-array-types.raml"));
         NodeShape decl = RamlLoader.findShape("mother", api.declares());
 
         assertTrue(ShapeType.isNewInlineType(Utils.rangeOf(findProperty(decl, "complicatedChildren"))));
@@ -189,7 +189,7 @@ public class ShapeTypeTest extends UnitTest {
     @Test
     public void unionWithExtraPropertiesIsNewInlineType() throws ExecutionException, InterruptedException {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-types.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("inline-types.raml"));
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "unionWithExtraProperty");
 

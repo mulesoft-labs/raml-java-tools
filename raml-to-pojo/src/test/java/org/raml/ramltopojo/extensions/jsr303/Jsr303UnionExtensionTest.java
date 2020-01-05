@@ -1,9 +1,9 @@
 package org.raml.ramltopojo.extensions.jsr303;
 
+import amf.client.model.document.Document;
 import com.squareup.javapoet.ClassName;
 import org.junit.Test;
 import org.raml.ramltopojo.*;
-import webapi.WebApiDocument;
 
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -26,7 +26,7 @@ public class Jsr303UnionExtensionTest {
     @Test
     public void unionValidation() throws Exception {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("union-type.raml"));
+        Document api = RamlLoader.loadEdited(this.getClass().getResource("union-type.raml"));
         RamlToPojo ramlToPojo = new RamlToPojoBuilder(api).fetchTypes(TypeFetchers.fromAnywhere()).findTypes(TypeFinders.everyWhere()).build(Arrays.asList("core.jsr303"));
         CreationResult r = ramlToPojo.buildPojos().creationResults().stream().filter(x -> x.getJavaName(EventType.INTERFACE).simpleName().equals("Foo")).findFirst().get();
 

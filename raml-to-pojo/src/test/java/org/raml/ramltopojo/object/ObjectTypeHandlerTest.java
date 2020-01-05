@@ -1,9 +1,9 @@
 package org.raml.ramltopojo.object;
 
+import amf.client.model.document.Document;
 import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.PropertyShape;
 import amf.client.model.domain.Shape;
-import amf.client.model.domain.UnionShape;
 import com.squareup.javapoet.*;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
@@ -16,8 +16,6 @@ import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.testutils.UnitTest;
 import org.raml.testutils.assertj.ListAssert;
-import webapi.Raml10;
-import webapi.WebApiDocument;
 
 import java.net.URL;
 import java.util.Collections;
@@ -54,7 +52,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Test
     public void simplest() throws Exception {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("simplest-type.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("simplest-type.raml"));
         ObjectTypeHandler handler = new ObjectTypeHandler("foo", (NodeShape)findShape("foo", api.declares()));
 
         GenerationContextImpl generationContext = new GenerationContextImpl(api);
@@ -113,7 +111,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Test
     public void simplestContainingSimpleArray() throws Exception {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("simplest-containing-simple-array.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("simplest-containing-simple-array.raml"));
         ObjectTypeHandler handler = new ObjectTypeHandler("foo", (NodeShape) findShape("foo", api.declares()));
 
         GenerationContextImpl generationContext = new GenerationContextImpl(api);
@@ -147,93 +145,11 @@ public class ObjectTypeHandlerTest extends UnitTest {
         )));
     }
 
-    @Test
-    public void coo() throws Exception {
-
-        WebApiDocument doc = (WebApiDocument) Raml10.parse("#%RAML 1.0\n" +
-                "title: Hello World API\n" +
-                "version: v1\n" +
-                "baseUri: https://api.github.com\n" +
-                "types:\n" +
-                "    inherited:\n" +
-                "      properties:\n" +
-                "        age: integer\n" +
-                "    foo:\n" +
-                "        type: inherited\n" +
-                "        properties:\n" +
-                "          name: string\n").get();
-
-        System.err.println(((NodeShape)doc.getDeclarationByName("foo").inherits().get(0).linkTarget().get()).properties());
-        System.err.println(((NodeShape)doc.getDeclarationByName("inherited")).properties());
-    }
-
-    @Test
-    public void coo2() throws Exception {
-
-        WebApiDocument doc = (WebApiDocument) Raml10.parse("#%RAML 1.0\n" +
-                "title: Hello World API\n" +
-                "version: v1\n" +
-                "baseUri: https://api.github.com\n" +
-                "types:\n" +
-                "    inherited:\n" +
-                "      properties:\n" +
-                "        age: integer\n" +
-                "    foo:\n" +
-                "        type: [inherited]\n" +
-                "        properties:\n" +
-                "          name: string\n").get();
-
-        System.err.println(((NodeShape)doc.getDeclarationByName("foo").inherits().get(0).linkTarget().orElse(doc.getDeclarationByName("foo").inherits().get(0))).properties());
-        System.err.println(((NodeShape)doc.getDeclarationByName("inherited")).properties());
-    }
-
-    @Test
-    public void coo3() throws Exception {
-
-        WebApiDocument doc = (WebApiDocument) Raml10.parse("#%RAML 1.0\n" +
-                "title: Hello World API\n" +
-                "version: v1\n" +
-                "baseUri: https://api.github.com\n" +
-                "types:\n" +
-                "    once:\n" +
-                "      properties:\n" +
-                "        right: string\n" +
-                "    twice:\n" +
-                "      properties:\n" +
-                "        left: string\n" +
-                "    foo:\n" +
-                "        type: [once, twice]\n" +
-                "        properties:\n" +
-                "          name: string").get();
-
-        System.err.println(((NodeShape)doc.getDeclarationByName("foo").inherits().get(0)).properties());
-        System.err.println(((NodeShape)doc.getDeclarationByName("once")).properties());
-    }
-
-    @Test
-    public void coo4() throws Exception {
-
-        WebApiDocument doc = (WebApiDocument) Raml10.parse("#%RAML 1.0\n" +
-                "title: Hello World API\n" +
-                "version: v1\n" +
-                "baseUri: https://api.github.com\n" +
-                "types:\n" +
-                "    first:\n" +
-                "      properties:\n" +
-                "        age: integer\n" +
-                "    second:\n" +
-                "      properties:\n" +
-                "        area: string\n" +
-                "    foo:\n" +
-                "        type: string|number").get();
-
-        System.err.println(((UnionShape)doc.getDeclarationByName("foo").inherits().get(0)).anyOf());
-    }
 
     @Test
     public void usingComposedTypes() throws Exception {
 
-        final WebApiDocument api = RamlLoader.load(this.getClass().getResource("using-composed-type.raml"));
+        final Document api = RamlLoader.load(this.getClass().getResource("using-composed-type.raml"));
         ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
@@ -264,7 +180,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Test
     public void simpleInheritance() throws Exception {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inherited-type.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("inherited-type.raml"));
         ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
@@ -311,7 +227,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Test
     public void inheritanceWithDiscriminator() throws Exception {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inheritance-with-discriminator-type.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("inheritance-with-discriminator-type.raml"));
         ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
@@ -363,7 +279,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Test
     public void inheritanceWithDiscriminatorAndValue() throws Exception {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inheritance-with-discriminatorvalue-type.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("inheritance-with-discriminatorvalue-type.raml"));
         ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
@@ -387,7 +303,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Test
     public void multipleInheritance() throws Exception {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("multiple-inheritance-type.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("multiple-inheritance-type.raml"));
         ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
@@ -436,7 +352,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Test
     public void simplestInternal() throws Exception {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-type.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("inline-type.raml"));
         ObjectTypeHandler handler = new ObjectTypeHandler("foo", (NodeShape) findShape("foo", api.declares()));
 
         GenerationContextImpl generationContext = new GenerationContextImpl(api);
@@ -471,7 +387,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
         });
 
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("plugin-test.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("plugin-test.raml"));
         ObjectTypeHandler handler = new ObjectTypeHandler("foo", (NodeShape) findShape("foo", api.declares()));
 
         GenerationContextImpl generationContext = new GenerationContextImpl(api) {
@@ -494,7 +410,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void checkAnnotations() throws Exception {
 
         URL url = this.getClass().getResource("plugin-invocation.raml");
-        WebApiDocument api = RamlLoader.load(url);
+        Document api = RamlLoader.load(url);
         ObjectTypeHandler handler = new ObjectTypeHandler("foo", (NodeShape) findShape("foo", api.declares()));
 
         GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.createPluginManager("org/raml/ramltopojo/object/simple-plugin.properties"), api, TypeFetchers.NULL_FETCHER, "bar.pack", Collections.<String>emptyList());
@@ -511,7 +427,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Test
     public void enumerationsInline() throws ExecutionException, InterruptedException {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-enumeration.raml") );
+        Document api = RamlLoader.load(this.getClass().getResource("inline-enumeration.raml") );
         ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
@@ -543,7 +459,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Test
     public void unionsInline() throws ExecutionException, InterruptedException {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("inline-union.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("inline-union.raml"));
         ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
@@ -589,7 +505,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
 
         System.err.println(r.internalType("unionOfOthers").getInterface());
     }
-    protected GenerationContextImpl createGenerationContext(final WebApiDocument api) {
+    protected GenerationContextImpl createGenerationContext(final Document api) {
         return new GenerationContextImpl(PluginManager.NULL, api, null, "pojo.pack", Collections.emptyList());
     }
 

@@ -23,7 +23,6 @@ import org.raml.ramltopojo.ScalarTypes;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
 import org.raml.ramltopojo.union.UnionTypesHelper;
-import org.raml.v2.api.model.v10.datamodel.*;
 
 import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
@@ -98,21 +97,21 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
             serialize.beginControlFlow("if ( object." + isMethod + "())");
 
             // Check for dates (special serialization)
-            if (typeDeclaration instanceof DateTypeDeclaration) {
+            if (ScalarTypes.isDateOnly(typeDeclaration)) {
 
                 serialize.addStatement("new $T().setDateFormat(new $T($S)).writeValue(jsonGenerator, object." + getMethod + "())", ObjectMapper.class, SimpleDateFormat.class, "yyyy-mm-dd");
 
-            } else if (typeDeclaration instanceof TimeOnlyTypeDeclaration) {
+            } else if (ScalarTypes.isTimeOnly(typeDeclaration)) {
 
                 serialize.addStatement("new $T().setDateFormat(new $T($S)).writeValue(jsonGenerator, object." + getMethod + "())", ObjectMapper.class, SimpleDateFormat.class, "hh:mm:ss");
 
-            } else if (typeDeclaration instanceof DateTimeOnlyTypeDeclaration) {
+            } else if (ScalarTypes.isDatetimeOnly(typeDeclaration)) {
 
                 serialize.addStatement("new $T().setDateFormat(new $T($S)).writeValue(jsonGenerator, object." + getMethod + "())", ObjectMapper.class, SimpleDateFormat.class, "yyyy-MM-dd'T'HH:mm:ss");
 
-            } else if (typeDeclaration instanceof DateTimeTypeDeclaration) {
+            } else if (ScalarTypes.isDateTime(typeDeclaration)) {
 
-                if (Objects.equals("rfc2616", ((DateTimeTypeDeclaration) typeDeclaration).format())) {
+                if (Objects.equals("rfc2616", ((ScalarShape) typeDeclaration).format().value())) {
                     serialize.addStatement("new $T().setDateFormat(new $T($S)).writeValue(jsonGenerator, object." + getMethod + "())", ObjectMapper.class, SimpleDateFormat.class, "EEE, dd MMM yyyy HH:mm:ss z");
                 } else {
                     serialize.addStatement("new $T().setDateFormat(new $T($S)).writeValue(jsonGenerator, object." + getMethod + "())", ObjectMapper.class, SimpleDateFormat.class, "yyyy-MM-dd'T'HH:mm:ssZ");
@@ -246,7 +245,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
 
                 dateValidation = true;
 
-                if (Objects.equals("rfc2616", ((DateTimeTypeDeclaration) typeDeclaration).format())) {
+                if (Objects.equals("rfc2616", ((ScalarShape) typeDeclaration).format().value())) {
 
                     this.buildDateDeserialize(unionPluginContext, deserialize, "EEE, dd MMM yyyy HH:mm:ss z");
 
@@ -298,17 +297,17 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
 
                 }
 
-            } else if (typeDeclaration instanceof AnyTypeDeclaration) {
+            } else if (typeDeclaration instanceof FileShape) {
 
-                throw new GenerationException("Type 'any' within a union is not supported yet");
+                throw new GenerationException("Type 'file' within a union is not supported yet");
 
-            } else if (typeDeclaration instanceof UnionTypeDeclaration) {
+            } else if (typeDeclaration instanceof UnionShape) {
 
                 throw new GenerationException("Type 'union' within a union is not supported yet");
 
-            } else if (typeDeclaration instanceof FileTypeDeclaration) {
+            } else if (typeDeclaration instanceof AnyShape) {
 
-                throw new GenerationException("Type 'file' within a union is not supported yet");
+                throw new GenerationException("Type 'any' within a union is not supported yet");
 
             } else {
 

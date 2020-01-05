@@ -52,6 +52,7 @@ public class Jsr303Extension extends AllTypesPluginHelper {
             }
         };
 
+        FacetValidation.addFacetsForAll(adder, typeDeclaration);
         addAnnotations((AnyShape) typeDeclaration.range(), adder);
         return fieldSpec;
     }

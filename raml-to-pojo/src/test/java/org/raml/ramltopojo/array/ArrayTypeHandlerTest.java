@@ -1,5 +1,6 @@
 package org.raml.ramltopojo.array;
 
+import amf.client.model.document.Document;
 import amf.client.model.domain.ArrayShape;
 import amf.client.model.domain.ScalarShape;
 import amf.client.model.domain.Shape;
@@ -16,7 +17,6 @@ import org.raml.ramltopojo.extensions.ArrayTypeHandlerPlugin;
 import org.raml.ramltopojo.extensions.ReferencePluginContext;
 import org.raml.ramltopojo.extensions.ReferenceTypeHandlerPlugin;
 import org.raml.testutils.UnitTest;
-import webapi.WebApiDocument;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,7 +89,7 @@ public class ArrayTypeHandlerTest extends UnitTest {
     @Test
     public void arrayAsType() throws Exception {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("arrays-generation.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("arrays-generation.raml"));
         ArrayTypeHandler handler = new ArrayTypeHandler("foo", findShape("typearray", api.declares()));
 
 
@@ -104,7 +104,7 @@ public class ArrayTypeHandlerTest extends UnitTest {
     @Test
     public void bracketArrayAsType() throws Exception {
 
-        WebApiDocument api = RamlLoader.load(this.getClass().getResource("arrays-generation.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("arrays-generation.raml"));
         ArrayTypeHandler handler = new ArrayTypeHandler("foo", findShape("typebracketarray", api.declares()));
 
 

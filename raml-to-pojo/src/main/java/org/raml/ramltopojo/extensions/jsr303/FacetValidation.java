@@ -8,10 +8,7 @@ import org.raml.ramltopojo.ScalarTypes;
 import org.raml.ramltopojo.Utils;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -20,19 +17,16 @@ import java.math.BigInteger;
  */
 public class FacetValidation {
 
-    public static void addFacetsForAll(AnnotationAdder typeSpec, AnyShape typeDeclaration) {
+    public static void addFacetsForAll(AnnotationAdder typeSpec, PropertyShape typeDeclaration) {
 
-/* TODO:  for properties only.....
         if (typeDeclaration.minCount().value() > 0) {
 
             typeSpec.addAnnotation(AnnotationSpec.builder(NotNull.class).build());
         }
-*/
     }
 
     public static void addAnnotations(AnyShape typeDeclaration, AnnotationAdder adder) {
 
-        addFacetsForAll(adder, typeDeclaration);
 
         if (ScalarTypes.isString(typeDeclaration)) {
 
@@ -40,7 +34,7 @@ public class FacetValidation {
             return;
         }
 
-        if (ScalarTypes.isNumber(typeDeclaration)) {
+        if (ScalarTypes.isNumber(typeDeclaration) || ScalarTypes.isInteger(typeDeclaration)) {
 
             addFacetsForNumbers(adder, (ScalarShape)typeDeclaration);
             return;
