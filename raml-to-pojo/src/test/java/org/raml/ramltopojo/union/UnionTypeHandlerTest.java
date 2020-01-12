@@ -31,7 +31,7 @@ public class UnionTypeHandlerTest {
     @Test
     public void simpleUnion() throws Exception {
 
-        Document api = RamlLoader.load(this.getClass().getResource("union-type.raml"));
+        Document api = RamlLoader.loadEdited(this.getClass().getResource("union-type.raml"));
         UnionTypeHandler handler = new UnionTypeHandler("foo", findTypes("foo", api.declares()));
 
         GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api,TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());
@@ -70,7 +70,7 @@ public class UnionTypeHandlerTest {
     @Test
     public void primitiveUnion() throws Exception {
 
-        Document api = RamlLoader.load(this.getClass().getResource("union-primitive-type.raml"));
+        Document api = RamlLoader.loadEdited(this.getClass().getResource("union-primitive-type.raml"));
         UnionTypeHandler handler = new UnionTypeHandler("foo", findTypes("foo", api.declares()));
 
         CreationResult r = handler.create(new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack",Collections.<String>emptyList()),new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
@@ -116,7 +116,7 @@ public class UnionTypeHandlerTest {
     @Test
     public void nilUnion() throws Exception {
 
-        Document api = RamlLoader.load(this.getClass().getResource("union-nil-type.raml"));
+        Document api = RamlLoader.loadEdited(this.getClass().getResource("union-nil-type.raml"));
         UnionTypeHandler handler = new UnionTypeHandler("foo", findTypes("foo", api.declares()));
 
         GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api,TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());

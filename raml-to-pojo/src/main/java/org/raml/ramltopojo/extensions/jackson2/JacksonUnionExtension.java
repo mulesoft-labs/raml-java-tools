@@ -373,10 +373,9 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
         builder.addMethod(spec.build());
     }
 
-    private String prettyName(AnyShape type, UnionPluginContext unionPluginContext) {
-        return type instanceof NilShape ? "nil" : shorten(unionPluginContext.findType(type.name().value(), type).box());
+    private String prettyName(AnyShape type, UnionPluginContext generationContext) {
+        return type instanceof NilShape ? "nil" : type.name().isNullOrEmpty() ?shorten(generationContext.findType(type.name().value(), (AnyShape) type).box()):type.name().value();
     }
-
 
     private String shorten(TypeName typeName) {
         if (!(typeName instanceof ClassName)) {

@@ -84,17 +84,17 @@ public class FacetValidation {
     public static void addFacetsForString(AnnotationAdder typeSpec, ScalarShape typeDeclaration) {
 
         AnnotationSpec.Builder minMax = null;
-        if (typeDeclaration.minLength() != null) {
+        if (!typeDeclaration.minLength().isNull()) {
 
             minMax =
-                    AnnotationSpec.builder(Size.class).addMember("min", "$L", typeDeclaration.minLength());
+                    AnnotationSpec.builder(Size.class).addMember("min", "$L", typeDeclaration.minLength().value());
         }
 
-        if (typeDeclaration.maxLength() != null) {
+        if (!typeDeclaration.maxLength().isNull()) {
 
             if (minMax == null) {
                 minMax =
-                        AnnotationSpec.builder(Size.class).addMember("max", "$L", typeDeclaration.maxLength());
+                        AnnotationSpec.builder(Size.class).addMember("max", "$L", typeDeclaration.maxLength().value());
             } else {
 
                 minMax.addMember("max", "$L", typeDeclaration.maxLength());
@@ -105,7 +105,7 @@ public class FacetValidation {
             typeSpec.addAnnotation(minMax.build());
         }
 
-        if ( typeDeclaration.pattern() != null ) {
+        if ( !typeDeclaration.pattern().isNullOrEmpty() ) {
 
             typeSpec.addAnnotation(AnnotationSpec.builder(Pattern.class).addMember("regexp", "$S", EcmaPattern.fromString(typeDeclaration.pattern().value()).asJavaPattern()).build());
         }
@@ -114,7 +114,7 @@ public class FacetValidation {
 
     public static void addFacetsForNumbers(AnnotationAdder typeSpec, ScalarShape typeDeclaration) {
 
-        if (typeDeclaration.minimum() != null) {
+        if (! typeDeclaration.minimum().isNull()) {
             if (isInteger(typeSpec.typeName())) {
 
                 typeSpec.addAnnotation(AnnotationSpec.builder(Min.class)
@@ -122,7 +122,7 @@ public class FacetValidation {
             }
         }
 
-        if (typeDeclaration.maximum() != null) {
+        if (! typeDeclaration.maximum().isNull()) {
             if (isInteger(typeSpec.typeName())) {
 
                 typeSpec.addAnnotation(AnnotationSpec.builder(Max.class)

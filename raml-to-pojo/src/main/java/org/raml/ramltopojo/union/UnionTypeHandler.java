@@ -258,7 +258,7 @@ public class UnionTypeHandler implements TypeHandler {
     }
 
     private String prettyName(Shape type, GenerationContext generationContext) {
-        return type instanceof NilShape ? "nil" : shorten(findType(type.name().value(), (AnyShape) type, generationContext).box());
+        return type instanceof NilShape ? "nil" : type.name().isNullOrEmpty() ?shorten(findType(type.name().value(), (AnyShape) type, generationContext).box()):type.name().value();
     }
 
     private String shorten(TypeName typeName) {

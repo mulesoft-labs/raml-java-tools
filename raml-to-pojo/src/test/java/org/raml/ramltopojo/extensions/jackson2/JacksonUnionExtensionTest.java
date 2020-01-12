@@ -27,7 +27,7 @@ public class JacksonUnionExtensionTest {
     @Test
     public void complexInlineUnion() throws Exception {
 
-        Document api = RamlLoader.load(this.getClass().getResource("union-mix-type.raml"));
+        Document api = RamlLoader.loadEdited(this.getClass().getResource("union-mix-type.raml"));
         RamlToPojo ramlToPojo = new RamlToPojoBuilder(api).fetchTypes(TypeFetchers.fromAnywhere()).findTypes(TypeFinders.everyWhere()).build(Arrays.asList("core.jackson2"));
         CreationResult r = ramlToPojo.buildPojos().creationResults().stream().filter(x -> x.getJavaName(EventType.INTERFACE).simpleName().equals("Foo")).findFirst().get();
 
@@ -39,16 +39,16 @@ public class JacksonUnionExtensionTest {
             r.internalType("prop").getInterface(),
             is(
                 allOf(
-                    name(is(equalTo("BaaEmailBooleanIntegerNilUnion"))),
+                    name(is(equalTo("PropUnion"))),
                     annotations(
                         containsInAnyOrder(
                             allOf(
                                 annotationType(equalTo(ClassName.get(JsonSerialize.class))),
-                                member("using", contains(codeBlockContents(equalTo("BaaEmailBooleanIntegerNilUnion.Serializer.class"))))
+                                member("using", contains(codeBlockContents(equalTo("PropUnion.Serializer.class"))))
                             ),
                             allOf(
                                 annotationType(equalTo(ClassName.get(JsonDeserialize.class))),
-                                member("using", contains(codeBlockContents(equalTo("BaaEmailBooleanIntegerNilUnion.Deserializer.class"))))
+                                member("using", contains(codeBlockContents(equalTo("PropUnion.Deserializer.class"))))
                             )
                         )
                     ),

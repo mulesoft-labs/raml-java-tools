@@ -203,7 +203,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
                     // Inline union naming: string | nil => StringNilUnion
                     CreationResult cr = CreationResultFactory.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),
-                        Names.typeName(propertyDeclaration.range().name().value(), "union"), propertyDeclaration, generationContext).get();
+                        Names.typeName(propertyDeclaration.name().value(), "union"), propertyDeclaration, generationContext).get();
                     result.withInternalType(propertyDeclaration.name().value(), cr);
                     tn = cr.getJavaName(EventType.INTERFACE);
 

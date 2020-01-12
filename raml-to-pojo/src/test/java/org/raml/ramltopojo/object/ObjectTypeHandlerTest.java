@@ -459,7 +459,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Test
     public void unionsInline() throws ExecutionException, InterruptedException {
 
-        Document api = RamlLoader.load(this.getClass().getResource("inline-union.raml"));
+        Document api = RamlLoader.loadEdited(this.getClass().getResource("inline-union.raml"));
         ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
@@ -476,10 +476,10 @@ public class ObjectTypeHandlerTest extends UnitTest {
         assertThat(r.internalType("unionOfPrimitives").getInterface(), is(allOf(
 
                 name(
-                        is(equalTo("StringIntegerUnion"))
+                        is(equalTo("UnionOfPrimitivesUnion"))
                 ),
                 methods(containsInAnyOrder(
-                        allOf(methodName(equalTo("getUnionType")), returnType(equalTo(ClassName.get("bar.pack", "Foo.StringIntegerUnion.UnionType")))),
+                        allOf(methodName(equalTo("getUnionType")), returnType(equalTo(ClassName.get("bar.pack", "Foo.UnionOfPrimitivesUnion.UnionType")))),
                         allOf(methodName(equalTo("isString")), returnType(equalTo(ClassName.get(Boolean.class).unbox()))),
                         allOf(methodName(equalTo("getString")), returnType(equalTo(ClassName.get(String.class)))),
                         allOf(methodName(equalTo("isInteger")), returnType(equalTo(ClassName.get(Boolean.class).unbox()))),
@@ -491,10 +491,10 @@ public class ObjectTypeHandlerTest extends UnitTest {
         assertThat(r.internalType("unionOfOthers").getInterface(), is(allOf(
 
                 name(
-                        is(equalTo("OneTwoUnion"))
+                        is(equalTo("UnionOfOthersUnion"))
                 ),
                 methods(contains(
-                        allOf(methodName(equalTo("getUnionType")), returnType(equalTo(ClassName.get("bar.pack", "Foo.OneTwoUnion.UnionType")))),
+                        allOf(methodName(equalTo("getUnionType")), returnType(equalTo(ClassName.get("bar.pack", "Foo.UnionOfOthersUnion.UnionType")))),
                         allOf(methodName(equalTo("isOne")), returnType(equalTo(ClassName.get(Boolean.class).unbox()))),
                         allOf(methodName(equalTo("getOne")), returnType(equalTo(ClassName.get("pojo.pack", "One")))),
                         allOf(methodName(equalTo("isTwo")), returnType(equalTo(ClassName.get(Boolean.class).unbox()))),
