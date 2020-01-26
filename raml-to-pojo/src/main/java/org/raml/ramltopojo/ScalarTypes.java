@@ -1,5 +1,6 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.domain.ScalarNode;
 import amf.client.model.domain.ScalarShape;
 import amf.client.model.domain.Shape;
 
@@ -48,5 +49,12 @@ public class ScalarTypes {
     public static boolean isString(Shape shape) {
 
         return shape instanceof ScalarShape && ((ScalarShape)shape).dataType().is(STRING_SCALAR);
+    }
+
+    public static ScalarNode SCALAR_NODE_TRUE = new ScalarNode("true", BOOLEAN_SCALAR);
+    public static ScalarNode SCALAR_NODE_FALSE = new ScalarNode("false", BOOLEAN_SCALAR);
+
+    public static ScalarNode stringNode(String value) {
+        return new ScalarNode(value, STRING_SCALAR);
     }
 }

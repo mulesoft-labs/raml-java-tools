@@ -459,7 +459,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     @Test
     public void unionsInline() throws ExecutionException, InterruptedException {
 
-        Document api = RamlLoader.loadEdited(this.getClass().getResource("inline-union.raml"));
+        Document api = RamlLoader.load(this.getClass().getResource("inline-union.raml"));
         ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
 
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
