@@ -83,8 +83,8 @@ public class ObjectTypeHandler implements TypeHandler {
                 .addSuperinterface(result.getJavaName(EventType.INTERFACE))
                 .addModifiers(Modifier.PUBLIC);
 
-        Optional<String> discriminator = Optional.fromNullable(objectTypeDeclaration.discriminator());
-
+        Optional<String> discriminator = Optional.fromNullable(objectTypeDeclaration.discriminator());        
+        
         for (TypeDeclaration propertyDeclaration : objectTypeDeclaration.properties()) {
 
             if ( EcmaPattern.isSlashedPattern(propertyDeclaration.name())) {

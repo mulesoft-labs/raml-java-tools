@@ -100,12 +100,12 @@ public class ObjectTypeHandlerTest extends UnitTest {
                         allOf(fieldName(equalTo("name")), fieldType(equalTo(ClassName.get(String.class)))),
                         allOf(fieldName(equalTo("age")), fieldType(equalTo(ClassName.INT)))
                 )),
-                methods(contains(
+                methods(containsInAnyOrder(
                         allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get(String.class))), codeContent(equalTo("return this.name;\n"))),
                         allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get(String.class))))), codeContent(equalTo("this.name = name;\n"))),
                         allOf(methodName(equalTo("getAge")), returnType(equalTo(ClassName.INT))),
                         allOf(methodName(equalTo("setAge")), parameters(contains(type(equalTo(ClassName.INT)))))
-                )),
+                )),                  
                 superInterfaces(contains(
                         allOf(typeName(equalTo(ClassName.get("", "bar.pack.Foo"))))
                 ))
@@ -143,7 +143,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
                         allOf(fieldName(equalTo("names")), fieldType(equalTo(ParameterizedTypeName.get(List.class, String.class)))),
                         allOf(fieldName(equalTo("ages")), fieldType(equalTo(ParameterizedTypeName.get(List.class, Integer.class))))
                 )),
-                methods(contains(
+                methods(containsInAnyOrder(
                         allOf(methodName(equalTo("getNames")), returnType(equalTo(ParameterizedTypeName.get(List.class, String.class)))),
                         allOf(methodName(equalTo("setNames")), parameters(contains(type(equalTo(ParameterizedTypeName.get(List.class, String.class)))))),
                         allOf(methodName(equalTo("getAges")), returnType(equalTo(ParameterizedTypeName.get(List.class, Integer.class)))),
@@ -176,11 +176,11 @@ public class ObjectTypeHandlerTest extends UnitTest {
                 fields(contains(
                         allOf(fieldName(equalTo("name")), fieldType(equalTo(ClassName.get("", "pojo.pack.Composed"))))
                 )),
-                methods(contains(
+                methods(containsInAnyOrder(
                         allOf(methodName(equalTo("getName")), returnType(equalTo(ClassName.get("", "pojo.pack.Composed")))),
-                        allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get("", "pojo.pack.Composed")))))))
+                        allOf(methodName(equalTo("setName")), parameters(contains(type(equalTo(ClassName.get("", "pojo.pack.Composed"))))))
                 ))
-        ));
+        )));
     }
 
     @Test
