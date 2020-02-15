@@ -14,7 +14,6 @@ import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * Created. There, you have it.
@@ -58,7 +57,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
     @Override
     // TODO deal with null interface spec.
-    public java.util.Optional<CreationResult> create(GenerationContext generationContext, CreationResult result) {
+    public Optional<CreationResult> create(GenerationContext generationContext, CreationResult result) {
 
         // I need to createHandler an interface and an implementation.
         ObjectPluginContext context = new ObjectPluginContextImpl(generationContext, result);
@@ -67,9 +66,9 @@ public class ObjectTypeHandler implements TypeHandler {
 
         if ( interfaceSpec == null ) {
 
-            return java.util.Optional.empty();
+            return Optional.empty();
         } else {
-            return java.util.Optional.of(result.withInterface(interfaceSpec).withImplementation(implementationSpec));
+            return Optional.of(result.withInterface(interfaceSpec).withImplementation(implementationSpec));
         }
     }
 
@@ -83,7 +82,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
         Optional<String> discriminator = discriminatorName(objectTypeDeclaration);
 
-        for (PropertyShape propertyDeclaration : Utils.allProperties(objectTypeDeclaration)) {
+        for (PropertyShape propertyDeclaration : objectTypeDeclaration.properties()) {
 
             if ( EcmaPattern.isSlashedPattern(propertyDeclaration.name().value())) {
 
@@ -145,7 +144,7 @@ public class ObjectTypeHandler implements TypeHandler {
             }
         }
 
-        if ( objectTypeDeclaration.additionalPropertiesSchema() != null) {
+        if ( objectTypeDeclaration.closed().is(false) || objectTypeDeclaration.additionalPropertiesSchema() != null) {
 
             handleAdditionalPropertiesImplementation(objectPluginContext, result, generationContext, typeSpec);
         }
@@ -171,8 +170,9 @@ public class ObjectTypeHandler implements TypeHandler {
 
         Optional<String> discriminator = discriminatorName(objectTypeDeclaration);
 
-        for (AnyShape typeDeclaration : objectTypeDeclaration.inherits().stream().map(x -> (AnyShape)x).collect(Collectors.toList())) {
+        for (String typeDeclarationName : ExtraInformation.parentType(objectTypeDeclaration)) {
 
+            AnyShape typeDeclaration = findType(typeDeclarationName, generationContext, EventType.INTERFACE);
             if (typeDeclaration instanceof NodeShape) {
 
                 if (typeDeclaration.name().value().equals("object")) {
@@ -184,11 +184,11 @@ public class ObjectTypeHandler implements TypeHandler {
             } else {
 
                 throw new GenerationException("ramltopojo does not support inheriting from "
-                        + Utils.declarationType((AnyShape) typeDeclaration) + " name: " + typeDeclaration.name() + " and " + typeDeclaration.name().value());
+                        + Utils.declarationType(typeDeclaration) + " name: " + typeDeclaration.name() + " and " + typeDeclaration.name().value());
             }
         }
 
-        for (PropertyShape propertyDeclaration : Utils.allProperties(objectTypeDeclaration)) {
+        for (PropertyShape propertyDeclaration : objectTypeDeclaration.properties()) {
 
             if ( EcmaPattern.isSlashedPattern(propertyDeclaration.name().value())) {
 
@@ -255,7 +255,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
         }
 
-        if ( objectTypeDeclaration.additionalPropertiesSchema() != null) {
+        if ( objectTypeDeclaration.closed().is(false) || objectTypeDeclaration.additionalPropertiesSchema() != null ) {
 
             handleAdditionalPropertiesInterface(objectPluginContext, result, generationContext, typeSpec);
         }
@@ -432,8 +432,13 @@ public class ObjectTypeHandler implements TypeHandler {
 
         AnyShape domainElement = Utils.rangeOf(type);
 
+        return ShapeType.calculateTypeName(domainElement.name().value(), domainElement, generationContext, eventType );
+    }
 
-        return ShapeType.calculateTypeName(Utils.nameOf(domainElement), domainElement, generationContext, eventType );
+    private AnyShape findType(String typeName, GenerationContext generationContext, EventType eventType) {
+
+        CreationResult result =  generationContext.findCreatedType(typeName, null );
+        return result.getOriginalShape();
     }
 
     private TypeName findType(String typeName, AnyShape type, GenerationContext generationContext, EventType eventType) {

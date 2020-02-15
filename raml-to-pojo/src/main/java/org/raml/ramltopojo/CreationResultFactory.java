@@ -31,7 +31,7 @@ public class CreationResultFactory {
         TypeHandler handler = shapeType.createHandler(typeDeclaration.name().value(), shapeType, typeDeclaration);
         ClassName intf = handler.javaClassName(context, EventType.INTERFACE);
         ClassName impl = handler.javaClassName(context, EventType.IMPLEMENTATION);
-        CreationResult creationResult = new CreationResult(context.defaultPackage(), intf, impl);
+        CreationResult creationResult = new CreationResult(typeDeclaration, context.defaultPackage(), intf, impl);
         context.newExpectedType(typeDeclaration.name().value(), creationResult);
         context.setupTypeHierarchy(typeDeclaration.name().value(), typeDeclaration);
         return handler.create(context, creationResult);
@@ -51,7 +51,7 @@ public class CreationResultFactory {
         TypeHandler handler = shapeType.createHandler(name, shapeType, typeDeclaration);
         ClassName intf = handler.javaClassName(context, EventType.INTERFACE);
         ClassName impl = handler.javaClassName(context, EventType.IMPLEMENTATION);
-        CreationResult creationResult = new CreationResult(context.defaultPackage(), intf, impl);
+        CreationResult creationResult = new CreationResult(typeDeclaration, context.defaultPackage(), intf, impl);
         context.newExpectedType(name, creationResult);
         context.setupTypeHierarchy(typeDeclaration.name().value(), typeDeclaration);
         return handler.create(context, creationResult);
@@ -71,7 +71,7 @@ public class CreationResultFactory {
         TypeHandler handler = shapeType.createHandler(name, shapeType, Utils.rangeOf(propertyShape));
         ClassName intf = handler.javaClassName(new InlineGenerationContext(containingClassName, containingClassName, context),  EventType.INTERFACE);
         ClassName impl = handler.javaClassName(new InlineGenerationContext(containingClassName, containingImplementation, context), EventType.IMPLEMENTATION);
-        CreationResult preCreationResult = new CreationResult("", intf, impl);
+        CreationResult preCreationResult = new CreationResult(Utils.rangeOf(propertyShape), "", intf, impl);
         return handler.create(context, preCreationResult);
     }
 
@@ -82,7 +82,7 @@ public class CreationResultFactory {
         TypeHandler handler = shapeType.createHandler(name, shapeType, shape);
         ClassName intf = handler.javaClassName(new InlineGenerationContext(containingClassName, containingClassName, context),  EventType.INTERFACE);
         ClassName impl = handler.javaClassName(new InlineGenerationContext(containingClassName, containingImplementation, context), EventType.IMPLEMENTATION);
-        CreationResult preCreationResult = new CreationResult("", intf, impl);
+        CreationResult preCreationResult = new CreationResult(shape, "", intf, impl);
         return handler.create(context, preCreationResult);
     }
 

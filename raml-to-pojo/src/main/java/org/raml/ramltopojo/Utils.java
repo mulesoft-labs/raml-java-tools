@@ -1,15 +1,13 @@
 package org.raml.ramltopojo;
 
-import amf.client.model.domain.*;
-import org.apache.jena.ext.com.google.common.collect.Streams;
-import org.raml.v2.api.model.v10.api.Library;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
+import amf.client.model.domain.AnyShape;
+import amf.client.model.domain.ArrayShape;
+import amf.client.model.domain.PropertyShape;
+import amf.client.model.domain.Shape;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Created. There, you have it.
@@ -19,26 +17,6 @@ public class Utils {
     public static Class<?> declarationType(AnyShape typeDeclaration) {
 
         return typeDeclaration.getClass();
-    }
-
-    static List<TypeDeclaration> goThroughLibraries(List<TypeDeclaration> foundTypes, Set<String> visitedLibraries, List<Library> libraries) {
-
-
-        for (Library library : libraries) {
-            if (visitedLibraries.contains(library.name())) {
-
-                continue;
-            } else {
-
-                visitedLibraries.add(library.name());
-            }
-
-            goThroughLibraries(foundTypes, visitedLibraries, library.uses());
-
-            foundTypes.addAll(library.types());
-        }
-
-        return foundTypes;
     }
 
     static public List<AnyShape> allParents(AnyShape target) {
@@ -56,17 +34,6 @@ public class Utils {
         return found;
     }
 
-    static public String nameOf(AnyShape anyShape) {
-
-        if ( anyShape.linkTarget().isPresent() ) {
-
-            AnyShape shape = (AnyShape) anyShape.linkTarget().get();
-            return shape.name().value();
-        } else {
-
-            return anyShape.name().value();
-        }
-    }
     static public AnyShape rangeOf(PropertyShape propertyShape) {
 
         Shape shape = propertyShape.range();
@@ -93,11 +60,4 @@ public class Utils {
         return ((ArrayShape)shape.inherits().get(0)).items();
     }
 
-    public static List<PropertyShape> allProperties(NodeShape objectTypeDeclaration) {
-
-        return Streams.concat(
-                objectTypeDeclaration.properties().stream(),
-                objectTypeDeclaration.inherits().stream()
-                        .flatMap(x -> ((NodeShape)x.linkTarget().orElse(x)).properties().stream())).collect(Collectors.toList());
-    }
 }

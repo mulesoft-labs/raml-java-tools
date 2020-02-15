@@ -20,7 +20,7 @@ public class CreationResultTest extends UnitTest{
     @Test
     public void createType() throws Exception {
 
-        CreationResult result = new CreationResult("pack.me", ClassName.get("", "foo"), ClassName.get("", "foo")) {
+        CreationResult result = new CreationResult(null, "pack.me", ClassName.get("", "foo"), ClassName.get("", "foo")) {
 
             TypeSpec[] specs = {interf, cls};
             int c = 0;

@@ -90,11 +90,12 @@ public class ArrayTypeHandlerTest extends UnitTest {
     public void arrayAsType() throws Exception {
 
         Document api = RamlLoader.load(this.getClass().getResource("arrays-generation.raml"));
-        ArrayTypeHandler handler = new ArrayTypeHandler("foo", findShape("typearray", api.declares()));
+        ArrayShape typearray = findShape("typearray", api.declares());
+        ArrayTypeHandler handler = new ArrayTypeHandler("foo", typearray);
 
 
         GenerationContextImpl generationContext = new GenerationContextImpl(api);
-        CreationResult r = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+        CreationResult r = handler.create(generationContext, new CreationResult(typearray, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         assertFalse(r.getImplementation().isPresent());
         assertEquals(r.getInterface().name, "Foo");
@@ -105,11 +106,12 @@ public class ArrayTypeHandlerTest extends UnitTest {
     public void bracketArrayAsType() throws Exception {
 
         Document api = RamlLoader.load(this.getClass().getResource("arrays-generation.raml"));
-        ArrayTypeHandler handler = new ArrayTypeHandler("foo", findShape("typebracketarray", api.declares()));
+        ArrayShape typebracketarray = findShape("typebracketarray", api.declares());
+        ArrayTypeHandler handler = new ArrayTypeHandler("foo", typebracketarray);
 
 
         GenerationContextImpl generationContext = new GenerationContextImpl(api);
-        CreationResult r = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+        CreationResult r = handler.create(generationContext, new CreationResult(typebracketarray, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         assertFalse(r.getImplementation().isPresent());
         assertEquals(r.getInterface().name, "Foo");

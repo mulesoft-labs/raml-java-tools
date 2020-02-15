@@ -53,10 +53,11 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void simplest() throws Exception {
 
         Document api = RamlLoader.load(this.getClass().getResource("simplest-type.raml"));
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", (NodeShape)findShape("foo", api.declares()));
+        NodeShape foo = findShape("foo", api.declares());
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", foo);
 
         GenerationContextImpl generationContext = new GenerationContextImpl(api);
-        CreationResult r = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+        CreationResult r = handler.create(generationContext, new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         assertThat(r.getInterface())
                 .hasName("Foo");
@@ -112,10 +113,11 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void simplestContainingSimpleArray() throws Exception {
 
         Document api = RamlLoader.load(this.getClass().getResource("simplest-containing-simple-array.raml"));
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", (NodeShape) findShape("foo", api.declares()));
+        NodeShape foo = findShape("foo", api.declares());
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", foo);
 
         GenerationContextImpl generationContext = new GenerationContextImpl(api);
-        CreationResult r = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+        CreationResult r = handler.create(generationContext, new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
         System.err.println(r.getInterface().toString());
         System.err.println(r.getImplementation().toString());
 
@@ -150,9 +152,10 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void usingComposedTypes() throws Exception {
 
         final Document api = RamlLoader.load(this.getClass().getResource("using-composed-type.raml"));
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
+        NodeShape foo = findShape("foo", api.declares());
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", foo);
 
-        CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+        CreationResult r = handler.create(createGenerationContext(api), new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         System.err.println(r.getInterface().toString());
         System.err.println(r.getImplementation().toString());
@@ -181,9 +184,10 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void simpleInheritance() throws Exception {
 
         Document api = RamlLoader.load(this.getClass().getResource("inherited-type.raml"));
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
+        NodeShape foo = findShape("foo", api.declares());
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", foo);
 
-        CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+        CreationResult r = handler.create(createGenerationContext(api), new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         System.err.println(r.getInterface().toString());
         System.err.println(r.getImplementation().toString());
@@ -228,9 +232,10 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void inheritanceWithDiscriminator() throws Exception {
 
         Document api = RamlLoader.load(this.getClass().getResource("inheritance-with-discriminator-type.raml"));
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
+        NodeShape foo = findShape("foo", api.declares());
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", foo);
 
-        CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+        CreationResult r = handler.create(createGenerationContext(api), new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         System.err.println(r.getInterface().toString());
         System.err.println(r.getImplementation().toString());
@@ -280,9 +285,10 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void inheritanceWithDiscriminatorAndValue() throws Exception {
 
         Document api = RamlLoader.load(this.getClass().getResource("inheritance-with-discriminatorvalue-type.raml"));
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
+        NodeShape foo = findShape("foo", api.declares());
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", foo);
 
-        CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+        CreationResult r = handler.create(createGenerationContext(api), new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         System.err.println(r.getInterface().toString());
         System.err.println(r.getImplementation().toString());
@@ -304,9 +310,10 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void multipleInheritance() throws Exception {
 
         Document api = RamlLoader.load(this.getClass().getResource("multiple-inheritance-type.raml"));
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
+        NodeShape foo = findShape("foo", api.declares());
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", foo);
 
-        CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+        CreationResult r = handler.create(createGenerationContext(api), new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         System.err.println(r.getInterface().toString());
         System.err.println(r.getImplementation().toString());
@@ -353,11 +360,12 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void simplestInternal() throws Exception {
 
         Document api = RamlLoader.load(this.getClass().getResource("inline-type.raml"));
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", (NodeShape) findShape("foo", api.declares()));
+        NodeShape foo = findShape("foo", api.declares());
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", foo);
 
         GenerationContextImpl generationContext = new GenerationContextImpl(api);
 
-        CreationResult r = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+        CreationResult r = handler.create(generationContext, new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         assertThat(r.getInternalTypeForProperty("inside").getInterface(), name(equalTo("InsideType")));
         assertThat(r.getInternalTypeForProperty("inside").getImplementation().get(), name(equalTo("InsideTypeImpl")));
@@ -388,7 +396,8 @@ public class ObjectTypeHandlerTest extends UnitTest {
 
 
         Document api = RamlLoader.load(this.getClass().getResource("plugin-test.raml"));
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", (NodeShape) findShape("foo", api.declares()));
+        NodeShape foo = findShape("foo", api.declares());
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", foo);
 
         GenerationContextImpl generationContext = new GenerationContextImpl(api) {
             @Override
@@ -397,7 +406,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
             }
         };
 
-        CreationResult r = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+        CreationResult r = handler.create(generationContext, new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         assertNotNull(r);
         assertFalse(r.getImplementation().isPresent());
@@ -411,11 +420,12 @@ public class ObjectTypeHandlerTest extends UnitTest {
 
         URL url = this.getClass().getResource("plugin-invocation.raml");
         Document api = RamlLoader.load(url);
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", (NodeShape) findShape("foo", api.declares()));
+        NodeShape foo = findShape("foo", api.declares());
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", foo);
 
         GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.createPluginManager("org/raml/ramltopojo/object/simple-plugin.properties"), api, TypeFetchers.NULL_FETCHER, "bar.pack", Collections.<String>emptyList());
 
-        CreationResult r = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+        CreationResult r = handler.create(generationContext, new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         assertNotNull(r);
         assertTrue(r.getInterface().annotations.size() == 1);
@@ -428,9 +438,10 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void enumerationsInline() throws ExecutionException, InterruptedException {
 
         Document api = RamlLoader.load(this.getClass().getResource("inline-enumeration.raml") );
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
+        NodeShape foo = findShape("foo", api.declares());
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", foo);
 
-        CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+        CreationResult r = handler.create(createGenerationContext(api), new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         assertNotNull(r);
         assertThat(r.internalType("name").getInterface(), is(allOf(
@@ -460,9 +471,10 @@ public class ObjectTypeHandlerTest extends UnitTest {
     public void unionsInline() throws ExecutionException, InterruptedException {
 
         Document api = RamlLoader.load(this.getClass().getResource("inline-union.raml"));
-        ObjectTypeHandler handler = new ObjectTypeHandler("foo", findShape("foo", api.declares()));
+        NodeShape foo = findShape("foo", api.declares());
+        ObjectTypeHandler handler = new ObjectTypeHandler("foo", foo);
 
-        CreationResult r = handler.create(createGenerationContext(api), new CreationResult("bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+        CreationResult r = handler.create(createGenerationContext(api), new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         assertNotNull(r);
 
@@ -506,7 +518,12 @@ public class ObjectTypeHandlerTest extends UnitTest {
         System.err.println(r.internalType("unionOfOthers").getInterface());
     }
     protected GenerationContextImpl createGenerationContext(final Document api) {
-        return new GenerationContextImpl(PluginManager.NULL, api, null, "pojo.pack", Collections.emptyList());
+        return new GenerationContextImpl(PluginManager.NULL, api, new TypeFetcher() {
+            @Override
+            public Shape fetchType(Document api, String name) throws GenerationException {
+                return findShape(name, api.declares());
+            }
+        }, "pojo.pack", Collections.emptyList());
     }
 
 

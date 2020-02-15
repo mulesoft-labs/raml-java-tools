@@ -35,9 +35,9 @@ public class EnumerationTypeHandlerTest extends UnitTest {
         ScalarShape enumShape = findShape("days", api.declares());
         EnumerationTypeHandler handler = new EnumerationTypeHandler("days", enumShape);
         GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());
-        generationContext.newExpectedType("Days", new CreationResult("bar.pack", ClassName.get("bar.pack", "Days"), null));
+        generationContext.newExpectedType("Days", new CreationResult(enumShape, "bar.pack", ClassName.get("bar.pack", "Days"), null));
 
-        CreationResult result = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Days"), null)).get();
+        CreationResult result = handler.create(generationContext, new CreationResult(enumShape, "bar.pack", ClassName.get("bar.pack", "Days"), null)).get();
 
         assertThat(result.getInterface(), allOf(
                 name(equalTo("Days")),
@@ -57,9 +57,9 @@ public class EnumerationTypeHandlerTest extends UnitTest {
         ScalarShape enumShape = findShape("time", api.declares());
         EnumerationTypeHandler handler = new EnumerationTypeHandler("time", enumShape);
         GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());
-        generationContext.newExpectedType("Time", new CreationResult("bar.pack", ClassName.get("bar.pack", "Time"), null));
+        generationContext.newExpectedType("Time", new CreationResult(enumShape, "bar.pack", ClassName.get("bar.pack", "Time"), null));
 
-        CreationResult result = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Time"), null)).get();
+        CreationResult result = handler.create(generationContext, new CreationResult(enumShape, "bar.pack", ClassName.get("bar.pack", "Time"), null)).get();
 
         assertThat(result.getInterface(), allOf(
                 name(equalTo("Time")),

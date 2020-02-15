@@ -1,6 +1,6 @@
 package org.raml.ramltopojo;
 
-import com.google.common.base.Optional;
+import amf.client.model.domain.AnyShape;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
@@ -10,12 +10,14 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created. There, you have it.
  */
 public class CreationResult {
 
+    private final AnyShape originalShape;
     private final String packageName;
     private ClassName interfaceName;
     private ClassName implementationName;
@@ -24,7 +26,8 @@ public class CreationResult {
 
     private final Map<String, CreationResult> internalTypes = new HashMap<>();
 
-    public CreationResult(String packageName, ClassName interfaceName, ClassName implementationName) {
+    public CreationResult(AnyShape originalShape, String packageName, ClassName interfaceName, ClassName implementationName) {
+        this.originalShape = originalShape;
         this.packageName = packageName;
         this.interfaceName = interfaceName;
         this.implementationName = implementationName;
@@ -46,7 +49,11 @@ public class CreationResult {
         return interf;
     }
     public Optional<TypeSpec> getImplementation() {
-        return Optional.fromNullable(impl);
+        return Optional.ofNullable(impl);
+    }
+
+    public AnyShape getOriginalShape() {
+        return originalShape;
     }
 
     public void createType(String rootDirectory) throws IOException {
