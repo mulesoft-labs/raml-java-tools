@@ -2,7 +2,6 @@ package org.raml.ramltopojo;
 
 import amf.client.model.domain.*;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.array.ArrayTypeHandler;
@@ -13,8 +12,10 @@ import org.raml.ramltopojo.references.ReferenceTypeHandler;
 import org.raml.ramltopojo.union.UnionTypeHandler;
 
 import java.io.File;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -74,27 +75,14 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         @Override
         public boolean shouldCreateInlineType(AnyShape declaration) {
 
-            List<Shape> extended = declaration.inherits();
+            List<String> types = ExtraInformation.parentTypes(declaration);
+            String declaredName = declaration.name().value();
 
-            if ( extended.size() > 1) {
-
-                return true;
+            if ( types.size() == 0 ) {
+                return false;
             }
 
-            Set<String> allExtendedProps;
-
-            // TODO certqinly we can do better here.
-            if ( extended.size() == 1  && "object".equals(extended.get(0).name().value())) {
-
-                allExtendedProps = Collections.emptySet();
-            } else {
-                allExtendedProps =
-                        extended.stream().filter(NodeShape.class::isInstance).map(NodeShape.class::cast)
-                                .flatMap(ShapeType::pullNames).collect(Collectors.toSet());
-            }
-
-            Set<String> typePropertyNames = pullNames((NodeShape) declaration).collect(Collectors.toSet());
-            return !Sets.difference(typePropertyNames, allExtendedProps).isEmpty();
+            return types.size() != 1 || !declaredName.equals(types.get(0));
         }
     },
     ENUMERATION {

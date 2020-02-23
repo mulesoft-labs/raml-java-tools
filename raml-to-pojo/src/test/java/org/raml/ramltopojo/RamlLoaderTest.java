@@ -86,7 +86,7 @@ public class RamlLoaderTest {
         );
 
         NodeShape shape = RamlLoader.findShape("mytype", doc.declares());
-        assertThat(ExtraInformation.parentType(shape)).hasSize(1).containsExactly("typeOne");
+        assertThat(ExtraInformation.parentTypes(shape)).hasSize(1).containsExactly("typeOne");
     }
 
 }

@@ -170,7 +170,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
         Optional<String> discriminator = discriminatorName(objectTypeDeclaration);
 
-        for (String typeDeclarationName : ExtraInformation.parentType(objectTypeDeclaration)) {
+        for (String typeDeclarationName : ExtraInformation.parentTypes(objectTypeDeclaration)) {
 
             AnyShape typeDeclaration = findType(typeDeclarationName, generationContext, EventType.INTERFACE);
             if (typeDeclaration instanceof NodeShape) {

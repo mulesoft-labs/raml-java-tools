@@ -22,7 +22,7 @@ public class ExtraInformation {
                 .orElse(ScalarTypes.SCALAR_NODE_FALSE).equals(ScalarTypes.SCALAR_NODE_TRUE);
     }
 
-    public static List<String> parentType(Shape shape) {
+    public static List<String> parentTypes(Shape shape) {
 
         return shape.customDomainProperties().stream()
                 .filter(x -> x.name().is("ramltopojo"))
