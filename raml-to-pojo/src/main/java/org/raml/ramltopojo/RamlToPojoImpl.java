@@ -23,7 +23,6 @@ public class RamlToPojoImpl implements RamlToPojo {
 
         ResultingPojos resultingPojos = new ResultingPojos(generationContext);
 
-///*  TODO JP reactivate when types migrated
         for (AnyShape typeDeclaration : typeFinder.findTypes(generationContext.api())) {
 
             ShapeType.calculateTypeName(typeDeclaration.name().value(), typeDeclaration, generationContext, EventType.INTERFACE);
@@ -34,7 +33,6 @@ public class RamlToPojoImpl implements RamlToPojo {
             Optional<CreationResult> spec = CreationResultFactory.createType(typeDeclaration, generationContext);
             spec.ifPresent(resultingPojos::addNewResult);
         }
-//*/
 
         return resultingPojos;
     }

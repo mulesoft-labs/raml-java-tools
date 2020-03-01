@@ -2,6 +2,7 @@ package org.raml.ramltopojo;
 
 import amf.client.model.domain.*;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,12 +39,16 @@ public class ExtraInformation {
 
         ObjectNode node = new ObjectNode();
         de.withExtension(node);
+        URI shapeId = URI.create(shape.id());
+        if (
+                shape.isLink() ||
+                shapeId.getFragment().matches("/declarations/types/[^/]*$") ||
+                shapeId.getFragment().matches("/declarations/types/union/[^/]*$") ) {
 
-        if ( shape.inlined() ) {
+            node.addProperty("inlined", ScalarTypes.SCALAR_NODE_FALSE);
+        } else {
 
             node.addProperty("inlined", ScalarTypes.SCALAR_NODE_TRUE);
-        } else {
-            node.addProperty("inlined", ScalarTypes.SCALAR_NODE_FALSE);
         }
 
         ArrayNode arrayNode  = new ArrayNode();

@@ -59,7 +59,7 @@ public class ShapeTypeTest extends UnitTest {
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "unextended");
 
-        assertFalse(ShapeType.isNewInlineType(Utils.rangeOf(property)));
+        assertTrue(ShapeType.isNewInlineType(Utils.rangeOf(property)));
     }
 
     @Test
@@ -79,7 +79,7 @@ public class ShapeTypeTest extends UnitTest {
         NodeShape decl = RamlLoader.findShape("foo", api.declares());
         PropertyShape property = findProperty(decl, "extendedFromOne");
 
-        assertTrue(ShapeType.isNewInlineType(Utils.rangeOf(property)));
+        assertFalse(ShapeType.isNewInlineType(Utils.rangeOf(property)));
     }
 
     @Test

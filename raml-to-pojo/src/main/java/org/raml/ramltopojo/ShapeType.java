@@ -13,7 +13,6 @@ import org.raml.ramltopojo.union.UnionTypeHandler;
 
 import java.io.File;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -75,14 +74,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         @Override
         public boolean shouldCreateInlineType(AnyShape declaration) {
 
-            List<String> types = ExtraInformation.parentTypes(declaration);
-            String declaredName = declaration.name().value();
-
-            if ( types.size() == 0 ) {
-                return true;
-            }
-
-            return types.size() != 1 || !declaredName.equals(types.get(0));
+            return ExtraInformation.isInline(declaration);
         }
     },
     ENUMERATION {
