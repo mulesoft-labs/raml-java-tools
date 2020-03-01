@@ -9,140 +9,140 @@ uses:
   j1unions: unions-jackson1.raml
   discriminatorjackson: discriminator-jackson.raml
 types:
-    withAnArray:
-      properties:
-          someArray:
-            type: integer[]
-            (ramltopojo.types):
-                 - name: core.asArray
-          anotherArray:
-            type: dates[]
-            (ramltopojo.types):
-                - name: core.asArray
-    dates:
-      (ramltopojo.types):
-          - name: core.jackson2
-      properties:
-        someDate: datetime
-    foo:
-      (ramltopojo.types):
-            - name: core.equalsAndHashCode
-            - name: core.jsr303
-            - name: core.jackson2
-      type: object
-      discriminatorValue: myOwnValue
-      properties:
-        name:
-          type: string
-          pattern: a\[a-z\]b
-        goo:
-          type: object
-          properties:
-            glue: boolean
-            flue:
-              type: object
-              properties:
-                another: string
-    eater:
-      (ramltopojo.types):
-          - name: core.equalsAndHashCode
-            arguments: [name]
-          - name: core.toString
-#          - name: core.jackson2
-      additionalProperties: false
-      type: object
-      discriminatorValue: myOwnValue
-      properties:
-        name: string
-        count: integer
-        other: foo
-    addPropsVerification:
-      (ramltopojo.types):
-          - name: core.jackson2
-      type: object
-      discriminatorValue: myOwnValue
-      properties:
-        name: string
-        /note\d+/: string
+  withAnArray:
+    properties:
+      someArray:
+        type: integer[]
+        (ramltopojo.types):
+          - name: core.asArray
+      anotherArray:
+        type: dates[]
+        (ramltopojo.types):
+          - name: core.asArray
+  dates:
+    (ramltopojo.types):
+      - name: core.jackson2
+    properties:
+      someDate: datetime
+  foo:
+    (ramltopojo.types):
+      - name: core.equalsAndHashCode
+      - name: core.jsr303
+      - name: core.jackson2
+    type: object
+    discriminatorValue: myOwnValue
+    properties:
+      name:
+        type: string
+        pattern: a\[a-z\]b
+      goo:
+        type: object
+        properties:
+          glue: boolean
+          flue:
+            type: object
+            properties:
+              another: string
+  eater:
+    (ramltopojo.types):
+      - name: core.equalsAndHashCode
+        arguments: [name]
+      - name: core.toString
+    #          - name: core.jackson2
+    additionalProperties: false
+    type: object
+    discriminatorValue: myOwnValue
+    properties:
+      name: string
+      count: integer
+      other: foo
+  addPropsVerification:
+    (ramltopojo.types):
+      - name: core.jackson2
+    type: object
+    discriminatorValue: myOwnValue
+    properties:
+      name: string
+      /note\d+/: string
 
-    OceanAnimal:
-      (ramltopojo.types):
-          - name: core.jackson2
-      type: object
-      properties:
-        numberOfFins: integer
-    JungleAnimal:
-      (ramltopojo.types):
-          - name: core.jackson2
-      type: object
-      properties:
-        numberOfSpots: integer
+  OceanAnimal:
+    (ramltopojo.types):
+      - name: core.jackson2
+    type: object
+    properties:
+      numberOfFins: integer
+  JungleAnimal:
+    (ramltopojo.types):
+      - name: core.jackson2
+    type: object
+    properties:
+      numberOfSpots: integer
 
-    BiomeBase:
-      (ramltopojo.types):
-          - name: core.jackson2
-      discriminator: kind
-      type: object
-      properties:
-        id: integer
-        name: string
-        kind: string
+  BiomeBase:
+    (ramltopojo.types):
+      - name: core.jackson2
+    discriminator: kind
+    type: object
+    properties:
+      id: integer
+      name: string
+      kind: string
 
-    Ocean:
-      (ramltopojo.types):
-          - name: core.jackson2
-      type: BiomeBase
-      properties:
-        animals: OceanAnimal[]
+  Ocean:
+    (ramltopojo.types):
+      - name: core.jackson2
+    type: BiomeBase
+    properties:
+      animals: OceanAnimal[]
 
-    Jungle:
-      (ramltopojo.types):
-          - name: core.jackson2
-      type: BiomeBase
-      properties:
-        animals: JungleAnimal[]
+  Jungle:
+    (ramltopojo.types):
+      - name: core.jackson2
+    type: BiomeBase
+    properties:
+      animals: JungleAnimal[]
 
-    Biome:
-      (ramltopojo.types):
-          - name: core.jackson2
-      type: Ocean | Jungle
+  Biome:
+    (ramltopojo.types):
+      - name: core.jackson2
+    type: Ocean | Jungle
 
-    listElementParent:
-      type: object
-      properties:
-        name: string
+  listElementParent:
+    type: object
+    properties:
+      name: string
 
-    listElementChild:
-      type: listElementParent
-      properties:
-        name: string
+  listElementChild:
+    type: listElementParent
+    properties:
+      name: string
 
-    listHolderParent:
-      type: object
-      (ramltopojo.types):
-          - name: core.wildcardcollection
-            arguments: [java.lang.Object]
-      properties:
-        elements: listElementParent[]
-        names: string[]
-        id: integer
+  listHolderParent:
+    type: object
+    (ramltopojo.types):
+      - name: core.wildcardcollection
+        arguments: [java.lang.Object]
+    properties:
+      elements: listElementParent[]
+      names: string[]
+      id: integer
 
-    listHolderChild:
-      type: listHolderParent
-      properties:
-        elements: listElementChild[]
+  listHolderChild:
+    type: listHolderParent
+    properties:
+      elements: listElementChild[]
 
-    nametypes:
-      type: string
-      (ramltopojo.types):
-          - name: core.jackson2
-      enum: [up,down]
+  nametypes:
+    type: string
+    (ramltopojo.types):
+      - name: core.jackson2
+    enum: [up,down]
 
-    elevator:
-      (ramltopojo.types):
-          - name: core.jackson2
-      type: object
-      properties:
-        name: string
-        direction: nametypes
+  elevator:
+    (ramltopojo.types):
+      - name: core.jackson2
+    type: object
+    properties:
+      name: string
+      direction: nametypes
 

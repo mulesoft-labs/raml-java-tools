@@ -2,57 +2,57 @@
 uses:
   ramltopojo: ramltopojo.raml
 types:
-    child:
+  child:
+    type: object
+    properties:
+      name: string
+  childArray:
+    type: array
+    items: child
+  childBracketArray:
+    type: child[]
+  inlineChildren:
+    type: array
+    items:
+      type: child
+      properties:
+        last: string
+  inlineStuff:
+    type: array
+    items:
       type: object
       properties:
-        name: string
-    childArray:
-      type: array
-      items: child
-    childBracketArray:
-      type: child[]
-    inlineChildren:
-      type: array
-      items:
-         type: child
-         properties:
-             last: string
-    inlineStuff:
-      type: array
-      items:
-         type: object
-         properties:
-             last: string
+        last: string
 
-#    emptyArrayType:
-#      type: array
+  #    emptyArrayType:
+  #      type: array
 
-    father:
-      type: object
-      properties:
-        others: child[]
-        some: string[]
+  father:
+    type: object
+    properties:
+      others: child[]
+      some: string[]
 
-    mother:
-      type: object
-      properties:
-        children: childArray
-        otherChildren:
-          type: array
-          items:
-            type: child
-#        complicatedChildren:
-#          (ramltopojo.types):
-#            generateInlineArrayType: true
-#          type: emptyArrayType
-#          items:
-#            type: child
-        smaller:
-#          (ramltopojo.types):
-#            generateInlineArrayType: true
-          type: array
-          items:
-            type: object
-            properties:
-              name: string
+  mother:
+    type: object
+    properties:
+      children: childArray
+      otherChildren:
+        type: array
+        items:
+          type: child
+      #        complicatedChildren:
+      #          (ramltopojo.types):
+      #            generateInlineArrayType: true
+      #          type: emptyArrayType
+      #          items:
+      #            type: child
+      smaller:
+        #          (ramltopojo.types):
+        #            generateInlineArrayType: true
+        type: array
+        items:
+          type: object
+          properties:
+            name: string
 

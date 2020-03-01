@@ -4,7 +4,7 @@ uses:
 types:
   PetResponse:
     (ramltopojo.types):
-        - name: core.jackson2
+      - name: core.jackson2
     type: object
     properties:
       myPet:
@@ -12,7 +12,7 @@ types:
 
   Animal:
     (ramltopojo.types):
-        - name: core.jackson2
+      - name: core.jackson2
     type: object
     discriminator: animalType
     properties:
@@ -20,7 +20,7 @@ types:
 
   Cat:
     (ramltopojo.types):
-        - name: core.jackson2
+      - name: core.jackson2
     type: Animal
     discriminatorValue: CAT
     properties:
@@ -28,7 +28,7 @@ types:
 
   Fish:
     (ramltopojo.types):
-        - name: core.jackson2
+      - name: core.jackson2
     type: Animal
     discriminatorValue: FISH
     properties:
