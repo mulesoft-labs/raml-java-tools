@@ -79,7 +79,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
             String declaredName = declaration.name().value();
 
             if ( types.size() == 0 ) {
-                return false;
+                return true;
             }
 
             return types.size() != 1 || !declaredName.equals(types.get(0));

@@ -63,6 +63,16 @@ public class ShapeTypeTest extends UnitTest {
     }
 
     @Test
+    public void simpleObjectSimpleType() throws ExecutionException, InterruptedException {
+
+        Document api = RamlLoader.load(this.getClass().getResource("inline-types.raml"));
+        NodeShape decl = RamlLoader.findShape("foo", api.declares());
+        PropertyShape property = findProperty(decl, "inside");
+
+        assertTrue(ShapeType.isNewInlineType(Utils.rangeOf(property)));
+    }
+
+    @Test
     public void extendedObjectIsNotNewInlineType() throws ExecutionException, InterruptedException {
 
         Document api = RamlLoader.load(this.getClass().getResource("inline-types.raml"));

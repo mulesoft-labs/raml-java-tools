@@ -1,7 +1,9 @@
 package org.raml.ramltopojo;
 
 import amf.client.model.document.Document;
-import amf.client.model.domain.*;
+import amf.client.model.domain.AnyShape;
+import amf.client.model.domain.DomainElement;
+import amf.client.model.domain.Shape;
 import amf.client.resolve.Raml10Resolver;
 import amf.client.validate.ValidationReport;
 import amf.core.resolution.pipelines.ResolutionPipeline;
@@ -9,7 +11,6 @@ import webapi.Raml10;
 import webapi.WebApiDocument;
 
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -31,7 +32,7 @@ public class RamlLoader {
             markAll(parsedDocument);
             return (Document) new Raml10Resolver().resolve(parsedDocument, ResolutionPipeline.EDITING_PIPELINE());
         } else {
-            results.forEach(r -> System.err.println(r.message()));
+            results.forEach(r -> System.err.println(r.message() + ":::" + r.position()));
             throw new IllegalArgumentException();
         }
     }
@@ -58,33 +59,7 @@ public class RamlLoader {
         parsedDocument.findByType("http://a.ml/vocabularies/shapes#Shape").stream()
                 .filter(x -> x instanceof AnyShape)
                 .map(AnyShape.class::cast)
-                .forEach(RamlLoader::createInformation);
-    }
-
-    private static void createInformation(AnyShape shape) {
-        DomainExtension de = new DomainExtension().withName("ramltopojo");
-        shape.withCustomDomainProperties(Collections.singletonList(de));
-
-        // false inlined
-        ScalarNode sn  = new ScalarNode("false", ScalarTypes.BOOLEAN_SCALAR);
-
-        ObjectNode node = new ObjectNode();
-        de.withExtension(node);
-
-        if ( shape.inlined() ) {
-
-            node.addProperty("inlined", ScalarTypes.SCALAR_NODE_TRUE);
-        } else {
-            node.addProperty("inlined", ScalarTypes.SCALAR_NODE_FALSE);
-        }
-
-        ArrayNode arrayNode  = new ArrayNode();
-        if ( shape instanceof NodeShape ) {
-            NodeShape nodeShape = (NodeShape) shape;
-            nodeShape.inherits().forEach(i -> arrayNode.addMember(ScalarTypes.stringNode(i.name().value())) );
-        }
-
-        node.addProperty("supertypes", arrayNode);
+                .forEach(ExtraInformation::createInformation);
     }
 
     public static <T extends Shape> T findShape(final String name, List<DomainElement> types) {

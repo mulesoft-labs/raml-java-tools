@@ -367,6 +367,9 @@ public class ObjectTypeHandlerTest extends UnitTest {
 
         CreationResult r = handler.create(generationContext, new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
+        System.err.println(r.getInterface().toString());
+        System.err.println(r.getImplementation().toString());
+
         assertThat(r.getInternalTypeForProperty("inside").getInterface(), name(equalTo("InsideType")));
         assertThat(r.getInternalTypeForProperty("inside").getImplementation().get(), name(equalTo("InsideTypeImpl")));
     }

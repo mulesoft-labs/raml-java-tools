@@ -1,10 +1,8 @@
 package org.raml.ramltopojo;
 
-import amf.client.model.domain.ArrayNode;
-import amf.client.model.domain.ObjectNode;
-import amf.client.model.domain.ScalarNode;
-import amf.client.model.domain.Shape;
+import amf.client.model.domain.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,5 +27,31 @@ public class ExtraInformation {
                 .findFirst()
                 .map(x -> (ArrayNode)((ObjectNode)x.extension()).getProperty("supertypes").orElse(new ArrayNode()))
                 .orElse(new ArrayNode()).members().stream().map(ScalarNode.class::cast).map(x -> x.value().value()).collect(Collectors.toList());
+    }
+
+    static void createInformation(AnyShape shape) {
+        DomainExtension de = new DomainExtension().withName("ramltopojo");
+        shape.withCustomDomainProperties(Collections.singletonList(de));
+
+        // false inlined
+        ScalarNode sn  = new ScalarNode("false", ScalarTypes.BOOLEAN_SCALAR);
+
+        ObjectNode node = new ObjectNode();
+        de.withExtension(node);
+
+        if ( shape.inlined() ) {
+
+            node.addProperty("inlined", ScalarTypes.SCALAR_NODE_TRUE);
+        } else {
+            node.addProperty("inlined", ScalarTypes.SCALAR_NODE_FALSE);
+        }
+
+        ArrayNode arrayNode  = new ArrayNode();
+        if ( shape instanceof NodeShape ) {
+            NodeShape nodeShape = (NodeShape) shape;
+            nodeShape.inherits().forEach(i -> arrayNode.addMember(ScalarTypes.stringNode(i.name().value())) );
+        }
+
+        node.addProperty("supertypes", arrayNode);
     }
 }
