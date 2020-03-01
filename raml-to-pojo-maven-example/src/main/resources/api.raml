@@ -14,22 +14,18 @@ types:
           someArray:
             type: integer[]
             (ramltopojo.types):
-               plugins:
                  - name: core.asArray
           anotherArray:
             type: dates[]
             (ramltopojo.types):
-              plugins:
                 - name: core.asArray
     dates:
       (ramltopojo.types):
-        plugins:
           - name: core.jackson2
       properties:
         someDate: datetime
     foo:
       (ramltopojo.types):
-          plugins:
             - name: core.equalsAndHashCode
             - name: core.jsr303
             - name: core.jackson2
@@ -49,7 +45,6 @@ types:
                 another: string
     eater:
       (ramltopojo.types):
-        plugins:
           - name: core.equalsAndHashCode
             arguments: [name]
           - name: core.toString
@@ -63,7 +58,6 @@ types:
         other: foo
     addPropsVerification:
       (ramltopojo.types):
-        plugins:
           - name: core.jackson2
       type: object
       discriminatorValue: myOwnValue
@@ -73,14 +67,12 @@ types:
 
     OceanAnimal:
       (ramltopojo.types):
-        plugins:
           - name: core.jackson2
       type: object
       properties:
         numberOfFins: integer
     JungleAnimal:
       (ramltopojo.types):
-        plugins:
           - name: core.jackson2
       type: object
       properties:
@@ -88,7 +80,6 @@ types:
 
     BiomeBase:
       (ramltopojo.types):
-        plugins:
           - name: core.jackson2
       discriminator: kind
       type: object
@@ -99,7 +90,6 @@ types:
 
     Ocean:
       (ramltopojo.types):
-        plugins:
           - name: core.jackson2
       type: BiomeBase
       properties:
@@ -107,7 +97,6 @@ types:
 
     Jungle:
       (ramltopojo.types):
-        plugins:
           - name: core.jackson2
       type: BiomeBase
       properties:
@@ -115,7 +104,6 @@ types:
 
     Biome:
       (ramltopojo.types):
-        plugins:
           - name: core.jackson2
       type: Ocean | Jungle
 
@@ -132,7 +120,6 @@ types:
     listHolderParent:
       type: object
       (ramltopojo.types):
-        plugins:
           - name: core.wildcardcollection
             arguments: [java.lang.Object]
       properties:
@@ -148,13 +135,11 @@ types:
     nametypes:
       type: string
       (ramltopojo.types):
-        plugins:
           - name: core.jackson2
       enum: [up,down]
 
     elevator:
       (ramltopojo.types):
-        plugins:
           - name: core.jackson2
       type: object
       properties:

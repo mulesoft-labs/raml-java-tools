@@ -1,9 +1,7 @@
 package org.raml.ramltopojo.extensions.jackson1;
 
 import amf.client.model.domain.*;
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import com.squareup.javapoet.*;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonNode;
@@ -19,12 +17,11 @@ import org.codehaus.jackson.map.ser.std.SerializerBase;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.GenerationException;
 import org.raml.ramltopojo.Names;
+import org.raml.ramltopojo.ScalarTypes;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
 import org.raml.ramltopojo.union.UnionTypesHelper;
-import org.raml.v2.api.model.v10.datamodel.*;
 
-import javax.annotation.Nullable;
 import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.sql.Date;
@@ -32,6 +29,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created. There, you have it.
@@ -102,21 +100,21 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
             serialize.beginControlFlow("if ( object." + isMethod + "())");
 
             // Check for dates (special serialization)
-            if (typeDeclaration instanceof DateTypeDeclaration) {
+            if (ScalarTypes.isDateOnly(typeDeclaration)) {
                 CodeBlock cb = createCodeBlockWithFormat(getMethod, "yyyy-mm-dd");
                 serialize.addCode(cb);
 
-            } else if (typeDeclaration instanceof TimeOnlyTypeDeclaration) {
+            } else if (ScalarTypes.isTimeOnly(typeDeclaration)) {
 
                 serialize.addCode(createCodeBlockWithFormat(getMethod, "hh:mm:ss"));
 
-            } else if (typeDeclaration instanceof DateTimeOnlyTypeDeclaration) {
+            } else if (ScalarTypes.isDatetimeOnly(typeDeclaration)) {
 
                 serialize.addCode(createCodeBlockWithFormat(getMethod, "yyyy-MM-dd'T'HH:mm:ss"));
 
-            } else if (typeDeclaration instanceof DateTimeTypeDeclaration) {
+            } else if (ScalarTypes.isDateTime(typeDeclaration)) {
 
-                if (Objects.equals("rfc2616", ((DateTimeTypeDeclaration) typeDeclaration).format())) {
+                if (Objects.equals("rfc2616", ((ScalarShape) typeDeclaration).format().value())) {
                     serialize.addCode(createCodeBlockWithFormat(getMethod,  "EEE, dd MMM yyyy HH:mm:ss z"));
                 } else {
                     serialize.addCode(createCodeBlockWithFormat(getMethod, "yyyy-MM-dd'T'HH:mm:ssZ"));
@@ -185,7 +183,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
             // get type name of declaration
             TypeName typeName = unionPluginContext.findType(typeDeclaration.name().value(), typeDeclaration).box();
 
-            if (typeDeclaration instanceof NullTypeDeclaration) {
+            if (typeDeclaration instanceof NilShape) {
 
                 deserialize.beginControlFlow("if (node.isNull())");
                 deserialize.addStatement("return new $T(null)", unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION));
@@ -200,13 +198,13 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                     nullMethod = true;
                 }
 
-            } else if (typeDeclaration instanceof BooleanTypeDeclaration) {
+            } else if (ScalarTypes.isBoolean(typeDeclaration)) {
 
                 deserialize.beginControlFlow("if (node.isBoolean().value())");
                 deserialize.addStatement("return new $T(node.asBoolean())", unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION));
                 deserialize.endControlFlow();
 
-            } else if (typeDeclaration instanceof IntegerTypeDeclaration) {
+            } else if (ScalarTypes.isInteger(typeDeclaration)) {
 
                 if (typeName.box().equals(TypeName.LONG.box())) {
                     deserialize.beginControlFlow("if (node.isLong())");
@@ -224,39 +222,39 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                     throw new GenerationException("Unknown integer type");
                 }
 
-            } else if (typeDeclaration instanceof StringTypeDeclaration) {
+            } else if (ScalarTypes.isString(typeDeclaration)) {
 
                 deserialize.beginControlFlow("if (node.isTextual())");
                 deserialize.addStatement("return new $T(node.asText())", unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION));
                 deserialize.endControlFlow();
 
-            } else if (typeDeclaration instanceof NumberTypeDeclaration) {
+            } else if (ScalarTypes.isNumber(typeDeclaration)) {
 
                 deserialize.beginControlFlow("if (node.isNumber())");
                 deserialize.addStatement("return new $T(jp.getCodec().treeToValue(node, $T.class))",
                     unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), Number.class);
                 deserialize.endControlFlow();
 
-            } else if (typeDeclaration instanceof DateTypeDeclaration) {
+            } else if (ScalarTypes.isDateOnly(typeDeclaration)) {
 
                 dateValidation = true;
                 this.buildDateDeserialize(unionPluginContext, deserialize, "yyyy-mm-dd");
 
-            } else if (typeDeclaration instanceof TimeOnlyTypeDeclaration) {
+            } else if (ScalarTypes.isTimeOnly(typeDeclaration)) {
 
                 dateValidation = true;
                 this.buildDateDeserialize(unionPluginContext, deserialize, "hh:mm:ss");
 
-            } else if (typeDeclaration instanceof DateTimeOnlyTypeDeclaration) {
+            } else if (ScalarTypes.isDatetimeOnly(typeDeclaration)) {
 
                 dateValidation = true;
                 this.buildDateDeserialize(unionPluginContext, deserialize, "yyyy-MM-dd'T'HH:mm:ss");
 
-            } else if (typeDeclaration instanceof DateTimeTypeDeclaration) {
+            } else if (ScalarTypes.isDateTime(typeDeclaration)) {
 
                 dateValidation = true;
 
-                if (Objects.equals("rfc2616", ((DateTimeTypeDeclaration) typeDeclaration).format())) {
+                if (Objects.equals("rfc2616", ((ScalarShape) typeDeclaration).format().value())) {
 
                     this.buildDateDeserialize(unionPluginContext, deserialize, "EEE, dd MMM yyyy HH:mm:ss z");
 
@@ -276,40 +274,33 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                     unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), arrayType);
                 deserialize.endControlFlow();
 
-            } else if (typeDeclaration instanceof ObjectTypeDeclaration) {
+            } else if (typeDeclaration instanceof NodeShape) {
 
                 objectValidation = true;
-                ObjectTypeDeclaration otd = (ObjectTypeDeclaration) typeDeclaration;
+                NodeShape otd = (NodeShape) typeDeclaration;
 
-                List<String> names = Lists.transform(otd.properties(), new Function<TypeDeclaration, String>() {
-                    @Nullable
-                    @Override
-                    public String apply(@Nullable TypeDeclaration input) {
-                        return "\"" + input.name() + "\"";
-                    }
-                });
+                List<String> names = otd.properties().stream().map(input -> "\"" + input.name().value() + "\"").collect(Collectors.toList());
 
                 deserialize.beginControlFlow("if (node.isObject() && isValidObject(node, $T.asList($L)))", Arrays.class, Joiner.on(",").join(names));
                 deserialize.addStatement("return new $T(jp.getCodec().treeToValue(node, $T.class))",
                     unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), typeName);
                 deserialize.endControlFlow();
 
-            } else if (typeDeclaration instanceof AnyTypeDeclaration) {
-
-                throw new GenerationException("Type 'any' within a union is not supported yet");
-
-            } else if (typeDeclaration instanceof UnionTypeDeclaration) {
+            }  else if (typeDeclaration instanceof UnionShape) {
 
                 throw new GenerationException("Type 'union' within a union is not supported yet");
 
-            } else if (typeDeclaration instanceof FileTypeDeclaration) {
+            } else if (typeDeclaration instanceof FileShape) {
 
                 throw new GenerationException("Type 'file' within a union is not supported yet");
 
+            } else if (typeDeclaration instanceof AnyShape) {
+
+                throw new GenerationException("Type 'any' within a union is not supported yet");
+
             } else {
 
-                throw new GenerationException("Type 'unkown' within a union is not supported yet");
-
+                throw new GenerationException("Type " + typeDeclaration.name() + " within a union is not supported yet");
             }
         }
 

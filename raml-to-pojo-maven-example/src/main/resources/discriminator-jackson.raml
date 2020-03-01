@@ -4,7 +4,6 @@ uses:
 types:
   PetResponse:
     (ramltopojo.types):
-      plugins:
         - name: core.jackson2
     type: object
     properties:
@@ -13,7 +12,6 @@ types:
 
   Animal:
     (ramltopojo.types):
-      plugins:
         - name: core.jackson2
     type: object
     discriminator: animalType
@@ -22,7 +20,6 @@ types:
 
   Cat:
     (ramltopojo.types):
-      plugins:
         - name: core.jackson2
     type: Animal
     discriminatorValue: CAT
@@ -31,7 +28,6 @@ types:
 
   Fish:
     (ramltopojo.types):
-      plugins:
         - name: core.jackson2
     type: Animal
     discriminatorValue: FISH

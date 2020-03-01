@@ -118,7 +118,7 @@ public class RamlToPojoMojo extends AbstractMojo {
 
                 ramlToPojo.buildPojos().createAllTypes(outputDirectory.getAbsolutePath());
             } else {
-                results.forEach(r -> getLog().error(r.message()));
+                results.forEach(r -> getLog().error("Error " + r.message() + " at " + r.position() + " in " + r.location()));
                 throw new MojoExecutionException("invalid raml " + ramlFile);
             }
 

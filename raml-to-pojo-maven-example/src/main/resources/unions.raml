@@ -4,7 +4,6 @@ uses:
 types:
   Dog:
     (ramltopojo.types):
-      plugins:
         - name: core.jackson2
     type: object
     properties:
@@ -12,51 +11,42 @@ types:
       color: string
   Television:
     (ramltopojo.types):
-      plugins:
         - name: core.jackson2
     type: object
     properties:
       color: boolean
   Projector:
     (ramltopojo.types):
-      plugins:
         - name: core.jackson2
     type: object
     properties:
       hanging: boolean
   Entertainement:
      (ramltopojo.types):
-      plugins:
         - name: core.jackson2
      type: Television | Projector
   SomeScalar:
     (ramltopojo.types):
-      plugins:
         - name: core.jackson2
     type: string|integer
   date1Union:
     (ramltopojo.types):
-      plugins:
         - name: core.jackson2
     type: date-only | nil
   date2Union:
     (ramltopojo.types):
-      plugins:
         - name: core.jackson2
     type: time-only | nil
   date3Union:
     (ramltopojo.types):
-      plugins:
         - name: core.jackson2
     type: datetime-only | nil
   date4Union:
     (ramltopojo.types):
-      plugins:
         - name: core.jackson2
     type: datetime | nil
   dateUnion:
     (ramltopojo.types):
-      plugins:
         - name: core.jackson2
     type: object
     properties:
@@ -66,22 +56,18 @@ types:
       date4: date4Union
   nilString:
     (ramltopojo.types):
-     plugins:
       - name: core.jackson2
     type: string | nil
   nilUnionType:
     (ramltopojo.types):
-      plugins:
         - name: core.jackson2
     type: string|nil
   complexUnion:
     (ramltopojo.types):
-      plugins:
         - name: core.jackson2
     type: boolean|integer|string|nil
   unionProperty:
     (ramltopojo.types):
-      plugins:
         - name: core.jackson2
     properties:
       goo: nilString
