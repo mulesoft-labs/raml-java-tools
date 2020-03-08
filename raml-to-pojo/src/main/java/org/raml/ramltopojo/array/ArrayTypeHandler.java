@@ -46,7 +46,7 @@ public class ArrayTypeHandler implements TypeHandler {
     @Override
     public TypeName javaClassReference(GenerationContext generationContext, EventType type) {
 
-        if (true) {
+        if (typeDeclaration.items() != null) {
             String itemTypeName = Utils.items(typeDeclaration).name().value();
             if ("object".equals(itemTypeName)) {
                 itemTypeName = Utils.items(typeDeclaration).name().value();
