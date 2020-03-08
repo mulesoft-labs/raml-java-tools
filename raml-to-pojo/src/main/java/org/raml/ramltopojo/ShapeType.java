@@ -87,7 +87,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         @Override
         public boolean shouldCreateInlineType(AnyShape declaration) {
         //    return "string".equals(declaration.name().value()) || "number".equals(declaration.name().value()) || "integer".equals(declaration.name().value());
-            return true;
+            return false;
         }
     },
     ARRAY {
@@ -116,7 +116,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         public boolean shouldCreateInlineType(AnyShape declaration) {
 
             // this seems wrong.
-            return declaration instanceof UnionShape;
+            return ExtraInformation.isInline(declaration);
         }
     },
     INTEGER {
@@ -124,7 +124,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
 
             ScalarShape integerTypeDeclaration = (ScalarShape) typeDeclaration;
-            if ( false ) {
+            if (  ! integerTypeDeclaration.values().isEmpty() ) {
                 return ENUMERATION.createHandler(name, type, typeDeclaration);
             } else {
 
@@ -137,7 +137,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         public boolean shouldCreateInlineType(AnyShape originalTypeDeclaration) {
             ScalarShape declaration = (ScalarShape) originalTypeDeclaration;
 
-            if (false ) {
+            if (! declaration.values().isEmpty() ) {
 
                 return ENUMERATION.shouldCreateInlineType(declaration);
             } else {
@@ -155,7 +155,12 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
 
         @Override
         public boolean shouldCreateInlineType(AnyShape declaration) {
-            return false;
+            if (! declaration.values().isEmpty() ) {
+
+                return ENUMERATION.shouldCreateInlineType(declaration);
+            } else {
+                return false;
+            }
         }
     },
     DATE {
@@ -208,7 +213,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
 
             ScalarShape integerTypeDeclaration = (ScalarShape) typeDeclaration;
-            if ( false ) {
+            if ( ! integerTypeDeclaration.values().isEmpty() ) {
                 return ENUMERATION.createHandler(name, type, typeDeclaration);
             } else {
 
@@ -222,7 +227,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
 
             ScalarShape declaration = (ScalarShape) originalTypeDeclaration;
 
-            if ( false ) {
+            if ( ! declaration.values().isEmpty() ) {
 
                 return ENUMERATION.shouldCreateInlineType(declaration);
             } else {
@@ -236,7 +241,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
 
             ScalarShape declaration = (ScalarShape) typeDeclaration;
-            if ( false ) {
+            if ( ! declaration.values().isEmpty() ) {
                 return ENUMERATION.createHandler(name, type, typeDeclaration);
             } else {
 
@@ -249,7 +254,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
 
             ScalarShape declaration = (ScalarShape) originalTypeDeclaration;
 
-            if ( false ) {
+            if ( ! declaration.values().isEmpty() ) {
 
                 return ENUMERATION.shouldCreateInlineType(declaration);
             } else {

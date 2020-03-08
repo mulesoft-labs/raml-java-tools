@@ -16,9 +16,6 @@
 package org.raml.ramltopojo.plugin.maven;
 
 import amf.client.model.document.Document;
-import amf.client.resolve.Raml10Resolver;
-import amf.client.validate.ValidationReport;
-import amf.core.resolution.pipelines.ResolutionPipeline;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -27,10 +24,9 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.raml.ramltopojo.RamlLoader;
 import org.raml.ramltopojo.RamlToPojo;
 import org.raml.ramltopojo.RamlToPojoBuilder;
-import webapi.Raml10;
-import webapi.WebApiDocument;
 
 import java.io.File;
 import java.io.IOException;
@@ -103,24 +99,13 @@ public class RamlToPojoMojo extends AbstractMojo {
 
             getLog().info("about to read file " + ramlFile + " in directory " + ramlFile.getParent());
 
-            WebApiDocument document = (WebApiDocument) Raml10.parse(ramlFile.toURL().toString()).get();
-            ValidationReport report = Raml10.validate(document).get();
+            Document api = RamlLoader.load(ramlFile.toURL().toString());
+            RamlToPojo ramlToPojo = RamlToPojoBuilder.builder(api)
+                    .inPackage(defaultPackage)
+                    .fetchTypes(fromAnywhere())
+                    .findTypes(everyWhere()).build(basePlugins);
 
-            List<amf.client.validate.ValidationResult> results = report.results();
-            if ( results.isEmpty()) {
-
-                WebApiDocument data = (WebApiDocument) Raml10.parse(ramlFile.toURL().toString()).get();
-                Document api = (Document) new Raml10Resolver().resolve(data, ResolutionPipeline.EDITING_PIPELINE());
-                RamlToPojo ramlToPojo = RamlToPojoBuilder.builder(api)
-                        .inPackage(defaultPackage)
-                        .fetchTypes(fromAnywhere())
-                        .findTypes(everyWhere()).build(basePlugins);
-
-                ramlToPojo.buildPojos().createAllTypes(outputDirectory.getAbsolutePath());
-            } else {
-                results.forEach(r -> getLog().error("Error " + r.message() + " at " + r.position() + " in " + r.location()));
-                throw new MojoExecutionException("invalid raml " + ramlFile);
-            }
+            ramlToPojo.buildPojos().createAllTypes(outputDirectory.getAbsolutePath());
 
         } catch (InterruptedException| IOException| ExecutionException e) {
 

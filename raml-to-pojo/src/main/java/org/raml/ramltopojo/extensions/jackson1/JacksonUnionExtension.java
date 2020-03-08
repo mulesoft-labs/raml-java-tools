@@ -200,7 +200,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
 
             } else if (ScalarTypes.isBoolean(typeDeclaration)) {
 
-                deserialize.beginControlFlow("if (node.isBoolean().value())");
+                deserialize.beginControlFlow("if (node.isBoolean())");
                 deserialize.addStatement("return new $T(node.asBoolean())", unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION));
                 deserialize.endControlFlow();
 

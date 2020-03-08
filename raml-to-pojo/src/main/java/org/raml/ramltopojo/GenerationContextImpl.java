@@ -144,66 +144,52 @@ public class GenerationContextImpl implements GenerationContext {
         }
     }
 
+    private <T> Set<T> appropriatePlugins(Class<T> ofType, Shape... typeDeclarations) {
+
+        List<PluginDef> data = Annotations.PLUGINS.get(Collections.emptyList(), api, typeDeclarations);
+        //System.err.println("annotation defined plugins for " + typeDeclarations[0].name() + "are " + data);
+        Set<T> plugins = new HashSet<>();
+        loadBasePlugins(plugins, ofType);
+        for (PluginDef datum : data) {
+            Set<T> classesForName = pluginManager.getClassesForName(datum.getPluginName(), datum.getArguments(), ofType);
+            for (T somePlugin : classesForName) {
+                plugins.removeIf(x ->  x.getClass() == somePlugin.getClass());
+            }
+            plugins.addAll(classesForName);
+        }
+
+        return plugins;
+    }
+
     @Override
     public ObjectTypeHandlerPlugin pluginsForObjects(Shape... typeDeclarations) {
 
-        List<PluginDef> data = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, typeDeclarations);
-        //System.err.println("annotation defined plugins for " + typeDeclarations[0].name() + "are " + data);
-        Set<ObjectTypeHandlerPlugin> plugins = new HashSet<>();
-        loadBasePlugins(plugins, ObjectTypeHandlerPlugin.class);
-        for (PluginDef datum : data) {
-            plugins.addAll(pluginManager.getClassesForName(datum.getPluginName(), datum.getArguments() , ObjectTypeHandlerPlugin.class));
-        }
-        //System.err.println("plugin definitions for object type " + plugins + " for " + typeDeclarations[0].name());
-        return new ObjectTypeHandlerPlugin.Composite(plugins);
+        return new ObjectTypeHandlerPlugin.Composite(appropriatePlugins(ObjectTypeHandlerPlugin.class, typeDeclarations));
     }
 
 
     @Override
     public EnumerationTypeHandlerPlugin pluginsForEnumerations(Shape... typeDeclarations) {
-        List<PluginDef> data = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, typeDeclarations);
-        Set<EnumerationTypeHandlerPlugin> plugins = new HashSet<>();
-        loadBasePlugins(plugins, EnumerationTypeHandlerPlugin.class);
 
-        for (PluginDef datum : data) {
-            plugins.addAll(pluginManager.getClassesForName(datum.getPluginName(), datum.getArguments() , EnumerationTypeHandlerPlugin.class));
-        }
-        return new EnumerationTypeHandlerPlugin.Composite(plugins);
+        return new EnumerationTypeHandlerPlugin.Composite(appropriatePlugins(EnumerationTypeHandlerPlugin.class, typeDeclarations));
     }
 
     @Override
     public ArrayTypeHandlerPlugin pluginsForArrays(Shape... typeDeclarations) {
-        List<PluginDef> data = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, typeDeclarations);
-        Set<ArrayTypeHandlerPlugin> plugins = new HashSet<>();
-        loadBasePlugins(plugins, ArrayTypeHandlerPlugin.class);
 
-        for (PluginDef datum : data) {
-            plugins.addAll(pluginManager.getClassesForName(datum.getPluginName(), datum.getArguments() , ArrayTypeHandlerPlugin.class));
-        }
-        return new ArrayTypeHandlerPlugin.Composite(plugins);
+        return new ArrayTypeHandlerPlugin.Composite(appropriatePlugins(ArrayTypeHandlerPlugin.class, typeDeclarations));
     }
 
     @Override
     public UnionTypeHandlerPlugin pluginsForUnions(Shape... typeDeclarations) {
-        List<PluginDef> data = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, typeDeclarations);
-        Set<UnionTypeHandlerPlugin> plugins = new HashSet<>();
-        loadBasePlugins(plugins, UnionTypeHandlerPlugin.class);
-        for (PluginDef datum : data) {
-            plugins.addAll(pluginManager.getClassesForName(datum.getPluginName(), datum.getArguments() , UnionTypeHandlerPlugin.class));
-        }
-        return new UnionTypeHandlerPlugin.Composite(plugins);
+
+        return new UnionTypeHandlerPlugin.Composite(appropriatePlugins(UnionTypeHandlerPlugin.class, typeDeclarations));
     }
 
     @Override
     public ReferenceTypeHandlerPlugin pluginsForReferences(Shape... typeDeclarations) {
 
-        List<PluginDef> data = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), api, typeDeclarations);
-        Set<ReferenceTypeHandlerPlugin> plugins = new HashSet<>();
-        loadBasePlugins(plugins, ReferenceTypeHandlerPlugin.class);
-        for (PluginDef datum : data) {
-            plugins.addAll(pluginManager.getClassesForName(datum.getPluginName(), datum.getArguments() , ReferenceTypeHandlerPlugin.class));
-        }
-        return new ReferenceTypeHandlerPlugin.Composite(plugins);
+        return new ReferenceTypeHandlerPlugin.Composite(appropriatePlugins(ReferenceTypeHandlerPlugin.class, typeDeclarations));
     }
 
 

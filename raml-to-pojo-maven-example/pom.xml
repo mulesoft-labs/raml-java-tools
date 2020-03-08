@@ -56,11 +56,6 @@
                         <configuration>
                             <defaultPackage>foo.foo</defaultPackage>
                             <ramlFile>${project.build.resources[0].directory}/api.raml</ramlFile>
-
-                            <basePlugins>
-                                    <value>core.jackson</value>
-                            </basePlugins>
-
                         </configuration>
                     </execution>
                 </executions>

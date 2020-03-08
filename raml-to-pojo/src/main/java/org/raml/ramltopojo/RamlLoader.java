@@ -1,6 +1,7 @@
 package org.raml.ramltopojo;
 
 import amf.client.model.document.Document;
+import amf.client.model.document.Module;
 import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.DomainElement;
 import amf.client.model.domain.Shape;
@@ -60,6 +61,15 @@ public class RamlLoader {
                 .filter(x -> x instanceof AnyShape)
                 .map(AnyShape.class::cast)
                 .forEach(ExtraInformation::createInformation);
+
+        parsedDocument.references().stream()
+                .filter(x -> x instanceof Module)
+                .map(x -> (Module) x)
+                .flatMap(TypeFindingUtils::gettingSubModules)
+                .forEach(d -> d.findByType("http://a.ml/vocabularies/shapes#Shape").stream()
+                        .filter(x -> x instanceof AnyShape)
+                        .map(AnyShape.class::cast)
+                        .forEach(ExtraInformation::createInformation));
     }
 
     public static <T extends Shape> T findShape(final String name, List<DomainElement> types) {

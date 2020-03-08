@@ -3,7 +3,7 @@ package org.raml.ramltopojo;
 import amf.client.model.domain.*;
 
 import java.net.URI;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,7 +32,9 @@ public class ExtraInformation {
 
     static void createInformation(AnyShape shape) {
         DomainExtension de = new DomainExtension().withName("ramltopojo");
-        shape.withCustomDomainProperties(Collections.singletonList(de));
+        List<DomainExtension> newList = new ArrayList<>(shape.customDomainProperties());
+        newList.add(de);
+        shape.withCustomDomainProperties(newList);
 
         // false inlined
         ScalarNode sn  = new ScalarNode("false", ScalarTypes.BOOLEAN_SCALAR);
