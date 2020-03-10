@@ -19,6 +19,7 @@ import amf.client.model.domain.NodeShape;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.CreationResult;
@@ -75,15 +76,10 @@ public class JacksonDiscriminatorInheritanceTypeExtension extends ObjectTypeHand
               .addMember("value", "$S", ramlType.discriminatorValue()).build());
     }
 
-
-    /* TODO
-    if (!Annotations.ABSTRACT.get(otr)) {
-
-      typeSpec.addAnnotation(AnnotationSpec.builder(JsonDeserialize.class)
+    typeSpec.addAnnotation(AnnotationSpec.builder(JsonDeserialize.class)
               .addMember("as", "$T.class", objectPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION))
               .build());
-    }
-*/
+
 
     return typeSpec;
   }

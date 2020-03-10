@@ -62,7 +62,7 @@ public class JacksonScalarTypeSerialization extends ObjectTypeHandlerPlugin.Help
 
       if ( "datetime".equals(propertyType.dataType().value())) {
 
-        // TODO:  do better
+        // TODO: do better
         Optional<String> format = Optional.ofNullable(propertyType.format()).map(StrField::value);
         if (format.isPresent() && "rfc2616".equals(format.get())) {
 

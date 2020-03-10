@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.EventType;
+import org.raml.ramltopojo.ScalarTypes;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
 
@@ -70,7 +71,7 @@ public class JacksonScalarTypeSerialization extends ObjectTypeHandlerPlugin.Help
                 .addMember("pattern", "$S", "yyyy-MM-dd").build());
       }
 
-      if ("datetime".equals(propertyType.dataType().value())) {
+      if (ScalarTypes.isDateTime(propertyType)) {
 
         // TODO:  do better
         Optional<String> format = Optional.ofNullable(propertyType.format()).map(StrField::value);
