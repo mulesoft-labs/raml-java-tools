@@ -50,21 +50,21 @@ public class JacksonScalarTypeSerialization extends ObjectTypeHandlerPlugin.Help
     if (typeDeclaration.range() instanceof ScalarShape) {
       ScalarShape propertyType = (ScalarShape) typeDeclaration.range();
 
-      if ("datetime-only".equals(propertyType.dataType().value())) {
+      if (ScalarTypes.isDatetimeOnly(propertyType)) {
 
         builder.addAnnotation(AnnotationSpec.builder(JsonFormat.class)
                 .addMember("shape", "$T.STRING", JsonFormat.Shape.class)
                 .addMember("pattern", "$S", "yyyy-MM-dd'T'HH:mm:ss").build());
       }
 
-      if ("time-only".equals(propertyType.dataType().value())) {
+      if (ScalarTypes.isTimeOnly(propertyType)) {
 
         builder.addAnnotation(AnnotationSpec.builder(JsonFormat.class)
                 .addMember("shape", "$T.STRING", JsonFormat.Shape.class)
                 .addMember("pattern", "$S", "HH:mm:ss").build());
       }
 
-      if ("date".equals(propertyType.dataType().value())) {
+      if (ScalarTypes.isDateOnly(propertyType)) {
 
         builder.addAnnotation(AnnotationSpec.builder(JsonFormat.class)
                 .addMember("shape", "$T.STRING", JsonFormat.Shape.class)
