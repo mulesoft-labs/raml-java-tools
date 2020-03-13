@@ -278,7 +278,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                     }
                 });
 
-                if (otd.discriminator() != null) {
+                if (otd.discriminator().nonNull()) {
 
                     TypeName unionPossibility = unionPluginContext.unionClass(typeDeclaration).getJavaName(EventType.INTERFACE);
 
@@ -290,7 +290,9 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
 
                 } else {
 
-                    deserialize.beginControlFlow("if (node.isObject() && isValidObject(node, $T.asList($L)))", Arrays.class, Joiner.on(",").join(names));
+                    deserialize.beginControlFlow("if (node.isObject() && isValidObject(node, $T.asList($L)))",
+                            Arrays.class,
+                            Joiner.on(",").join(names));
                     deserialize.addStatement("return new $T(jp.getCodec().treeToValue(node, $T.class))",
                         unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), typeName);
                     deserialize.endControlFlow();
