@@ -87,7 +87,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         @Override
         public boolean shouldCreateInlineType(AnyShape declaration) {
         //    return "string".equals(declaration.name().value()) || "number".equals(declaration.name().value()) || "integer".equals(declaration.name().value());
-            return false;
+            return ExtraInformation.isInline(declaration);
         }
     },
     ARRAY {

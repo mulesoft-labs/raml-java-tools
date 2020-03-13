@@ -1,0 +1,18 @@
+#%RAML 1.0 Library
+#uses:
+#  ramltopojo: ramltopojo.raml
+
+types:
+  nametypes:
+    type: string
+#    (ramltopojo.types):
+#      - name: core.jackson2
+    enum: [up,down]
+
+  elevator:
+#    (ramltopojo.types):
+#      - name: core.jackson2
+    type: object
+    properties:
+      name: string
+      direction: nametypes

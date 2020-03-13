@@ -45,6 +45,7 @@ public class ExtraInformation {
         if (
                 shape.isLink() ||
                 shapeId.getFragment().matches("/declarations/types/[^/]*$") ||
+                shapeId.getFragment().matches("/declarations/types/scalar/[^/]*$") ||
                 shapeId.getFragment().matches("/declarations/types/union/[^/]*$") ) {
 
             node.addProperty("inlined", ScalarTypes.SCALAR_NODE_FALSE);

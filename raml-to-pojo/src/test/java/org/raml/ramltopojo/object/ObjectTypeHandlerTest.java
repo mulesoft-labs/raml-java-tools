@@ -447,6 +447,9 @@ public class ObjectTypeHandlerTest extends UnitTest {
         CreationResult r = handler.create(createGenerationContext(api), new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         assertNotNull(r);
+
+        System.err.println(r.getInterface());
+
         assertThat(r.internalType("name").getInterface(), is(allOf(
 
                 name(

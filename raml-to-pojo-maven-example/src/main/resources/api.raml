@@ -7,6 +7,7 @@ uses:
   arrays: arrays.raml
   unions: unions.raml
   j1unions: unions-jackson1.raml
+  enumerations: enumerations.raml
   discriminatorjackson: discriminator-jackson.raml
 types:
   withAnArray:
@@ -132,17 +133,4 @@ types:
     properties:
       elements: listElementChild[]
 
-  nametypes:
-    type: string
-    (ramltopojo.types):
-      - name: core.jackson2
-    enum: [up,down]
-
-  elevator:
-    (ramltopojo.types):
-      - name: core.jackson2
-    type: object
-    properties:
-      name: string
-      direction: nametypes
 
