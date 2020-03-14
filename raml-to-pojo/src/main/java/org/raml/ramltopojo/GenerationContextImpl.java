@@ -86,15 +86,22 @@ public class GenerationContextImpl implements GenerationContext {
 
         if ( typeDeclaration instanceof NodeShape) {
             List<AnyShape> parents = Utils.allParents(typeDeclaration);
-            for (AnyShape parent : parents) {
+//            for (AnyShape parent : parents) {
+//
+//                if (parent.name().isNullOrEmpty() || ( parent.name().value().equals(typeDeclaration.name().value()))) {
+//                    continue;
+//                }
+//
+//                setupTypeHierarchy(parent.name().value(), parent);
+//                if (!parent.name().value().equals(actualName)) {
+//                    childTypes.put(parent.name().value(), actualName);
+//                }
+//            }
 
-                if (parent.name().isNullOrEmpty() || ( parent.name().is(typeDeclaration.name().value()))) {
-                    continue;
-                }
+            for (String parent:  ExtraInformation.parentTypes(typeDeclaration)) {
 
-                setupTypeHierarchy(parent.name().value(), parent);
-                if (!parent.name().value().equals(actualName)) {
-                    childTypes.put(parent.name().value(), actualName);
+                if (parent != null && !parent.equals(actualName)) {
+                    childTypes.put(parent, actualName);
                 }
             }
         }

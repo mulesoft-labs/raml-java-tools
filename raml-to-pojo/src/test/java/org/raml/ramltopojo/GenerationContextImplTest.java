@@ -2,6 +2,7 @@ package org.raml.ramltopojo;
 
 import amf.client.model.domain.NodeShape;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.raml.testutils.UnitTest;
 import webapi.WebApiParser;
@@ -18,7 +19,7 @@ public class GenerationContextImplTest extends UnitTest{
 
     NodeShape type1, type2, type3, type4;
 
-    @Test
+    @Test @Ignore("irrelevant")
     public void setupTypeHierarchy() throws ExecutionException, InterruptedException {
 
         WebApiParser.init().get();
