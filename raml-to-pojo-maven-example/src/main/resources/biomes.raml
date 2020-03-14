@@ -1,0 +1,45 @@
+#%RAML 1.0 Library
+uses:
+  ramltopojo: ramltopojo.raml
+types:
+  OceanAnimal:
+    (ramltopojo.types):
+      - name: core.jackson2
+    type: object
+    properties:
+      numberOfFins: integer
+  JungleAnimal:
+    (ramltopojo.types):
+      - name: core.jackson2
+    type: object
+    properties:
+      numberOfSpots: integer
+
+  BiomeBase:
+    (ramltopojo.types):
+      - name: core.jackson2
+    discriminator: kind
+    type: object
+    properties:
+      id: integer
+      name: string
+      kind: string
+
+  Ocean:
+    (ramltopojo.types):
+      - name: core.jackson2
+    type: BiomeBase
+    properties:
+      animals: OceanAnimal[]
+
+  Jungle:
+    (ramltopojo.types):
+      - name: core.jackson2
+    type: BiomeBase
+    properties:
+      animals: JungleAnimal[]
+
+  Biome:
+    (ramltopojo.types):
+      - name: core.jackson2
+    type: Ocean | Jungle

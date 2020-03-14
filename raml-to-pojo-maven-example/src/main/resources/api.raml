@@ -9,6 +9,7 @@ uses:
   j1unions: unions-jackson1.raml
   enumerations: enumerations.raml
   discriminatorjackson: discriminator-jackson.raml
+  biomes: biomes.raml
 types:
   withAnArray:
     properties:
@@ -65,48 +66,6 @@ types:
     properties:
       name: string
       /note\d+/: string
-
-  OceanAnimal:
-    (ramltopojo.types):
-      - name: core.jackson2
-    type: object
-    properties:
-      numberOfFins: integer
-  JungleAnimal:
-    (ramltopojo.types):
-      - name: core.jackson2
-    type: object
-    properties:
-      numberOfSpots: integer
-
-  BiomeBase:
-    (ramltopojo.types):
-      - name: core.jackson2
-    discriminator: kind
-    type: object
-    properties:
-      id: integer
-      name: string
-      kind: string
-
-  Ocean:
-    (ramltopojo.types):
-      - name: core.jackson2
-    type: BiomeBase
-    properties:
-      animals: OceanAnimal[]
-
-  Jungle:
-    (ramltopojo.types):
-      - name: core.jackson2
-    type: BiomeBase
-    properties:
-      animals: JungleAnimal[]
-
-  Biome:
-    (ramltopojo.types):
-      - name: core.jackson2
-    type: Ocean | Jungle
 
   listElementParent:
     type: object

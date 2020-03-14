@@ -283,7 +283,11 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                     TypeName unionPossibility = unionPluginContext.unionClass(typeDeclaration).getJavaName(EventType.INTERFACE);
 
                     deserialize.beginControlFlow("if (node.isObject() && isValidObject(node, $T.asList($L)) && $T.equals(node.path($S).asText(), $S))",
-                        Arrays.class, Joiner.on(",").join(names), Objects.class, otd.discriminator(), Optional.ofNullable(otd.discriminatorValue()).orElse(otd.name()));
+                            Arrays.class,
+                            Joiner.on(",").join(names),
+                            Objects.class,
+                            otd.discriminator(),
+                            Optional.ofNullable(otd.discriminatorValue().value()).orElse(otd.name().value()));
                     deserialize.addStatement("return new $T(($T)jp.getCodec().treeToValue(node, $T.class))",
                         unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), unionPossibility, unionPluginContext.unionClass((AnyShape) findParentType(typeDeclaration)).getJavaName(EventType.INTERFACE));
                     deserialize.endControlFlow();
