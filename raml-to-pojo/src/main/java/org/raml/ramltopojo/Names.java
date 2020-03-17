@@ -15,13 +15,9 @@
  */
 package org.raml.ramltopojo;
 
+import amf.client.model.domain.*;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Joiner;
-import org.raml.v2.api.model.v08.bodies.BodyLike;
-import org.raml.v2.api.model.v10.bodies.Response;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
-import org.raml.v2.api.model.v10.methods.Method;
-import org.raml.v2.api.model.v10.resources.Resource;
 
 import javax.lang.model.SourceVersion;
 import java.util.ArrayList;
@@ -29,9 +25,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.StringUtils.left;
-import static org.apache.commons.lang.math.NumberUtils.isDigits;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.left;
+import static org.apache.commons.lang3.math.NumberUtils.isDigits;
+
 
 /**
  * <p>
@@ -129,31 +126,32 @@ public class Names {
     return CaseFormat.UPPER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, buildJavaFriendlyName(value, NameFixer.CAMEL_UPPER, 0));
   }
 
-  public static String javaTypeName(Resource resource, TypeDeclaration declaration) {
-    return typeName(resource.resourcePath(), declaration.name());
+  public static String javaTypeName(amf.client.model.domain.EndPoint resource, AnyShape declaration) {
+    return typeName(resource.path().value(), declaration.name().value());
   }
 
-  public static String javaTypeName(Resource resource, Method method, TypeDeclaration declaration) {
-    return typeName(resource.resourcePath(), method.method(), declaration.name());
+  public static String javaTypeName(EndPoint resource, Operation method, AnyShape declaration) {
+    return typeName(resource.path().value(), method.method().value(), declaration.name().value());
   }
 
-  public static String ramlTypeName(Resource resource, Method method, TypeDeclaration declaration) {
-    return resource.resourcePath() + method.method() + declaration.name();
+  public static String ramlTypeName(EndPoint resource, Operation method, AnyShape declaration) {
+    return resource.path().value() + method.method().value() + declaration.name().value();
   }
 
-  public static String ramlTypeName(Resource resource, TypeDeclaration declaration) {
-    return resource.resourcePath() + declaration.name();
+  public static String ramlTypeName(EndPoint resource, AnyShape declaration) {
+    return resource.path().value() + declaration.name().value();
   }
 
-  public static String javaTypeName(Resource resource, Method method, Response response,
-                                    TypeDeclaration declaration) {
-    return typeName(resource.resourcePath(), method.method(), response.code().value(),
-                    declaration.name());
+  public static String javaTypeName(EndPoint resource, Operation method, Response response,
+                                    AnyShape declaration) {
+    return typeName(resource.path().value(), method.method().value(), response.statusCode().value(),
+                    declaration.name().value());
   }
 
-  public static String ramlTypeName(Resource resource, Method method, Response response,
-                                    TypeDeclaration declaration) {
-    return resource.resourcePath() + method.method() + response.code().value() + declaration.name();
+  public static String ramlTypeName(EndPoint resource, Operation method, Response response,
+                                    AnyShape declaration) {
+    return resource.path().value() + method.method().value() + response.statusCode().value() +
+            declaration.name().value();
   }
 
 
@@ -224,30 +222,30 @@ public class Names {
   }
 
 
-  public static String ramlTypeName(org.raml.v2.api.model.v08.resources.Resource resource,
-                                    org.raml.v2.api.model.v08.methods.Method method, BodyLike typeDeclaration) {
+  public static String ramlTypeName(EndPoint resource,
+                                    Operation method, Payload typeDeclaration) {
 
-    return resource.resourcePath() + method.method() + typeDeclaration.name();
+    return resource.path().value() + method.method().value() + typeDeclaration.name().value();
   }
 
-  public static String ramlTypeName(org.raml.v2.api.model.v08.resources.Resource resource,
-                                    org.raml.v2.api.model.v08.methods.Method method,
-                                    org.raml.v2.api.model.v08.bodies.Response response, BodyLike typeDeclaration) {
+  public static String ramlTypeName(EndPoint resource,
+                                    Operation method,
+                                    Response response, Payload typeDeclaration) {
 
-    return resource.resourcePath() + method.method() + response.code().value()
+    return resource.path().value() + method.method() + response.statusCode().value()
         + typeDeclaration.name();
   }
 
-  public static String javaTypeName(org.raml.v2.api.model.v08.resources.Resource resource,
-                                    org.raml.v2.api.model.v08.methods.Method method, BodyLike typeDeclaration) {
-    return typeName(resource.resourcePath(), method.method(), typeDeclaration.name());
+  public static String javaTypeName(EndPoint resource,
+                                    Operation method, Payload typeDeclaration) {
+    return typeName(resource.path().value(), method.method().value(), typeDeclaration.name().value());
   }
 
-  public static String javaTypeName(org.raml.v2.api.model.v08.resources.Resource resource,
-                                    org.raml.v2.api.model.v08.methods.Method method,
-                                    org.raml.v2.api.model.v08.bodies.Response response, BodyLike typeDeclaration) {
-    return typeName(resource.resourcePath(), method.method(), response.code().value(),
-                    typeDeclaration.name());
+  public static String javaTypeName(EndPoint resource,
+                                    Operation method,
+                                    Response response, Payload typeDeclaration) {
+    return typeName(resource.path().value(), method.method().value(), response.statusCode().value(),
+                    typeDeclaration.name().value());
   }
 
 }

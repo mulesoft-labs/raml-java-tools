@@ -17,9 +17,7 @@ package org.raml.ramltopojo;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.raml.v2.api.model.v10.system.types.RelativeUriString;
 
 import static org.junit.Assert.assertEquals;
 
@@ -28,9 +26,6 @@ import static org.junit.Assert.assertEquals;
  */
 public class NamesTest {
 
-
-  @Mock
-  RelativeUriString url;
 
   @Before
   public void mocks() {

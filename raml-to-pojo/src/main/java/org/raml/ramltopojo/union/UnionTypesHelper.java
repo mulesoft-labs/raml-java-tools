@@ -4,7 +4,6 @@ import amf.client.model.domain.*;
 import com.google.common.collect.ImmutableMap;
 import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.Utils;
-import org.raml.v2.api.model.v10.datamodel.ObjectTypeDeclaration;
 
 import java.util.*;
 import java.util.function.Function;
@@ -30,9 +29,9 @@ public class UnionTypesHelper {
         Map<Class<? extends AnyShape>, Integer> typePriority = getPriorityTypeMap();
         sortedTypes.sort((t1, t2) -> {
             // if both types are objects, we first do discriminator objects: TODO this may me illegitimate:  unions don't discriminate.
-            if (t1 instanceof ObjectTypeDeclaration && t2 instanceof ObjectTypeDeclaration) {
-                String d1 = ((ObjectTypeDeclaration) t1).discriminator();
-                String d2 = ((ObjectTypeDeclaration) t2).discriminator();
+            if (t1 instanceof NodeShape && t2 instanceof NodeShape) {
+                String d1 = ((NodeShape) t1).discriminator().value();
+                String d2 = ((NodeShape) t2).discriminator().value();
                 return d1 != null && d2 != null ? 0 : d2 == null ? -1 : 1;
             }
             // no furhter process needed for other types

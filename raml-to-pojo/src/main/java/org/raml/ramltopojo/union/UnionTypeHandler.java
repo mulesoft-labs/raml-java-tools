@@ -1,16 +1,11 @@
 package org.raml.ramltopojo.union;
 
-import amf.client.model.domain.AnyShape;
-import amf.client.model.domain.NilShape;
-import amf.client.model.domain.Shape;
-import amf.client.model.domain.UnionShape;
+import amf.client.model.domain.*;
 import com.squareup.javapoet.*;
 import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.ramltopojo.extensions.UnionPluginContextImpl;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
-import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
-import org.raml.v2.api.model.v10.datamodel.NullTypeDeclaration;
 
 import javax.lang.model.element.Modifier;
 import java.util.stream.Collectors;
@@ -215,11 +210,11 @@ public class UnionTypeHandler implements TypeHandler {
 
         for (Shape unitedType : union.anyOf()) {
 
-            if (unitedType instanceof ArrayTypeDeclaration) {
+            if (unitedType instanceof ArrayShape) {
                 throw new GenerationException("ramltopojo currently does not support arrays in unions");
             }
 
-            TypeName typeName = unitedType instanceof NullTypeDeclaration ? NULL_CLASS: findType(unitedType.name().value(), (AnyShape) unitedType, generationContext).box();
+            TypeName typeName = unitedType instanceof NilShape ? NULL_CLASS: findType(unitedType.name().value(), (AnyShape) unitedType, generationContext).box();
             String prettyName = prettyName(unitedType, generationContext);
 
             // add enum name
