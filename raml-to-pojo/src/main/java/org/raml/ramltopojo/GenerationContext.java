@@ -9,6 +9,7 @@ import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.extensions.*;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -17,6 +18,8 @@ import java.util.Set;
 public interface GenerationContext {
 
     CreationResult findCreatedType(String typeName, Shape ramlType);
+    Optional<TypeName> findTypeNameByRamlName(String ramlName);
+
     String defaultPackage();
 
     void newExpectedType(String name, CreationResult creationResult);
@@ -36,4 +39,6 @@ public interface GenerationContext {
     void createSupportTypes(String rootDirectory) throws IOException;
 
     TypeName createSupportClass(TypeSpec.Builder newSupportType);
+
+    AnyShape findOriginalDeclaredName(String name);
 }

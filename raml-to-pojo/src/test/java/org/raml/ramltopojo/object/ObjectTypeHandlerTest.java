@@ -1,6 +1,7 @@
 package org.raml.ramltopojo.object;
 
 import amf.client.model.document.Document;
+import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.PropertyShape;
 import amf.client.model.domain.Shape;
@@ -526,7 +527,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
     protected GenerationContextImpl createGenerationContext(final Document api) {
         return new GenerationContextImpl(PluginManager.NULL, api, new TypeFetcher() {
             @Override
-            public Shape fetchType(Document api, String name) throws GenerationException {
+            public AnyShape fetchType(Document api, String name) throws GenerationException {
                 return findShape(name, api.declares());
             }
         }, "pojo.pack", Collections.emptyList());

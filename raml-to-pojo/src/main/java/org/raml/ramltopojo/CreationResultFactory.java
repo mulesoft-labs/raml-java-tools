@@ -103,6 +103,16 @@ public class CreationResultFactory {
         }
 
         @Override
+        public AnyShape findOriginalDeclaredName(String name) {
+            return context.findOriginalDeclaredName(name);
+        }
+
+        @Override
+        public Optional<TypeName> findTypeNameByRamlName(String ramlName) {
+            return context.findTypeNameByRamlName(ramlName);
+        }
+
+        @Override
         public TypeName createSupportClass(TypeSpec.Builder newSupportType) {
             return context.createSupportClass(newSupportType);
         }

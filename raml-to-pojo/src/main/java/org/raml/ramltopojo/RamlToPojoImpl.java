@@ -1,8 +1,10 @@
 package org.raml.ramltopojo;
 
 import amf.client.model.domain.AnyShape;
+import com.google.common.collect.Lists;
 import com.squareup.javapoet.TypeName;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -23,16 +25,18 @@ public class RamlToPojoImpl implements RamlToPojo {
 
         ResultingPojos resultingPojos = new ResultingPojos(generationContext);
 
-        for (AnyShape typeDeclaration : typeFinder.findTypes(generationContext.api())) {
+        List<AnyShape> allShapes = Lists.newArrayList(typeFinder.findTypes(generationContext.api()));
+        allShapes.stream()
+                .filter(a ->  ! ExtraInformation.isInline(a))
+                .forEach( a -> generationContext.newTypeName(
+                        a.name().value(),
+                        ShapeType.calculateTypeName(a.name().value(), a, generationContext, EventType.INTERFACE)));
 
-            ShapeType.calculateTypeName(typeDeclaration.name().value(), typeDeclaration, generationContext, EventType.INTERFACE);
-        }
-
-        for (AnyShape typeDeclaration : typeFinder.findTypes(generationContext.api())) {
-
-            Optional<CreationResult> spec = CreationResultFactory.createType(typeDeclaration, generationContext);
-            spec.ifPresent(resultingPojos::addNewResult);
-        }
+        allShapes
+                .forEach( a -> {
+                    Optional<CreationResult> spec = CreationResultFactory.createType(a, generationContext);
+                    spec.ifPresent(resultingPojos::addNewResult);
+                });
 
         return resultingPojos;
     }

@@ -1,11 +1,11 @@
 package org.raml.ramltopojo.extensions;
 
 import amf.client.model.domain.AnyShape;
+import amf.client.model.domain.NodeShape;
 import com.squareup.javapoet.TypeName;
-import org.raml.ramltopojo.CreationResult;
-import org.raml.ramltopojo.EventType;
-import org.raml.ramltopojo.GenerationContext;
-import org.raml.ramltopojo.ShapeType;
+import org.raml.ramltopojo.*;
+
+import java.util.List;
 
 /**
  * Created. There, you have it.
@@ -34,5 +34,16 @@ public class UnionPluginContextImpl implements UnionPluginContext {
     @Override
     public CreationResult unionClass(AnyShape ramlType) {
         return generationContext.findCreatedType(ramlType.name().value(), ramlType);
+    }
+
+    @Override
+    public TypeName unionClassName(String ramlName) {
+        return generationContext.findTypeNameByRamlName(ramlName).orElseThrow(() -> new GenerationException("no such declared type " + ramlName + " while generating union" ));
+    }
+
+    @Override
+    public List<String> parentTypes(NodeShape otd) {
+
+        return ExtraInformation.parentTypes(generationContext.findOriginalDeclaredName(otd.name().value()));
     }
 }

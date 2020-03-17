@@ -1,10 +1,10 @@
 package org.raml.ramltopojo;
 
 import amf.client.model.domain.Shape;
-import com.google.common.collect.Streams;
 
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * Created. There, you have it.
@@ -34,7 +34,7 @@ public class TypeFetchers {
 
         return (api, name) -> {
             // todo resources
-            return Streams.concat(TypeFindingUtils.shapesFromTypes(api), TypeFindingUtils.shapesFromLibraries(api))
+            return Stream.concat(TypeFindingUtils.shapesFromTypes(api), TypeFindingUtils.shapesFromLibraries(api))
                     .filter(namedPredicate(name))
                     .findFirst()
                     .orElseThrow(fail(name));

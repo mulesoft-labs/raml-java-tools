@@ -57,7 +57,7 @@ public class ExtraInformation {
         ArrayNode arrayNode  = new ArrayNode();
         if ( shape instanceof NodeShape ) {
             NodeShape nodeShape = (NodeShape) shape;
-            nodeShape.inherits().forEach(i -> arrayNode.addMember(ScalarTypes.stringNode(i.name().value())) );
+            nodeShape.inherits().stream().filter( i -> i.name().value() != null).forEach(i -> arrayNode.addMember(ScalarTypes.stringNode(i.name().value())) );
         }
 
         node.addProperty("supertypes", arrayNode);

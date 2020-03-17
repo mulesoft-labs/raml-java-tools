@@ -289,7 +289,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                             otd.discriminator(),
                             Optional.ofNullable(otd.discriminatorValue().value()).orElse(otd.name().value()));
                     deserialize.addStatement("return new $T(($T)jp.getCodec().treeToValue(node, $T.class))",
-                        unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), unionPossibility, unionPluginContext.unionClass((AnyShape) findParentType(typeDeclaration)).getJavaName(EventType.INTERFACE));
+                        unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), unionPossibility, findParentType(typeDeclaration, unionPluginContext));
                     deserialize.endControlFlow();
 
                 } else {
@@ -335,12 +335,13 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
         typeBuilder.addType(builder.build());
     }
 
-    private Shape findParentType(Shape typeDeclaration) {
+    private TypeName findParentType(Shape typeDeclaration, UnionPluginContext unionPluginContext) {
         if (typeDeclaration instanceof NodeShape) {
             NodeShape otd = (NodeShape) typeDeclaration;
-            return otd.inherits().size() > 0 ? otd.inherits().get(0) : otd;
+            List<String> names = unionPluginContext.parentTypes(otd);
+            return names.size() > 0 ? unionPluginContext.unionClassName(names.get(0)) : unionPluginContext.unionClassName(otd.name().value());
         } else {
-            return typeDeclaration;
+            return unionPluginContext.unionClassName(typeDeclaration.name().value());
         }
     }
 

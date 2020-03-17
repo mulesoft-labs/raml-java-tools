@@ -27,10 +27,13 @@ public class GenerationContextImpl implements GenerationContext {
     private final Document api;
     private final TypeFetcher typeFetcher;
     private final ConcurrentHashMap<String, CreationResult> knownTypes = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, TypeName> typeNames = new ConcurrentHashMap<>();
+
     private final SetMultimap<String, String> childTypes = HashMultimap.create();
     private final String defaultPackage;
     private final List<String> basePlugins;
     private Map<String, TypeSpec> supportClasses = new HashMap<>();
+    private Map<String, AnyShape> realTypes = new HashMap<>();
 
     public GenerationContextImpl(Document api) {
         this(PluginManager.NULL, api, TypeFetchers.NULL_FETCHER, "", Collections.<String>emptyList());
@@ -42,6 +45,36 @@ public class GenerationContextImpl implements GenerationContext {
         this.typeFetcher = typeFetcher;
         this.defaultPackage = defaultPackage;
         this.basePlugins = basePlugins;
+    }
+
+    public void newTypeName(String name, TypeName typeName) {
+        this.typeNames.put(name, typeName);
+    }
+
+    public void setupTypeHierarchy(String actualName, AnyShape typeDeclaration) {
+
+        if ( actualName != null && ! realTypes.containsKey(actualName) ) {
+            realTypes.put(actualName, typeDeclaration);
+        }
+        if ( typeDeclaration instanceof NodeShape) {
+            for (String parent:  ExtraInformation.parentTypes(typeDeclaration)) {
+
+                if (parent != null && !parent.equals(actualName)) {
+                    childTypes.put(parent, actualName);
+                }
+            }
+        }
+    }
+
+    @Override
+    public Optional<TypeName> findTypeNameByRamlName(String ramlName) {
+        return Optional.ofNullable(typeNames.get(ramlName));
+    }
+
+    @Override
+    public AnyShape findOriginalDeclaredName(String name) {
+        // really stupid
+        return realTypes.get(name);
     }
 
     @Override
@@ -82,17 +115,6 @@ public class GenerationContextImpl implements GenerationContext {
         return ClassName.get(defaultPackage, name);
     }
 
-    public void setupTypeHierarchy(String actualName, AnyShape typeDeclaration) {
-
-        if ( typeDeclaration instanceof NodeShape) {
-            for (String parent:  ExtraInformation.parentTypes(typeDeclaration)) {
-
-                if (parent != null && !parent.equals(actualName)) {
-                    childTypes.put(parent, actualName);
-                }
-            }
-        }
-    }
 
     @Override
     public void newExpectedType(String name, CreationResult creationResult) {
