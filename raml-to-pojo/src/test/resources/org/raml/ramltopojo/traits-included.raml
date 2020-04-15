@@ -1,0 +1,12 @@
+#%RAML 1.0 Library
+
+uses:
+  errorMessage: error-messages.raml
+
+traits:
+  Bad:
+    responses:
+      400:
+        body:
+          application/problem+json:
+            type: errorMessage.Message

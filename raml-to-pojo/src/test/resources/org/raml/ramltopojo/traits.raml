@@ -1,0 +1,19 @@
+#%RAML 1.0
+version: v1
+title: Example
+uses:
+  Errors: traits-included.raml
+
+mediaType: application/json
+protocols: [HTTPS]
+
+description: APIs
+
+/resource:
+  get:
+    is:
+      - Errors.Bad
+    body:
+      type: string
+    responses:
+      202:

@@ -32,7 +32,11 @@ public class RamlLoaderTest {
                         "    mytype:\n" +
                         "       type: object\n" +
                         "       properties:\n" +
-                        "          goo: string|integer\n"
+                        "          goo: string|integer\n" +
+                        "/fun:\n" +
+                        "   get:\n" +
+                        "   /funkytown:\n" +
+                        "      get:"
         );
 
         NodeShape shape = RamlLoader.findShape("mytype", doc.declares());
