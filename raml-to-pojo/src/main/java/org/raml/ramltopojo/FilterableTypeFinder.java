@@ -1,7 +1,17 @@
 package org.raml.ramltopojo;
 
 import amf.client.model.document.Document;
+import amf.client.model.document.EncodesModel;
+import amf.client.model.document.Module;
 import amf.client.model.domain.*;
+import webapi.WebApiModule;
+
+import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.raml.ramltopojo.NamedElementPath.pair;
 
 /**
  * Created. There, you have it.
@@ -10,51 +20,68 @@ public class FilterableTypeFinder {
 
     public void findTypes(Document api, FilterCallBack filterCallBack, FoundCallback foundCallback) {
 
-        findTypes(api, NamedElementPath.root(), filterCallBack, foundCallback);
+        findTypes(
+                api.declares().stream().filter(p -> p instanceof AnyShape).map(s -> (AnyShape)s),
+                ((WebApi)api.encodes()).endPoints().stream(),
+                api.references().stream()
+                        .filter(x -> x instanceof Module)
+                        .map(x -> (Module) x),
+                NamedElementPath.root(), filterCallBack, foundCallback);
     }
 
-    private void findTypes(Document api, NamedElementPath namedElementPath, FilterCallBack filterCallBack, FoundCallback foundCallback) {
+    private void findTypes(Stream<AnyShape> supplierOfDeclarations, Stream<EndPoint> supplierOfEncodings, Stream<Module> supplierOfModules, NamedElementPath namedElementPath, FilterCallBack filterCallBack, FoundCallback foundCallback) {
 
-        api.declares().stream()
-                .filter(x -> x instanceof AnyShape)
-                .map(x -> (AnyShape) x)
+        supplierOfDeclarations
                 .filter(s -> filterCallBack.filter(namedElementPath))
                 .forEach(s -> foundCallback.found(namedElementPath.append(s), s));
 
-        WebApi encoded = (WebApi) api.encodes();
-        for (EndPoint endPoint : encoded.endPoints()) {
+        supplierOfEncodings.forEach( endPoint -> {
 
+            NamedElementPath epPath = namedElementPath.append(endPoint);
             for (Parameter p : endPoint.parameters()) {
-                foundCallback.found(namedElementPath.append(endPoint, p, p.schema()), (AnyShape) p.schema());
+                foundCallback.found(epPath.append( p).append(p.schema()), (AnyShape) p.schema());
             }
 
             for ( Operation operation : endPoint.operations()) {
 
+                NamedElementPath opPath = epPath.append(operation);
+
                 Request request = operation.request();
                 for (Parameter p : request.queryParameters()) {
-                    foundCallback.found(namedElementPath.append(endPoint, operation, p, p.schema()), (AnyShape) p.schema());
+                    foundCallback.found(opPath.append(p).append(p.schema()), (AnyShape) p.schema());
                 }
 
                 for (Parameter p : request.headers()) {
-                    foundCallback.found(namedElementPath.append(endPoint, operation, p, p.schema()), (AnyShape) p.schema());
+                    foundCallback.found(opPath.append(p).append(p.schema()), (AnyShape) p.schema());
                 }
 
                 for (Payload payload: request.payloads()) {
-                    foundCallback.found(namedElementPath.append(endPoint, operation, payload, payload.schema()), (AnyShape) payload.schema());
+                    foundCallback.found(opPath.append(payload).append(payload.schema()), (AnyShape) payload.schema());
                 }
 
                 for ( Response response: operation.responses()) {
 
+                    NamedElementPath respPath = opPath.append(response);
+
                     for (Parameter p : response.headers()) {
-                        foundCallback.found(namedElementPath.append(endPoint, operation, response, p, p.schema()), (AnyShape) p.schema());
+                        foundCallback.found(respPath.append(p).append(p.schema()), (AnyShape) p.schema());
                     }
 
                     for (Payload payload: response.payloads()) {
-                        foundCallback.found(namedElementPath.append(endPoint, operation, response, payload, payload.schema()), (AnyShape) payload.schema());
+                        foundCallback.found(respPath.append(payload).append(payload.schema()), (AnyShape) payload.schema());
                     }
                 }
             }
-        }
+        });
+
+
+        supplierOfModules.forEach(m -> findTypes(
+                m.declares().stream().filter(p -> p instanceof AnyShape).map(s -> (AnyShape)s),
+                Stream.empty(),
+                m.references().stream()
+                        .filter(x -> x instanceof Module)
+                        .map(x -> (Module) x), namedElementPath.append(m), filterCallBack, foundCallback)
+                );
     }
 
 }

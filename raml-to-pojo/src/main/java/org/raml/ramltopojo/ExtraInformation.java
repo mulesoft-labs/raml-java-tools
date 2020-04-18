@@ -37,11 +37,13 @@ public class ExtraInformation {
         shape.withCustomDomainProperties(newList);
 
         // false inlined
-        ScalarNode sn  = new ScalarNode("false", ScalarTypes.BOOLEAN_SCALAR);
-
         ObjectNode node = new ObjectNode();
         de.withExtension(node);
         URI shapeId = URI.create(shape.id());
+        if (! shape.isLink() ) {
+            node.addProperty("location", ScalarTypes.stringNode(shapeId.getPath()));
+        }
+
         if (
                 shape.isLink() ||
                 shapeId.getFragment().matches("/declarations/types/[^/]*$") ||

@@ -2,19 +2,19 @@ package org.raml.ramltopojo;
 
 import amf.client.model.document.Document;
 import amf.client.model.domain.*;
-import com.google.gson.JsonObject;
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.api.Condition;
-import org.assertj.core.data.Index;
 import org.junit.Test;
+import amf.client.model.document.Module;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.raml.ramltopojo.FilterableTypeFinderTest.MatchesExactly.*;
+import static org.raml.ramltopojo.FilterableTypeFinderTest.AllMatchesExactly.thatAllMatchExactly;
+import static org.raml.ramltopojo.FilterableTypeFinderTest.ClassesMatchesExactly.*;
 
 
 /**
@@ -31,21 +31,25 @@ public class FilterableTypeFinderTest {
         finder.findTypes(doc, (p) -> true, (p, s) -> result.add(p));
 
         assertThat(result)
-                .hasSize(4)
-                .areAtLeastOne(thatMatchesExactly(ScalarShape.class))
-                .areAtLeastOne(thatMatchesExactly(NodeShape.class))
-                .areAtLeastOne(thatMatchesExactly(EndPoint.class, Operation.class, Payload.class, NodeShape.class))
-                .areAtLeastOne(thatMatchesExactly(EndPoint.class, Operation.class, Payload.class, ScalarShape.class));
+                .hasSize(9)
+                .areAtLeastOne(thatAllMatchExactly("someint", ScalarShape.class))
+                .areAtLeastOne(thatAllMatchExactly("foo", NodeShape.class))
+                .areAtLeastOne(thatAllMatchExactly("somebool", NodeShape.class))
+                .areAtLeastOne(thatAllMatchExactly("/first", EndPoint.class, "put", Operation.class, "q1", Parameter.class, "schema", ScalarShape.class))
+                .areAtLeastOne(thatAllMatchExactly("/first", EndPoint.class, "put", Operation.class, "h1", Parameter.class, "schema", ScalarShape.class))
+                .areAtLeastOne(thatAllMatchExactly("/first", EndPoint.class, "put", Operation.class, "application/json", Payload.class, "haha", ScalarShape.class))
+                .areAtLeastOne(thatAllMatchExactly("/first", EndPoint.class, "put", Operation.class, "200", Response.class, "application/json", Payload.class, "foo", NodeShape.class))
+                .areAtLeastOne(thatAllMatchExactly("/first/deep", EndPoint.class, "put", Operation.class, "application/json", Payload.class, "foo", NodeShape.class))
+                .areAtLeastOne(thatClassesMatchExactly(Module.class, ScalarShape.class));
     }
 
     @AllArgsConstructor
-    static class MatchesExactly extends Condition<NamedElementPath> {
+    static class ClassesMatchesExactly extends Condition<NamedElementPath> {
 
-        private final Class<? extends NamedDomainElement>[] listOfClasses;
+        private final Class<?>[] listOfClasses;
 
-        @SafeVarargs
-        public static MatchesExactly thatMatchesExactly(Class<? extends NamedDomainElement>... dom) {
-            return new MatchesExactly(dom);
+        public static ClassesMatchesExactly thatClassesMatchExactly(Class<?>... dom) {
+            return new ClassesMatchesExactly(dom);
         }
 
         @Override
@@ -54,7 +58,21 @@ public class FilterableTypeFinderTest {
         }
     }
 
-    private AssertionError failOnType() {
-        return new AssertionError("not right type");
+    @AllArgsConstructor
+    static class AllMatchesExactly extends Condition<NamedElementPath> {
+
+        private final Object[] listOfStuff;
+
+        public static AllMatchesExactly thatAllMatchExactly(Object... dom) {
+            return new AllMatchesExactly(dom);
+        }
+
+        @Override
+        public boolean matches(NamedElementPath value) {
+
+            return value.entirelyMatches(Arrays.stream(listOfStuff).filter(s -> s instanceof Class<?>).map(s -> (Class<?>) s).toArray(Class[]::new))
+                    && value.entirelyMatches(Arrays.stream(listOfStuff).filter(s -> s instanceof String).map(s -> (String) s).toArray(String[]::new));
+        }
     }
+
 }

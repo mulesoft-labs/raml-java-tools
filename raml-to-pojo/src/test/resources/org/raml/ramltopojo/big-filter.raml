@@ -2,17 +2,33 @@
 title: Hello World API
 version: v1
 baseUri: https://api.github.com
+uses:
+  libOne: lib1.raml
 types:
   someint: integer
   foo:
     type: object
     properties:
       string: string
+  somebool:
+    type: object
+    properties:
+        gaa: string
+
 /first:
   put:
+    queryParameters:
+      q1: integer
+    headers:
+      h1: integer
     body:
       application/json:
-        type: string
+        type: libOne.haha
+    responses:
+      200:
+        body:
+          application/json:
+            type: foo
   /deep:
     put:
       body:

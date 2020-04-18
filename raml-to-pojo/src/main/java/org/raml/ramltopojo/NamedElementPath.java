@@ -1,39 +1,98 @@
 package org.raml.ramltopojo;
 
+import amf.client.model.StrField;
 import amf.client.model.domain.*;
-import amf.core.model.domain.DomainElement;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.Lists;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.*;
 import java.util.function.IntPredicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static java.util.Collections.reverse;
+import amf.client.model.document.Module;
 
 /**
  * Created. There, you have it.
  */
-@AllArgsConstructor
+@AllArgsConstructor @ToString(of={"domainElements"})
 public class NamedElementPath {
+
+    @RequiredArgsConstructor(access=AccessLevel.PRIVATE)
+    private static class NameTypePair {
+        private final Object object;
+        private final String objectName;
+
+        public String toString() {
+            return objectName + "(" + object.getClass().getSimpleName()  + ")";
+        }
+    }
+    public static NameTypePair pair(Object target, String name) {
+
+        return new NameTypePair(target, name);
+    }
+
+    public static NameTypePair pair(Object target, StrField name) {
+
+        return new NameTypePair(target, name.value());
+    }
+
     @Getter(AccessLevel.PRIVATE)
-    private final List<NamedDomainElement> domainElements;
-    private final Supplier<List<String>> names = Suppliers.memoize(() -> getDomainElements().stream().map(d -> d.name().value()).collect(Collectors.toList()));
-    private final Supplier<List<Class<? extends NamedDomainElement>>> classes = Suppliers.memoize(() -> getDomainElements().stream().map(NamedDomainElement::getClass).collect(Collectors.toList()));
+    private final List<NameTypePair> domainElements;
+    private final Supplier<List<String>> names = Suppliers.memoize(() -> getDomainElements().stream().map(d -> d.objectName).collect(Collectors.toList()));
+    private final Supplier<List<Class<?>>> classes = Suppliers.memoize(() -> getDomainElements().stream().map(d -> d.object.getClass()).collect(Collectors.toList()));
 
     public static NamedElementPath root() {
         return new NamedElementPath(Collections.emptyList());
     }
 
-    public <T extends NamedDomainElement> NamedElementPath append(T... elements) {
 
-        ArrayList<NamedDomainElement> domainElements = new ArrayList<>(this.domainElements);
-        domainElements.addAll(Arrays.asList(elements));
+    public NamedElementPath append(Module m) {
+
+        ArrayList<NameTypePair> domainElements = new ArrayList<>(this.domainElements);
+        domainElements.add(new NameTypePair(m, m.location()));
+        return new NamedElementPath(domainElements);
+    }
+
+    public NamedElementPath append(Shape m) {
+
+        ArrayList<NameTypePair> domainElements = new ArrayList<>(this.domainElements);
+        domainElements.add(new NameTypePair(m, m.name().value()));
+        return new NamedElementPath(domainElements);
+    }
+
+    public NamedElementPath append(EndPoint m) {
+
+        ArrayList<NameTypePair> domainElements = new ArrayList<>(this.domainElements);
+        domainElements.add(new NameTypePair(m, m.path().value()));
+        return new NamedElementPath(domainElements);
+    }
+
+    public NamedElementPath append(Operation m) {
+
+        ArrayList<NameTypePair> domainElements = new ArrayList<>(this.domainElements);
+        domainElements.add(new NameTypePair(m, m.method().value()));
+        return new NamedElementPath(domainElements);
+    }
+
+    public NamedElementPath append(Response m) {
+
+        ArrayList<NameTypePair> domainElements = new ArrayList<>(this.domainElements);
+        domainElements.add(new NameTypePair(m, m.statusCode().value()));
+        return new NamedElementPath(domainElements);
+    }
+
+    public NamedElementPath append(Payload m) {
+
+        ArrayList<NameTypePair> domainElements = new ArrayList<>(this.domainElements);
+        domainElements.add(new NameTypePair(m, m.mediaType().value()));
+        return new NamedElementPath(domainElements);
+    }
+
+    public NamedElementPath append(Parameter m) {
+
+        ArrayList<NameTypePair> domainElements = new ArrayList<>(this.domainElements);
+        domainElements.add(new NameTypePair(m, m.name().value()));
         return new NamedElementPath(domainElements);
     }
 
@@ -41,7 +100,7 @@ public class NamedElementPath {
         return names.get();
     }
 
-    public List<Class<? extends NamedDomainElement>> classes() {
+    public List<Class<?>> classes() {
         return classes.get();
     }
 
@@ -54,7 +113,7 @@ public class NamedElementPath {
         if (domainElements.size() == 0 || !cls.isAssignableFrom(domainElements.get(domainElements.size() - 1).getClass())) {
             return Optional.empty();
         } else {
-            T t = (T) domainElements.get(domainElements.size() - 1);
+            T t = (T) domainElements.get(domainElements.size() - 1).object;
             return Optional.of(t);
         }
     }
@@ -69,17 +128,31 @@ public class NamedElementPath {
         return IntStream.range(0, path.length).allMatch(getDiffablePredicate(diff, path));
     }
 
-    private IntPredicate getDiffablePredicate(int diff, Class<? extends NamedDomainElement>[] path) {
-        return i -> path[i].isAssignableFrom(domainElements.get(i + diff).getClass());
-    }
 
-    public boolean entirelyMatches(Class<? extends NamedDomainElement>... path) {
+    public boolean entirelyMatches(Class<?>... path) {
 
         if ( domainElements.size() - path.length != 0) {
             return false;
         }
 
         return IntStream.range(0, path.length).allMatch(getDiffablePredicate(0, path));
+    }
+
+    public boolean entirelyMatches(String... path) {
+
+        if ( domainElements.size() - path.length != 0) {
+            return false;
+        }
+
+        return IntStream.range(0, path.length).allMatch(getDiffablePredicate(0, path));
+    }
+
+    private IntPredicate getDiffablePredicate(int diff, Class<?>[] path) {
+        return i -> path[i].isAssignableFrom(domainElements.get(i + diff).object.getClass());
+    }
+
+    private IntPredicate getDiffablePredicate(int diff, String[] path) {
+        return i -> path[i].equals(domainElements.get(i + diff).objectName);
     }
 
 }
