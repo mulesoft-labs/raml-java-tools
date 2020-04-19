@@ -1,17 +1,10 @@
 package org.raml.ramltopojo;
 
 import amf.client.model.document.Document;
-import amf.client.model.document.EncodesModel;
 import amf.client.model.document.Module;
 import amf.client.model.domain.*;
-import webapi.WebApiModule;
-
-import java.util.List;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.raml.ramltopojo.NamedElementPath.pair;
 
 /**
  * Created. There, you have it.

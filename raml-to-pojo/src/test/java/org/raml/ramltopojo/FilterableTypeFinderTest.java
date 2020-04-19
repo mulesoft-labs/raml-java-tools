@@ -23,25 +23,61 @@ import static org.raml.ramltopojo.FilterableTypeFinderTest.ClassesMatchesExactly
 public class FilterableTypeFinderTest {
 
     @Test
-    public void findTypes() {
+    public void findTopTypes() {
 
+        ArrayList<NamedElementPath> result = buildResults();
+
+        assertThat(result)
+                .areAtLeastOne(thatAllMatchExactly("someint", ScalarShape.class))
+                .areAtLeastOne(thatAllMatchExactly("foo", NodeShape.class))
+                .areAtLeastOne(thatAllMatchExactly("somebool", NodeShape.class));
+    }
+
+    @Test
+    public void findParametersInRequest() {
+
+        ArrayList<NamedElementPath> result = buildResults();
+
+        assertThat(result)
+                .areAtLeastOne(thatAllMatchExactly("/first", EndPoint.class, "put", Operation.class, "q1", Parameter.class, "schema", ScalarShape.class))
+                .areAtLeastOne(thatAllMatchExactly("/first", EndPoint.class, "put", Operation.class, "h1", Parameter.class, "schema", ScalarShape.class));
+    }
+
+    @Test
+    public void findRequestSchemas() {
+
+        ArrayList<NamedElementPath> result = buildResults();
+
+        assertThat(result)
+                .areAtLeastOne(thatAllMatchExactly("/first", EndPoint.class, "put", Operation.class, "application/json", Payload.class, "haha", ScalarShape.class))
+                .areAtLeastOne(thatAllMatchExactly("/first/deep", EndPoint.class, "put", Operation.class, "application/json", Payload.class, "foo", NodeShape.class));
+    }
+    @Test
+    public void findResponses() {
+
+        ArrayList<NamedElementPath> result = buildResults();
+
+        assertThat(result)
+                .areAtLeastOne(thatAllMatchExactly("/first", EndPoint.class, "put", Operation.class, "200", Response.class, "application/json", Payload.class, "foo", NodeShape.class));
+    }
+    @Test
+    public void findModules() {
+
+        ArrayList<NamedElementPath> result = buildResults();
+
+        assertThat(result)
+                .areAtLeastOne(thatClassesMatchExactly(Module.class, ScalarShape.class));
+    }
+
+
+    private ArrayList<NamedElementPath> buildResults() {
         Document doc = RamlLoader.load(this.getClass().getResource("big-filter.raml"));
         FilterableTypeFinder finder = new FilterableTypeFinder();
         ArrayList<NamedElementPath> result = new ArrayList<>();
         finder.findTypes(doc, (p) -> true, (p, s) -> result.add(p));
-
-        assertThat(result)
-                .hasSize(9)
-                .areAtLeastOne(thatAllMatchExactly("someint", ScalarShape.class))
-                .areAtLeastOne(thatAllMatchExactly("foo", NodeShape.class))
-                .areAtLeastOne(thatAllMatchExactly("somebool", NodeShape.class))
-                .areAtLeastOne(thatAllMatchExactly("/first", EndPoint.class, "put", Operation.class, "q1", Parameter.class, "schema", ScalarShape.class))
-                .areAtLeastOne(thatAllMatchExactly("/first", EndPoint.class, "put", Operation.class, "h1", Parameter.class, "schema", ScalarShape.class))
-                .areAtLeastOne(thatAllMatchExactly("/first", EndPoint.class, "put", Operation.class, "application/json", Payload.class, "haha", ScalarShape.class))
-                .areAtLeastOne(thatAllMatchExactly("/first", EndPoint.class, "put", Operation.class, "200", Response.class, "application/json", Payload.class, "foo", NodeShape.class))
-                .areAtLeastOne(thatAllMatchExactly("/first/deep", EndPoint.class, "put", Operation.class, "application/json", Payload.class, "foo", NodeShape.class))
-                .areAtLeastOne(thatClassesMatchExactly(Module.class, ScalarShape.class));
+        return result;
     }
+
 
     @AllArgsConstructor
     static class ClassesMatchesExactly extends Condition<NamedElementPath> {
