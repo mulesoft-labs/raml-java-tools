@@ -21,6 +21,8 @@ public class NamedElementPath {
 
     public static final String ANY_NAME = ":::";
 
+
+
     @RequiredArgsConstructor(access=AccessLevel.PRIVATE)
     private static class NameTypePair {
         private final Object object;
@@ -40,6 +42,10 @@ public class NamedElementPath {
         return new NamedElementPath(Collections.emptyList());
     }
 
+    public NamedElementPath removeEnd() {
+
+        return new NamedElementPath(domainElements.subList(0, domainElements.size() -2 ));
+    }
 
     public NamedElementPath append(Module m) {
 
@@ -112,6 +118,10 @@ public class NamedElementPath {
         }
     }
 
+    public boolean isRoot() {
+        return domainElements.isEmpty();
+    }
+
     public boolean endMatches(Class<?>... path) {
 
         int diff = domainElements.size() - path.length;
@@ -136,6 +146,12 @@ public class NamedElementPath {
 
         return endMatches(Arrays.stream(things).filter(s -> s instanceof Class<?>).map(s -> (Class<?>) s).toArray(Class[]::new))
                 && endMatches(Arrays.stream(things).filter(s -> s instanceof String).map(s -> (String) s).toArray(String[]::new));
+    }
+
+    public boolean entirelyMatches(Object... things) {
+
+        return entirelyMatches(Arrays.stream(things).filter(s -> s instanceof Class<?>).map(s -> (Class<?>) s).toArray(Class[]::new))
+                && entirelyMatches(Arrays.stream(things).filter(s -> s instanceof String).map(s -> (String) s).toArray(String[]::new));
     }
 
     public boolean entirelyMatches(Class<?>... path) {

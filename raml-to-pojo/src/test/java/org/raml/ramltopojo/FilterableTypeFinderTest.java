@@ -84,7 +84,7 @@ public class FilterableTypeFinderTest {
         Document doc = RamlLoader.load(this.getClass().getResource("big-filter.raml"));
         FilterableTypeFinder finder = new FilterableTypeFinder();
         ArrayList<NamedElementPath> result = new ArrayList<>();
-        finder.findTypes(doc, (p) -> true, (p, s) -> result.add(p));
+        finder.findTypes(doc, (p) -> true, (p, s) -> result.add(p.append(s)));
         return result;
     }
 

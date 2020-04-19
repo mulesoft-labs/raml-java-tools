@@ -27,6 +27,17 @@ public class NamedElementPathTest {
     }
 
     @Test
+    public void removeEnd() {
+
+        NamedElementPath p = NamedElementPath.root()
+                .append(new EndPoint().withPath("/hello"))
+                .append(new Parameter().withName("foo"))
+                .append(new ScalarShape().withName("goo")).removeEnd();
+
+        p.entirelyMatches("/hello", EndPoint.class, "foo", Parameter.class);
+    }
+
+    @Test
     public void endMatches() {
 
         NamedElementPath p = NamedElementPath.root()
