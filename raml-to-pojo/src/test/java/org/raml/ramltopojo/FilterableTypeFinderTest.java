@@ -60,6 +60,16 @@ public class FilterableTypeFinderTest {
         assertThat(result)
                 .areAtLeastOne(thatAllMatchExactly("/first", EndPoint.class, "put", Operation.class, "200", Response.class, "application/json", Payload.class, "foo", NodeShape.class));
     }
+
+    @Test
+    public void findResponseHeaders() {
+
+        ArrayList<NamedElementPath> result = buildResults();
+
+        assertThat(result)
+                .areAtLeastOne(thatAllMatchExactly("/first", EndPoint.class, "put", Operation.class, "200", Response.class, "h2", Parameter.class, "schema", ScalarShape.class));
+    }
+
     @Test
     public void findModules() {
 

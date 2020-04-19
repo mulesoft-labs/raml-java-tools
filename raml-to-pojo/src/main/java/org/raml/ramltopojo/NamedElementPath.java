@@ -18,6 +18,9 @@ import amf.client.model.document.Module;
 @AllArgsConstructor @ToString(of={"domainElements"})
 public class NamedElementPath {
 
+
+    public static final String ANY_NAME = ":::";
+
     @RequiredArgsConstructor(access=AccessLevel.PRIVATE)
     private static class NameTypePair {
         private final Object object;
@@ -26,15 +29,6 @@ public class NamedElementPath {
         public String toString() {
             return objectName + "(" + object.getClass().getSimpleName()  + ")";
         }
-    }
-    public static NameTypePair pair(Object target, String name) {
-
-        return new NameTypePair(target, name);
-    }
-
-    public static NameTypePair pair(Object target, StrField name) {
-
-        return new NameTypePair(target, name.value());
     }
 
     @Getter(AccessLevel.PRIVATE)
@@ -118,7 +112,7 @@ public class NamedElementPath {
         }
     }
 
-    public boolean endMatches(Class<? extends NamedDomainElement>... path) {
+    public boolean endMatches(Class<?>... path) {
 
         int diff = domainElements.size() - path.length;
         if ( diff < 0) {
@@ -128,6 +122,21 @@ public class NamedElementPath {
         return IntStream.range(0, path.length).allMatch(getDiffablePredicate(diff, path));
     }
 
+    public boolean endMatches(String... names) {
+
+        int diff = domainElements.size() - names.length;
+        if ( diff < 0) {
+            return false;
+        }
+
+        return IntStream.range(0, names.length).allMatch(getDiffablePredicate(diff, names));
+    }
+
+    public boolean endMatches(Object... things) {
+
+        return endMatches(Arrays.stream(things).filter(s -> s instanceof Class<?>).map(s -> (Class<?>) s).toArray(Class[]::new))
+                && endMatches(Arrays.stream(things).filter(s -> s instanceof String).map(s -> (String) s).toArray(String[]::new));
+    }
 
     public boolean entirelyMatches(Class<?>... path) {
 
@@ -147,12 +156,17 @@ public class NamedElementPath {
         return IntStream.range(0, path.length).allMatch(getDiffablePredicate(0, path));
     }
 
+    public<T> T elementFromTheEnd(int i) {
+        return (T) domainElements.get(domainElements.size() -i -1).object;
+    }
+
     private IntPredicate getDiffablePredicate(int diff, Class<?>[] path) {
         return i -> path[i].isAssignableFrom(domainElements.get(i + diff).object.getClass());
     }
 
     private IntPredicate getDiffablePredicate(int diff, String[] path) {
-        return i -> path[i].equals(domainElements.get(i + diff).objectName);
+        return i -> path[i].equals(domainElements.get(i + diff).objectName) || path[i].equals(ANY_NAME);
     }
+
 
 }
