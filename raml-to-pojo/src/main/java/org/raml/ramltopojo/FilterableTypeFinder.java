@@ -40,28 +40,30 @@ public class FilterableTypeFinder {
                 NamedElementPath opPath = epPath.append(operation);
 
                 Request request = operation.request();
-                for (Parameter p : request.queryParameters()) {
-                    foundCallback.found(opPath.append(p), (AnyShape) p.schema());
-                }
-
-                for (Parameter p : request.headers()) {
-                    foundCallback.found(opPath.append(p), (AnyShape) p.schema());
-                }
-
-                for (Payload payload: request.payloads()) {
-                    foundCallback.found(opPath.append(payload), (AnyShape) payload.schema());
-                }
-
-                for ( Response response: operation.responses()) {
-
-                    NamedElementPath respPath = opPath.append(response);
-
-                    for (Parameter p : response.headers()) {
-                        foundCallback.found(respPath.append(p), (AnyShape) p.schema());
+                if ( request != null) {
+                    for (Parameter p : request.queryParameters()) {
+                        foundCallback.found(opPath.append(p), (AnyShape) p.schema());
                     }
 
-                    for (Payload payload: response.payloads()) {
-                        foundCallback.found(respPath.append(payload), (AnyShape) payload.schema());
+                    for (Parameter p : request.headers()) {
+                        foundCallback.found(opPath.append(p), (AnyShape) p.schema());
+                    }
+
+                    for (Payload payload : request.payloads()) {
+                        foundCallback.found(opPath.append(payload), (AnyShape) payload.schema());
+                    }
+
+                    for (Response response : operation.responses()) {
+
+                        NamedElementPath respPath = opPath.append(response);
+
+                        for (Parameter p : response.headers()) {
+                            foundCallback.found(respPath.append(p), (AnyShape) p.schema());
+                        }
+
+                        for (Payload payload : response.payloads()) {
+                            foundCallback.found(respPath.append(payload), (AnyShape) payload.schema());
+                        }
                     }
                 }
             }
