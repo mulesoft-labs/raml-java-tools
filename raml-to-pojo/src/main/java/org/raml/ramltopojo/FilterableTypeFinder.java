@@ -52,20 +52,21 @@ public class FilterableTypeFinder {
                     for (Payload payload : request.payloads()) {
                         foundCallback.found(opPath.append(payload), (AnyShape) payload.schema());
                     }
+                }
 
-                    for (Response response : operation.responses()) {
+                for (Response response : operation.responses()) {
 
-                        NamedElementPath respPath = opPath.append(response);
+                    NamedElementPath respPath = opPath.append(response);
 
-                        for (Parameter p : response.headers()) {
-                            foundCallback.found(respPath.append(p), (AnyShape) p.schema());
-                        }
+                    for (Parameter p : response.headers()) {
+                        foundCallback.found(respPath.append(p), (AnyShape) p.schema());
+                    }
 
-                        for (Payload payload : response.payloads()) {
-                            foundCallback.found(respPath.append(payload), (AnyShape) payload.schema());
-                        }
+                    for (Payload payload : response.payloads()) {
+                        foundCallback.found(respPath.append(payload), (AnyShape) payload.schema());
                     }
                 }
+
             }
         });
 
