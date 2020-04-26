@@ -64,7 +64,7 @@ public class RamlToPojoImpl implements RamlToPojo {
     }
 
     @Override
-    public TypeName fetchType(String suggestedName, AnyShape typeDeclaration) {
+    public TypeName fetchTypeName(String suggestedName, AnyShape typeDeclaration) {
 
 
         return ShapeType.calculateTypeName(suggestedName, typeDeclaration, generationContext, EventType.INTERFACE);

@@ -9,8 +9,6 @@ import amf.client.model.document.Module;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.raml.ramltopojo.FilterableTypeFinderTest.AllMatchesExactly.thatAllMatchExactly;
@@ -82,9 +80,10 @@ public class FilterableTypeFinderTest {
 
     private ArrayList<NamedElementPath> buildResults() {
         Document doc = RamlLoader.load(this.getClass().getResource("big-filter.raml"));
+        WebApi webApi = (WebApi)doc.encodes();
         FilterableTypeFinder finder = new FilterableTypeFinder();
         ArrayList<NamedElementPath> result = new ArrayList<>();
-        finder.findTypes(doc, (p) -> true, (p, s) -> result.add(p.append(s)));
+        finder.findTypes(doc, webApi, (p) -> true, (p, s) -> result.add(p.append(s)));
         return result;
     }
 

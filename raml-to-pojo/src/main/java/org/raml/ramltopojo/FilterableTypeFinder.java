@@ -11,11 +11,11 @@ import java.util.stream.Stream;
  */
 public class FilterableTypeFinder {
 
-    public void findTypes(Document api, FilterCallBack filterCallBack, FoundCallback foundCallback) {
+    public void findTypes(Document api, WebApi webApi, FilterCallBack filterCallBack, FoundCallback foundCallback) {
 
         findTypes(
                 api.declares().stream().filter(p -> p instanceof AnyShape).map(s -> (AnyShape)s),
-                ((WebApi)api.encodes()).endPoints().stream(),
+                webApi.endPoints().stream(),
                 api.references().stream()
                         .filter(x -> x instanceof Module)
                         .map(x -> (Module) x),
