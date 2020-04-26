@@ -2,9 +2,7 @@ package org.raml.ramltopojo;
 
 import amf.client.model.document.Document;
 import amf.client.model.document.Module;
-import amf.client.model.domain.AnyShape;
-import amf.client.model.domain.DomainElement;
-import amf.client.model.domain.Shape;
+import amf.client.model.domain.*;
 import amf.client.resolve.Raml08Resolver;
 import amf.client.resolve.Raml10Resolver;
 import amf.client.validate.ValidationReport;
@@ -86,6 +84,14 @@ public class RamlLoader {
 
     public static <T extends Shape> T findShape(final String name, List<DomainElement> types) {
         return types.stream().filter(x -> x instanceof Shape).map(x -> (T)x).filter(input -> input.name().value().equals(name)).findFirst().get();
+    }
+
+    public static <T extends Shape> T findShapeInResourceBody(final String resource, String method, Document document) {
+        EndPoint ep =  ((WebApi)document.encodes()).endPoints()
+                .stream()
+                .filter(t -> t.path().value().equals(resource)).findFirst().orElseThrow(() -> new RuntimeException("Not found"));
+        Operation op = ep.operations().stream().filter(o -> o.method().value().equals(method)).findFirst().orElseThrow(() -> new RuntimeException("Not found"));
+        return (T) op.request().payloads().get(0).schema();
     }
 
     private static Document raml10Resolve(Document d) {

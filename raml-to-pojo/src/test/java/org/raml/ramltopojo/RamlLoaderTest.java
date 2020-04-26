@@ -44,6 +44,48 @@ public class RamlLoaderTest {
     }
 
     @Test
+    public void type_in_resource() throws ExecutionException, InterruptedException {
+
+        Document doc = RamlLoader.load(
+                header() +
+                        "types:\n" +
+                        "    mytype:\n" +
+                        "       type: object\n" +
+                        "       properties:\n" +
+                        "          goo: string\n" +
+                        "/fun:\n" +
+                        "   get:\n" +
+                        "      body:\n" +
+                        "        application/json: \n" +
+                        "            type: mytype\n"
+
+        );
+
+        NodeShape shape = RamlLoader.findShapeInResourceBody("/fun", "get", doc);
+        assertTrue(ExtraInformation.isInline(shape));
+    }
+
+    @Test
+    public void type_in_resource_non_inline() throws ExecutionException, InterruptedException {
+
+        Document doc = RamlLoader.load(
+                header() +
+                        "types:\n" +
+                        "    mytype:\n" +
+                        "       type: object\n" +
+                        "       properties:\n" +
+                        "          goo: string\n" +
+                        "/fun:\n" +
+                        "   get:\n" +
+                        "      body:\n" +
+                        "        application/json: mytype\n"
+
+        );
+
+        NodeShape shape = RamlLoader.findShapeInResourceBody("/fun", "get", doc);
+        assertFalse(ExtraInformation.isInline(shape));
+    }
+    @Test
     public void inline_array() throws ExecutionException, InterruptedException {
 
         Document doc = RamlLoader.load(
