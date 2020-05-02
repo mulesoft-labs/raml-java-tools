@@ -5,6 +5,8 @@ import amf.client.model.domain.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -59,9 +61,15 @@ public class ExtraInformation {
         ArrayNode arrayNode  = new ArrayNode();
         if ( shape instanceof NodeShape ) {
             NodeShape nodeShape = (NodeShape) shape;
-            nodeShape.inherits().stream().filter( i -> i.name().value() != null).forEach(i -> arrayNode.addMember(ScalarTypes.stringNode(i.name().value())) );
+            nodeShape.inherits().stream().map(ExtraInformation::nodeToName).filter(Objects::nonNull).forEach(i -> arrayNode.addMember(ScalarTypes.stringNode(i)) );
         }
 
         node.addProperty("supertypes", arrayNode);
+    }
+
+    private static  String nodeToName(Shape nodeShape) {
+
+        return Optional.ofNullable(nodeShape.name().value())
+                .orElse( nodeShape.linkTarget().filter(ne-> ne instanceof NodeShape).map(ne -> (NodeShape) ne).map(ns -> ns.name().value()).orElse(null));
     }
 }
