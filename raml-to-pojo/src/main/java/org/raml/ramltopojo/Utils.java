@@ -1,9 +1,6 @@
 package org.raml.ramltopojo;
 
-import amf.client.model.domain.AnyShape;
-import amf.client.model.domain.ArrayShape;
-import amf.client.model.domain.PropertyShape;
-import amf.client.model.domain.Shape;
+import amf.client.model.domain.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,15 +34,32 @@ public class Utils {
     static public AnyShape rangeOf(PropertyShape propertyShape) {
 
         Shape shape = propertyShape.range();
-        if ( shape.getClass().equals(AnyShape.class) && shape.inherits().size() == 1) {
-            return (AnyShape) shape.inherits().get(0);
+        if ( shape instanceof RecursiveShape) {
+            RecursiveShape rs = (RecursiveShape) shape;
+            amf.core.model.domain.RecursiveShape recursiveDomain = rs._internal();
+            amf.core.model.domain.Shape deepShape = recursiveDomain.fixpointTarget().get();
+            return new NodeShape((amf.plugins.domain.shapes.models.NodeShape) deepShape);
+        } else {
+            if (shape.getClass().equals(AnyShape.class) && shape.inherits().size() == 1) {
+                return (AnyShape) shape.inherits().get(0);
+            }
+            return (AnyShape) propertyShape.range();
         }
-        return (AnyShape) propertyShape.range();
     }
 
     static public AnyShape items(ArrayShape shape) {
 
-        return (AnyShape) Optional.ofNullable(shape.items()).orElseGet(() -> itemsFromInheritance(shape));
+        // todo make this a bit better.
+        Shape items = shape.items();
+        if ( items instanceof RecursiveShape) {
+            RecursiveShape rs = (RecursiveShape) items;
+            amf.core.model.domain.RecursiveShape recursiveDomain = rs._internal();
+            amf.core.model.domain.Shape deepShape = recursiveDomain.fixpointTarget().get();
+            return new NodeShape((amf.plugins.domain.shapes.models.NodeShape) deepShape);
+        } else {
+
+            return (AnyShape) Optional.ofNullable(shape.items()).orElseGet(() -> itemsFromInheritance(shape));
+        }
     }
 
     private static Shape itemsFromInheritance(ArrayShape shape) {
