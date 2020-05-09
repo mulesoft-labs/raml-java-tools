@@ -19,8 +19,8 @@ public class ExtraInformation {
         return shape.customDomainProperties().stream()
                 .filter(x -> x.name().is("ramltopojo"))
                 .findFirst()
-                .map(x -> (ScalarNode)((ObjectNode)x.extension()).getProperty("inlined").orElse(ScalarTypes.SCALAR_NODE_FALSE))
-                .orElse(ScalarTypes.SCALAR_NODE_FALSE).equals(ScalarTypes.SCALAR_NODE_TRUE);
+                .map(x -> (ScalarNode)((ObjectNode)x.extension()).getProperty("inlined").orElse(ScalarTypes.SCALAR_NODE_TRUE))
+                .orElse(ScalarTypes.SCALAR_NODE_TRUE).equals(ScalarTypes.SCALAR_NODE_TRUE);
     }
 
     public static List<String> parentTypes(Shape shape) {

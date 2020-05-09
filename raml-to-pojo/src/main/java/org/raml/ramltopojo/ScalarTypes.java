@@ -5,11 +5,12 @@ import amf.client.model.domain.ScalarShape;
 import amf.client.model.domain.Shape;
 
 /**
- * Created. There, you have it.
+ * Created. There, you have it. //
  */
 public class ScalarTypes {
     public static final String DATETIME_ONLY_SCALAR = "http://a.ml/vocabularies/shapes#dateTimeOnly";
     public static final String INTEGER_SCALAR = "http://www.w3.org/2001/XMLSchema#integer";
+    public static final String LONG_INTEGER_SCALAR = "http://www.w3.org/2001/XMLSchema#long";
     public static final String BOOLEAN_SCALAR = "http://www.w3.org/2001/XMLSchema#boolean";
     public static final String TIME_ONLY_SCALAR = "http://www.w3.org/2001/XMLSchema#time";
     public static final String DATETIME_SCALAR = "http://www.w3.org/2001/XMLSchema#dateTime";
@@ -24,7 +25,7 @@ public class ScalarTypes {
 
     public static boolean isInteger(Shape shape) {
 
-        return shape instanceof ScalarShape && ((ScalarShape)shape).dataType().is(INTEGER_SCALAR);
+        return shape instanceof ScalarShape && (((ScalarShape)shape).dataType().is(INTEGER_SCALAR) || ((ScalarShape)shape).dataType().is(INTEGER_SCALAR));
     }
     public static boolean isBoolean(Shape shape) {
 
