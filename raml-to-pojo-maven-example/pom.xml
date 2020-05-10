@@ -55,7 +55,7 @@
                         </goals>
                         <configuration>
                             <defaultPackage>foo.foo</defaultPackage>
-                            <ramlFile>${project.build.resources[0].directory}/api.raml</ramlFile>
+                            <ramlFile>${project.build.resources[0].directory}/resourcetype.raml</ramlFile>
                         </configuration>
                     </execution>
                 </executions>

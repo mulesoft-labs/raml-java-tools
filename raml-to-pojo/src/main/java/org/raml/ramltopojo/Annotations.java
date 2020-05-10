@@ -20,7 +20,6 @@ import amf.client.model.document.Document;
 import amf.client.model.domain.*;
 
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
@@ -29,11 +28,6 @@ import static java.util.Collections.emptyList;
  * Created by Jean-Philippe Belanger on 1/2/17. Just potential zeroes and ones
  */
 public abstract class Annotations<T> {
-
-    private interface PluginDefSupplier extends Supplier<PluginDef> {
-
-    }
-
 
 
     public static Annotations<List<PluginDef>> PLUGINS = new Annotations<List<PluginDef>>() {
@@ -46,7 +40,6 @@ public abstract class Annotations<T> {
 
 
     private static <T,R> List<PluginDef> getWithDefaultList(String propName, Annotable target, Annotable... others) {
-        //((ObjectNode)((ArrayNode)((NodeShape) others[0]).customDomainProperties().get(0).extension()).members().get(0)).properties().keySet();
         List<PluginDef> b = Annotations.evaluateAsList(target, others);
         if (b == null) {
 
@@ -71,10 +64,10 @@ public abstract class Annotations<T> {
         ArrayNode arrayNode = null;
         if ( a instanceof Document) {
 
-            arrayNode = (ArrayNode) getExtension((Document) a).orElseGet(DomainExtension::new).extension();
+            arrayNode = (ArrayNode) getExtension("ramltopojo.types", (Document) a).orElseGet(DomainExtension::new).extension();
         } else {
 
-            arrayNode = (ArrayNode) getExtension((Shape) a).orElseGet(DomainExtension::new).extension();
+            arrayNode = (ArrayNode) getExtension("ramltopojo.types", (Shape) a).orElseGet(DomainExtension::new).extension();
         }
 
         return Optional.ofNullable(arrayNode).orElse(new ArrayNode()).members().stream()
@@ -90,30 +83,12 @@ public abstract class Annotations<T> {
 
     }
 
-    private static Optional<DomainExtension> getExtension(Shape a) {
-        return a.customDomainProperties().stream().filter(x -> x.name().is("ramltopojo.types")).findAny();
+    private static Optional<DomainExtension> getExtension(String annotationField, Shape a) {
+        return a.customDomainProperties().stream().filter(x -> x.name().is(annotationField)).findAny();
     }
 
-    private static Optional<DomainExtension> getExtension(Document a) {
-        return a.encodes().customDomainProperties().stream().filter(x -> x.name().is("ramltopojo.types")).findAny();
-    }
-
-    private static DomainExtension findAnnotation(Annotable annotable, String annotation) {
-
-        // ((ObjectNode)((NodeShape) others[0]).customDomainProperties().get(0).extension()).properties()
-
-        ((NodeShape) annotable).customDomainProperties().stream()
-                .filter(c -> "ramltopojo.types".equals(c.name().value()));
-
-        for (DomainExtension extension : annotable.annotations().custom()) {
-
-            if (extension.name().value().equalsIgnoreCase(annotation)) {
-
-                return extension;
-            }
-        }
-
-        return null;
+    private static Optional<DomainExtension> getExtension(String annotationField, Document a) {
+        return a.encodes().customDomainProperties().stream().filter(x -> x.name().is(annotationField)).findAny();
     }
 
     public abstract T getWithContext(Annotable target, Annotable... others);
@@ -139,8 +114,8 @@ public abstract class Annotations<T> {
         return getValueWithDefault(null, type);
     }
 
-    public T get(T def, Annotable type, Annotable... others) {
+    public T get(T defaultValue, Annotable type, Annotable... others) {
 
-        return getValueWithDefault(def, type, others);
+        return getValueWithDefault(defaultValue, type, others);
     }
 }

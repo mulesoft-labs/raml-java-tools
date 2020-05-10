@@ -1,0 +1,33 @@
+#%RAML 1.0
+title: Hello World API
+version: v1
+baseUri: https://api.github.com
+
+types:
+  schema:
+    description:
+      value: "Created by Jean-Philippe Belanger on 3/26/17. Just potential zeroes and ones"
+    properties:
+      name:
+        type:
+          type: string
+          displayName:
+            value: type
+
+resourceTypes:
+  paged:
+    get:
+      responses:
+        200:
+          body:
+            application/json: schema
+#              type: object
+#              properties:
+#                contained: <<resourceType>>
+#                next: string
+#                previous: string
+
+/paged:
+  type:
+    paged:
+      resourceType: string
