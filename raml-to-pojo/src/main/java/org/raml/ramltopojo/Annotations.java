@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 /**
  * Created by Jean-Philippe Belanger on 1/2/17. Just potential zeroes and ones
  */
-public abstract class Annotations<T> {
+public abstract class Annotations<T> implements AnnotationUser<T> {
 
 
     public static Annotations<List<PluginDef>> PLUGINS = new Annotations<List<PluginDef>>() {
@@ -34,7 +34,6 @@ public abstract class Annotations<T> {
             return AnnotationEngine.getWithDefaultList("ramltopojo.plugins", Annotations::mapToPluginDefs, target, others);
         }
     };
-
 
     private static List<PluginDef> mapToPluginDefs(ArrayNode arrayNode) {
         return Optional.ofNullable(arrayNode).orElse(new ArrayNode()).members().stream()
@@ -47,34 +46,5 @@ public abstract class Annotations<T> {
                                 .map(o -> ((ScalarNode)o).value().value())
                                 .collect(Collectors.toList())))
                 .collect(Collectors.toList());
-    }
-
-
-    public abstract T getWithContext(Annotable target, Annotable... others);
-
-    public T getValueWithDefault(T def, Annotable annotable, Annotable... others) {
-
-        T t = getWithContext(annotable, others);
-        if (t == null) {
-
-            return def;
-        } else {
-            return t;
-        }
-    }
-
-    public T get(T def, Annotable type) {
-
-        return getValueWithDefault(def, type);
-    }
-
-    public T get(Annotable type) {
-
-        return getValueWithDefault(null, type);
-    }
-
-    public T get(T defaultValue, Annotable type, Annotable... others) {
-
-        return getValueWithDefault(defaultValue, type, others);
     }
 }

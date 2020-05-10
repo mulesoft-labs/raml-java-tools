@@ -15,6 +15,7 @@ public class PluginDef {
         this.arguments = arguments;
     }
 
+
     public String getPluginName() {
         return pluginName;
     }
