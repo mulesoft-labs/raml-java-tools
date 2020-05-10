@@ -25,6 +25,17 @@ types:
         properties:
           name: string
           lastName: string
+    namedFoo:
+      type: object
+      (ramltopojo.plugins):
+        - name: core.foo
+          arguments:
+            first: foo
+            second: bar
+      properties:
+        name: string
+        lastName: string
+
     too:
         type: object
         (ramltopojo.plugins):

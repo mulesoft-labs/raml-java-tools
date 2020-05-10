@@ -4,6 +4,7 @@ import amf.client.model.document.Document;
 import amf.client.model.domain.Shape;
 import amf.client.validate.ValidationReport;
 import amf.client.validate.ValidationResult;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import org.raml.testutils.UnitTest;
 import webapi.Raml10;
@@ -59,6 +60,18 @@ public class AnnotationsTest extends UnitTest{
         assertEquals(Arrays.asList("alpha", "gamma"), defs.get(1).getArguments());
         assertEquals("core.foo", defs.get(2).getPluginName());
         assertEquals(Arrays.asList("foo", "bar"), defs.get(2).getArguments());
+    }
+
+    @Test
+    public void mappedArguments() throws Exception {
+
+        Document api = getApi();
+        Shape fooType = RamlLoader.findShape("namedFoo", api.declares());
+
+        List<PluginDef> defs = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), fooType);
+        assertEquals(1, defs.size());
+        assertEquals("core.foo", defs.get(0).getPluginName());
+        assertEquals(ImmutableMap.of("first", "foo", "second", "bar"), defs.get(0).getNamedArguments());
     }
 
     @Test

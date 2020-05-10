@@ -39,12 +39,28 @@ public abstract class Annotations<T> implements AnnotationUser<T> {
         return Optional.ofNullable(arrayNode).orElse(new ArrayNode()).members().stream()
                 .filter(n -> n instanceof ObjectNode)
                 .map(n -> (ObjectNode) n)
-                .map(on -> new PluginDef(
+                .map(on -> create(
                         ((ScalarNode)on.properties().get("name")).value().value(),
-                        Optional.ofNullable((ArrayNode) on.properties().get("arguments")).orElseGet(ArrayNode::new).members().stream()
-                                .filter( o -> o instanceof ScalarNode)
-                                .map(o -> ((ScalarNode)o).value().value())
-                                .collect(Collectors.toList())))
+                        Optional.ofNullable(on.properties().get("arguments")).orElseGet(ArrayNode::new)))
                 .collect(Collectors.toList());
+    }
+
+    private static PluginDef create(String name, DataNode dataNode) {
+
+        if (dataNode instanceof ArrayNode ) {
+            return new PluginDef(name,
+                    ((ArrayNode)dataNode).members()
+                            .stream()
+                            .filter( o -> o instanceof ScalarNode)
+                            .map(o -> ((ScalarNode)o).value().value())
+                    .collect(Collectors.toList()));
+        } else {
+
+            return new PluginDef(name,
+                    ((ObjectNode)dataNode).properties()
+                            .entrySet().stream()
+                            .filter( e -> e.getValue() instanceof ScalarNode)
+                            .collect(Collectors.toMap(Map.Entry::getKey, e -> ((ScalarNode) e.getValue()).value().value())));
+        }
     }
 }
