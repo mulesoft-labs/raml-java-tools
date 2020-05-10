@@ -31,7 +31,6 @@ import org.raml.ramltopojo.RamlToPojoBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE_PLUS_RUNTIME;
 import static org.raml.ramltopojo.TypeFetchers.fromAnywhere;
@@ -107,7 +106,7 @@ public class RamlToPojoMojo extends AbstractMojo {
 
             ramlToPojo.buildPojos().createAllTypes(outputDirectory.getAbsolutePath());
 
-        } catch (InterruptedException| IOException| ExecutionException e) {
+        } catch (IOException e) {
 
             throw new MojoExecutionException("execution exception", e);
         }

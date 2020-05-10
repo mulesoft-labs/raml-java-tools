@@ -15,19 +15,19 @@ types:
     properties:
       someArray:
         type: integer[]
-        (ramltopojo.types):
+        (ramltopojo.plugins):
           - name: core.asArray
       anotherArray:
         type: dates[]
-        (ramltopojo.types):
+        (ramltopojo.plugins):
           - name: core.asArray
   dates:
-    (ramltopojo.types):
+    (ramltopojo.plugins):
       - name: core.jackson2
     properties:
       someDate: datetime
   foo:
-    (ramltopojo.types):
+    (ramltopojo.plugins):
       - name: core.equalsAndHashCode
       - name: core.jsr303
       - name: core.jackson2
@@ -46,7 +46,7 @@ types:
             properties:
               another: string
   eater:
-    (ramltopojo.types):
+    (ramltopojo.plugins):
       - name: core.equalsAndHashCode
         arguments: [name]
       - name: core.toString
@@ -59,7 +59,7 @@ types:
       count: integer
       other: foo
   addPropsVerification:
-    (ramltopojo.types):
+    (ramltopojo.plugins):
       - name: core.jackson2
     type: object
     discriminatorValue: myOwnValue
@@ -79,7 +79,7 @@ types:
 
   listHolderParent:
     type: object
-    (ramltopojo.types):
+    (ramltopojo.plugins):
       - name: core.wildcardcollection
         arguments: [java.lang.Object]
     properties:

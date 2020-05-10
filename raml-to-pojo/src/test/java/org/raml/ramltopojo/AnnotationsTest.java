@@ -36,6 +36,16 @@ public class AnnotationsTest extends UnitTest{
     }
 
     @Test
+    public void noAnnotations() throws Exception {
+
+        Document api = getApi();
+        Shape fooType = RamlLoader.findShape("none", api.declares());
+
+        List<PluginDef> defs = Annotations.PLUGINS.get(Collections.<PluginDef>emptyList(), fooType);
+        assertEquals(0, defs.size());
+    }
+
+    @Test
     public void typeAnnotationsReading() throws Exception {
 
         Document api = getApi();

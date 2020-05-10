@@ -5,16 +5,21 @@ version: v1
 baseUri: https://api.github.com
 uses:
   ramltopojo: ramltopojo.raml
-(ramltopojo.types):
+(ramltopojo.plugins):
     - name: core.one
       arguments: [ foo, bar ]
     - name: core.two
       arguments: [ alpha, gamma ]
 
 types:
+    none:
+      type: object
+      properties:
+        name: string
+        lastName: string
     foo:
         type: object
-        (ramltopojo.types):
+        (ramltopojo.plugins):
             - name: core.foo
               arguments: [ foo, bar ]
         properties:
@@ -22,6 +27,6 @@ types:
           lastName: string
     too:
         type: object
-        (ramltopojo.types):
+        (ramltopojo.plugins):
           - name: core.too
           - name: core.moo

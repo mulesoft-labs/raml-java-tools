@@ -3,14 +3,14 @@ uses:
   ramltopojo: ramltopojo.raml
 types:
   PetResponse:
-    (ramltopojo.types):
+    (ramltopojo.plugins):
       - name: core.jackson2
     type: object
     properties:
       myPet: Animal
 
   Animal:
-    (ramltopojo.types):
+    (ramltopojo.plugins):
       - name: core.jackson2
     type: object
     discriminator: animalType
@@ -18,7 +18,7 @@ types:
       animalType: string
 
   Cat:
-    (ramltopojo.types):
+    (ramltopojo.plugins):
       - name: core.jackson2
     type: Animal
     discriminatorValue: CAT
@@ -26,7 +26,7 @@ types:
       legs: integer
 
   Fish:
-    (ramltopojo.types):
+    (ramltopojo.plugins):
       - name: core.jackson2
     type: Animal
     discriminatorValue: FISH
