@@ -16,14 +16,10 @@
 package org.raml.ramltopojo;
 
 import amf.client.model.Annotable;
-import amf.client.model.document.Document;
 import amf.client.model.domain.*;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static java.util.Collections.emptyList;
 
 /**
  * Created by Jean-Philippe Belanger on 1/2/17. Just potential zeroes and ones
@@ -35,7 +31,7 @@ public abstract class Annotations<T> {
 
         @Override
         public List<PluginDef> getWithContext(Annotable target, Annotable... others) {
-            return Annotations.getWithDefaultList("ramltopojo.plugins", Annotations::mapToPluginDefs, target, others);
+            return AnnotationEngine.getWithDefaultList("ramltopojo.plugins", Annotations::mapToPluginDefs, target, others);
         }
     };
 
@@ -53,48 +49,6 @@ public abstract class Annotations<T> {
                 .collect(Collectors.toList());
     }
 
-    private static <T> List<T> getWithDefaultList(String propName, Function<ArrayNode, List<T>> mapToType, Annotable target, Annotable... others) {
-        List<T> b = Annotations.evaluateAsList(propName, mapToType, target, others);
-        if (b == null) {
-
-            return emptyList();
-        } else {
-            return b;
-        }
-    }
-
-
-    public static<T> List<T> evaluateAsList(String annotationField, Function<ArrayNode, List<T>> mapToType, Annotable mandatory,  Annotable... others) {
-
-        List<Annotable> targets = new ArrayList<>();
-        targets.add(mandatory);
-        targets.addAll(Arrays.asList(others));
-
-        return targets.stream()
-                .map(a -> arrayNodes(annotationField, a))
-                .map(mapToType)
-                .flatMap(Collection::stream).collect(Collectors.toList());
-    }
-
-    private static ArrayNode arrayNodes(String annotationField, Annotable a ) {
-
-        if ( a instanceof Document) {
-
-            return (ArrayNode) getExtension(annotationField, (Document) a).orElseGet(DomainExtension::new).extension();
-        } else {
-
-            return (ArrayNode) getExtension(annotationField, (Shape) a).orElseGet(DomainExtension::new).extension();
-        }
-    }
-
-
-    private static Optional<DomainExtension> getExtension(String annotationField, Shape a) {
-        return a.customDomainProperties().stream().filter(x -> x.name().is(annotationField)).findAny();
-    }
-
-    private static Optional<DomainExtension> getExtension(String annotationField, Document a) {
-        return a.encodes().customDomainProperties().stream().filter(x -> x.name().is(annotationField)).findAny();
-    }
 
     public abstract T getWithContext(Annotable target, Annotable... others);
 
