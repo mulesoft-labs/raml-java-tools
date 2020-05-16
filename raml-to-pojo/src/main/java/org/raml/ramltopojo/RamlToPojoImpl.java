@@ -11,12 +11,10 @@ import java.util.Optional;
  * Created. There, you have it.
  */
 public class RamlToPojoImpl implements RamlToPojo {
-    private final TypeFinder typeFinder;
     private final GenerationContextImpl generationContext;
 
-    public RamlToPojoImpl( TypeFinder typeFinder, GenerationContextImpl generationContext) {
+    public RamlToPojoImpl( GenerationContextImpl generationContext) {
 
-        this.typeFinder = typeFinder;
         this.generationContext = generationContext;
     }
 
@@ -25,7 +23,7 @@ public class RamlToPojoImpl implements RamlToPojo {
 
         ResultingPojos resultingPojos = new ResultingPojos(generationContext);
 
-        List<AnyShape> allShapes = Lists.newArrayList(typeFinder.findTypes(generationContext.api()));
+        List<AnyShape> allShapes = Lists.newArrayList(generationContext.allKnownTypes());
         allShapes.stream()
                 .filter(a ->  ! ExtraInformation.isInline(a))
                 .forEach( a -> generationContext.newTypeName(
@@ -53,25 +51,26 @@ public class RamlToPojoImpl implements RamlToPojo {
     }
 
     @Override
-    public ResultingPojos buildPojo(String suggestedJavaName, AnyShape typeDeclaration) {
+    public ResultingPojos buildPojo(String suggestedJavaName, String typeId) {
+
+        AnyShape shape = (AnyShape) generationContext.api()
+                .findById(typeId)
+                .filter(t -> t instanceof AnyShape).orElseThrow(() -> new GenerationException("no such type id: " + typeId));
 
         ResultingPojos resultingPojos = new ResultingPojos(generationContext);
 
-        Optional<CreationResult> spec = CreationResultFactory.createNamedType(suggestedJavaName, typeDeclaration, generationContext);
+        Optional<CreationResult> spec = CreationResultFactory.createNamedType(suggestedJavaName, shape, generationContext);
         spec.ifPresent(resultingPojos::addNewResult);
 
         return resultingPojos;
     }
 
     @Override
-    public TypeName fetchTypeName(String suggestedName, AnyShape typeDeclaration) {
+    public TypeName attributeTypeToName(String suggestedName, String typeId) {
 
-
-        return ShapeType.calculateTypeName(suggestedName, typeDeclaration, generationContext, EventType.INTERFACE);
-    }
-
-    public boolean isInline(AnyShape typeDeclaration) {
-
-        return ShapeType.isNewInlineType(typeDeclaration);
+        AnyShape shape = (AnyShape) generationContext.api()
+                .findById(typeId)
+                .filter(t -> t instanceof AnyShape).orElseThrow(() -> new GenerationException("no such type id: " + typeId));
+        return ShapeType.calculateTypeName(suggestedName, shape, generationContext, EventType.INTERFACE);
     }
 }

@@ -16,9 +16,11 @@ import org.raml.ramltopojo.extensions.ArrayPluginContext;
 import org.raml.ramltopojo.extensions.ArrayTypeHandlerPlugin;
 import org.raml.ramltopojo.extensions.ReferencePluginContext;
 import org.raml.ramltopojo.extensions.ReferenceTypeHandlerPlugin;
+import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.testutils.UnitTest;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -94,7 +96,7 @@ public class ArrayTypeHandlerTest extends UnitTest {
         ArrayTypeHandler handler = new ArrayTypeHandler("foo", typearray);
 
 
-        GenerationContextImpl generationContext = new GenerationContextImpl(api);
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (x) -> true, (x,y) -> {}, "bar.pack", Collections.<String>emptyList());
         CreationResult r = handler.create(generationContext, new CreationResult(typearray, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         assertFalse(r.getImplementation().isPresent());
@@ -110,7 +112,7 @@ public class ArrayTypeHandlerTest extends UnitTest {
         ArrayTypeHandler handler = new ArrayTypeHandler("foo", typebracketarray);
 
 
-        GenerationContextImpl generationContext = new GenerationContextImpl(api);
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (x) -> true, (x,y) -> {}, "bar.pack", Collections.<String>emptyList());
         CreationResult r = handler.create(generationContext, new CreationResult(typebracketarray, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         assertFalse(r.getImplementation().isPresent());

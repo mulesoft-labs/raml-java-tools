@@ -1,9 +1,12 @@
 package org.raml.ramltopojo;
 
 import amf.client.model.document.Document;
+import amf.client.model.document.Module;
 import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.Shape;
+import amf.client.model.domain.WebApi;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.squareup.javapoet.ClassName;
@@ -17,6 +20,8 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Created. There, you have it.
@@ -25,7 +30,6 @@ public class GenerationContextImpl implements GenerationContext {
 
     private final PluginManager pluginManager;
     private final Document api;
-    private final TypeFetcher typeFetcher;
     private final ConcurrentHashMap<String, CreationResult> knownTypes = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, TypeName> typeNames = new ConcurrentHashMap<>();
 
@@ -34,17 +38,38 @@ public class GenerationContextImpl implements GenerationContext {
     private final List<String> basePlugins;
     private Map<String, TypeSpec> supportClasses = new HashMap<>();
     private Map<String, AnyShape> realTypes = new HashMap<>();
+    private final Supplier<Map<String, NamedType>> namedTypes;
 
     public GenerationContextImpl(Document api) {
-        this(PluginManager.NULL, api, TypeFetchers.NULL_FETCHER, "", Collections.<String>emptyList());
+        this(PluginManager.NULL, api, new FilterableTypeFinder(), (path) -> path.endMatches(Module.class) || path.isRoot(),(x,y) -> {} , "", Collections.<String>emptyList());
     }
 
-    public GenerationContextImpl(PluginManager pluginManager, Document api, TypeFetcher typeFetcher, String defaultPackage, List<String> basePlugins) {
+    public GenerationContextImpl(PluginManager pluginManager, Document api, FilterableTypeFinder filterableTypeFinder, FilterCallBack typeFilter, FoundCallback typeFinder, String defaultPackage, List<String> basePlugins) {
+
         this.pluginManager = pluginManager;
         this.api = api;
-        this.typeFetcher = typeFetcher;
         this.defaultPackage = defaultPackage;
         this.basePlugins = basePlugins;
+        this.namedTypes = Suppliers.memoize(() -> buildTypeMap(api, filterableTypeFinder, typeFilter, typeFinder));
+    }
+
+    public static Map<String, NamedType> buildTypeMap(Document api, FilterableTypeFinder filterableTypeFinder, FilterCallBack typeFilter, FoundCallback typeFinder) {
+
+        Map<String, NamedType> types = new HashMap<>();
+        filterableTypeFinder.findTypes(api, (WebApi) api.encodes(), typeFilter, (parentPath, shape) -> handleType(parentPath, shape, typeFinder, types));
+        return types;
+    }
+
+    private static void handleType(NamedElementPath parentPath, AnyShape shape, FoundCallback typeFinder, Map<String, NamedType> types) {
+        typeFinder.found(parentPath, shape);
+
+        // ? if (path.endMatches(Module.class) || path.isRoot()) {
+        types.put(shape.id(), new NamedType(shape, shape.name().option().orElse("unnamed")));
+    }
+
+
+    public List<AnyShape> allKnownTypes() {
+        return namedTypes.get().values().stream().map((e) -> e.getShape()).collect(Collectors.toList());
     }
 
     public void newTypeName(String name, TypeName typeName) {
@@ -86,8 +111,11 @@ public class GenerationContextImpl implements GenerationContext {
             return knownTypes.get(typeName);
         } else {
 
-            Shape typeDeclaration = typeFetcher.fetchType(api, typeName);
-            Optional<CreationResult> result =  CreationResultFactory.createType((AnyShape) typeDeclaration, this);
+            AnyShape typeDeclaration = namedTypes.get().values().stream()
+                    .filter(e -> e.getName().equals(typeName))
+                    .findFirst().map(NamedType::getShape)
+                    .orElseThrow(() -> new GenerationException("no type named " + typeName));
+            Optional<CreationResult> result =  CreationResultFactory.createType(typeDeclaration, this);
 
             // todo fix this.
             if ( result.isPresent() ) {
@@ -213,4 +241,5 @@ public class GenerationContextImpl implements GenerationContext {
     public Document api() {
         return api;
     }
+
 }

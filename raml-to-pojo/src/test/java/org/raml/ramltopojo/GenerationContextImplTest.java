@@ -4,10 +4,12 @@ import amf.client.model.domain.NodeShape;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.testutils.UnitTest;
 import webapi.WebApiParser;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertThat;
@@ -32,7 +34,7 @@ public class GenerationContextImplTest extends UnitTest{
         type1 = (NodeShape) type1.withInherits(Arrays.asList(type2, type3));
         type2 = (NodeShape) type2.withInherits(Arrays.asList(type3, type4));
 
-        GenerationContextImpl impl = new GenerationContextImpl(null);
+        GenerationContextImpl impl = new GenerationContextImpl(PluginManager.NULL, null, new FilterableTypeFinder(), (x) -> true, (x,y) -> {}, "bar.pack", Collections.<String>emptyList());
         impl.setupTypeHierarchy("type1", type1);
 
         assertThat(impl.childClasses("type2"), Matchers.contains(Matchers.equalTo("type1")));

@@ -6,9 +6,9 @@ import com.squareup.javapoet.ClassName;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.raml.ramltopojo.CreationResult;
+import org.raml.ramltopojo.FilterableTypeFinder;
 import org.raml.ramltopojo.GenerationContextImpl;
 import org.raml.ramltopojo.RamlLoader;
-import org.raml.ramltopojo.TypeFetchers;
 import org.raml.ramltopojo.plugin.PluginManager;
 import org.raml.testutils.UnitTest;
 import org.raml.testutils.matchers.FieldSpecMatchers;
@@ -34,7 +34,7 @@ public class EnumerationTypeHandlerTest extends UnitTest {
         Document api = RamlLoader.load(this.getClass().getResource("stringenum.raml"));
         ScalarShape enumShape = findShape("days", api.declares());
         EnumerationTypeHandler handler = new EnumerationTypeHandler("days", enumShape);
-        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (x) -> true, (x, y) -> {}, "bar.pack", Collections.<String>emptyList());
         generationContext.newExpectedType("Days", new CreationResult(enumShape, "bar.pack", ClassName.get("bar.pack", "Days"), null));
 
         CreationResult result = handler.create(generationContext, new CreationResult(enumShape, "bar.pack", ClassName.get("bar.pack", "Days"), null)).get();
@@ -56,7 +56,7 @@ public class EnumerationTypeHandlerTest extends UnitTest {
         Document api = RamlLoader.load(this.getClass().getResource("stringenum.raml"));
         ScalarShape enumShape = findShape("time", api.declares());
         EnumerationTypeHandler handler = new EnumerationTypeHandler("time", enumShape);
-        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (x) -> true, (x,y) -> {}, "bar.pack", Collections.<String>emptyList());
         generationContext.newExpectedType("Time", new CreationResult(enumShape, "bar.pack", ClassName.get("bar.pack", "Time"), null));
 
         CreationResult result = handler.create(generationContext, new CreationResult(enumShape, "bar.pack", ClassName.get("bar.pack", "Time"), null)).get();

@@ -10,8 +10,8 @@ public interface RamlToPojo {
 
     ResultingPojos buildPojos();
     ResultingPojos buildPojo(AnyShape typeDeclaration);
-    ResultingPojos buildPojo(String suggestedJavaName, AnyShape typeDeclaration);
 
-    TypeName fetchTypeName(String suggestedName, AnyShape typeDeclaration);
-    boolean isInline(AnyShape typeDeclaration);
+
+    ResultingPojos buildPojo(String suggestedJavaName, String typeId);
+    TypeName attributeTypeToName(String suggestedName, String typeId);
 }

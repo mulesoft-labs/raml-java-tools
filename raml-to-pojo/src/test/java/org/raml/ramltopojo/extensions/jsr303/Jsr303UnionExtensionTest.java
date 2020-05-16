@@ -20,7 +20,7 @@ public class Jsr303UnionExtensionTest {
     public void unionValidation() throws Exception {
 
         Document api = RamlLoader.load(this.getClass().getResource("union-type.raml"));
-        RamlToPojo ramlToPojo = new RamlToPojoBuilder(api).fetchTypes(TypeFetchers.fromAnywhere()).findTypes(TypeFinders.everyWhere()).build(Arrays.asList("core.jsr303"));
+        RamlToPojo ramlToPojo = new RamlToPojoBuilder(api).build(Arrays.asList("core.jsr303"));
         CreationResult r = ramlToPojo.buildPojos().creationResults().stream().filter(x -> x.getJavaName(EventType.INTERFACE).simpleName().equals("Foo")).findFirst().get();
 
         System.err.println(r.getInterface().toString());

@@ -33,8 +33,6 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.apache.maven.plugins.annotations.ResolutionScope.COMPILE_PLUS_RUNTIME;
-import static org.raml.ramltopojo.TypeFetchers.fromAnywhere;
-import static org.raml.ramltopojo.TypeFinders.everyWhere;
 
 @Mojo(name = "generate", requiresProject = true, threadSafe = false, requiresDependencyResolution = COMPILE_PLUS_RUNTIME,
         defaultPhase = LifecyclePhase.GENERATE_SOURCES)
@@ -101,8 +99,7 @@ public class RamlToPojoMojo extends AbstractMojo {
             Document api = RamlLoader.load(ramlFile.toURL().toString());
             RamlToPojo ramlToPojo = RamlToPojoBuilder.builder(api)
                     .inPackage(defaultPackage)
-                    .fetchTypes(fromAnywhere())
-                    .findTypes(everyWhere()).build(basePlugins);
+                    .build(basePlugins);
 
             ramlToPojo.buildPojos().createAllTypes(outputDirectory.getAbsolutePath());
 

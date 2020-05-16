@@ -9,22 +9,27 @@ import java.util.List;
 /**
  * Created. There, you have it.
  */
-public class RamlToPojoBuilder {
 
+public class RamlToPojoBuilder {
 
     private final Document api;
     private String packageName = "";
-    private TypeFetcher typeFetcher;
-    private TypeFinder typeFinder;
+    private FilterCallBack typeFilter = (x) -> true;
+    private FoundCallback typeFinder = (x,y) -> {};
 
     public RamlToPojoBuilder(Document api) {
 
         this.api = api;
     }
 
-    public static RamlToPojoBuilder builder(Document api) {
+    public RamlToPojoBuilder typeFilter(FilterCallBack filterCallBack) {
+        this.typeFilter = filterCallBack;
+        return this;
+    }
 
-        return new RamlToPojoBuilder(api);
+    public RamlToPojoBuilder typeFinder(FoundCallback foundCallback) {
+        this.typeFinder = foundCallback;
+        return this;
     }
 
     public RamlToPojoBuilder inPackage(String packageName) {
@@ -33,17 +38,11 @@ public class RamlToPojoBuilder {
         return this;
     }
 
-    public RamlToPojoBuilder fetchTypes(TypeFetcher typeFetcher) {
+    public static RamlToPojoBuilder builder(Document api) {
 
-        this.typeFetcher = typeFetcher;
-        return this;
+        return new RamlToPojoBuilder(api);
     }
 
-    public RamlToPojoBuilder findTypes(TypeFinder typeFinder) {
-
-        this.typeFinder = typeFinder;
-        return this;
-    }
 
     public RamlToPojo build() {
 
@@ -52,7 +51,7 @@ public class RamlToPojoBuilder {
 
     public RamlToPojo build(List<String> basePlugins) {
 
-        return new RamlToPojoImpl(typeFinder, new GenerationContextImpl(PluginManager.createPluginManager(), api, typeFetcher, packageName, basePlugins));
+        return new RamlToPojoImpl(new GenerationContextImpl(PluginManager.createPluginManager(), api, new FilterableTypeFinder(), typeFilter, typeFinder, packageName, basePlugins));
     }
 
 

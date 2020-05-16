@@ -35,7 +35,7 @@ public class UnionTypeHandlerTest {
         UnionShape foo = findTypes("foo", api.declares());
         UnionTypeHandler handler = new UnionTypeHandler("foo", foo);
 
-        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api,TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (x) -> true, (x,y) -> {}, "bar.pack", Collections.<String>emptyList());
         generationContext.newExpectedType("foo",new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl")));
         CreationResult r = handler.create(generationContext,new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
@@ -75,7 +75,7 @@ public class UnionTypeHandlerTest {
         UnionShape foo = findTypes("foo", api.declares());
         UnionTypeHandler handler = new UnionTypeHandler("foo", foo);
 
-        CreationResult r = handler.create(new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack",Collections.<String>emptyList()),new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+        CreationResult r = handler.create(new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (x) -> true, (x,y) -> {}, "bar.pack", Collections.<String>emptyList()),new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         assertThat(r.getInterface(), is(allOf(name(equalTo("Foo")), methods(containsInAnyOrder(
             allOf(methodName(equalTo("getUnionType")), returnType(equalTo(ClassName.get("bar.pack", "Foo.UnionType")))),
@@ -112,7 +112,7 @@ public class UnionTypeHandlerTest {
         Document api = RamlLoader.load(this.getClass().getResource("union-array-type.raml"));
         UnionTypeHandler handler = new UnionTypeHandler("foo", findTypes("foo", api.declares()));
 
-        handler.create(new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack",Collections.<String>emptyList()), null);
+        handler.create(new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (x) -> true, (x,y) -> {}, "bar.pack", Collections.<String>emptyList()), null);
     }
 
     @Test
@@ -122,7 +122,7 @@ public class UnionTypeHandlerTest {
         UnionShape foo = findTypes("foo", api.declares());
         UnionTypeHandler handler = new UnionTypeHandler("foo", foo);
 
-        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api,TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (x) -> true, (x,y) -> {}, "bar.pack", Collections.<String>emptyList());
         CreationResult r = handler.create(generationContext, new CreationResult(foo, generationContext.defaultPackage(),ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         assertThat(r.getInterface(), is(allOf(name(equalTo("Foo")), methods(containsInAnyOrder(
@@ -156,7 +156,7 @@ public class UnionTypeHandlerTest {
     @Test
     public void datesUnion() throws Exception {
         Document api = RamlLoader.load(this.getClass().getResource("union-dates.raml"));
-        RamlToPojo ramlToPojo = new RamlToPojoBuilder(api).fetchTypes(TypeFetchers.fromAnywhere()).findTypes(TypeFinders.everyWhere()).build(Arrays.asList("core.jackson2"));
+        RamlToPojo ramlToPojo = new RamlToPojoBuilder(api).build(Arrays.asList("core.jackson2"));
         ramlToPojo.buildPojos().creationResults().forEach(x -> {
             System.err.println(x.getInterface().toString());
             System.err.println(x.getImplementation().toString());

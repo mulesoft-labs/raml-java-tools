@@ -28,7 +28,7 @@ public class JacksonUnionExtensionTest {
     public void complexInlineUnion() throws Exception {
 
         Document api = RamlLoader.load(this.getClass().getResource("union-mix-type.raml"));
-        RamlToPojo ramlToPojo = new RamlToPojoBuilder(api).fetchTypes(TypeFetchers.fromAnywhere()).findTypes(TypeFinders.everyWhere()).build(Arrays.asList("core.jackson2"));
+        RamlToPojo ramlToPojo = new RamlToPojoBuilder(api).build(Arrays.asList("core.jackson2"));
         CreationResult r = ramlToPojo.buildPojos().creationResults().stream().filter(x -> x.getJavaName(EventType.INTERFACE).simpleName().equals("Foo")).findFirst().get();
 
         System.err.println(r.getInterface().toString());
@@ -81,7 +81,7 @@ public class JacksonUnionExtensionTest {
     @Test(expected = GenerationException.class)
     public void ambiguousUnion() throws Exception {
         Document api = RamlLoader.load(this.getClass().getResource("union-ambiguous-type.raml"));
-        RamlToPojo ramlToPojo = new RamlToPojoBuilder(api).fetchTypes(TypeFetchers.fromAnywhere()).findTypes(TypeFinders.everyWhere()).build(Arrays.asList("core.jackson2"));
+        RamlToPojo ramlToPojo = new RamlToPojoBuilder(api).build(Arrays.asList("core.jackson2"));
         ramlToPojo.buildPojos().creationResults();
     }
 }
