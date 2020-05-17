@@ -4,6 +4,7 @@ import amf.client.model.domain.*;
 import com.google.common.collect.ImmutableMap;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
+import org.raml.ramltopojo.amf.ExtraInformationImpl;
 import org.raml.ramltopojo.array.ArrayTypeHandler;
 import org.raml.ramltopojo.enumeration.EnumerationTypeHandler;
 import org.raml.ramltopojo.nulltype.NullTypeHandler;
@@ -74,7 +75,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         @Override
         public boolean shouldCreateInlineType(AnyShape declaration) {
 
-            return ExtraInformation.isInline(declaration);
+            return ExtraInformationImpl.isInline(declaration);
         }
     },
     ENUMERATION {
@@ -87,7 +88,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         @Override
         public boolean shouldCreateInlineType(AnyShape declaration) {
         //    return "string".equals(declaration.name().value()) || "number".equals(declaration.name().value()) || "integer".equals(declaration.name().value());
-            return ExtraInformation.isInline(declaration);
+            return ExtraInformationImpl.isInline(declaration);
         }
     },
     ARRAY {
@@ -116,7 +117,7 @@ public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
         public boolean shouldCreateInlineType(AnyShape declaration) {
 
             // this seems wrong.
-            return ExtraInformation.isInline(declaration);
+            return ExtraInformationImpl.isInline(declaration);
         }
     },
     INTEGER {

@@ -13,6 +13,8 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import org.raml.ramltopojo.amf.ExtraInformation;
+import org.raml.ramltopojo.amf.ExtraInformationImpl;
 import org.raml.ramltopojo.extensions.*;
 import org.raml.ramltopojo.plugin.PluginManager;
 
@@ -33,7 +35,7 @@ public class GenerationContextImpl implements GenerationContext {
     private final ConcurrentHashMap<String, CreationResult> knownTypes = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, TypeName> typeNames = new ConcurrentHashMap<>();
 
-    private final SetMultimap<String, String> childTypes = HashMultimap.create();
+    private final SetMultimap<String, AnyShape> childTypes = HashMultimap.create();
     private final String defaultPackage;
     private final List<String> basePlugins;
     private Map<String, TypeSpec> supportClasses = new HashMap<>();
@@ -41,7 +43,8 @@ public class GenerationContextImpl implements GenerationContext {
     private final Supplier<Map<String, NamedType>> namedTypes;
 
     public GenerationContextImpl(Document api) {
-        this(PluginManager.NULL, api, new FilterableTypeFinder(), (path) -> path.endMatches(Module.class) || path.isRoot(),(x,y) -> {} , "", Collections.<String>emptyList());
+        this(PluginManager.NULL, api, new FilterableTypeFinder(), (path) -> path.endMatches(Module.class) || path.isRoot(), (x, y) -> {
+        }, "", Collections.<String>emptyList());
     }
 
     public GenerationContextImpl(PluginManager pluginManager, Document api, FilterableTypeFinder filterableTypeFinder, FilterCallBack typeFilter, FoundCallback typeFinder, String defaultPackage, List<String> basePlugins) {
@@ -64,29 +67,39 @@ public class GenerationContextImpl implements GenerationContext {
         typeFinder.found(parentPath, shape);
 
         // ? if (path.endMatches(Module.class) || path.isRoot()) {
-        types.put(shape.id(), new NamedType(shape, shape.name().option().orElse("unnamed")));
+        NamedType namedType = new NamedType(shape, shape.name().option().orElse("unnamed"));
+        types.put(shape.id(), namedType);
+        types.put(ExtraInformationImpl.oldId(shape), namedType);
     }
 
+    public ShapeTool shapeTool() {
+
+        return new ShapeTool(this, ExtraInformation.extraInformation());
+    }
 
     public List<AnyShape> allKnownTypes() {
-        return namedTypes.get().values().stream().map((e) -> e.getShape()).collect(Collectors.toList());
+        // todo this is wrong, we get twice the stuff.
+        return namedTypes.get().values().stream().map(NamedType::getShape).collect(Collectors.toList());
+    }
+
+    public Optional<AnyShape> findShapeById(String typeId) {
+
+        return Optional.ofNullable(namedTypes.get().get(typeId)).map(NamedType::getShape);
     }
 
     public void newTypeName(String name, TypeName typeName) {
         this.typeNames.put(name, typeName);
     }
 
-    public void setupTypeHierarchy(String actualName, AnyShape typeDeclaration) {
+    public void setupTypeHierarchy(String actualName, AnyShape forShape) {
 
-        if ( actualName != null && ! realTypes.containsKey(actualName) ) {
-            realTypes.put(actualName, typeDeclaration);
+        if (actualName != null && !realTypes.containsKey(actualName)) {
+            realTypes.put(actualName, forShape);
         }
-        if ( typeDeclaration instanceof NodeShape) {
-            for (String parent:  ExtraInformation.parentTypes(typeDeclaration)) {
+        if (forShape instanceof NodeShape) {
+            for (AnyShape parent : shapeTool().parentShapes(forShape)) {
 
-                if (parent != null && !parent.equals(actualName)) {
-                    childTypes.put(parent, actualName);
-                }
+                childTypes.put(parent.id(), forShape);
             }
         }
     }
@@ -97,31 +110,23 @@ public class GenerationContextImpl implements GenerationContext {
     }
 
     @Override
-    public AnyShape findOriginalDeclaredName(String name) {
-        // really stupid
-        return realTypes.get(name);
-    }
-
-    @Override
-    public CreationResult findCreatedType(String typeName, Shape ramlType) {
+    public CreationResult findCreatedType(String typeId) {
 
 
-        if ( knownTypes.containsKey(typeName) ) {
+        if (knownTypes.containsKey(typeId)) {
 
-            return knownTypes.get(typeName);
+            return knownTypes.get(typeId);
         } else {
 
-            AnyShape typeDeclaration = namedTypes.get().values().stream()
-                    .filter(e -> e.getName().equals(typeName))
-                    .findFirst().map(NamedType::getShape)
-                    .orElseThrow(() -> new GenerationException("no type named " + typeName));
-            Optional<CreationResult> result =  CreationResultFactory.createType(typeDeclaration, this);
+            //AnyShape foundShape = Optional.ofNullable(namedTypes.get().get(typeId)).map(NamedType::getShape).orElseThrow(() -> new GenerationException("no type with id " + typeId));
+            AnyShape foundShape = (AnyShape) api.findById(typeId).orElseThrow(() -> new GenerationException("no type with id " + typeId));
+            Optional<CreationResult> result = CreationResultFactory.createType(foundShape, this);
 
             // todo fix this.
-            if ( result.isPresent() ) {
-                knownTypes.put(typeName, result.get());
+            if (result.isPresent()) {
+                knownTypes.put(typeId, result.get());
                 return result.get();
-            }  else {
+            } else {
                 return null;
             }
         }
@@ -134,8 +139,8 @@ public class GenerationContextImpl implements GenerationContext {
 
 
     @Override
-    public Set<String> childClasses(String ramlTypeName) {
-        return childTypes.get(ramlTypeName);
+    public Set<AnyShape> childClasses(String typeId) {
+        return childTypes.get(typeId);
     }
 
     @Override
@@ -165,7 +170,7 @@ public class GenerationContextImpl implements GenerationContext {
         }
     }
 
-    private<T> void loadBasePlugins(Set<T> plugins, Class<T> pluginType, Shape... typeDeclarations) {
+    private <T> void loadBasePlugins(Set<T> plugins, Class<T> pluginType, Shape... typeDeclarations) {
 
         for (String basePlugin : basePlugins) {
             plugins.addAll(pluginManager.getClassesForName(basePlugin, Collections.<String>emptyList(), pluginType));
@@ -177,7 +182,7 @@ public class GenerationContextImpl implements GenerationContext {
 
 
         TypeSpec typeSpec = newSupportType.build();
-        if ( supportClasses.containsKey(typeSpec.name) ) {
+        if (supportClasses.containsKey(typeSpec.name)) {
 
             TypeSpec builder = supportClasses.get(typeSpec.name);
             return ClassName.get(this.defaultPackage, builder.name);
@@ -197,7 +202,7 @@ public class GenerationContextImpl implements GenerationContext {
         for (PluginDef datum : data) {
             Set<T> classesForName = pluginManager.getClassesForName(datum.getPluginName(), datum.getArguments(), ofType);
             for (T somePlugin : classesForName) {
-                plugins.removeIf(x ->  x.getClass() == somePlugin.getClass());
+                plugins.removeIf(x -> x.getClass() == somePlugin.getClass());
             }
             plugins.addAll(classesForName);
         }

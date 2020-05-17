@@ -3,6 +3,7 @@ package org.raml.ramltopojo;
 import amf.client.model.domain.AnyShape;
 import com.google.common.collect.Lists;
 import com.squareup.javapoet.TypeName;
+import org.raml.ramltopojo.amf.ExtraInformationImpl;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +26,7 @@ public class RamlToPojoImpl implements RamlToPojo {
 
         List<AnyShape> allShapes = Lists.newArrayList(generationContext.allKnownTypes());
         allShapes.stream()
-                .filter(a ->  ! ExtraInformation.isInline(a))
+                .filter(a ->  ! ExtraInformationImpl.isInline(a))
                 .forEach( a -> generationContext.newTypeName(
                         a.name().value(),
                         ShapeType.calculateTypeName(a.name().value(), a, generationContext, EventType.INTERFACE)));

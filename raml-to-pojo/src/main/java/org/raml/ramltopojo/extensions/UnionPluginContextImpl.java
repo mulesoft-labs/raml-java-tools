@@ -33,7 +33,7 @@ public class UnionPluginContextImpl implements UnionPluginContext {
 
     @Override
     public CreationResult unionClass(AnyShape ramlType) {
-        return generationContext.findCreatedType(ramlType.name().value(), ramlType);
+        return generationContext.findCreatedType(ramlType.id());
     }
 
     @Override
@@ -42,8 +42,8 @@ public class UnionPluginContextImpl implements UnionPluginContext {
     }
 
     @Override
-    public List<String> parentTypes(NodeShape otd) {
+    public List<AnyShape> parentTypes(NodeShape otd) {
 
-        return ExtraInformation.parentTypes(generationContext.findOriginalDeclaredName(otd.name().value()));
+        return generationContext.shapeTool().parentShapes(otd);
     }
 }

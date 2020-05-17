@@ -17,7 +17,7 @@ import java.util.Set;
  */
 public interface GenerationContext {
 
-    CreationResult findCreatedType(String typeName, Shape ramlType);
+    CreationResult findCreatedType(String typeId);
     Optional<TypeName> findTypeNameByRamlName(String ramlName);
 
     String defaultPackage();
@@ -33,12 +33,12 @@ public interface GenerationContext {
 
     void setupTypeHierarchy(String actualName, AnyShape typeDeclaration);
     Document api();
-    Set<String> childClasses(String ramlTypeName);
+    Set<AnyShape> childClasses(String typeId);
     ClassName buildDefaultClassName(String name, EventType eventType);
 
     void createSupportTypes(String rootDirectory) throws IOException;
 
     TypeName createSupportClass(TypeSpec.Builder newSupportType);
 
-    AnyShape findOriginalDeclaredName(String name);
+    ShapeTool shapeTool();
 }

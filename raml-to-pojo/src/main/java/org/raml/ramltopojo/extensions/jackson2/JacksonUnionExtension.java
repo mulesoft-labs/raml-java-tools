@@ -338,8 +338,8 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
     private TypeName findParentType(Shape typeDeclaration, UnionPluginContext unionPluginContext) {
         if (typeDeclaration instanceof NodeShape) {
             NodeShape otd = (NodeShape) typeDeclaration;
-            List<String> names = unionPluginContext.parentTypes(otd);
-            return names.size() > 0 ? unionPluginContext.unionClassName(names.get(0)) : unionPluginContext.unionClassName(otd.name().value());
+            List<AnyShape> names = unionPluginContext.parentTypes(otd);
+            return names.size() > 0 ? unionPluginContext.unionClassName(names.get(0).name().value()) : unionPluginContext.unionClassName(otd.name().value());
         } else {
             return unionPluginContext.unionClassName(typeDeclaration.name().value());
         }

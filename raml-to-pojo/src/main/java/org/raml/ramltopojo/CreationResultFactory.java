@@ -103,11 +103,6 @@ public class CreationResultFactory {
         }
 
         @Override
-        public AnyShape findOriginalDeclaredName(String name) {
-            return context.findOriginalDeclaredName(name);
-        }
-
-        @Override
         public Optional<TypeName> findTypeNameByRamlName(String ramlName) {
             return context.findTypeNameByRamlName(ramlName);
         }
@@ -118,8 +113,8 @@ public class CreationResultFactory {
         }
 
         @Override
-        public CreationResult findCreatedType(String typeName, Shape ramlType) {
-            return context.findCreatedType(typeName, ramlType);
+        public CreationResult findCreatedType(String typeId) {
+            return context.findCreatedType(typeId);
         }
 
         @Override
@@ -163,8 +158,13 @@ public class CreationResultFactory {
         }
 
         @Override
-        public Set<String> childClasses(String ramlTypeName) {
-            return context.childClasses(ramlTypeName);
+        public ShapeTool shapeTool() {
+            return context.shapeTool();
+        }
+
+        @Override
+        public Set<AnyShape> childClasses(String typeId) {
+            return context.childClasses(typeId);
         }
 
         @Override

@@ -4,6 +4,7 @@ import amf.client.model.document.Document;
 import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.UnionShape;
 import org.junit.Test;
+import org.raml.ramltopojo.amf.ExtraInformationImpl;
 
 import java.util.concurrent.ExecutionException;
 
@@ -40,7 +41,7 @@ public class RamlLoaderTest {
         );
 
         NodeShape shape = RamlLoader.findShape("mytype", doc.declares());
-        assertTrue(ExtraInformation.isInline(shape.properties().get(0).range()));
+        assertTrue(ExtraInformationImpl.isInline(shape.properties().get(0).range()));
     }
 
     @Test
@@ -62,7 +63,7 @@ public class RamlLoaderTest {
         );
 
         NodeShape shape = RamlLoader.findShapeInResourceBody("/fun", "get", doc);
-        assertTrue(ExtraInformation.isInline(shape));
+        assertTrue(ExtraInformationImpl.isInline(shape));
     }
 
     @Test
@@ -83,7 +84,7 @@ public class RamlLoaderTest {
         );
 
         NodeShape shape = RamlLoader.findShapeInResourceBody("/fun", "get", doc);
-        assertFalse(ExtraInformation.isInline(shape));
+        assertFalse(ExtraInformationImpl.isInline(shape));
     }
     @Test
     public void inline_array() throws ExecutionException, InterruptedException {
@@ -98,7 +99,7 @@ public class RamlLoaderTest {
         );
 
         NodeShape shape = RamlLoader.findShape("mytype", doc.declares());
-        assertTrue(ExtraInformation.isInline(shape.properties().get(0).range()));
+        assertTrue(ExtraInformationImpl.isInline(shape.properties().get(0).range()));
     }
 
     @Test
@@ -112,7 +113,7 @@ public class RamlLoaderTest {
         );
 
         UnionShape shape = RamlLoader.findShape("mytype", doc.declares());
-        assertFalse(ExtraInformation.isInline(shape));
+        assertFalse(ExtraInformationImpl.isInline(shape));
     }
 
     @Test
@@ -132,7 +133,7 @@ public class RamlLoaderTest {
         );
 
         NodeShape shape = RamlLoader.findShape("mytype", doc.declares());
-        assertThat(ExtraInformation.parentTypes(shape)).hasSize(1).containsExactly("typeOne");
+        assertThat(ExtraInformationImpl.parentTypes(shape)).hasSize(1).containsExactly("http://a.ml/amf/default_document#/declarations/types/typeOne");
     }
 
 }

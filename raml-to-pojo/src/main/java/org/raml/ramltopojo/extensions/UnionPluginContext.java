@@ -18,5 +18,5 @@ public interface UnionPluginContext {
 
     TypeName unionClassName(String ramlName);
 
-    List<String> parentTypes(NodeShape otd);
+    List<AnyShape> parentTypes(NodeShape otd);
 }

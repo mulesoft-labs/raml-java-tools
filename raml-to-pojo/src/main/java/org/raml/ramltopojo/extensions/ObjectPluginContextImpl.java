@@ -25,10 +25,10 @@ public class ObjectPluginContextImpl implements ObjectPluginContext {
     }
 
     @Override
-    public Set<CreationResult> childClasses(String ramlTypeName) {
+    public Set<CreationResult> childClasses(String typeId) {
 
-        return generationContext.childClasses(ramlTypeName).stream()
-                .map((input) -> generationContext.findCreatedType(input, null))
+        return generationContext.childClasses(typeId).stream()
+                .map((input) -> generationContext.findCreatedType(input.id()))
                 .collect(Collectors.toSet());
     }
 
@@ -40,7 +40,7 @@ public class ObjectPluginContextImpl implements ObjectPluginContext {
 
     @Override
     public CreationResult dependentType(Shape items) {
-        return generationContext.findCreatedType(items.name().value(), items);
+        return generationContext.findCreatedType(items.id());
     }
 
     @Override

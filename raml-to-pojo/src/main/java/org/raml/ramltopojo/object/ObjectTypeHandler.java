@@ -170,9 +170,9 @@ public class ObjectTypeHandler implements TypeHandler {
 
         Optional<String> discriminator = discriminatorName(objectTypeDeclaration);
 
-        for (String typeDeclarationName : ExtraInformation.parentTypes(objectTypeDeclaration)) {
+        for (AnyShape parentShapes : generationContext.shapeTool().parentShapes(objectTypeDeclaration)) {
 
-            AnyShape typeDeclaration = findType(typeDeclarationName, generationContext, EventType.INTERFACE);
+            AnyShape typeDeclaration = findType(parentShapes.id(), generationContext, EventType.INTERFACE);
             if (typeDeclaration instanceof NodeShape) {
 
                 if (typeDeclaration.name().value().equals("object")) {
@@ -437,7 +437,7 @@ public class ObjectTypeHandler implements TypeHandler {
 
     private AnyShape findType(String typeName, GenerationContext generationContext, EventType eventType) {
 
-        CreationResult result =  generationContext.findCreatedType(typeName, null );
+        CreationResult result =  generationContext.findCreatedType(typeName);
         return result.getOriginalShape();
     }
 

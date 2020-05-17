@@ -7,6 +7,7 @@ import amf.client.resolve.Raml08Resolver;
 import amf.client.resolve.Raml10Resolver;
 import amf.client.validate.ValidationReport;
 import amf.core.resolution.pipelines.ResolutionPipeline;
+import org.raml.ramltopojo.amf.ExtraInformationImpl;
 import webapi.Raml08;
 import webapi.Raml10;
 import webapi.WebApiBaseUnit;
@@ -70,7 +71,7 @@ public class RamlLoader {
         parsedDocument.findByType("http://a.ml/vocabularies/shapes#Shape").stream()
                 .filter(x -> x instanceof AnyShape)
                 .map(AnyShape.class::cast)
-                .forEach(ExtraInformation::createInformation);
+                .forEach(ExtraInformationImpl::createInformation);
 
         parsedDocument.references().stream()
                 .filter(x -> x instanceof Module)
@@ -79,7 +80,7 @@ public class RamlLoader {
                 .forEach(d -> d.findByType("http://a.ml/vocabularies/shapes#Shape").stream()
                         .filter(x -> x instanceof AnyShape)
                         .map(AnyShape.class::cast)
-                        .forEach(ExtraInformation::createInformation));
+                        .forEach(ExtraInformationImpl::createInformation));
     }
 
     public static <T extends Shape> T findShape(final String name, List<DomainElement> types) {
