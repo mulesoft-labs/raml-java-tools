@@ -79,7 +79,7 @@ public class GenerationContextImpl implements GenerationContext {
 
     public List<AnyShape> allKnownTypes() {
         // todo this is wrong, we get twice the stuff.
-        return namedTypes.get().values().stream().map(NamedType::getShape).collect(Collectors.toList());
+        return namedTypes.get().values().stream().filter(x -> x.getName() != null).map(NamedType::getShape).collect(Collectors.toList());
     }
 
     public Optional<AnyShape> findShapeById(String typeId) {
@@ -87,8 +87,10 @@ public class GenerationContextImpl implements GenerationContext {
         return Optional.ofNullable(namedTypes.get().get(typeId)).map(NamedType::getShape);
     }
 
-    public void newTypeName(String typeId, TypeName typeName) {
-        this.typeNames.put(typeId, typeName);
+    public void newTypeName(AnyShape shape, TypeName typeName) {
+        this.typeNames.put(shape.id(), typeName);
+        this.typeNames.put(shapeTool().oldId(shape), typeName);
+
     }
 
     public void setupTypeHierarchy(String actualName, AnyShape forShape) {
