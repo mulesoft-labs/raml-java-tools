@@ -87,8 +87,8 @@ public class GenerationContextImpl implements GenerationContext {
         return Optional.ofNullable(namedTypes.get().get(typeId)).map(NamedType::getShape);
     }
 
-    public void newTypeName(String name, TypeName typeName) {
-        this.typeNames.put(name, typeName);
+    public void newTypeName(String typeId, TypeName typeName) {
+        this.typeNames.put(typeId, typeName);
     }
 
     public void setupTypeHierarchy(String actualName, AnyShape forShape) {
@@ -105,8 +105,8 @@ public class GenerationContextImpl implements GenerationContext {
     }
 
     @Override
-    public Optional<TypeName> findTypeNameByRamlName(String ramlName) {
-        return Optional.ofNullable(typeNames.get(ramlName));
+    public Optional<TypeName> findTypeNameByTypeId(String typeId) {
+        return Optional.ofNullable(typeNames.get(typeId));
     }
 
     @Override

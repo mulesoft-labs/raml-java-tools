@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public interface ObjectPluginContext {
 
-    Set<CreationResult> childClasses(String ramlTypeName);
+    Set<TypeName> childClasses(String ramlTypeName);
     CreationResult creationResult();
     CreationResult dependentType(Shape items);
     TypeName forProperty(PropertyShape typeDeclaration);

@@ -21,8 +21,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import org.raml.ramltopojo.CreationResult;
 import org.raml.ramltopojo.EventType;
 import org.raml.ramltopojo.extensions.ObjectPluginContext;
 import org.raml.ramltopojo.extensions.ObjectTypeHandlerPlugin;
@@ -47,15 +47,15 @@ public class JacksonDiscriminatorInheritanceTypeExtension extends ObjectTypeHand
               .addMember("property", "$S", ramlType.discriminator()).build());
 
       AnnotationSpec.Builder subTypes = AnnotationSpec.builder(JsonSubTypes.class);
-      for (CreationResult result : objectPluginContext.childClasses(ramlType.id())) {
+      for (TypeName typeName : objectPluginContext.childClasses(ramlType.id())) {
 
         subTypes.addMember(
                 "value",
                 "$L",
                 AnnotationSpec
                         .builder(JsonSubTypes.Type.class)
-                        .addMember("value", "$L",
-                                result.getJavaName(EventType.INTERFACE) + ".class").build());
+                        .addMember("value", "$T.class",
+                                typeName).build());
       }
 
       subTypes.addMember(

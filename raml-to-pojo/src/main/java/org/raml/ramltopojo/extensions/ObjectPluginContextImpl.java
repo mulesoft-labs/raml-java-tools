@@ -4,10 +4,7 @@ import amf.client.model.domain.PropertyShape;
 import amf.client.model.domain.Shape;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import org.raml.ramltopojo.CreationResult;
-import org.raml.ramltopojo.EventType;
-import org.raml.ramltopojo.GenerationContext;
-import org.raml.ramltopojo.ShapeType;
+import org.raml.ramltopojo.*;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,10 +22,10 @@ public class ObjectPluginContextImpl implements ObjectPluginContext {
     }
 
     @Override
-    public Set<CreationResult> childClasses(String typeId) {
+    public Set<TypeName> childClasses(String typeId) {
 
         return generationContext.childClasses(typeId).stream()
-                .map((input) -> generationContext.findCreatedType(input.id()))
+                .map((input) -> generationContext.findTypeNameByTypeId(input.id()).orElseThrow(() -> new GenerationException("unable to find type id " + input.id())))
                 .collect(Collectors.toSet());
     }
 

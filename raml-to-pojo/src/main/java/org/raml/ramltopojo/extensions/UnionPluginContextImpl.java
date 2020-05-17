@@ -37,8 +37,8 @@ public class UnionPluginContextImpl implements UnionPluginContext {
     }
 
     @Override
-    public TypeName unionClassName(String ramlName) {
-        return generationContext.findTypeNameByRamlName(ramlName).orElseThrow(() -> new GenerationException("no such declared type " + ramlName + " while generating union" ));
+    public TypeName unionClassName(String typeId) {
+        return generationContext.findTypeNameByTypeId(typeId).orElseThrow(() -> new GenerationException("no such declared type " + typeId + " while generating union" ));
     }
 
     @Override

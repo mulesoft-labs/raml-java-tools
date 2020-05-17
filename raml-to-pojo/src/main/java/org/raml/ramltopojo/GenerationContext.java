@@ -18,7 +18,7 @@ import java.util.Set;
 public interface GenerationContext {
 
     CreationResult findCreatedType(String typeId);
-    Optional<TypeName> findTypeNameByRamlName(String ramlName);
+    Optional<TypeName> findTypeNameByTypeId(String ramlName);
 
     String defaultPackage();
 

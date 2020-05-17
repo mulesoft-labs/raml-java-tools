@@ -28,7 +28,7 @@ public class RamlToPojoImpl implements RamlToPojo {
         allShapes.stream()
                 .filter(a ->  ! ExtraInformationImpl.isInline(a))
                 .forEach( a -> generationContext.newTypeName(
-                        a.name().value(),
+                        a.id(),
                         ShapeType.calculateTypeName(a.name().value(), a, generationContext, EventType.INTERFACE)));
 
         allShapes

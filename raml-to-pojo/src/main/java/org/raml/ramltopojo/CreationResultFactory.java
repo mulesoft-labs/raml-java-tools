@@ -103,8 +103,8 @@ public class CreationResultFactory {
         }
 
         @Override
-        public Optional<TypeName> findTypeNameByRamlName(String ramlName) {
-            return context.findTypeNameByRamlName(ramlName);
+        public Optional<TypeName> findTypeNameByTypeId(String typeId) {
+            return context.findTypeNameByTypeId(typeId);
         }
 
         @Override
