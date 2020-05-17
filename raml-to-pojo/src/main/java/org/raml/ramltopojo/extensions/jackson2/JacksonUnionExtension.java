@@ -335,13 +335,13 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
         typeBuilder.addType(builder.build());
     }
 
-    private TypeName findParentType(Shape typeDeclaration, UnionPluginContext unionPluginContext) {
+    private TypeName findParentType(AnyShape typeDeclaration, UnionPluginContext unionPluginContext) {
         if (typeDeclaration instanceof NodeShape) {
             NodeShape otd = (NodeShape) typeDeclaration;
             List<AnyShape> names = unionPluginContext.parentTypes(otd);
-            return names.size() > 0 ? unionPluginContext.unionClassName(names.get(0).id()) : unionPluginContext.unionClassName(otd.id());
+            return names.size() > 0 ? unionPluginContext.unionClassName(names.get(0)) : unionPluginContext.unionClassName(otd);
         } else {
-            return unionPluginContext.unionClassName(typeDeclaration.id());
+            return unionPluginContext.unionClassName(typeDeclaration);
         }
     }
 

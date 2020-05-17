@@ -37,8 +37,12 @@ public class UnionPluginContextImpl implements UnionPluginContext {
     }
 
     @Override
-    public TypeName unionClassName(String typeId) {
-        return generationContext.findTypeNameByTypeId(typeId).orElseThrow(() -> new GenerationException("no such declared type " + typeId + " while generating union" ));
+    public TypeName unionClassName(AnyShape typeId) {
+        String id = typeId.id();
+        String oldId = generationContext.shapeTool().oldId(typeId);
+        return generationContext.findTypeNameByTypeId(id)
+                .orElseGet(() -> generationContext.findTypeNameByTypeId(oldId)
+                        .orElseThrow(() -> new GenerationException("no such declared type " + id + " or " + oldId + " while generating union" )));
     }
 
     @Override

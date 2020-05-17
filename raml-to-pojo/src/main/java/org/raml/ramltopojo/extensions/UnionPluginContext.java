@@ -16,7 +16,7 @@ public interface UnionPluginContext {
     CreationResult unionClass(AnyShape ramlType);
     TypeName findType(String typeName, AnyShape type);
 
-    TypeName unionClassName(String ramlName);
+    TypeName unionClassName(AnyShape shape);
 
     List<AnyShape> parentTypes(NodeShape otd);
 }

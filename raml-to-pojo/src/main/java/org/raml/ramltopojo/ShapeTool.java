@@ -21,6 +21,11 @@ public class ShapeTool {
         return info.isInline(shape);
     }
 
+    public String oldId(AnyShape shape) {
+
+        return info.oldId(shape);
+    }
+
     public List<AnyShape> parentShapes(AnyShape shape) {
 
         return info.parentTypes(shape).stream()
