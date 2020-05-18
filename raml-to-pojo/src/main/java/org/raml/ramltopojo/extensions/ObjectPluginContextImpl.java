@@ -1,7 +1,7 @@
 package org.raml.ramltopojo.extensions;
 
+import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.PropertyShape;
-import amf.client.model.domain.Shape;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.*;
@@ -25,7 +25,7 @@ public class ObjectPluginContextImpl implements ObjectPluginContext {
     public Set<TypeName> childClasses(String typeId) {
 
         return generationContext.childClasses(typeId).stream()
-                .map((input) -> generationContext.findTypeNameByTypeId(input.id()).orElseThrow(() -> new GenerationException("unable to find type id " + input.id())))
+                .map((input) -> generationContext.findTypeNameByTypeId(input).orElseThrow(() -> new GenerationException("unable to find type id " + input.id())))
                 .collect(Collectors.toSet());
     }
 
@@ -36,8 +36,8 @@ public class ObjectPluginContextImpl implements ObjectPluginContext {
     }
 
     @Override
-    public CreationResult dependentType(Shape items) {
-        return generationContext.findCreatedType(items.id());
+    public CreationResult dependentType(AnyShape items) {
+        return generationContext.findCreatedType(items);
     }
 
     @Override

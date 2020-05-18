@@ -1,7 +1,7 @@
 package org.raml.ramltopojo.extensions;
 
+import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.PropertyShape;
-import amf.client.model.domain.Shape;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.CreationResult;
@@ -15,7 +15,7 @@ public interface ObjectPluginContext {
 
     Set<TypeName> childClasses(String ramlTypeName);
     CreationResult creationResult();
-    CreationResult dependentType(Shape items);
+    CreationResult dependentType(AnyShape items);
     TypeName forProperty(PropertyShape typeDeclaration);
 
     TypeName createSupportClass(TypeSpec.Builder newSupportType);

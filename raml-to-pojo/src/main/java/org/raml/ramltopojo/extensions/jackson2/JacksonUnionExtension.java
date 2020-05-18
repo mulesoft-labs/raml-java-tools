@@ -280,7 +280,7 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
 
                 if (otd.discriminator().nonNull()) {
 
-                    TypeName unionPossibility = unionPluginContext.unionClass(typeDeclaration).getJavaName(EventType.INTERFACE);
+                    TypeName unionPossibility = unionPluginContext.unionClassName(typeDeclaration);
 
                     deserialize.beginControlFlow("if (node.isObject() && isValidObject(node, $T.asList($L)) && $T.equals(node.path($S).asText(), $S))",
                             Arrays.class,

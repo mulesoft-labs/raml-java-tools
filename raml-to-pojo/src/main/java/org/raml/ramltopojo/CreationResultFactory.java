@@ -103,8 +103,8 @@ public class CreationResultFactory {
         }
 
         @Override
-        public Optional<TypeName> findTypeNameByTypeId(String typeId) {
-            return context.findTypeNameByTypeId(typeId);
+        public Optional<TypeName> findTypeNameByTypeId(AnyShape shape) {
+            return context.findTypeNameByTypeId(shape);
         }
 
         @Override
@@ -113,7 +113,7 @@ public class CreationResultFactory {
         }
 
         @Override
-        public CreationResult findCreatedType(String typeId) {
+        public CreationResult findCreatedType(AnyShape typeId) {
             return context.findCreatedType(typeId);
         }
 

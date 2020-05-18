@@ -32,17 +32,16 @@ public class UnionPluginContextImpl implements UnionPluginContext {
     }
 
     @Override
-    public CreationResult unionClass(AnyShape ramlType) {
-        return generationContext.findCreatedType(ramlType.id());
+    public CreationResult unionClass(AnyShape shape) {
+        return generationContext.findCreatedType(shape);
     }
 
     @Override
-    public TypeName unionClassName(AnyShape typeId) {
-        String id = typeId.id();
-        String oldId = generationContext.shapeTool().oldId(typeId);
-        return generationContext.findTypeNameByTypeId(id)
-                .orElseGet(() -> generationContext.findTypeNameByTypeId(oldId)
-                        .orElseThrow(() -> new GenerationException("no such declared type " + id + " or " + oldId + " while generating union" )));
+    public TypeName unionClassName(AnyShape shape) {
+        String id = shape.id();
+        String oldId = generationContext.shapeTool().oldId(shape);
+        return generationContext.findTypeNameByTypeId(shape)
+                        .orElseThrow(() -> new GenerationException("no such declared type " + id + " or " + oldId + " while generating union" ));
     }
 
     @Override

@@ -17,8 +17,8 @@ import java.util.Set;
  */
 public interface GenerationContext {
 
-    CreationResult findCreatedType(String typeId);
-    Optional<TypeName> findTypeNameByTypeId(String ramlName);
+    CreationResult findCreatedType(AnyShape typeId);
+    Optional<TypeName> findTypeNameByTypeId(AnyShape shape);
 
     String defaultPackage();
 

@@ -107,26 +107,33 @@ public class GenerationContextImpl implements GenerationContext {
     }
 
     @Override
-    public Optional<TypeName> findTypeNameByTypeId(String typeId) {
-        return Optional.ofNullable(typeNames.get(typeId));
+    public Optional<TypeName> findTypeNameByTypeId(AnyShape shape) {
+        return Optional.ofNullable(
+                Optional.ofNullable(typeNames.get(shape.id())).orElseGet(() ->typeNames.get(shapeTool().oldId(shape)))
+        );
     }
 
     @Override
-    public CreationResult findCreatedType(String typeId) {
+    public CreationResult findCreatedType(AnyShape fromShape) {
 
 
-        if (knownTypes.containsKey(typeId)) {
+        if (knownTypes.containsKey(fromShape.id())) {
 
-            return knownTypes.get(typeId);
+            return knownTypes.get(fromShape.id());
         } else {
 
-            //AnyShape foundShape = Optional.ofNullable(namedTypes.get().get(typeId)).map(NamedType::getShape).orElseThrow(() -> new GenerationException("no type with id " + typeId));
-            AnyShape foundShape = (AnyShape) api.findById(typeId).orElseThrow(() -> new GenerationException("no type with id " + typeId));
+            String id = fromShape.id();
+            String oldId = shapeTool().oldId(fromShape);
+
+            AnyShape foundShape = Optional.ofNullable(
+                    Optional.ofNullable(namedTypes.get().get(id)).orElseGet(() -> namedTypes.get().get(oldId))
+            ).map(NamedType::getShape).orElseThrow(() -> new GenerationException("no type with id " + fromShape));
+            //AnyShape foundShape = (AnyShape) api.findById(typeId).orElseThrow(() -> new GenerationException("no type with id " + typeId));
             Optional<CreationResult> result = CreationResultFactory.createType(foundShape, this);
 
             // todo fix this.
             if (result.isPresent()) {
-                knownTypes.put(typeId, result.get());
+                knownTypes.put(fromShape.id(), result.get());
                 return result.get();
             } else {
                 return null;
