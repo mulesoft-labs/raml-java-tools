@@ -67,11 +67,16 @@ public class RamlToPojoImpl implements RamlToPojo {
     }
 
     @Override
-    public TypeName attributeTypeToName(String suggestedName, String typeId) {
+    public TypeName attributeTypeToName(String suggestedName, AnyShape anyShape) {
 
-        AnyShape shape = (AnyShape) generationContext.api()
-                .findById(typeId)
-                .filter(t -> t instanceof AnyShape).orElseThrow(() -> new GenerationException("no such type id: " + typeId));
-        return ShapeType.calculateTypeName(suggestedName, shape, generationContext, EventType.INTERFACE);
+        // todo fix so we use generation context structures.
+        NamedType namedType = generationContext.findTargetNamedShape(anyShape).orElseThrow(() -> new GenerationException("no type found"));
+        namedType.nameType(suggestedName);
+        return ShapeType.calculateTypeName(suggestedName, namedType.getShape(), generationContext, EventType.INTERFACE);
+    }
+
+    @Override
+    public Optional<TypeName> fetchTypeName(AnyShape anyShape) {
+        return generationContext.findTypeNameByTypeId(anyShape);
     }
 }

@@ -87,6 +87,11 @@ public class GenerationContextImpl implements GenerationContext {
         return Optional.ofNullable(namedTypes.get().get(typeId)).map(NamedType::getShape);
     }
 
+    public Optional<NamedType> findTargetNamedShape(AnyShape anyShape) {
+
+        return Optional.ofNullable(Optional.ofNullable(namedTypes.get().get(anyShape.id())).orElseGet(() -> namedTypes.get().get(shapeTool().oldId(anyShape))));
+    }
+
     public void newTypeName(AnyShape shape, TypeName typeName) {
         this.typeNames.put(shape.id(), typeName);
         this.typeNames.put(shapeTool().oldId(shape), typeName);
