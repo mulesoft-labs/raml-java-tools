@@ -1,7 +1,6 @@
 package org.raml.ramltopojo;
 
 import amf.client.model.domain.AnyShape;
-import com.google.common.collect.Lists;
 import com.squareup.javapoet.TypeName;
 import org.raml.ramltopojo.amf.ExtraInformationImpl;
 
@@ -24,16 +23,21 @@ public class RamlToPojoImpl implements RamlToPojo {
 
         ResultingPojos resultingPojos = new ResultingPojos(generationContext);
 
-        List<AnyShape> allShapes = Lists.newArrayList(generationContext.allKnownTypes());
+        List<NamedType> allShapes = generationContext.allKnownTypes();
         allShapes.stream()
-                .filter(a ->  ! ExtraInformationImpl.isInline(a))
-                .forEach( a -> generationContext.newTypeName(
-                        a,
-                        ShapeType.calculateTypeName(a.name().value(), a, generationContext, EventType.INTERFACE)));
+                .filter(a ->  ! ExtraInformationImpl.isInline(a.getShape()))
+                .forEach( a ->  {
+
+                    TypeName t = ShapeType.calculateTypeName(a.getShape().name().value(), a.getShape(), generationContext, EventType.INTERFACE);
+                    generationContext.newTypeName(
+                            a.getShape(), t
+                           );
+                });
+
 
         allShapes
                 .forEach( a -> {
-                    Optional<CreationResult> spec = CreationResultFactory.createType(a, generationContext);
+                    Optional<CreationResult> spec = CreationResultFactory.createType(a.getShape(), generationContext);
                     spec.ifPresent(resultingPojos::addNewResult);
                 });
 
@@ -71,8 +75,10 @@ public class RamlToPojoImpl implements RamlToPojo {
 
         // todo fix so we use generation context structures.
         NamedType namedType = generationContext.findTargetNamedShape(anyShape).orElseThrow(() -> new GenerationException("no type found"));
-        namedType.nameType(suggestedName);
-        return ShapeType.calculateTypeName(suggestedName, namedType.getShape(), generationContext, EventType.INTERFACE);
+        TypeName typeName =  ShapeType.calculateTypeName(suggestedName, namedType.getShape(), generationContext, EventType.INTERFACE);
+        namedType.nameType(typeName);
+
+        return typeName;
     }
 
     @Override

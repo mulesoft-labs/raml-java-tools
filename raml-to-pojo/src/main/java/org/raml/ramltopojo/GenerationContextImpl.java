@@ -33,8 +33,6 @@ public class GenerationContextImpl implements GenerationContext {
     private final PluginManager pluginManager;
     private final Document api;
     private final ConcurrentHashMap<String, CreationResult> knownTypes = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, TypeName> typeNames = new ConcurrentHashMap<>();
-
     private final SetMultimap<String, AnyShape> childTypes = HashMultimap.create();
     private final String defaultPackage;
     private final List<String> basePlugins;
@@ -67,7 +65,7 @@ public class GenerationContextImpl implements GenerationContext {
         typeFinder.found(parentPath, shape);
 
         // ? if (path.endMatches(Module.class) || path.isRoot()) {
-        NamedType namedType = new NamedType(shape, shape.name().option().orElse("unnamed"));
+        NamedType namedType = new NamedType(shape, null);
         types.put(shape.id(), namedType);
         types.put(ExtraInformationImpl.oldId(shape), namedType);
     }
@@ -77,9 +75,9 @@ public class GenerationContextImpl implements GenerationContext {
         return new ShapeTool(this, ExtraInformation.extraInformation());
     }
 
-    public List<AnyShape> allKnownTypes() {
+    public List<NamedType> allKnownTypes() {
         // todo this is wrong, we get twice the stuff.
-        return namedTypes.get().values().stream().filter(x -> x.getName() != null).map(NamedType::getShape).collect(Collectors.toList());
+        return namedTypes.get().values().stream().collect(Collectors.toList());
     }
 
     public Optional<AnyShape> findShapeById(String typeId) {
@@ -93,9 +91,10 @@ public class GenerationContextImpl implements GenerationContext {
     }
 
     public void newTypeName(AnyShape shape, TypeName typeName) {
-        this.typeNames.put(shape.id(), typeName);
-        this.typeNames.put(shapeTool().oldId(shape), typeName);
+        //this.typeNames.put(shape.id(), typeName);
+        //this.typeNames.put(shapeTool().oldId(shape), typeName);
 
+        findTargetNamedShape(shape).orElseThrow(() -> new GenerationException("xxxx")).nameType(typeName);
     }
 
     public void setupTypeHierarchy(String actualName, AnyShape forShape) {
@@ -113,9 +112,17 @@ public class GenerationContextImpl implements GenerationContext {
 
     @Override
     public Optional<TypeName> findTypeNameByTypeId(AnyShape shape) {
-        return Optional.ofNullable(
-                Optional.ofNullable(typeNames.get(shape.id())).orElseGet(() ->typeNames.get(shapeTool().oldId(shape)))
+        Optional<NamedType> namedType = Optional.ofNullable(
+                Optional.ofNullable(namedTypes.get().get(shape.id())).orElseGet(() ->namedTypes.get().get(shapeTool().oldId(shape)))
         );
+
+        if (  namedType.isPresent() == false ) {
+            return Optional.empty();
+        } else {
+
+            return namedType.get().name();
+        }
+
     }
 
     @Override
