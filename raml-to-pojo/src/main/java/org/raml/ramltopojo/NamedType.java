@@ -3,7 +3,6 @@ package org.raml.ramltopojo;
 import amf.client.model.domain.AnyShape;
 import com.squareup.javapoet.TypeName;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.Optional;
 
@@ -13,17 +12,27 @@ import java.util.Optional;
 @AllArgsConstructor
 public class NamedType {
 
-    @Getter
     private final AnyShape shape;
-
-    public Optional<TypeName> name() {
-        return Optional.ofNullable(name);
-    }
+    private String ramlName;
 
     private TypeName name;
+
 
     public void nameType(TypeName name) {
 
         this.name = name;
     }
+
+    public AnyShape shape() {
+        return shape;
+    }
+
+    public Optional<TypeName> name() {
+        return Optional.ofNullable(name);
+    }
+
+    public Optional<String> ramlName() {
+        return Optional.ofNullable(ramlName);
+    }
+
 }

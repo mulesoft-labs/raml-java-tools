@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 /**
  * Created. There, you have it.
  */
-public enum ShapeType implements TypeHandlerFactory, TypeAnalyserFactory {
+public enum ShapeType implements TypeHandlerFactory {
 
     NULL {
         @Override

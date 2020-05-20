@@ -25,19 +25,19 @@ public class RamlToPojoImpl implements RamlToPojo {
 
         List<NamedType> allShapes = generationContext.allKnownTypes();
         allShapes.stream()
-                .filter(a ->  ! ExtraInformationImpl.isInline(a.getShape()))
+                .filter(a ->  ! ExtraInformationImpl.isInline(a.shape()))
                 .forEach( a ->  {
 
-                    TypeName t = ShapeType.calculateTypeName(a.getShape().name().value(), a.getShape(), generationContext, EventType.INTERFACE);
+                    TypeName t = ShapeType.calculateTypeName(a.shape().name().value(), a.shape(), generationContext, EventType.INTERFACE);
                     generationContext.newTypeName(
-                            a.getShape(), t
+                            a.shape(), t
                            );
                 });
 
 
         allShapes
                 .forEach( a -> {
-                    Optional<CreationResult> spec = CreationResultFactory.createType(a.getShape(), generationContext);
+                    Optional<CreationResult> spec = CreationResultFactory.createType(a.shape(), generationContext);
                     spec.ifPresent(resultingPojos::addNewResult);
                 });
 
@@ -75,7 +75,7 @@ public class RamlToPojoImpl implements RamlToPojo {
 
         // todo fix so we use generation context structures.
         NamedType namedType = generationContext.findTargetNamedShape(anyShape).orElseThrow(() -> new GenerationException("no type found"));
-        TypeName typeName =  ShapeType.calculateTypeName(suggestedName, namedType.getShape(), generationContext, EventType.INTERFACE);
+        TypeName typeName =  ShapeType.calculateTypeName(suggestedName, namedType.shape(), generationContext, EventType.INTERFACE);
         namedType.nameType(typeName);
 
         return typeName;

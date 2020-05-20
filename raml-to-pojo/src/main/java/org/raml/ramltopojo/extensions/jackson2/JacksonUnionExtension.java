@@ -289,7 +289,9 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
                             otd.discriminator(),
                             Optional.ofNullable(otd.discriminatorValue().value()).orElse(otd.name().value()));
                     deserialize.addStatement("return new $T(($T)jp.getCodec().treeToValue(node, $T.class))",
-                        unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION), unionPossibility, findParentType(typeDeclaration, unionPluginContext));
+                            unionPluginContext.creationResult().getJavaName(EventType.IMPLEMENTATION),
+                            unionPossibility,
+                            findParentType(typeDeclaration, unionPluginContext));
                     deserialize.endControlFlow();
 
                 } else {

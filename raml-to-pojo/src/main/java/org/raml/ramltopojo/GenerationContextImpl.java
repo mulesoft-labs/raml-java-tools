@@ -2,10 +2,7 @@ package org.raml.ramltopojo;
 
 import amf.client.model.document.Document;
 import amf.client.model.document.Module;
-import amf.client.model.domain.AnyShape;
-import amf.client.model.domain.NodeShape;
-import amf.client.model.domain.Shape;
-import amf.client.model.domain.WebApi;
+import amf.client.model.domain.*;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
@@ -58,6 +55,22 @@ public class GenerationContextImpl implements GenerationContext {
 
         Map<String, NamedType> types = new HashMap<>();
         filterableTypeFinder.findTypes(api, (WebApi) api.encodes(), typeFilter, (parentPath, shape) -> handleType(parentPath, shape, typeFinder, types));
+
+        // Ok:  now we need to fix union types.  We will find these by name and add a reference to it.
+        List<NamedType> allUnions = types.values().stream()
+                .filter(namedType -> namedType.shape() instanceof UnionShape)
+                .collect(Collectors.toList());
+
+        // this is....immoral but correct.  I might do the same with parent types.
+        // This might have to be done recursively going up the union type....
+        for (NamedType allUnion : allUnions) {
+            UnionShape union = (UnionShape) allUnion.shape();
+            List<Shape> changeShapes = union.anyOf().stream()
+                    .map(s -> s instanceof NodeShape ?
+                            types.get(s.name().value()).shape(): s).collect(Collectors.toList());
+
+            union.withAnyOf(changeShapes);
+        }
         return types;
     }
 
@@ -65,9 +78,13 @@ public class GenerationContextImpl implements GenerationContext {
         typeFinder.found(parentPath, shape);
 
         // ? if (path.endMatches(Module.class) || path.isRoot()) {
-        NamedType namedType = new NamedType(shape, null);
+
+        NamedType namedType = new NamedType(shape, shape.name().value(), null);
         types.put(shape.id(), namedType);
         types.put(ExtraInformationImpl.oldId(shape), namedType);
+        if (! shape.name().isNullOrEmpty() ) {
+            types.put(shape.name().value(), namedType);
+        }
     }
 
     public ShapeTool shapeTool() {
@@ -77,12 +94,12 @@ public class GenerationContextImpl implements GenerationContext {
 
     public List<NamedType> allKnownTypes() {
         // todo this is wrong, we get twice the stuff.
-        return namedTypes.get().values().stream().collect(Collectors.toList());
+        return new ArrayList<>(namedTypes.get().values());
     }
 
     public Optional<AnyShape> findShapeById(String typeId) {
 
-        return Optional.ofNullable(namedTypes.get().get(typeId)).map(NamedType::getShape);
+        return Optional.ofNullable(namedTypes.get().get(typeId)).map(NamedType::shape);
     }
 
     public Optional<NamedType> findTargetNamedShape(AnyShape anyShape) {
@@ -116,7 +133,7 @@ public class GenerationContextImpl implements GenerationContext {
                 Optional.ofNullable(namedTypes.get().get(shape.id())).orElseGet(() ->namedTypes.get().get(shapeTool().oldId(shape)))
         );
 
-        if (  namedType.isPresent() == false ) {
+        if (!namedType.isPresent()) {
             return Optional.empty();
         } else {
 
@@ -139,7 +156,7 @@ public class GenerationContextImpl implements GenerationContext {
 
             AnyShape foundShape = Optional.ofNullable(
                     Optional.ofNullable(namedTypes.get().get(id)).orElseGet(() -> namedTypes.get().get(oldId))
-            ).map(NamedType::getShape).orElseThrow(() -> new GenerationException("no type with id " + fromShape));
+            ).map(NamedType::shape).orElseThrow(() -> new GenerationException("no type with id " + fromShape));
             //AnyShape foundShape = (AnyShape) api.findById(typeId).orElseThrow(() -> new GenerationException("no type with id " + typeId));
             Optional<CreationResult> result = CreationResultFactory.createType(foundShape, this);
 
