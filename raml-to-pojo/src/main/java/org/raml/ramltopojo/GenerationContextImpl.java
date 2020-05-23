@@ -92,9 +92,13 @@ public class GenerationContextImpl implements GenerationContext {
         // ? if (path.endMatches(Module.class) || path.isRoot()) {
 
         NamedType namedType = new NamedType(shape, shape.name().value(), null);
-        types.put(shape.id(), namedType);
-        types.put(ExtraInformationImpl.oldId(shape), namedType);
-        if (! shape.name().isNullOrEmpty() ) {
+        if ( ! types.containsKey(shape.id()) ) {
+            types.put(shape.id(), namedType);
+        }
+        if ( ! types.containsKey(ExtraInformationImpl.oldId(shape))) {
+            types.put(ExtraInformationImpl.oldId(shape), namedType);
+        }
+        if (! shape.name().isNullOrEmpty() && ! types.containsKey(shape.name().value()) ) {
             types.put(shape.name().value(), namedType);
         }
 
