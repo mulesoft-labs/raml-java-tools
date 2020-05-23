@@ -29,11 +29,11 @@ public class RamlToPojoImpl implements RamlToPojo {
                 .forEach( a ->  {
 
                     TypeName t = ShapeType.calculateTypeName(a.shape().name().value(), a.shape(), generationContext, EventType.INTERFACE);
+                    generationContext.setupTypeHierarchy(a.shape().name().value(), a.shape());
                     generationContext.newTypeName(
                             a.shape(), t
                            );
                 });
-
 
         allShapes
                 .forEach( a -> {
