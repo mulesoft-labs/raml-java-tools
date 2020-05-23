@@ -96,7 +96,7 @@ public class ArrayTypeHandlerTest extends UnitTest {
         ArrayTypeHandler handler = new ArrayTypeHandler("foo", typearray);
 
 
-        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (x) -> true, (x,y) -> {}, "bar.pack", Collections.<String>emptyList());
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (x) -> true, (x,y,z) -> {}, "bar.pack", Collections.<String>emptyList());
         CreationResult r = handler.create(generationContext, new CreationResult(typearray, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         assertFalse(r.getImplementation().isPresent());
@@ -112,7 +112,7 @@ public class ArrayTypeHandlerTest extends UnitTest {
         ArrayTypeHandler handler = new ArrayTypeHandler("foo", typebracketarray);
 
 
-        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (x) -> true, (x,y) -> {}, "bar.pack", Collections.<String>emptyList());
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (x) -> true, (x,y,z) -> {}, "bar.pack", Collections.<String>emptyList());
         CreationResult r = handler.create(generationContext, new CreationResult(typebracketarray, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         assertFalse(r.getImplementation().isPresent());

@@ -56,7 +56,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
         NodeShape foo = findShape("foo", api.declares());
         ObjectTypeHandler handler = new ObjectTypeHandler("foo", foo);
 
-        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (x) -> true, (x,y) -> {}, "bar.pack", Collections.<String>emptyList());
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (x) -> true, (x,y,z) -> {}, "bar.pack", Collections.<String>emptyList());
         CreationResult r = handler.create(generationContext, new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         assertThat(r.getInterface())
@@ -116,7 +116,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
         NodeShape foo = findShape("foo", api.declares());
         ObjectTypeHandler handler = new ObjectTypeHandler("foo", foo);
 
-        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (x) -> true, (x,y) -> {}, "bar.pack", Collections.<String>emptyList());
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (x) -> true, (x,y,z) -> {}, "bar.pack", Collections.<String>emptyList());
         CreationResult r = handler.create(generationContext, new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
         System.err.println(r.getInterface().toString());
         System.err.println(r.getImplementation().toString());
@@ -363,7 +363,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
         NodeShape foo = findShape("foo", api.declares());
         ObjectTypeHandler handler = new ObjectTypeHandler("foo", foo);
 
-        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (x) -> true, (x,y) -> {}, "bar.pack", Collections.<String>emptyList());
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (x) -> true, (x,y,z) -> {}, "bar.pack", Collections.<String>emptyList());
 
         CreationResult r = handler.create(generationContext, new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
@@ -402,7 +402,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
         NodeShape foo = findShape("foo", api.declares());
         ObjectTypeHandler handler = new ObjectTypeHandler("foo", foo);
 
-        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (x) -> true, (x,y) -> {}, "bar.pack", Collections.<String>emptyList()) {
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (x) -> true, (x,y,z) -> {}, "bar.pack", Collections.<String>emptyList()) {
             @Override
             public ObjectTypeHandlerPlugin pluginsForObjects(Shape... typeDeclarations) {
                 return mockPlugin;
@@ -426,7 +426,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
         NodeShape foo = findShape("foo", api.declares());
         ObjectTypeHandler handler = new ObjectTypeHandler("foo", foo);
 
-        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.createPluginManager("org/raml/ramltopojo/object/simple-plugin.properties"), api, new FilterableTypeFinder(), (x) -> true, (x,y) -> {}, "bar.pack", Collections.<String>emptyList());
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.createPluginManager("org/raml/ramltopojo/object/simple-plugin.properties"), api, new FilterableTypeFinder(), (x) -> true, (x,y,z) -> {}, "bar.pack", Collections.<String>emptyList());
 
         CreationResult r = handler.create(generationContext, new CreationResult(foo, "bar.pack", ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
@@ -524,7 +524,7 @@ public class ObjectTypeHandlerTest extends UnitTest {
         System.err.println(r.internalType("unionOfOthers").getInterface());
     }
     protected GenerationContextImpl createGenerationContext(final Document api) {
-        return new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (p) -> true, (x,y) -> {}, "pojo.pack", Collections.emptyList());
+        return new GenerationContextImpl(PluginManager.NULL, api, new FilterableTypeFinder(), (p) -> true, (x,y,z) -> {}, "pojo.pack", Collections.emptyList());
     }
 
 }

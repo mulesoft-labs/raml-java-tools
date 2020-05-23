@@ -38,23 +38,31 @@ public class GenerationContextImpl implements GenerationContext {
     private final Supplier<Map<String, NamedType>> namedTypes;
 
     public GenerationContextImpl(Document api) {
-        this(PluginManager.NULL, api, new FilterableTypeFinder(), (path) -> path.endMatches(Module.class) || path.isRoot(), (x, y) -> {
+        this(PluginManager.NULL, api, new FilterableTypeFinder(), (path) -> path.endMatches(Module.class) || path.isRoot(), (x, y, r) -> {
         }, "", Collections.<String>emptyList());
     }
 
-    public GenerationContextImpl(PluginManager pluginManager, Document api, FilterableTypeFinder filterableTypeFinder, FilterCallBack typeFilter, FoundCallback typeFinder, String defaultPackage, List<String> basePlugins) {
+    public GenerationContextImpl(PluginManager pluginManager, Document api, FilterableTypeFinder filterableTypeFinder, FilterCallBack typeFilter, ExtendedFoundCallback typeFinder, String defaultPackage, List<String> basePlugins) {
 
         this.pluginManager = pluginManager;
         this.api = api;
         this.defaultPackage = defaultPackage;
         this.basePlugins = basePlugins;
-        this.namedTypes = Suppliers.memoize(() -> buildTypeMap(api, filterableTypeFinder, typeFilter, typeFinder));
+        this.namedTypes = Suppliers.memoize(() -> buildTypeMap(this, api, filterableTypeFinder, typeFilter, typeFinder));
     }
 
-    public static Map<String, NamedType> buildTypeMap(Document api, FilterableTypeFinder filterableTypeFinder, FilterCallBack typeFilter, FoundCallback typeFinder) {
+    public static Map<String, NamedType> buildTypeMap(GenerationContextImpl generationContext, Document api, FilterableTypeFinder filterableTypeFinder, FilterCallBack typeFilter, ExtendedFoundCallback typeFinder) {
 
         Map<String, NamedType> types = new HashMap<>();
-        filterableTypeFinder.findTypes(api, (WebApi) api.encodes(), typeFilter, (parentPath, shape) -> handleType(parentPath, shape, typeFinder, types));
+
+        filterableTypeFinder.findTypes(api, (WebApi) api.encodes(), typeFilter,
+                (parentPath, shape) -> handleType(parentPath, shape, (x,y) -> typeFinder.found(x,y, (n,t) -> {
+                    NamedType namedType = types.get(t.id());
+                    TypeName typeName =  ShapeType.calculateTypeName(n, namedType.shape(), generationContext, EventType.INTERFACE);
+                    namedType.nameType(typeName);
+
+                    return typeName;
+                }), types));
 
         // Ok:  now we need to fix union types.  We will find these by name and add a reference to it.
         List<NamedType> allUnions = types.values().stream()
@@ -71,11 +79,15 @@ public class GenerationContextImpl implements GenerationContext {
 
             union.withAnyOf(changeShapes);
         }
+
+
         return types;
     }
 
     private static void handleType(NamedElementPath parentPath, AnyShape shape, FoundCallback typeFinder, Map<String, NamedType> types) {
-        typeFinder.found(parentPath, shape);
+
+        // todo this is wrong because the callback will return to a call that is incomplete and call get() again...
+        // call this once without the callback, then once with the callback.
 
         // ? if (path.endMatches(Module.class) || path.isRoot()) {
 
@@ -85,6 +97,8 @@ public class GenerationContextImpl implements GenerationContext {
         if (! shape.name().isNullOrEmpty() ) {
             types.put(shape.name().value(), namedType);
         }
+
+        typeFinder.found(parentPath, shape);
     }
 
     public ShapeTool shapeTool() {

@@ -15,7 +15,7 @@ public class RamlToPojoBuilder {
     private final Document api;
     private String packageName = "";
     private FilterCallBack typeFilter = (x) -> true;
-    private FoundCallback typeFinder = (x,y) -> {};
+    private ExtendedFoundCallback typeFinder = (x,y,r) -> {};
 
     public RamlToPojoBuilder(Document api) {
 
@@ -27,7 +27,7 @@ public class RamlToPojoBuilder {
         return this;
     }
 
-    public RamlToPojoBuilder typeFinder(FoundCallback foundCallback) {
+    public RamlToPojoBuilder typeFinder(ExtendedFoundCallback foundCallback) {
         this.typeFinder = foundCallback;
         return this;
     }
