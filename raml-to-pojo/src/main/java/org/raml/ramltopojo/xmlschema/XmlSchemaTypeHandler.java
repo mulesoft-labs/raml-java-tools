@@ -2,6 +2,7 @@ package org.raml.ramltopojo.xmlschema;
 
 import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.SchemaShape;
+import com.google.common.io.Files;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 import com.sun.codemodel.JClass;
@@ -56,9 +57,9 @@ public class XmlSchemaTypeHandler implements TypeHandler {
     public Optional<CreationResult> create(GenerationContext generationContext, CreationResult preCreationResult) {
         File schemaFile = null;
         try {
-            File tmpFile = File.createTempFile("temp", "xsd");
-            tmpFile.deleteOnExit();
-            schemaFile = saveSchema(schemaShape.raw().value(), tmpFile);
+            File tempDir = Files.createTempDir();
+            tempDir.deleteOnExit();
+            schemaFile = saveSchema(schemaShape.raw().value(), tempDir);
             final JCodeModel codeModel = new JCodeModel();
 
             Map<String, JClass> generated =
