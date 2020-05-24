@@ -20,6 +20,7 @@ public interface GenerationContext {
     CreationResult findCreatedType(AnyShape typeId);
     Optional<TypeName> findTypeNameByTypeId(AnyShape shape);
 
+
     String defaultPackage();
 
     void newExpectedType(String name, CreationResult creationResult);
@@ -30,6 +31,7 @@ public interface GenerationContext {
     UnionTypeHandlerPlugin pluginsForUnions(Shape... typeDeclarations);
     ArrayTypeHandlerPlugin pluginsForArrays(Shape... typeDeclarations);
     ReferenceTypeHandlerPlugin pluginsForReferences(Shape... typeDeclarations);
+    XmlSchemaTypeHandlerPlugin pluginsForXmlSchemas(Shape... shapeType);
 
     void setupTypeHierarchy(String actualName, AnyShape typeDeclaration);
     Document api();

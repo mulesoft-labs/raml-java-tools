@@ -11,6 +11,7 @@ import org.raml.ramltopojo.nulltype.NullTypeHandler;
 import org.raml.ramltopojo.object.ObjectTypeHandler;
 import org.raml.ramltopojo.references.ReferenceTypeHandler;
 import org.raml.ramltopojo.union.UnionTypeHandler;
+import org.raml.ramltopojo.xmlschema.XmlSchemaTypeHandler;
 
 import java.io.File;
 import java.util.Date;
@@ -275,6 +276,18 @@ public enum ShapeType implements TypeHandlerFactory {
             return false;
         }
     },
+
+    XMLSCHEMA {
+        @Override
+        public boolean shouldCreateInlineType(AnyShape declaration) {
+            return false;
+        }
+
+        @Override
+        public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
+            return new XmlSchemaTypeHandler(name, type, typeDeclaration);
+        }
+    },
     FILE {
         @Override
         public TypeHandler createHandler(String name, ShapeType type, AnyShape typeDeclaration) {
@@ -308,6 +321,7 @@ public enum ShapeType implements TypeHandlerFactory {
             .put(FileShape.class, FILE)
             .put(AnyShape.class, ANY)
             .put(NilShape.class, NULL)
+            .put(SchemaShape.class, XMLSCHEMA)
             .build();
 
     public static ShapeType ramlToType(Class  scalarType) {

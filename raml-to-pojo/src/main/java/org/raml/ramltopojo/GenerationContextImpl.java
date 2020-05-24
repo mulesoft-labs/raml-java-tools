@@ -296,6 +296,12 @@ public class GenerationContextImpl implements GenerationContext {
         return new ReferenceTypeHandlerPlugin.Composite(appropriatePlugins(ReferenceTypeHandlerPlugin.class, typeDeclarations));
     }
 
+    @Override
+    public XmlSchemaTypeHandlerPlugin pluginsForXmlSchemas(Shape... typeDeclarations) {
+
+        return new XmlSchemaTypeHandlerPlugin.Composite(appropriatePlugins(XmlSchemaTypeHandlerPlugin.class, typeDeclarations));
+    }
+
 
     @Override
     public Document api() {

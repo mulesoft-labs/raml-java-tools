@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 /**
  * Created. There, you have it.
@@ -21,7 +22,10 @@ public class CreationResult {
     private final String packageName;
     private ClassName interfaceName;
     private ClassName implementationName;
-    private TypeSpec interf;
+    private BiConsumer<String, CreationResult> interf;
+
+    private TypeSpec generatedInterface;
+
     private TypeSpec impl;
 
     private final Map<String, CreationResult> internalTypes = new HashMap<>();
@@ -35,7 +39,25 @@ public class CreationResult {
 
     public CreationResult withInterface(TypeSpec spec) {
 
-        this.interf = spec;
+        this.generatedInterface = spec;
+        this.interf = (root, cr) -> {
+
+            try {
+                if (generatedInterface.typeSpecs.size() == 0) {
+                    createInlineType( this);
+                }
+
+                createJavaFile(packageName, generatedInterface, root, true);
+            } catch (IOException e) {
+                throw new GenerationException(e);
+            }
+        };
+        return this;
+    }
+
+    public CreationResult withInterface(BiConsumer<String, CreationResult> specConsumer) {
+
+        this.interf = specConsumer;
         return this;
     }
 
@@ -46,7 +68,7 @@ public class CreationResult {
     }
 
     public TypeSpec getInterface() {
-        return interf;
+        return generatedInterface;
     }
     public Optional<TypeSpec> getImplementation() {
         return Optional.ofNullable(impl);
@@ -60,11 +82,7 @@ public class CreationResult {
 
         // This is a bit wrong.  We are covering ourselves because
         // we a generating some types twice.  TODO fix this.
-        if ( interf.typeSpecs.size() == 0 ) {
-            createInlineType(this);
-        }
-
-        createJavaFile(packageName, interf, rootDirectory, true);
+        interf.accept(rootDirectory, this);
 
         if ( implementationName != null ) {
 
@@ -96,7 +114,7 @@ public class CreationResult {
             if ( internalType.getInterface().kind == TypeSpec.Kind.CLASS) {
                 internalBuilder.addModifiers(Modifier.STATIC);
             }
-            containingResult.interf = containingResult.getInterface().toBuilder().addType(internalBuilder.build()).build();
+            containingResult.generatedInterface = containingResult.getInterface().toBuilder().addType(internalBuilder.build()).build();
             if ( containingResult.getImplementation().isPresent()) {
                 if (internalType.getImplementation().isPresent() ) {
                     containingResult.impl = containingResult.getImplementation().get().toBuilder().addType(
@@ -107,7 +125,7 @@ public class CreationResult {
 
                 if ( internalType.getImplementation().isPresent() ) {
 
-                    containingResult.interf = containingResult.getInterface().toBuilder().addType(internalType.getImplementation().get().toBuilder().addModifiers(Modifier.STATIC).build()).build();
+                    containingResult.generatedInterface = containingResult.getInterface().toBuilder().addType(internalType.getImplementation().get().toBuilder().addModifiers(Modifier.STATIC).build()).build();
                 }
             }
         }

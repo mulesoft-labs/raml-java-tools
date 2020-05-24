@@ -153,6 +153,11 @@ public class CreationResultFactory {
         }
 
         @Override
+        public XmlSchemaTypeHandlerPlugin pluginsForXmlSchemas(Shape... shapeType) {
+            return context.pluginsForXmlSchemas(shapeType);
+        }
+
+        @Override
         public Document api() {
             return context.api();
         }
