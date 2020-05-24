@@ -59,7 +59,7 @@ public class GenerationContextImpl implements GenerationContext {
                 (parentPath, shape) -> handleType(parentPath, shape, (x,y) -> typeFinder.found(x,y, (n,t) -> {
                     NamedType namedType = types.get(t.id());
                     TypeName typeName =  ShapeType.calculateTypeName(n, namedType.shape(), generationContext, EventType.INTERFACE);
-                    namedType.nameType(typeName);
+                    namedType.nameType(n, typeName);
 
                     return typeName;
                 }), types));
@@ -112,7 +112,7 @@ public class GenerationContextImpl implements GenerationContext {
 
     public List<NamedType> allKnownTypes() {
         // todo this is wrong, we get twice the stuff.
-        return new ArrayList<>(namedTypes.get().values());
+        return namedTypes.get().entrySet().stream().filter(s -> s.getKey().startsWith("amf://")).map(Map.Entry::getValue).collect(Collectors.toList());
     }
 
     public Optional<AnyShape> findShapeById(String typeId) {
@@ -126,10 +126,9 @@ public class GenerationContextImpl implements GenerationContext {
     }
 
     public void newTypeName(AnyShape shape, TypeName typeName) {
-        //this.typeNames.put(shape.id(), typeName);
-        //this.typeNames.put(shapeTool().oldId(shape), typeName);
 
-        findTargetNamedShape(shape).orElseThrow(() -> new GenerationException("xxxx")).nameType(typeName);
+        // todo this might be useless
+        findTargetNamedShape(shape).orElseThrow(() -> new GenerationException("xxxx")).nameType(null, typeName);
     }
 
     public void setupTypeHierarchy(String actualName, AnyShape forShape) {

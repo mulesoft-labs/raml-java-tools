@@ -18,9 +18,10 @@ public class NamedType {
     private TypeName name;
 
 
-    public void nameType(TypeName name) {
+    public void nameType(String newRamlName, TypeName name) {
 
         this.name = name;
+        this.ramlName = newRamlName;
     }
 
     public AnyShape shape() {

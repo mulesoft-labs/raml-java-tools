@@ -37,7 +37,7 @@ public class RamlToPojoImpl implements RamlToPojo {
 
         allShapes
                 .forEach( a -> {
-                    Optional<CreationResult> spec = CreationResultFactory.createType(a.shape(), generationContext);
+                    Optional<CreationResult> spec = CreationResultFactory.createNamedType(a.ramlName().orElse(a.shape().name().value()), a.shape(), generationContext);
                     spec.ifPresent(resultingPojos::addNewResult);
                 });
 
@@ -76,7 +76,7 @@ public class RamlToPojoImpl implements RamlToPojo {
         // todo fix so we use generation context structures.
         NamedType namedType = generationContext.findTargetNamedShape(anyShape).orElseThrow(() -> new GenerationException("no type found"));
         TypeName typeName =  ShapeType.calculateTypeName(suggestedName, namedType.shape(), generationContext, EventType.INTERFACE);
-        namedType.nameType(typeName);
+        namedType.nameType(null, typeName);
 
         return typeName;
     }
