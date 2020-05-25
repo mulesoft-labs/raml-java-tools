@@ -56,7 +56,7 @@ public class GenerationContextImpl implements GenerationContext {
         Map<String, NamedType> types = new HashMap<>();
 
         filterableTypeFinder.findTypes(api, (WebApi) api.encodes(), typeFilter,
-                (parentPath, shape) -> handleType(parentPath, shape, (x,y) -> typeFinder.found(x,y, (n,t) -> {
+                (parentPath, shape) -> handleType(generationContext, parentPath, shape, (x,y) -> typeFinder.found(x,y, (n,t) -> {
                     NamedType namedType = types.get(t.id());
                     TypeName typeName =  ShapeType.calculateTypeName(n, namedType.shape(), generationContext, EventType.INTERFACE);
                     namedType.nameType(n, typeName);
@@ -84,14 +84,17 @@ public class GenerationContextImpl implements GenerationContext {
         return types;
     }
 
-    private static void handleType(NamedElementPath parentPath, AnyShape shape, FoundCallback typeFinder, Map<String, NamedType> types) {
+    private static void handleType(GenerationContextImpl generationContext, NamedElementPath parentPath, AnyShape shape, FoundCallback typeFinder, Map<String, NamedType> types) {
 
         // todo this is wrong because the callback will return to a call that is incomplete and call get() again...
         // call this once without the callback, then once with the callback.
 
-        // ? if (path.endMatches(Module.class) || path.isRoot()) {
+        if ( types.containsKey(shape.id()) ) {
 
-        NamedType namedType = new NamedType(shape, shape.name().value(), null);
+            return;
+        }
+
+        NamedType namedType = new NamedType(shape, shape.name().value(), null, ! (parentPath.endMatches(Module.class) || parentPath.isRoot()));
         if ( ! types.containsKey(shape.id()) ) {
             types.put(shape.id(), namedType);
         }
@@ -102,7 +105,14 @@ public class GenerationContextImpl implements GenerationContext {
             types.put(shape.name().value(), namedType);
         }
 
-        typeFinder.found(parentPath, shape);
+
+        if ( namedType.isInline()) {
+            typeFinder.found(parentPath, shape);
+        } else {
+            TypeName typeName =  ShapeType.calculateTypeName(shape.name().value(), namedType.shape(), generationContext, EventType.INTERFACE);
+            namedType.nameType(shape.name().value(), typeName);
+
+        }
     }
 
     public ShapeTool shapeTool() {

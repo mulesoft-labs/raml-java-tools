@@ -17,6 +17,7 @@ public class NamedType {
 
     private TypeName name;
 
+    private final boolean inline;
 
     public void nameType(String newRamlName, TypeName name) {
 
@@ -36,4 +37,7 @@ public class NamedType {
         return Optional.ofNullable(ramlName);
     }
 
+    public boolean isInline() {
+        return inline;
+    }
 }
