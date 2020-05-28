@@ -33,13 +33,13 @@ public class GenerationContextImpl implements GenerationContext {
     private final SetMultimap<String, AnyShape> childTypes = HashMultimap.create();
     private final String defaultPackage;
     private final List<String> basePlugins;
-    private Map<String, TypeSpec> supportClasses = new HashMap<>();
-    private Map<String, AnyShape> realTypes = new HashMap<>();
+    private final Map<String, TypeSpec> supportClasses = new HashMap<>();
+    private final Map<String, AnyShape> realTypes = new HashMap<>();
     private final Supplier<Map<String, NamedType>> namedTypes;
 
     public GenerationContextImpl(Document api) {
         this(PluginManager.NULL, api, new FilterableTypeFinder(), (path) -> path.endMatches(Module.class) || path.isRoot(), (x, y, r) -> {
-        }, "", Collections.<String>emptyList());
+        }, "", Collections.emptyList());
     }
 
     public GenerationContextImpl(PluginManager pluginManager, Document api, FilterableTypeFinder filterableTypeFinder, FilterCallBack typeFilter, ExtendedFoundCallback typeFinder, String defaultPackage, List<String> basePlugins) {
@@ -238,7 +238,7 @@ public class GenerationContextImpl implements GenerationContext {
     private <T> void loadBasePlugins(Set<T> plugins, Class<T> pluginType, Shape... typeDeclarations) {
 
         for (String basePlugin : basePlugins) {
-            plugins.addAll(pluginManager.getClassesForName(basePlugin, Collections.<String>emptyList(), pluginType));
+            plugins.addAll(pluginManager.getClassesForName(basePlugin, Collections.emptyList(), pluginType));
         }
     }
 
