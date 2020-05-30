@@ -2,10 +2,7 @@ package org.raml.ramltopojo;
 
 import amf.client.model.Annotable;
 import amf.client.model.document.Document;
-import amf.client.model.domain.ArrayNode;
-import amf.client.model.domain.DataNode;
-import amf.client.model.domain.DomainExtension;
-import amf.client.model.domain.Shape;
+import amf.client.model.domain.*;
 
 import java.util.*;
 import java.util.function.Function;
@@ -47,7 +44,7 @@ public class AnnotationEngine {
             node =  getExtension(annotationField, (Document) a).orElseGet(DomainExtension::new).extension();
         } else {
 
-            node = getExtension(annotationField, (Shape) a).orElseGet(DomainExtension::new).extension();
+            node = getExtension(annotationField, (DomainElement)a).orElseGet(DomainExtension::new).extension();
         }
 
         if ( node == null || node instanceof ArrayNode ) {
@@ -57,7 +54,7 @@ public class AnnotationEngine {
         }
     }
 
-    private static Optional<DomainExtension> getExtension(String annotationField, Shape a) {
+    private static Optional<DomainExtension> getExtension(String annotationField, DomainElement a) {
         return a.customDomainProperties().stream().filter(x -> x.name().is(annotationField)).findAny();
     }
 
