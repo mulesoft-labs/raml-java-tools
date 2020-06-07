@@ -1,0 +1,11 @@
+#%RAML 1.0 Library
+uses:
+  ramltopojo: ramltopojo.raml
+types:
+  Banana:
+    (ramltopojo.plugins):
+      - name: core.rename
+        arguments: [SecondBanana]
+    type: object
+    properties:
+      size: integer

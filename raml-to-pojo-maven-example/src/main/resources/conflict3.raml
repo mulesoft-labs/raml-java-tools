@@ -1,0 +1,14 @@
+#%RAML 1.0 Library
+uses:
+  ramltopojo: ramltopojo.raml
+
+types:
+  Banana:
+    (ramltopojo.plugins):
+      - name: core.repackage
+        arguments: [foo.foo.colors]
+    type: object
+    properties:
+      color:
+        type: string
+        enum: [yello,green]

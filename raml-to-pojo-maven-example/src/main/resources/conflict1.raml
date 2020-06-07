@@ -1,0 +1,14 @@
+#%RAML 1.0 Library
+uses:
+  ramltopojo: ramltopojo.raml
+  conflict2: conflict2.raml
+  conflict3: conflict3.raml
+
+
+types:
+  Banana:
+    type: object
+    properties:
+      pealable: boolean
+      anotherBanana: conflict2.Banana
+      yetAnotherBanana: conflict3.Banana
