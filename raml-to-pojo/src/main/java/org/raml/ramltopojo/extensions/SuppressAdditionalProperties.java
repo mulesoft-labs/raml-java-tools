@@ -19,8 +19,7 @@ import amf.client.model.domain.NodeShape;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 import org.raml.ramltopojo.EventType;
-import org.raml.ramltopojo.extensions.utils.DefaultTypeCopyHandler;
-import org.raml.ramltopojo.extensions.utils.TypeCopier;
+import org.raml.ramltopojo.javapoet.TypeSpecModifier;
 
 /**
  * Created. There, you have it.
@@ -30,19 +29,18 @@ public class SuppressAdditionalProperties extends ObjectTypeHandlerPlugin.Helper
   @Override
   public TypeSpec.Builder classCreated(ObjectPluginContext objectPluginContext, NodeShape ramlType, TypeSpec.Builder incoming, EventType eventType) {
 
-    TypeCopier copier = new TypeCopier(new DefaultTypeCopyHandler() {
+    TypeSpecModifier.modify(incoming)
+            .modifyMethods(this::supressAdditionalProperties).modifyAll();
 
-      @Override
-      public boolean handleMethod(TypeSpec.Builder newType, MethodSpec methodSpec) {
-        if (methodSpec.name.equals("setAdditionalProperties") || methodSpec.name.equals("getAdditionalProperties")) {
-          return true;
-        } else {
+    return incoming;
+  }
 
-          return super.handleMethod(newType, methodSpec);
-        }
-      }
-    });
+  private MethodSpec supressAdditionalProperties(MethodSpec methodSpec) {
+    if (methodSpec.name.equals("setAdditionalProperties") || methodSpec.name.equals("getAdditionalProperties")) {
+      return null;
+    } else {
 
-    return copier.copy(incoming, "");
+      return methodSpec;
+    }
   }
 }
