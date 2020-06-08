@@ -1,5 +1,6 @@
 package org.raml.builder;
 
+import amf.client.model.domain.DomainElement;
 import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
 import org.raml.yagi.framework.nodes.Node;
 import org.raml.yagi.framework.nodes.StringNodeImpl;
@@ -13,7 +14,7 @@ public class NodeBuilders {
 
         return new NodeBuilder() {
             @Override
-            public Node buildNode() {
+            public DomainElement buildNode() {
                 return new KeyValueNodeImpl(new StringNodeImpl(key), new StringNodeImpl(value));
             }
         };
@@ -23,7 +24,7 @@ public class NodeBuilders {
 
         return new NodeBuilder() {
             @Override
-            public Node buildNode() {
+            public DomainElement buildNode() {
                 return new KeyValueNodeImpl(new StringNodeImpl(key), new StringNodeImpl(value));
             }
         };
@@ -33,7 +34,7 @@ public class NodeBuilders {
 
         return new NodeBuilder() {
             @Override
-            public Node buildNode() {
+            public DomainElement buildNode() {
                 SimpleArrayNode san = new SimpleArrayNode();
                 for (String value : values) {
                     san.addChild(new StringNodeImpl(value));

@@ -11,7 +11,7 @@ import static org.raml.builder.RamlDocumentBuilder.document;
 /**
  * Created. There, you have it.
  */
-public class TypePropertyBuilderTest {
+public class PropertyShapeBuilderTest {
 
     @Test
     public void complexType() {
@@ -22,12 +22,12 @@ public class TypePropertyBuilderTest {
                 .version("one")
                 .mediaType("foo/fun")
                 .withTypes(
-                        TypeDeclarationBuilder.typeDeclaration("Mom")
-                                .ofType(TypeBuilder.type("object")
+                        AnyShapeBuilder.typeDeclaration("Mom")
+                                .ofType(TypeShapeBuilder.type("object")
                                         .withProperty(
-                                                TypePropertyBuilder.property("name", TypeBuilder.type("string")))
+                                                PropertyShapeBuilder.property("name", TypeShapeBuilder.type("string")))
                                         .withProperty(
-                                                TypePropertyBuilder.property("address", TypeBuilder.type("string")).required(false))
+                                                PropertyShapeBuilder.property("address", TypeShapeBuilder.type("string")).required(false))
                                 )
                 )
                 .buildModel();

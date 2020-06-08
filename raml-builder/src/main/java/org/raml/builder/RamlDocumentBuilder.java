@@ -1,5 +1,6 @@
 package org.raml.builder;
 
+import amf.client.model.domain.DomainElement;
 import org.raml.v2.api.model.v10.api.Api;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import org.raml.v2.internal.impl.commons.model.DefaultModelElement;
@@ -43,7 +44,7 @@ public class RamlDocumentBuilder implements NodeBuilder, ModelBuilder<Api> {
     }
 
     @Override
-    public Node buildNode() {
+    public DomainElement buildNode() {
 
         Node documentNode = new RamlDocumentNode();
         for (NodeBuilder builder : builders) {
@@ -89,7 +90,7 @@ public class RamlDocumentBuilder implements NodeBuilder, ModelBuilder<Api> {
         return this;
     }
 
-    public RamlDocumentBuilder withTypes(TypeDeclarationBuilder... typeBuilders) {
+    public RamlDocumentBuilder withTypes(AnyShapeBuilder... typeBuilders) {
         this.typeDeclarationBuilders.addAll(typeBuilders);
         return this;
     }

@@ -1,5 +1,6 @@
 package org.raml.builder;
 
+import amf.client.model.domain.DomainElement;
 import org.raml.yagi.framework.nodes.*;
 
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class KeyValueNodeBuilder<B extends KeyValueNodeBuilder> implements NodeB
         return new StringNodeImpl(id);
     }
 
-    public KeyValueNode buildNode() {
+    public DomainElement buildNode() {
         Node value = createValueNode();
         for (NodeBuilder builder : builders) {
             value.addChild(builder.buildNode());

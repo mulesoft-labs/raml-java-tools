@@ -5,20 +5,20 @@ import org.raml.yagi.framework.nodes.Node;
 /**
  * Created. There, you have it.
  */
-public class BodyBuilder extends KeyValueNodeBuilder<BodyBuilder> implements NodeBuilder {
+public class AnyShapeBuilder extends KeyValueNodeBuilder<AnyShapeBuilder> implements NodeBuilder {
 
-    private TypeBuilder types = null;
+    private TypeShapeBuilder types = null;
 
-    private BodyBuilder(String name) {
+    private AnyShapeBuilder(String name) {
         super(name);
     }
 
-    static public BodyBuilder body(String type) {
+    static public AnyShapeBuilder typeDeclaration(String name) {
 
-        return new BodyBuilder(type);
+        return new AnyShapeBuilder(name);
     }
 
-    public BodyBuilder ofType(TypeBuilder builder) {
+    public AnyShapeBuilder ofType(TypeShapeBuilder builder) {
 
         types = builder;
         return this;

@@ -1,8 +1,8 @@
 package org.raml.pojotoraml.plugins;
 
-import org.raml.builder.TypeBuilder;
-import org.raml.builder.TypeDeclarationBuilder;
-import org.raml.builder.TypePropertyBuilder;
+import org.raml.builder.TypeShapeBuilder;
+import org.raml.builder.AnyShapeBuilder;
+import org.raml.builder.PropertyShapeBuilder;
 import org.raml.pojotoraml.Property;
 import org.raml.pojotoraml.RamlAdjuster;
 
@@ -16,7 +16,7 @@ import java.util.Map;
 public class AdditionalPropertiesAdjuster extends RamlAdjuster.Helper {
 
     @Override
-    public TypeBuilder adjustForUnknownType(Type type) {
+    public TypeShapeBuilder adjustForUnknownType(Type type) {
 
         if (type instanceof ParameterizedType) {
 
@@ -33,7 +33,7 @@ public class AdditionalPropertiesAdjuster extends RamlAdjuster.Helper {
     }
 
     @Override
-    public void adjustForUnknownTypeInProperty(Type type, TypeBuilder typeBuilder, TypeDeclarationBuilder builder, Property property) {
+    public void adjustForUnknownTypeInProperty(Type type, TypeShapeBuilder typeBuilder, AnyShapeBuilder builder, Property property) {
 
         if (property.type() instanceof ParameterizedType) {
 
@@ -42,7 +42,7 @@ public class AdditionalPropertiesAdjuster extends RamlAdjuster.Helper {
                     parameterizedType.getActualTypeArguments().length == 2 &&
                     parameterizedType.getActualTypeArguments()[0].equals(String.class)) {
 
-                typeBuilder.withProperty(TypePropertyBuilder.property("//", "string"));
+                typeBuilder.withProperty(PropertyShapeBuilder.property("//", "string"));
                 return;
             }
         }

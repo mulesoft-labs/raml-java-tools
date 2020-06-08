@@ -1,8 +1,8 @@
 package org.raml.pojotoraml;
 
-import org.raml.builder.TypeBuilder;
-import org.raml.builder.TypeDeclarationBuilder;
-import org.raml.builder.TypePropertyBuilder;
+import org.raml.builder.TypeShapeBuilder;
+import org.raml.builder.AnyShapeBuilder;
+import org.raml.builder.PropertyShapeBuilder;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -22,7 +22,7 @@ public interface RamlAdjuster {
         }
 
         @Override
-        public TypeBuilder adjustType(Type type, String typeName, TypeBuilder builder) {
+        public TypeShapeBuilder adjustType(Type type, String typeName, TypeShapeBuilder builder) {
             return builder;
         }
 
@@ -32,22 +32,22 @@ public interface RamlAdjuster {
         }
 
         @Override
-        public TypePropertyBuilder adjustScalarProperty(TypeDeclarationBuilder typeDeclaration, Property property, TypePropertyBuilder typePropertyBuilder) {
-            return typePropertyBuilder;
+        public PropertyShapeBuilder adjustScalarProperty(AnyShapeBuilder typeDeclaration, Property property, PropertyShapeBuilder propertyShapeBuilder) {
+            return propertyShapeBuilder;
         }
 
         @Override
-        public TypePropertyBuilder adjustComposedProperty(TypeDeclarationBuilder typeDeclaration, Property property, TypePropertyBuilder typePropertyBuilder) {
-            return typePropertyBuilder;
+        public PropertyShapeBuilder adjustComposedProperty(AnyShapeBuilder typeDeclaration, Property property, PropertyShapeBuilder propertyShapeBuilder) {
+            return propertyShapeBuilder;
         }
 
         @Override
-        public TypeBuilder adjustForUnknownType(Type type) {
+        public TypeShapeBuilder adjustForUnknownType(Type type) {
             throw new IllegalArgumentException("cannot parse type " + type);
         }
 
         @Override
-        public void adjustForUnknownTypeInProperty(Type type, TypeBuilder typeBuilder, TypeDeclarationBuilder builder, Property property) {
+        public void adjustForUnknownTypeInProperty(Type type, TypeShapeBuilder typeBuilder, AnyShapeBuilder builder, Property property) {
 
             throw new IllegalArgumentException("cannot parse property of type " + type + " for property " + property.name() + " of type " + property.type());
 
@@ -73,8 +73,8 @@ public interface RamlAdjuster {
         }
 
         @Override
-        public TypeBuilder adjustType(Type type, String typeName, TypeBuilder builder) {
-            TypeBuilder val = builder;
+        public TypeShapeBuilder adjustType(Type type, String typeName, TypeShapeBuilder builder) {
+            TypeShapeBuilder val = builder;
             for (RamlAdjuster adjuster : adjusters) {
                 val = adjuster.adjustType(type, typeName, val);
             }
@@ -91,8 +91,8 @@ public interface RamlAdjuster {
         }
 
         @Override
-        public TypePropertyBuilder adjustScalarProperty(TypeDeclarationBuilder typeDeclaration, Property property, TypePropertyBuilder typePropertyBuilder) {
-            TypePropertyBuilder val = typePropertyBuilder;
+        public PropertyShapeBuilder adjustScalarProperty(AnyShapeBuilder typeDeclaration, Property property, PropertyShapeBuilder propertyShapeBuilder) {
+            PropertyShapeBuilder val = propertyShapeBuilder;
             for (RamlAdjuster adjuster : adjusters) {
                 val = adjuster.adjustScalarProperty(typeDeclaration, property, val);
             }
@@ -100,8 +100,8 @@ public interface RamlAdjuster {
         }
 
         @Override
-        public TypePropertyBuilder adjustComposedProperty(TypeDeclarationBuilder typeDeclaration, Property property, TypePropertyBuilder typePropertyBuilder) {
-            TypePropertyBuilder val = typePropertyBuilder;
+        public PropertyShapeBuilder adjustComposedProperty(AnyShapeBuilder typeDeclaration, Property property, PropertyShapeBuilder propertyShapeBuilder) {
+            PropertyShapeBuilder val = propertyShapeBuilder;
             for (RamlAdjuster adjuster : adjusters) {
                 val = adjuster.adjustComposedProperty(typeDeclaration, property, val);
             }
@@ -109,8 +109,8 @@ public interface RamlAdjuster {
         }
 
         @Override
-        public TypeBuilder adjustForUnknownType(Type type) {
-            TypeBuilder val = null;
+        public TypeShapeBuilder adjustForUnknownType(Type type) {
+            TypeShapeBuilder val = null;
             for (RamlAdjuster adjuster : adjusters) {
                 val = adjuster.adjustForUnknownType(type);
             }
@@ -118,9 +118,9 @@ public interface RamlAdjuster {
         }
 
         @Override
-        public void adjustForUnknownTypeInProperty(Type type, TypeBuilder typeBuilder, TypeDeclarationBuilder typeDeclarationBuilder, Property property) {
+        public void adjustForUnknownTypeInProperty(Type type, TypeShapeBuilder typeBuilder, AnyShapeBuilder anyShapeBuilder, Property property) {
             for (RamlAdjuster adjuster : adjusters) {
-                 adjuster.adjustForUnknownTypeInProperty(type, typeBuilder, typeDeclarationBuilder, property);
+                 adjuster.adjustForUnknownTypeInProperty(type, typeBuilder, anyShapeBuilder, property);
             }
         }
     }
@@ -140,11 +140,11 @@ public interface RamlAdjuster {
      * @param builder a suggested builder. You can add to it and return this builder, or build a new one.
      * @return
      */
-    TypeBuilder adjustType(Type type, String typeName, TypeBuilder builder);
+    TypeShapeBuilder adjustType(Type type, String typeName, TypeShapeBuilder builder);
 
     /**
      * Allows you to change the name when used as a reference.  In most cases, it should match what comes out of
-     * {@link #adjustType(Type, String, TypeBuilder)} should you overload both.
+     * {@link #adjustType(Type, String, TypeShapeBuilder)} should you overload both.
      * @param aClass
      * @param name a suggested type name.  You may return it or change it.  It may not be null.
      * @return
@@ -155,26 +155,26 @@ public interface RamlAdjuster {
      * You may change the property definition for a given scalar type.
      * @param typeDeclaration
      * @param property
-     * @param typePropertyBuilder a suggested builder. You can add to it and return this builder, or build a new one.
+     * @param propertyShapeBuilder a suggested builder. You can add to it and return this builder, or build a new one.
      * @return
      */
-    TypePropertyBuilder adjustScalarProperty(TypeDeclarationBuilder typeDeclaration, Property property, TypePropertyBuilder typePropertyBuilder);
+    PropertyShapeBuilder adjustScalarProperty(AnyShapeBuilder typeDeclaration, Property property, PropertyShapeBuilder propertyShapeBuilder);
 
     /**
      * You may change the property definition for a given composed type.
      * @param typeDeclaration
      * @param property
-     * @param typePropertyBuilder a suggested builder. You can add to it and return this builder, or build a new one.
+     * @param propertyShapeBuilder a suggested builder. You can add to it and return this builder, or build a new one.
      * @return
      */
-    TypePropertyBuilder adjustComposedProperty(TypeDeclarationBuilder typeDeclaration, Property property, TypePropertyBuilder typePropertyBuilder);
+    PropertyShapeBuilder adjustComposedProperty(AnyShapeBuilder typeDeclaration, Property property, PropertyShapeBuilder propertyShapeBuilder);
 
     /**
      * Should you have a property than contains an unsupported type for RAML, you could handle here.
      * @param type
      * @return
      */
-    TypeBuilder adjustForUnknownType(Type type);
+    TypeShapeBuilder adjustForUnknownType(Type type);
 
     /**
      * Should you have a property than contains an unsupported type for RAML, you could handle here.
@@ -182,6 +182,6 @@ public interface RamlAdjuster {
      * @param typeBuilder
      * @return
      */
-    void adjustForUnknownTypeInProperty(Type type, TypeBuilder typeBuilder, TypeDeclarationBuilder builder, Property property);
+    void adjustForUnknownTypeInProperty(Type type, TypeShapeBuilder typeBuilder, AnyShapeBuilder builder, Property property);
 
 }

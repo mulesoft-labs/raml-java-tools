@@ -5,20 +5,20 @@ import org.raml.yagi.framework.nodes.Node;
 /**
  * Created. There, you have it.
  */
-public class TypeDeclarationBuilder extends KeyValueNodeBuilder<TypeDeclarationBuilder> implements NodeBuilder {
+public class PayloadBuilder extends KeyValueNodeBuilder<PayloadBuilder> implements NodeBuilder {
 
-    private TypeBuilder types = null;
+    private TypeShapeBuilder types = null;
 
-    private TypeDeclarationBuilder(String name) {
+    private PayloadBuilder(String name) {
         super(name);
     }
 
-    static public TypeDeclarationBuilder typeDeclaration(String name) {
+    static public PayloadBuilder body(String type) {
 
-        return new TypeDeclarationBuilder(name);
+        return new PayloadBuilder(type);
     }
 
-    public TypeDeclarationBuilder ofType(TypeBuilder builder) {
+    public PayloadBuilder ofType(TypeShapeBuilder builder) {
 
         types = builder;
         return this;

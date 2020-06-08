@@ -15,8 +15,8 @@
  */
 package org.raml.pojotoraml.plugins;
 
-import org.raml.builder.TypeDeclarationBuilder;
-import org.raml.builder.TypePropertyBuilder;
+import org.raml.builder.AnyShapeBuilder;
+import org.raml.builder.PropertyShapeBuilder;
 import org.raml.pojotoraml.Property;
 import org.raml.pojotoraml.RamlAdjuster;
 
@@ -41,14 +41,14 @@ public class ChangeTypeName extends RamlAdjuster.Helper {
   }
 
   @Override
-  public TypePropertyBuilder adjustScalarProperty(TypeDeclarationBuilder typeDeclaration, Property property,
-                                                  TypePropertyBuilder typePropertyBuilder) {
-    return typePropertyBuilder;
+  public PropertyShapeBuilder adjustScalarProperty(AnyShapeBuilder typeDeclaration, Property property,
+                                                   PropertyShapeBuilder propertyShapeBuilder) {
+    return propertyShapeBuilder;
   }
 
   @Override
-  public TypePropertyBuilder adjustComposedProperty(TypeDeclarationBuilder typeDeclaration, Property property,
-                                                    TypePropertyBuilder typePropertyBuilder) {
-    return typePropertyBuilder;
+  public PropertyShapeBuilder adjustComposedProperty(AnyShapeBuilder typeDeclaration, Property property,
+                                                     PropertyShapeBuilder propertyShapeBuilder) {
+    return propertyShapeBuilder;
   }
 }

@@ -1,5 +1,6 @@
 package org.raml.builder;
 
+import amf.client.model.domain.DomainElement;
 import org.raml.yagi.framework.nodes.KeyValueNode;
 
 import java.util.ArrayList;
@@ -9,44 +10,44 @@ import java.util.List;
 /**
  * Created. There, you have it.
  */
-public class TypePropertyBuilder extends KeyValueNodeBuilder<TypePropertyBuilder> implements AnnotableBuilder<TypePropertyBuilder> {
+public class PropertyShapeBuilder extends KeyValueNodeBuilder<PropertyShapeBuilder> implements AnnotableBuilder<PropertyShapeBuilder> {
 
-    private final TypeBuilder type;
+    private final TypeShapeBuilder type;
     private Boolean required;
     private List<AnnotationBuilder> annotations = new ArrayList<>();
 
-    public TypePropertyBuilder(String name, TypeBuilder type) {
+    public PropertyShapeBuilder(String name, TypeShapeBuilder type) {
 
         super(name);
         this.type = type;
         this.required = true;
     }
 
-    public static TypePropertyBuilder property(String name, String type) {
+    public static PropertyShapeBuilder property(String name, String type) {
 
-        return new TypePropertyBuilder(name, TypeBuilder.type(type));
+        return new PropertyShapeBuilder(name, TypeShapeBuilder.type(type));
     }
 
-    public static TypePropertyBuilder property(String name, TypeBuilder type) {
+    public static PropertyShapeBuilder property(String name, TypeShapeBuilder type) {
 
-        return new TypePropertyBuilder(name, type);
+        return new PropertyShapeBuilder(name, type);
     }
 
-    public TypePropertyBuilder required(boolean required) {
+    public PropertyShapeBuilder required(boolean required) {
 
         this.required = required;
         return this;
     }
 
     @Override
-    public TypePropertyBuilder withAnnotations(AnnotationBuilder... builders) {
+    public PropertyShapeBuilder withAnnotations(AnnotationBuilder... builders) {
 
         this.annotations.addAll(Arrays.asList(builders));
         return this;
     }
 
     @Override
-    public KeyValueNode buildNode() {
+    public DomainElement buildNode() {
 
         KeyValueNode node = super.buildNode();
         node.setValue(type.buildNode());

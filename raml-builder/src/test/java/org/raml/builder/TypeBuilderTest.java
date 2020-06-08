@@ -23,8 +23,8 @@ public class TypeBuilderTest {
                 .version("one")
                 .mediaType("foo/fun")
                 .withTypes(
-                        TypeDeclarationBuilder.typeDeclaration("Mom")
-                                .ofType(TypeBuilder.type("boolean")))
+                        AnyShapeBuilder.typeDeclaration("Mom")
+                                .ofType(TypeShapeBuilder.type("boolean")))
                 .buildModel();
 
         assertEquals("Mom", api.types().get(0).name());
@@ -41,8 +41,8 @@ public class TypeBuilderTest {
                 .version("one")
                 .mediaType("foo/fun")
                 .withTypes(
-                        TypeDeclarationBuilder.typeDeclaration("Mom")
-                                .ofType(TypeBuilder.type("boolean").enumValues(true, false)))
+                        AnyShapeBuilder.typeDeclaration("Mom")
+                                .ofType(TypeShapeBuilder.type("boolean").enumValues(true, false)))
                 .buildModel();
 
         assertEquals("Mom", api.types().get(0).name());
@@ -58,8 +58,8 @@ public class TypeBuilderTest {
                 .version("one")
                 .mediaType("foo/fun")
                 .withTypes(
-                        TypeDeclarationBuilder.typeDeclaration("Mom")
-                                .ofType(TypeBuilder.type("integer").enumValues(1,2,3)))
+                        AnyShapeBuilder.typeDeclaration("Mom")
+                                .ofType(TypeShapeBuilder.type("integer").enumValues(1,2,3)))
                 .buildModel();
 
         assertEquals("Mom", api.types().get(0).name());
@@ -77,8 +77,8 @@ public class TypeBuilderTest {
                 .version("one")
                 .mediaType("foo/fun")
                 .withTypes(
-                        TypeDeclarationBuilder.typeDeclaration("Mom")
-                                .ofType(TypeBuilder.type("string").enumValues("1", "2", "3")))
+                        AnyShapeBuilder.typeDeclaration("Mom")
+                                .ofType(TypeShapeBuilder.type("string").enumValues("1", "2", "3")))
                 .buildModel();
 
         assertEquals("Mom", api.types().get(0).name());
@@ -95,10 +95,10 @@ public class TypeBuilderTest {
                 .version("one")
                 .mediaType("foo/fun")
                 .withTypes(
-                        TypeDeclarationBuilder.typeDeclaration("Mom")
-                                .ofType(TypeBuilder.type("object")
+                        AnyShapeBuilder.typeDeclaration("Mom")
+                                .ofType(TypeShapeBuilder.type("object")
                                         .withProperty(
-                                                TypePropertyBuilder.property("name", TypeBuilder.type("string")))
+                                                PropertyShapeBuilder.property("name", TypeShapeBuilder.type("string")))
                                 )
                 )
                 .buildModel();
@@ -118,16 +118,16 @@ public class TypeBuilderTest {
                 .version("one")
                 .mediaType("foo/fun")
                 .withTypes(
-                        TypeDeclarationBuilder.typeDeclaration("Parent")
-                                .ofType(TypeBuilder.type("object")
+                        AnyShapeBuilder.typeDeclaration("Parent")
+                                .ofType(TypeShapeBuilder.type("object")
                                         .withProperty(
-                                                TypePropertyBuilder.property("name", TypeBuilder.type("string")))
+                                                PropertyShapeBuilder.property("name", TypeShapeBuilder.type("string")))
                                 ),
 
-                        TypeDeclarationBuilder.typeDeclaration("Mom")
-                                .ofType(TypeBuilder.type("Parent")
+                        AnyShapeBuilder.typeDeclaration("Mom")
+                                .ofType(TypeShapeBuilder.type("Parent")
                                         .withProperty(
-                                                TypePropertyBuilder.property("subName", TypeBuilder.type("string")))
+                                                PropertyShapeBuilder.property("subName", TypeShapeBuilder.type("string")))
                                 )
                 )
                 .buildModel();
@@ -149,22 +149,22 @@ public class TypeBuilderTest {
                 .version("one")
                 .mediaType("foo/fun")
                 .withTypes(
-                        TypeDeclarationBuilder.typeDeclaration("Parent1")
-                                .ofType(TypeBuilder.type("object")
+                        AnyShapeBuilder.typeDeclaration("Parent1")
+                                .ofType(TypeShapeBuilder.type("object")
                                         .withProperty(
-                                                TypePropertyBuilder.property("name", TypeBuilder.type("string")))
+                                                PropertyShapeBuilder.property("name", TypeShapeBuilder.type("string")))
                                 ),
-                        TypeDeclarationBuilder.typeDeclaration("Parent2")
-                                .ofType(TypeBuilder.type("object")
+                        AnyShapeBuilder.typeDeclaration("Parent2")
+                                .ofType(TypeShapeBuilder.type("object")
                                         .withProperty(
-                                                TypePropertyBuilder.property("name2", TypeBuilder.type("string")))
+                                                PropertyShapeBuilder.property("name2", TypeShapeBuilder.type("string")))
                                 ),
 
 
-                        TypeDeclarationBuilder.typeDeclaration("Mom")
-                                .ofType(TypeBuilder.type("Parent1", "Parent2")
+                        AnyShapeBuilder.typeDeclaration("Mom")
+                                .ofType(TypeShapeBuilder.type("Parent1", "Parent2")
                                         .withProperty(
-                                                TypePropertyBuilder.property("subName", TypeBuilder.type("string")))
+                                                PropertyShapeBuilder.property("subName", TypeShapeBuilder.type("string")))
                                 )
                 )
                 .buildModel();
@@ -186,8 +186,8 @@ public class TypeBuilderTest {
                 .version("one")
                 .mediaType("foo/fun")
                 .withTypes(
-                        TypeDeclarationBuilder.typeDeclaration("Mom")
-                                .ofType(TypeBuilder.type("string | integer")
+                        AnyShapeBuilder.typeDeclaration("Mom")
+                                .ofType(TypeShapeBuilder.type("string | integer")
                         )
                 )
                 .buildModel();
@@ -208,22 +208,22 @@ public class TypeBuilderTest {
                 .version("one")
                 .mediaType("foo/fun")
                 .withTypes(
-                        TypeDeclarationBuilder.typeDeclaration("Parent1")
-                                .ofType(TypeBuilder.type("object")
+                        AnyShapeBuilder.typeDeclaration("Parent1")
+                                .ofType(TypeShapeBuilder.type("object")
                                         .withProperty(
-                                                TypePropertyBuilder.property("name", TypeBuilder.type("string")))
+                                                PropertyShapeBuilder.property("name", TypeShapeBuilder.type("string")))
                                 ),
-                        TypeDeclarationBuilder.typeDeclaration("Parent2")
-                                .ofType(TypeBuilder.type("object")
+                        AnyShapeBuilder.typeDeclaration("Parent2")
+                                .ofType(TypeShapeBuilder.type("object")
                                         .withProperty(
-                                                TypePropertyBuilder.property("name2", TypeBuilder.type("string")))
+                                                PropertyShapeBuilder.property("name2", TypeShapeBuilder.type("string")))
                                 ),
 
 
-                        TypeDeclarationBuilder.typeDeclaration("Mom")
-                                .ofType(TypeBuilder.type("Parent1 | Parent2")
+                        AnyShapeBuilder.typeDeclaration("Mom")
+                                .ofType(TypeShapeBuilder.type("Parent1 | Parent2")
                                         .withProperty(
-                                                TypePropertyBuilder.property("subName", TypeBuilder.type("string")))
+                                                PropertyShapeBuilder.property("subName", TypeShapeBuilder.type("string")))
                                 )
                 )
                 .buildModel();

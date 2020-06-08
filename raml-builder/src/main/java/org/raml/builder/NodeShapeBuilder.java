@@ -1,7 +1,7 @@
 package org.raml.builder;
 
-import org.raml.yagi.framework.nodes.ObjectNode;
-import org.raml.yagi.framework.nodes.ObjectNodeImpl;
+import amf.client.model.domain.DomainElement;
+import amf.client.model.domain.NodeShape;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created. There, you have it.
  */
-public class ObjectNodeBuilder<B extends ObjectNodeBuilder> implements NodeBuilder {
+public class NodeShapeBuilder<B extends NodeShapeBuilder> implements NodeBuilder {
 
     private List<NodeBuilder> builders = new ArrayList<>();
 
@@ -20,8 +20,8 @@ public class ObjectNodeBuilder<B extends ObjectNodeBuilder> implements NodeBuild
         return (B) this;
     }
 
-    public ObjectNode buildNode() {
-        ObjectNode value = new ObjectNodeImpl();
+    public DomainElement buildNode() {
+        NodeShape value = new NodeShape();
         for (NodeBuilder builder : builders) {
             value.addChild(builder.buildNode());
         }

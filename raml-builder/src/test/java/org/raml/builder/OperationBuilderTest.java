@@ -10,7 +10,7 @@ import static org.raml.builder.ResourceBuilder.resource;
 /**
  * Created. There, you have it.
  */
-public class MethodBuilderTest {
+public class OperationBuilderTest {
 
 
     @Test
@@ -23,10 +23,10 @@ public class MethodBuilderTest {
                 .mediaType("foo/fun")
                 .withResources(
                         resource("/foo")
-                            .withMethods(MethodBuilder.method("get")
+                            .withMethods(OperationBuilder.method("get")
                                     .withQueryParameter(ParameterBuilder.parameter("foo").ofType("string"))
                                     .withHeaderParameters(ParameterBuilder.parameter("faf").ofType("string"))
-                                    .withBodies(BodyBuilder.body("application/json"))
+                                    .withPayloads(PayloadBuilder.body("application/json"))
                             )
                 )
                 .buildModel();

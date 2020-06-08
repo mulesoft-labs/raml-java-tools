@@ -18,7 +18,7 @@ package org.raml.pojotoraml.types;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import org.raml.builder.PropertyValueBuilder;
-import org.raml.builder.TypeBuilder;
+import org.raml.builder.TypeShapeBuilder;
 
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -102,8 +102,8 @@ public enum ScalarType implements RamlType {
     }
 
     @Override
-    public TypeBuilder getRamlSyntax() {
-        return TypeBuilder.type(ramlSyntax);
+    public TypeShapeBuilder getRamlSyntax() {
+        return TypeShapeBuilder.type(ramlSyntax);
     }
 
 
@@ -132,7 +132,7 @@ public enum ScalarType implements RamlType {
 
         RamlType wrappedType = new RamlType() {
             @Override
-            public TypeBuilder getRamlSyntax() {
+            public TypeShapeBuilder getRamlSyntax() {
 
                 String format = foundType.formats.get(type);
                 if ( format == null ) {
@@ -161,7 +161,7 @@ public enum ScalarType implements RamlType {
         return Optional.of(wrappedType);
     }
 
-    public static boolean  isRamalScalarType(String type) {
+    public static boolean isRamlScalarType(String type) {
 
         return SCALAR_TYPES.contains(type);
     }

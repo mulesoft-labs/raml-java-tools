@@ -1,5 +1,6 @@
 package org.raml.builder;
 
+import amf.client.model.domain.DomainElement;
 import org.raml.yagi.framework.nodes.KeyValueNode;
 import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
 import org.raml.yagi.framework.nodes.ObjectNodeImpl;
@@ -71,7 +72,7 @@ public class PropertyValueBuilder implements NodeBuilder, SupportsProperties<Pro
 
 
     @Override
-    public KeyValueNode buildNode() {
+    public DomainElement buildNode() {
 
         if (value != null) {
             return new KeyValueNodeImpl(new StringNodeImpl(name), value.createNode());

@@ -22,9 +22,9 @@ public class ResponseBuilderTest {
                 .mediaType("foo/fun")
                 .withResources(
                         resource("/foo")
-                                .withMethods(MethodBuilder.method("get")
+                                .withMethods(OperationBuilder.method("get")
                                         .withResponses(ResponseBuilder.response(200)
-                                                .withBodies(BodyBuilder.body("application/json").ofType(TypeBuilder.type("integer")))
+                                                .withBodies(PayloadBuilder.body("application/json").ofType(TypeShapeBuilder.type("integer")))
                                         )
                                 )
                 )

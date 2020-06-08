@@ -1,5 +1,6 @@
 package org.raml.builder;
 
+import amf.client.model.domain.DomainElement;
 import org.raml.v2.internal.impl.commons.nodes.TypeDeclarationNode;
 import org.raml.yagi.framework.nodes.KeyValueNode;
 import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
@@ -11,7 +12,7 @@ import org.raml.yagi.framework.nodes.StringNodeImpl;
  */
 public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
 
-    private TypeBuilder type;
+    private TypeShapeBuilder type;
     private String displayName;
     private String description;
     private Boolean required;
@@ -27,11 +28,11 @@ public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
 
     public ParameterBuilder ofType(String name) {
 
-        this.type = TypeBuilder.type(name);
+        this.type = TypeShapeBuilder.type(name);
         return this;
     }
 
-    public ParameterBuilder ofType(TypeBuilder name) {
+    public ParameterBuilder ofType(TypeShapeBuilder name) {
 
         this.type = name;
         return this;
@@ -43,7 +44,7 @@ public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
     }
 
     @Override
-    public KeyValueNode buildNode() {
+    public DomainElement buildNode() {
 
         KeyValueNode node = super.buildNode();
 

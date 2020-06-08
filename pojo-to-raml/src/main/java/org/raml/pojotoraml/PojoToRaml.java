@@ -1,6 +1,6 @@
 package org.raml.pojotoraml;
 
-import org.raml.builder.TypeBuilder;
+import org.raml.builder.TypeShapeBuilder;
 
 import java.lang.reflect.Type;
 
@@ -10,6 +10,6 @@ import java.lang.reflect.Type;
 public interface PojoToRaml {
 
     Result classToRaml(Class<?> clazz);
-    TypeBuilder name(Class<?> clazz);
-    TypeBuilder name(Type type);
+    TypeShapeBuilder name(Class<?> clazz);
+    TypeShapeBuilder name(Type type);
 }

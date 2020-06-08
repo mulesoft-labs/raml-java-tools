@@ -2,8 +2,8 @@ package org.raml.pojotoraml;
 
 import org.junit.Test;
 import org.raml.builder.RamlDocumentBuilder;
-import org.raml.builder.TypeBuilder;
-import org.raml.builder.TypeDeclarationBuilder;
+import org.raml.builder.TypeShapeBuilder;
+import org.raml.builder.AnyShapeBuilder;
 import org.raml.pojotoraml.field.FieldClassParser;
 import org.raml.pojotoraml.plugins.AdditionalPropertiesAdjuster;
 import org.raml.simpleemitter.Emitter;
@@ -132,7 +132,7 @@ public class PojoToRamlImplTest {
     public void name() throws Exception {
 
         PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), AdjusterFactory.NULL_FACTORY);
-        TypeBuilder builder = pojoToRaml.name(Fun.class.getMethod("stringMethod").getGenericReturnType());
+        TypeShapeBuilder builder = pojoToRaml.name(Fun.class.getMethod("stringMethod").getGenericReturnType());
 
         ObjectNode node = builder.buildNode();
 
@@ -145,7 +145,7 @@ public class PojoToRamlImplTest {
                 .baseUri("http://google.com")
                 .title("hello")
                 .version("1")
-                .withTypes(types.allTypes().toArray(new TypeDeclarationBuilder[0]));
+                .withTypes(types.allTypes().toArray(new AnyShapeBuilder[0]));
 
         Api api = ramlDocumentBuilder.buildModel();
 

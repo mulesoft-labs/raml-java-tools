@@ -1,5 +1,6 @@
 package org.raml.builder;
 
+import amf.client.model.domain.DomainElement;
 import org.raml.yagi.framework.nodes.KeyValueNode;
 
 import java.util.Arrays;
@@ -14,7 +15,7 @@ public class ResourceBuilder extends KeyValueNodeBuilder<ResourceBuilder> implem
     private String relativeUri;
 
     private KeyValueNodeBuilderMap<ResourceBuilder> resourceBuilders = KeyValueNodeBuilderMap.createMap();
-    private KeyValueNodeBuilderMap<MethodBuilder> methodBuilders = KeyValueNodeBuilderMap.createMap();
+    private KeyValueNodeBuilderMap<OperationBuilder> methodBuilders = KeyValueNodeBuilderMap.createMap();
 
     private ResourceBuilder(String name) {
         super(name);
@@ -26,7 +27,7 @@ public class ResourceBuilder extends KeyValueNodeBuilder<ResourceBuilder> implem
     }
 
     @Override
-    public KeyValueNode buildNode() {
+    public DomainElement buildNode() {
 
         KeyValueNode resourceNode = super.buildNode();
 
@@ -62,8 +63,8 @@ public class ResourceBuilder extends KeyValueNodeBuilder<ResourceBuilder> implem
         return this;
     }
 
-    public ResourceBuilder withMethods(MethodBuilder... methodBuilders) {
-        this.methodBuilders.addAll(Arrays.asList(methodBuilders));
+    public ResourceBuilder withMethods(OperationBuilder... operationBuilders) {
+        this.methodBuilders.addAll(Arrays.asList(operationBuilders));
         return this;
     }
 

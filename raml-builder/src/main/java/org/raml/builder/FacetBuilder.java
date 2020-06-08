@@ -1,5 +1,6 @@
 package org.raml.builder;
 
+import amf.client.model.domain.DomainElement;
 import org.raml.yagi.framework.nodes.KeyValueNode;
 
 /**
@@ -25,7 +26,7 @@ public class FacetBuilder extends KeyValueNodeBuilder<FacetBuilder> {
     }
 
     @Override
-    public KeyValueNode buildNode() {
+    public DomainElement buildNode() {
         KeyValueNode node = super.buildNode();
         node.setValue(value.createNode());
         return node;

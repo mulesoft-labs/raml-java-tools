@@ -1,9 +1,6 @@
 package org.raml.builder;
 
-import org.raml.yagi.framework.nodes.KeyValueNode;
-import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
-import org.raml.yagi.framework.nodes.ObjectNodeImpl;
-import org.raml.yagi.framework.nodes.StringNodeImpl;
+import amf.client.model.domain.DomainElement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,51 +9,51 @@ import java.util.List;
 /**
  * Created. There, you have it.
  */
-public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder> implements AnnotableBuilder<MethodBuilder>/*, ModelBuilder<Method>*/ {
+public class OperationBuilder extends KeyValueNodeBuilder<OperationBuilder> implements AnnotableBuilder<OperationBuilder>/*, ModelBuilder<Method>*/ {
 
     private List<ResponseBuilder> responses = new ArrayList<>();
-    private List<BodyBuilder> bodies = new ArrayList<>();
+    private List<PayloadBuilder> bodies = new ArrayList<>();
     private List<AnnotationBuilder> annotations = new ArrayList<>();
     private List<ParameterBuilder> queryParameters = new ArrayList<>();
     private List<ParameterBuilder> headerParameters = new ArrayList<>();
     private String description;
 
 
-    private MethodBuilder(String name) {
+    private OperationBuilder(String name) {
         super(name);
     }
 
-    static public MethodBuilder method(String name) {
+    static public OperationBuilder method(String name) {
 
-        return new MethodBuilder(name);
+        return new OperationBuilder(name);
     }
 
-    public MethodBuilder withResponses(ResponseBuilder... response) {
+    public OperationBuilder withResponses(ResponseBuilder... response) {
 
         responses.addAll(Arrays.asList(response));
         return this;
     }
 
-    public MethodBuilder withBodies(BodyBuilder... builder) {
+    public OperationBuilder withPayloads(PayloadBuilder... builder) {
 
         this.bodies.addAll(Arrays.asList(builder));
         return this;
     }
 
-    public MethodBuilder withQueryParameter(ParameterBuilder... builder) {
+    public OperationBuilder withQueryParameter(ParameterBuilder... builder) {
 
         this.queryParameters.addAll(Arrays.asList(builder));
         return this;
     }
 
-    public MethodBuilder withHeaderParameters(ParameterBuilder... builder) {
+    public OperationBuilder withHeaderParameters(ParameterBuilder... builder) {
 
         this.headerParameters.addAll(Arrays.asList(builder));
         return this;
     }
 
     @Override
-    public MethodBuilder withAnnotations(AnnotationBuilder... builders) {
+    public OperationBuilder withAnnotations(AnnotationBuilder... builders) {
 
         this.annotations.addAll(Arrays.asList(builders));
         return this;
@@ -68,7 +65,7 @@ public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder> implements
   //  }
 
     @Override
-    public KeyValueNode buildNode() {
+    public DomainElement buildNode() {
         KeyValueNode node =  super.buildNode();
 
         addProperty(node.getValue(), "description", description);
@@ -121,7 +118,7 @@ public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder> implements
             KeyValueNodeImpl bkvn = new KeyValueNodeImpl(new StringNodeImpl("body"), bodyValueNode);
             node.getValue().addChild(bkvn);
 
-            for (BodyBuilder body : bodies) {
+            for (PayloadBuilder body : bodies) {
                 bodyValueNode.addChild(body.buildNode());
             }
         }
@@ -130,7 +127,7 @@ public class MethodBuilder extends KeyValueNodeBuilder<MethodBuilder> implements
 
     }
 
-    public MethodBuilder description(String description) {
+    public OperationBuilder description(String description) {
         this.description = description;
         return this;
     }

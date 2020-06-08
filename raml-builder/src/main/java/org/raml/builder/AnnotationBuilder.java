@@ -1,5 +1,7 @@
 package org.raml.builder;
 
+import amf.client.model.Annotations;
+import amf.client.model.domain.DomainElement;
 import org.raml.yagi.framework.nodes.KeyValueNode;
 import org.raml.yagi.framework.nodes.StringNodeImpl;
 
@@ -36,7 +38,7 @@ public class AnnotationBuilder extends KeyValueNodeBuilder<AnnotationBuilder> im
     }
 
     @Override
-    public KeyValueNode buildNode() {
+    public DomainElement buildNode() {
 
         KeyValueNode k = super.buildNode();
         for (PropertyValueBuilder property : properties) {

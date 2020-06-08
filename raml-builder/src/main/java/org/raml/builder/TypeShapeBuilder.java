@@ -1,5 +1,6 @@
 package org.raml.builder;
 
+import amf.client.model.domain.DomainElement;
 import com.google.common.base.Joiner;
 import org.raml.v2.internal.impl.commons.nodes.FacetNode;
 import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
@@ -16,9 +17,9 @@ import static org.raml.builder.NodeBuilders.property;
 /**
  * Created. There, you have it.
  */
-public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeBuilder, AnnotableBuilder<TypeBuilder> {
+public class TypeShapeBuilder extends NodeShapeBuilder<TypeShapeBuilder> implements NodeBuilder, AnnotableBuilder<TypeShapeBuilder> {
 
-    private List<TypePropertyBuilder> properties = new ArrayList<>();
+    private List<PropertyShapeBuilder> properties = new ArrayList<>();
     private List<ExamplesBuilder> examples = new ArrayList<>();
     private List<AnnotationBuilder> annotations = new ArrayList<>();
     private List<FacetBuilder> facets = new ArrayList<>();
@@ -30,18 +31,18 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
 
     private ExamplesBuilder example;
 
-    private TypeBuilder arrayItems;
+    private TypeShapeBuilder arrayItems;
 
-    private TypeBuilder(String type) {
+    private TypeShapeBuilder(String type) {
         this.types= new String[] {type};
     }
 
-    public TypeBuilder(String[] types) {
+    public TypeShapeBuilder(String[] types) {
 
         this.types = types;
     }
 
-    public TypeBuilder(TypeBuilder builder) {
+    public TypeShapeBuilder(TypeShapeBuilder builder) {
         this.types = new String[] {"array"};
         this.arrayItems = builder;
     }
@@ -56,84 +57,84 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
         }
     }
 
-    static public TypeBuilder type(String type) {
+    static public TypeShapeBuilder type(String type) {
 
-        return new TypeBuilder(type);
+        return new TypeShapeBuilder(type);
     }
 
-    static public TypeBuilder arrayOf(TypeBuilder builder) {
+    static public TypeShapeBuilder arrayOf(TypeShapeBuilder builder) {
 
-        return new TypeBuilder(builder);
+        return new TypeShapeBuilder(builder);
     }
 
-    static public TypeBuilder type() {
+    static public TypeShapeBuilder type() {
 
-        return new TypeBuilder((String[])null);
+        return new TypeShapeBuilder((String[])null);
     }
 
-    static public TypeBuilder type(String... types) {
+    static public TypeShapeBuilder type(String... types) {
 
-        return new TypeBuilder(types);
+        return new TypeShapeBuilder(types);
     }
 
     @Override
-    public TypeBuilder withAnnotations(AnnotationBuilder... builders) {
+    public TypeShapeBuilder withAnnotations(AnnotationBuilder... builders) {
 
         this.annotations.addAll(Arrays.asList(builders));
         return this;
     }
 
-    public TypeBuilder withProperty(TypePropertyBuilder... properties) {
+    public TypeShapeBuilder withProperty(PropertyShapeBuilder... properties) {
 
         this.properties.addAll(Arrays.asList(properties));
         return this;
     }
 
-    public TypeBuilder withExamples(ExamplesBuilder... properties) {
+    public TypeShapeBuilder withExamples(ExamplesBuilder... properties) {
 
         this.example = null;
         this.examples.addAll(Arrays.asList(properties));
         return this;
     }
 
-    public TypeBuilder withExample(ExamplesBuilder example) {
+    public TypeShapeBuilder withExample(ExamplesBuilder example) {
 
         this.examples.clear();
         this.example = example;
         return this;
     }
 
-    public TypeBuilder withFacets(FacetBuilder... facetBuilders) {
+    public TypeShapeBuilder withFacets(FacetBuilder... facetBuilders) {
 
         this.facets.addAll(Arrays.asList(facetBuilders));
         return this;
     }
 
-    public TypeBuilder description(String description) {
+    public TypeShapeBuilder description(String description) {
 
         this.description = description;
         return this;
     }
 
-    public TypeBuilder enumValues(String... enumValues) {
+    public TypeShapeBuilder enumValues(String... enumValues) {
 
         this.enumValues = ValueNodeFactories.create(new SimpleSYArrayNode(), enumValues);
         return this;
     }
 
-    public TypeBuilder enumValues(long... enumValues) {
+    public TypeShapeBuilder enumValues(long... enumValues) {
 
         this.enumValues = ValueNodeFactories.create(new SimpleSYArrayNode(), enumValues);
         return this;
     }
-    public TypeBuilder enumValues(boolean... enumValues) {
+    public TypeShapeBuilder enumValues(boolean... enumValues) {
 
         this.enumValues = ValueNodeFactories.create(new SimpleSYArrayNode(), enumValues);
         return this;
     }
 
     @Override
-    public ObjectNode buildNode() {
+    public DomainElement buildNode() {
 
         ObjectNode node = super.buildNode();
 
@@ -185,7 +186,7 @@ public class TypeBuilder extends ObjectNodeBuilder<TypeBuilder> implements NodeB
         if ( ! properties.isEmpty() ) {
 
             KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("properties"), new ObjectNodeImpl());
-            for (TypePropertyBuilder property : properties) {
+            for (PropertyShapeBuilder property : properties) {
                 kvn.getValue().addChild(property.buildNode());
             }
 

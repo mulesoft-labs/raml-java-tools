@@ -1,5 +1,6 @@
 package org.raml.builder;
 
+import amf.client.model.domain.DomainElement;
 import org.raml.yagi.framework.nodes.KeyValueNode;
 import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
 import org.raml.yagi.framework.nodes.ObjectNodeImpl;
@@ -55,7 +56,7 @@ public class ExamplesBuilder extends KeyValueNodeBuilder<ExamplesBuilder> implem
     }
 
     @Override
-    public KeyValueNode buildNode() {
+    public DomainElement buildNode() {
 
         KeyValueNode node = super.buildNode();
         node.getValue().addChild(new KeyValueNodeImpl(new StringNodeImpl("strict"), new BooleanNode(strict)));

@@ -1,6 +1,6 @@
 package org.raml.pojotoraml.types;
 
-import org.raml.builder.TypeBuilder;
+import org.raml.builder.TypeShapeBuilder;
 
 /**
  * Created. There, you have it.
@@ -22,8 +22,8 @@ public class ComposedRamlType implements RamlType{
     }
 
     @Override
-    public TypeBuilder getRamlSyntax() {
-        return TypeBuilder.type(actualRamlName);
+    public TypeShapeBuilder getRamlSyntax() {
+        return TypeShapeBuilder.type(actualRamlName);
     }
 
     @Override

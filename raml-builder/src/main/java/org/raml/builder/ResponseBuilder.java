@@ -1,5 +1,6 @@
 package org.raml.builder;
 
+import amf.client.model.domain.DomainElement;
 import org.raml.yagi.framework.nodes.KeyValueNode;
 import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
 import org.raml.yagi.framework.nodes.ObjectNodeImpl;
@@ -14,7 +15,7 @@ import java.util.List;
  */
 public class ResponseBuilder extends KeyValueNodeBuilder<ResponseBuilder> implements NodeBuilder, AnnotableBuilder<ResponseBuilder> {
 
-    private List<BodyBuilder> bodies = new ArrayList<>();
+    private List<PayloadBuilder> bodies = new ArrayList<>();
     private List<AnnotationBuilder> annotations = new ArrayList<>();
     private String description;
 
@@ -27,7 +28,7 @@ public class ResponseBuilder extends KeyValueNodeBuilder<ResponseBuilder> implem
         return new ResponseBuilder(code);
     }
 
-    public ResponseBuilder withBodies(BodyBuilder... builder) {
+    public ResponseBuilder withBodies(PayloadBuilder... builder) {
 
         this.bodies.addAll(Arrays.asList(builder));
         return this;
@@ -42,7 +43,7 @@ public class ResponseBuilder extends KeyValueNodeBuilder<ResponseBuilder> implem
 
 
     @Override
-    public KeyValueNode buildNode() {
+    public DomainElement buildNode() {
         KeyValueNode node =  super.buildNode();
 
         addProperty(node.getValue(), "descrption", description);
@@ -52,7 +53,7 @@ public class ResponseBuilder extends KeyValueNodeBuilder<ResponseBuilder> implem
             KeyValueNodeImpl bkvn = new KeyValueNodeImpl(new StringNodeImpl("body"), valueNode);
             node.getValue().addChild(bkvn);
 
-            for (BodyBuilder body : bodies) {
+            for (PayloadBuilder body : bodies) {
                 valueNode.addChild(body.buildNode());
             }
         }
