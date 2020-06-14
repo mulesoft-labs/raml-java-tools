@@ -58,7 +58,7 @@ public class PojoToRamlImpl implements PojoToRaml {
         }
 
         final String simpleName = adjuster.adjustTypeName(clazz, clazz.getSimpleName());
-        return TypeShapeBuilder.type(simpleName);
+        return TypeShapeBuilder.simpleType(simpleName);
     }
 
     @Override
@@ -148,7 +148,7 @@ public class PojoToRamlImpl implements PojoToRaml {
     private AnyShapeBuilder handleEnum(final RamlType quickType, final RamlAdjuster adjuster, Map<String, AnyShapeBuilder> builtTypes) {
 
         Class<? extends Enum> c = (Class<? extends Enum>) quickType.type();
-        TypeShapeBuilder typeBuilder = TypeShapeBuilder.type().enumValues(
+        TypeShapeBuilder typeBuilder = TypeShapeBuilder.enumeratedType().enumValues(
                 Arrays.stream(c.getEnumConstants()).map(new java.util.function.Function<Enum, String>() {
                     @Nullable
                     @Override
@@ -191,9 +191,9 @@ public class PojoToRamlImpl implements PojoToRaml {
 
         TypeShapeBuilder builder;
         if ( typeNames.isEmpty()) {
-            builder = TypeShapeBuilder.type("object");
+            builder = TypeShapeBuilder.simpleType("object");
         } else {
-            builder = TypeShapeBuilder.type(typeNames.toArray(new String[0]));
+            builder = TypeShapeBuilder.inheritingObject(typeNames.toArray(new String[0]));
         }
         return builder;
     }

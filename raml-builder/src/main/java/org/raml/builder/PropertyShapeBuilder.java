@@ -1,6 +1,7 @@
 package org.raml.builder;
 
 import amf.client.model.domain.DomainElement;
+import amf.client.model.domain.PropertyShape;
 import org.raml.yagi.framework.nodes.KeyValueNode;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class PropertyShapeBuilder extends KeyValueNodeBuilder<PropertyShapeBuild
 
     public static PropertyShapeBuilder property(String name, String type) {
 
-        return new PropertyShapeBuilder(name, TypeShapeBuilder.type(type));
+        return new PropertyShapeBuilder(name, TypeShapeBuilder.simpleType(type));
     }
 
     public static PropertyShapeBuilder property(String name, TypeShapeBuilder type) {
@@ -47,7 +48,7 @@ public class PropertyShapeBuilder extends KeyValueNodeBuilder<PropertyShapeBuild
     }
 
     @Override
-    public DomainElement buildNode() {
+    public PropertyShape buildNode() {
 
         KeyValueNode node = super.buildNode();
         node.setValue(type.buildNode());

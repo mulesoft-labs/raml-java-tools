@@ -24,7 +24,7 @@ public class ResponseBuilderTest {
                         resource("/foo")
                                 .withMethods(OperationBuilder.method("get")
                                         .withResponses(ResponseBuilder.response(200)
-                                                .withBodies(PayloadBuilder.body("application/json").ofType(TypeShapeBuilder.type("integer")))
+                                                .withBodies(PayloadBuilder.body("application/json").ofType(TypeShapeBuilder.simpleType("integer")))
                                         )
                                 )
                 )

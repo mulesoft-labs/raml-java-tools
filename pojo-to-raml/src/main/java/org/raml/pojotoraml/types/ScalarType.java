@@ -103,7 +103,7 @@ public enum ScalarType implements RamlType {
 
     @Override
     public TypeShapeBuilder getRamlSyntax() {
-        return TypeShapeBuilder.type(ramlSyntax);
+        return TypeShapeBuilder.simpleType(ramlSyntax);
     }
 
 
@@ -138,7 +138,7 @@ public enum ScalarType implements RamlType {
                 if ( format == null ) {
                     return foundType.getRamlSyntax();
                 } else {
-                    return foundType.getRamlSyntax().with(PropertyValueBuilder.property("format", format));
+                    return foundType.getRamlSyntax().withFormat(PropertyValueBuilder.property("format", format));
                 }
             }
 

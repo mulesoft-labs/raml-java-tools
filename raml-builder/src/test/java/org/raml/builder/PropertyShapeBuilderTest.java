@@ -23,11 +23,11 @@ public class PropertyShapeBuilderTest {
                 .mediaType("foo/fun")
                 .withTypes(
                         AnyShapeBuilder.typeDeclaration("Mom")
-                                .ofType(TypeShapeBuilder.type("object")
+                                .ofType(TypeShapeBuilder.simpleType("object")
                                         .withProperty(
-                                                PropertyShapeBuilder.property("name", TypeShapeBuilder.type("string")))
+                                                PropertyShapeBuilder.property("name", TypeShapeBuilder.simpleType("string")))
                                         .withProperty(
-                                                PropertyShapeBuilder.property("address", TypeShapeBuilder.type("string")).required(false))
+                                                PropertyShapeBuilder.property("address", TypeShapeBuilder.simpleType("string")).required(false))
                                 )
                 )
                 .buildModel();

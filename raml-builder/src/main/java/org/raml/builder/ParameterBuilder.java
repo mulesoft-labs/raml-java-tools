@@ -28,7 +28,7 @@ public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
 
     public ParameterBuilder ofType(String name) {
 
-        this.type = TypeShapeBuilder.type(name);
+        this.type = TypeShapeBuilder.simpleType(name);
         return this;
     }
 
