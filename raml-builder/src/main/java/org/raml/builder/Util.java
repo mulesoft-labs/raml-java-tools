@@ -7,18 +7,11 @@ import org.raml.v2.internal.impl.commons.RamlHeader;
 import org.raml.v2.internal.impl.commons.model.DefaultModelElement;
 import org.raml.v2.internal.impl.commons.model.StringType;
 import org.raml.v2.internal.impl.commons.model.factory.TypeDeclarationModelFactory;
-import org.raml.v2.internal.impl.commons.phase.*;
 import org.raml.v2.internal.impl.v10.grammar.Raml10Grammar;
 import org.raml.v2.internal.impl.v10.phase.AnnotationValidationPhase;
 import org.raml.v2.internal.impl.v10.phase.ExampleValidationPhase;
 import org.raml.v2.internal.impl.v10.phase.MediaTypeInjectionPhase;
 import org.raml.v2.internal.impl.v10.phase.ReferenceResolverTransformer;
-import org.raml.yagi.framework.model.*;
-import org.raml.yagi.framework.nodes.ErrorNode;
-import org.raml.yagi.framework.nodes.Node;
-import org.raml.yagi.framework.phase.GrammarPhase;
-import org.raml.yagi.framework.phase.Phase;
-import org.raml.yagi.framework.phase.TransformationPhase;
 
 import javax.annotation.Nullable;
 import java.io.InputStream;

@@ -1,8 +1,6 @@
 package org.raml.builder;
 
-import amf.client.model.domain.DomainElement;
 import amf.client.model.domain.PropertyShape;
-import org.raml.yagi.framework.nodes.KeyValueNode;
 
 import java.util.ArrayList;
 import java.util.Arrays;

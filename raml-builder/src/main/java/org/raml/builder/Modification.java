@@ -1,7 +1,7 @@
 package org.raml.builder;
 
-import org.raml.yagi.framework.model.NodeModel;
-import org.raml.yagi.framework.nodes.*;
+
+
 
 /**
  * Created. There, you have it.

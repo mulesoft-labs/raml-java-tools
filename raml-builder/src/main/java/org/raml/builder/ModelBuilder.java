@@ -1,6 +1,6 @@
 package org.raml.builder;
 
-import org.raml.yagi.framework.model.ModelBindingConfiguration;
+
 
 /**
  * Created. There, you have it.

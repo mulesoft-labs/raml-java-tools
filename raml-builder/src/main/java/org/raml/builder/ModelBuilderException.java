@@ -3,7 +3,6 @@ package org.raml.builder;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.FluentIterable;
-import org.raml.yagi.framework.nodes.ErrorNode;
 
 import javax.annotation.Nullable;
 import java.util.List;

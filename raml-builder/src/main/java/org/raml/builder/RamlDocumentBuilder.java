@@ -7,14 +7,6 @@ import org.raml.v2.internal.impl.commons.model.DefaultModelElement;
 import org.raml.v2.internal.impl.commons.model.StringType;
 import org.raml.v2.internal.impl.commons.model.factory.TypeDeclarationModelFactory;
 import org.raml.v2.internal.impl.commons.nodes.RamlDocumentNode;
-import org.raml.yagi.framework.model.DefaultModelBindingConfiguration;
-import org.raml.yagi.framework.model.ModelBindingConfiguration;
-import org.raml.yagi.framework.model.NodeModel;
-import org.raml.yagi.framework.model.NodeModelFactory;
-import org.raml.yagi.framework.nodes.KeyValueNode;
-import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
-import org.raml.yagi.framework.nodes.Node;
-import org.raml.yagi.framework.nodes.StringNodeImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;

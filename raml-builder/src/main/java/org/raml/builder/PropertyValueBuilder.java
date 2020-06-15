@@ -1,11 +1,11 @@
 package org.raml.builder;
 
-import amf.client.model.domain.DomainElement;
+import amf.client.model.domain.ArrayNode;
+import amf.client.model.domain.DataNode;
+import amf.client.model.domain.ObjectNode;
 import amf.client.model.domain.ScalarNode;
-import org.raml.yagi.framework.nodes.KeyValueNode;
-import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
-import org.raml.yagi.framework.nodes.ObjectNodeImpl;
-import org.raml.yagi.framework.nodes.StringNodeImpl;
+
+import java.util.Arrays;
 
 /**
  * Created. There, you have it.
@@ -13,46 +13,59 @@ import org.raml.yagi.framework.nodes.StringNodeImpl;
 public class PropertyValueBuilder implements NodeBuilder, SupportsProperties<PropertyValueBuilder> {
 
 
+    private final DataNode node;
     private String name;
     private final ValueNodeFactory value;
     private PropertyValueBuilder subValue;
 
-    public PropertyValueBuilder(String name, ValueNodeFactory value) {
+    private PropertyValueBuilder(String name, ValueNodeFactory value) {
         this.name = name;
         this.value = value;
         this.subValue = null;
+        this.node = null;
     }
 
-    public PropertyValueBuilder(String name) {
+    private PropertyValueBuilder(String name) {
 
         this.name = name;
         this.subValue = null;
+        this.value = null;
+        this.node = null;
+    }
+
+    private PropertyValueBuilder(DataNode node) {
+
+        this.node = node;
         this.value = null;
     }
 
     public static PropertyValueBuilder property(String name, String value) {
 
-        return new PropertyValueBuilder(name, ValueNodeFactories.create(value));
+        return new PropertyValueBuilder(new ScalarNode(value, "http://www.w3.org/2001/XMLSchema#string").withName(name));
     }
 
     public static PropertyValueBuilder property(String name, long value) {
 
-        return new PropertyValueBuilder(name, ValueNodeFactories.create(value));
+        return new PropertyValueBuilder(new ScalarNode(Long.toString(value), "http://www.w3.org/2001/XMLSchema#long").withName(name));
     }
 
     public static PropertyValueBuilder property(String name, boolean value) {
 
-        return new PropertyValueBuilder(name, ValueNodeFactories.create(value));
+        return new PropertyValueBuilder(new ScalarNode(Boolean.toString(value), "http://www.w3.org/2001/XMLSchema#boolean").withName(name));
     }
 
     public static PropertyValueBuilder propertyOfArray(String name, String... values) {
 
-        return new PropertyValueBuilder(name, ValueNodeFactories.create(values));
+        ArrayNode arrayNode = new ArrayNode().withName(name);
+        Arrays.stream(values).map(s -> new ScalarNode(s, "http://www.w3.org/2001/XMLSchema#string")).forEach(arrayNode::addMember);
+        return new PropertyValueBuilder(arrayNode);
     }
 
     public static PropertyValueBuilder propertyOfArray(String name, long... values) {
 
-        return new PropertyValueBuilder(name, ValueNodeFactories.create(values));
+        ArrayNode arrayNode = new ArrayNode().withName(name);
+        Arrays.stream(values).mapToObj(s -> new ScalarNode(Long.toString(s), "http://www.w3.org/2001/XMLSchema#long")).forEach(arrayNode::addMember);;
+        return new PropertyValueBuilder(arrayNode);
     }
 
     public static PropertyValueBuilder propertyOfArray(String name, boolean... values) {
@@ -73,20 +86,18 @@ public class PropertyValueBuilder implements NodeBuilder, SupportsProperties<Pro
 
 
     @Override
-    public ScalarNode buildNode() {
+    public DataNode buildNode() {
 
         if (value != null) {
-            return new KeyValueNodeImpl(new StringNodeImpl(name), value.createNode());
+            return node;
         } else {
 
             if (subValue != null) {
-                return new KeyValueNodeImpl(new StringNodeImpl(name), subValue.buildNode());
+                return ((ObjectNode)node).addProperty(name, subValue.buildNode());
             } else {
 
-                return new KeyValueNodeImpl(new StringNodeImpl(name), new ObjectNodeImpl());
+                return new ObjectNode().withName(name);
             }
         }
     }
-
-
 }

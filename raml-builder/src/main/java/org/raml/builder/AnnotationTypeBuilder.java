@@ -1,10 +1,6 @@
 package org.raml.builder;
 
 import amf.client.model.domain.DomainElement;
-import org.raml.yagi.framework.nodes.KeyValueNode;
-import org.raml.yagi.framework.nodes.KeyValueNodeImpl;
-import org.raml.yagi.framework.nodes.ObjectNodeImpl;
-import org.raml.yagi.framework.nodes.StringNodeImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
