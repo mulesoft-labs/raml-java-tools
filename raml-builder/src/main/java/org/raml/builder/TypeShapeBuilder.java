@@ -24,6 +24,8 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
 
     private TypeShapeBuilder arrayItems;
 
+    @Override
+    abstract public N buildNode();
 
     public static ScalarShapeBuilder stringScalar() {
         return new ScalarShapeBuilder("http://www.w3.org/2001/XMLSchema#string");

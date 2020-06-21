@@ -1,6 +1,5 @@
 package org.raml.builder;
 
-import amf.client.model.domain.DomainElement;
 import amf.client.model.domain.NodeShape;
 
 import java.util.ArrayList;
@@ -32,7 +31,7 @@ public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuild
 
 
     @Override
-    public DomainElement buildNode() {
+    public NodeShape buildNode() {
 
         NodeShape nodeShape = new NodeShape();
         commonNodeInfo(nodeShape);

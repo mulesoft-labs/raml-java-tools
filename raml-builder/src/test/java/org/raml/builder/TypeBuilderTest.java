@@ -1,11 +1,35 @@
 package org.raml.builder;
 
+import amf.client.model.domain.ScalarShape;
 import org.junit.Test;
+import webapi.WebApiDocument;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.raml.builder.RamlDocumentBuilder.document;
 
 /**
  * Created. There, you have it.
  */
 public class TypeBuilderTest {
+
+
+    @Test
+    public void justATypeMam() {
+
+        WebApiDocument api = document()
+                .baseUri("http://google.com")
+                .title("doc")
+                .version("one")
+                .mediaType("foo/fun")
+                .withTypes(
+                        DeclaredShapeBuilder.typeDeclaration("Mom").ofType(ScalarShapeBuilder.stringScalar())
+                )
+                .buildModel();
+
+        assertEquals("Mom", ((ScalarShape)api.declares().get(0)).name().value());
+        assertTrue(((ScalarShape)api.declares().get(0)).dataType().value().contains("string"));
+    }
 
     @Test
     public void simpleType() {
@@ -28,18 +52,19 @@ public class TypeBuilderTest {
     @Test
     public void enumeratedBoolean() {
 
-/*        Api api = document()
+        WebApiDocument api = document()
                 .baseUri("http://google.com")
                 .title("doc")
                 .version("one")
                 .mediaType("foo/fun")
                 .withTypes(
-                        AnyShapeBuilder.typeDeclaration("Mom")
-                                .ofType(TypeShapeBuilder.simpleType("boolean").enumValues(true, false)))
+                        DeclaredShapeBuilder.typeDeclaration("Mom").ofType(EnumShapeBuilder.enumeratedType().enumValues(true, false))
+                )
                 .buildModel();
 
-        assertEquals("Mom", api.types().get(0).name());
-        assertEquals(Arrays.asList(true, false), ((BooleanTypeDeclaration)api.types().get(0)).enumValues());*/
+        assertEquals("Mom", ((ScalarShape)api.declares().get(0)).name().value());
+        assertTrue(((ScalarShape)api.declares().get(0)).dataType().value().contains("boolean"));
+        assertEquals(2, ((ScalarShape) api.declares().get(0)).values().size());
     }
 
     @Test

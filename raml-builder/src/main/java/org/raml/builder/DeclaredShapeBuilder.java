@@ -8,10 +8,12 @@ import amf.client.model.domain.AnyShape;
  */
 public class DeclaredShapeBuilder extends KeyValueNodeBuilder<DeclaredShapeBuilder> implements NodeBuilder {
 
-    private TypeShapeBuilder types = null;
+    private final String name;
+    private TypeShapeBuilder<AnyShape, ?> types = null;
 
     private DeclaredShapeBuilder(String name) {
         super(name);
+        this.name = name;
     }
 
     static public DeclaredShapeBuilder typeDeclaration(String name) {
@@ -28,6 +30,8 @@ public class DeclaredShapeBuilder extends KeyValueNodeBuilder<DeclaredShapeBuild
     @Override
     public AnyShape buildNode() {
 
-            return null;
+        AnyShape shape = types.buildNode();
+        shape.withName(name);
+        return shape;
     }
 }

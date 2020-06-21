@@ -1,7 +1,6 @@
 package org.raml.builder;
 
 import amf.client.model.domain.DataNode;
-import amf.client.model.domain.DomainElement;
 import amf.client.model.domain.ScalarNode;
 import amf.client.model.domain.ScalarShape;
 
@@ -51,9 +50,10 @@ public class EnumShapeBuilder extends TypeShapeBuilder<ScalarShape, EnumShapeBui
 
 
     @Override
-    public DomainElement buildNode() {
+    public ScalarShape buildNode() {
 
         ScalarShape shape = new ScalarShape();
+        shape.withDataType("http://www.w3.org/2001/XMLSchema#boolean"); // todo fix me!
         commonNodeInfo(shape);
         if ( enumValues != null ) {
 
