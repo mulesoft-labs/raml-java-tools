@@ -35,10 +35,11 @@ public class ResourceBuilder extends KeyValueNodeBuilder<ResourceBuilder> implem
     public EndPoint buildNode() {
 
         EndPoint resourceNode = new EndPoint();
-        Optional.ofNullable(description).ifPresent(resourceNode::withDescription);
-        Optional.ofNullable(relativeUri).ifPresent(resourceNode::withPath);
-        Optional.ofNullable(name).ifPresent(resourceNode::withName);
 
+        Optional.ofNullable(description).ifPresent(resourceNode::withDescription);
+        //Optional.ofNullable(relativeUri).ifPresent(resourceNode::withPath);
+        Optional.ofNullable(name).ifPresent(resourceNode::withName);
+        Optional.ofNullable(name).ifPresent(resourceNode::withPath);
 
         resourceNode.withOperations(methodBuilders.stream().map(OperationBuilder::buildNode).collect(Collectors.toList()));
 

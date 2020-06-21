@@ -1,7 +1,11 @@
 package org.raml.builder;
 
-import amf.client.model.document.Document;
+
 import amf.client.model.domain.WebApi;
+import amf.client.validate.ValidationReport;
+import amf.core.AMF;
+import webapi.Raml10;
+import webapi.WebApiDocument;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -9,11 +13,15 @@ import java.util.stream.Collectors;
 /**
  * Created. There, you have it.
  */
-public class RamlDocumentBuilder implements ModelBuilder<Document> {
+public class RamlDocumentBuilder implements ModelBuilder<WebApiDocument> {
+
+    static {
+        AMF.init();
+    }
 
     private List<NodeBuilder> builders = new ArrayList<>();
 
-   // private KeyValueNodeBuilderMap<KeyValueNodeBuilder> annotationTypeBuilders = KeyValueNodeBuilderMap.createMap();
+    // private KeyValueNodeBuilderMap<KeyValueNodeBuilder> annotationTypeBuilders = KeyValueNodeBuilderMap.createMap();
     private List<DeclaredShapeBuilder> typeDeclarationBuilders = new ArrayList<>();
     private List<ResourceBuilder> resourceBuilders = new ArrayList();
     private String baseUri;
@@ -24,29 +32,48 @@ public class RamlDocumentBuilder implements ModelBuilder<Document> {
 
     RamlDocumentBuilder() {
 
+
     }
 
     @Override
-    public Document buildModel() {
-        return buildNode();
+    public WebApiDocument buildModel() {
+
+        try {
+            WebApiDocument document = buildNode();
+            ValidationReport s = Raml10.validate(document).get();
+            if (!s.conforms()) {
+                throw new ModelBuilderException(s);
+            }
+            return document;
+        } catch (ModelBuilderException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ModelBuilderException(e);
+        }
     }
 
-    public Document buildNode() {
+    public WebApiDocument buildNode() {
 
-        Document doc = new Document();
+        WebApiDocument doc = new WebApiDocument();
+
         WebApi apiNode = new WebApi();
+        doc.withEncodes(apiNode);
 
-       // Optional.ofNullable(baseUri).ifPresent(apiNode::withServer);
+
+
         Optional.ofNullable(version).ifPresent(apiNode::withVersion);
-      //  Optional.ofNullable(title).ifPresent(apiNode::withDocumentationTitle);
+        Optional.ofNullable(title).ifPresent(apiNode::withName);
         Optional.ofNullable(mediaType).ifPresent(c -> apiNode.withContentType(Collections.singletonList(c)));
         Optional.ofNullable(mediaType).ifPresent(c -> apiNode.withAccepts(Collections.singletonList(c)));
-      //  Optional.ofNullable(baseUri).ifPresent(apiNode::withServer);
+
+        // Not sure where this goes....
+        // Optional.ofNullable(baseUri).ifPresent(apiNode::withServer);
+
         apiNode.withEndPoints(resourceBuilders.stream().map(ResourceBuilder::buildNode).collect(Collectors.toList()));
-        doc.withEncodes(apiNode);
 
         //annotationTypeBuilders.addAllToNamedNode("annotationTypes", apiNode);
         doc.withDeclares(typeDeclarationBuilders.stream().map(DeclaredShapeBuilder::buildNode).collect(Collectors.toList()));
+
         return doc;
     }
 
@@ -57,7 +84,7 @@ public class RamlDocumentBuilder implements ModelBuilder<Document> {
     }
 
     public RamlDocumentBuilder withAnnotationTypes(AnnotationTypeBuilder... annotationTypeBuilders) {
-    //    this.annotationTypeBuilders.addAll(annotationTypeBuilders);
+        //    this.annotationTypeBuilders.addAll(annotationTypeBuilders);
         return this;
     }
 

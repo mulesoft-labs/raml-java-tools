@@ -6,6 +6,7 @@ import amf.client.model.domain.Request;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
  */
 public class OperationBuilder extends KeyValueNodeBuilder<OperationBuilder> implements AnnotableBuilder<OperationBuilder>/*, ModelBuilder<Method>*/ {
 
+    private final String name;
     private List<ResponseBuilder> responses = new ArrayList<>();
     private List<PayloadBuilder> bodies = new ArrayList<>();
     private List<AnnotationBuilder> annotations = new ArrayList<>();
@@ -23,6 +25,7 @@ public class OperationBuilder extends KeyValueNodeBuilder<OperationBuilder> impl
 
     private OperationBuilder(String name) {
         super(name);
+        this.name = name;
     }
 
     static public OperationBuilder method(String name) {
@@ -65,7 +68,8 @@ public class OperationBuilder extends KeyValueNodeBuilder<OperationBuilder> impl
     public Operation buildNode() {
 
         Operation node =  new Operation();
-        node.withDescription(description);
+        node.withMethod(name);
+        Optional.ofNullable(description).ifPresent(node::withDescription);
         node.withResponses(responses.stream().map(ResponseBuilder::buildNode).collect(Collectors.toList()));
 
         Request request = new Request();

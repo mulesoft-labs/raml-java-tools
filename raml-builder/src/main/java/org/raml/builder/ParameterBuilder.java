@@ -11,18 +11,32 @@ import java.util.Optional;
  */
 public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
 
+    private final String name;
+    private final String binding;
     private TypeShapeBuilder type;
     private String displayName;
     private String description;
     private Boolean required;
 
-    private ParameterBuilder(String name) {
+    private ParameterBuilder(String name, String binding  ) {
         super(name);
+        this.name = name;
+        this.binding = binding;
     }
 
     public static ParameterBuilder parameter(String name) {
 
-        return new ParameterBuilder(name);
+        return new ParameterBuilder(name, "query");
+    }
+
+    public static ParameterBuilder queryParameter(String name) {
+
+        return new ParameterBuilder(name, "query");
+    }
+
+    public static ParameterBuilder headerParameter(String name) {
+
+        return new ParameterBuilder(name, "header");
     }
 
     public ParameterBuilder ofType(String name) {
@@ -40,7 +54,8 @@ public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
     @Override
     public Parameter buildNode() {
 
-        Parameter node = new Parameter();
+        Parameter node = new Parameter().withName(name);
+        node.withBinding("query");
         Optional.ofNullable(description).ifPresent(node::withDescription);
         node.withRequired(Optional.ofNullable(required).orElse(false));
         node.withSchema((Shape) type.buildNode());

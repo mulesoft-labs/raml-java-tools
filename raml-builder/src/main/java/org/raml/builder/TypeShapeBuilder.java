@@ -25,6 +25,18 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
     private TypeShapeBuilder arrayItems;
 
 
+    public static ScalarShapeBuilder stringScalar() {
+        return new ScalarShapeBuilder("http://www.w3.org/2001/XMLSchema#string");
+    }
+
+    public static ScalarShapeBuilder booleanScalar() {
+        return new ScalarShapeBuilder("http://www.w3.org/2001/XMLSchema#boolean");
+    }
+
+    public static ScalarShapeBuilder longScalar() {
+        return new ScalarShapeBuilder("http://www.w3.org/2001/XMLSchema#long");
+    }
+
     static public TypeShapeBuilder simpleType(String type) {
 
         return new NodeShapeBuilder(type);
@@ -36,10 +48,10 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
     }
 
     /* for enums */
-    static public ScalarShapeBuilder enumeratedType() {
+    static public EnumShapeBuilder enumeratedType() {
 
         // todo not hello
-        return new ScalarShapeBuilder("hello");
+        return new EnumShapeBuilder("hello");
     }
 
     static public NodeShapeBuilder inheritingObject(String... types) {
@@ -48,7 +60,7 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
     }
 
     public static TypeShapeBuilder anyType() {
-        return new AnyShapeBuilder();
+        return new AnyShapeBuilder("any");
     }
 
     @Override
