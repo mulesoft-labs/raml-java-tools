@@ -1,10 +1,12 @@
 package org.raml.builder;
 
-import amf.client.model.domain.DomainElement;
+import amf.client.model.domain.Operation;
+import amf.client.model.domain.Request;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created. There, you have it.
@@ -59,72 +61,29 @@ public class OperationBuilder extends KeyValueNodeBuilder<OperationBuilder> impl
         return this;
     }
 
- //   @Override
- //   protected KeyValueNode createContainerNode() {
- //       return new MethodNode();
-  //  }
-
     @Override
-    public DomainElement buildNode() {
-        KeyValueNode node =  super.buildNode();
+    public Operation buildNode() {
 
-        addProperty(node.getValue(), "description", description);
+        Operation node =  new Operation();
+        node.withDescription(description);
+        node.withResponses(responses.stream().map(ResponseBuilder::buildNode).collect(Collectors.toList()));
 
-        if ( ! responses.isEmpty()) {
-            ObjectNodeImpl responsesValueNode = new ObjectNodeImpl();
-            KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("responses"), responsesValueNode);
+        Request request = new Request();
+        node.withRequest(request);
+        request.withQueryParameters(queryParameters.stream().map(ParameterBuilder::buildNode).collect(Collectors.toList()));
+        request.withHeaders(headerParameters.stream().map(ParameterBuilder::buildNode).collect(Collectors.toList()));
+        request.withPayloads(bodies.stream().map(PayloadBuilder::buildNode).collect(Collectors.toList()));
 
-            for (ResponseBuilder response : responses) {
 
-                responsesValueNode.addChild(response.buildNode());
-            }
-
-            node.getValue().addChild(kvn);
-        }
-
-        if ( ! queryParameters.isEmpty()) {
-            ObjectNodeImpl responsesValueNode = new ObjectNodeImpl();
-            KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("queryParameters"), responsesValueNode);
-
-            for (ParameterBuilder queryParameter : queryParameters) {
-
-                responsesValueNode.addChild(queryParameter.buildNode());
-            }
-
-            node.getValue().addChild(kvn);
-        }
-
-        if ( ! headerParameters.isEmpty()) {
-            ObjectNodeImpl responsesValueNode = new ObjectNodeImpl();
-            KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("headers"), responsesValueNode);
-
-            for (ParameterBuilder quertParameter : headerParameters) {
-
-                responsesValueNode.addChild(quertParameter.buildNode());
-            }
-
-            node.getValue().addChild(kvn);
-        }
-
-        if ( ! annotations.isEmpty() ) {
-
-            for (AnnotationBuilder annotation : annotations) {
-                node.getValue().addChild(annotation.buildNode());
-            }
-        }
-
-        if ( ! bodies.isEmpty()) {
-            ObjectNodeImpl bodyValueNode = new ObjectNodeImpl();
-            KeyValueNodeImpl bkvn = new KeyValueNodeImpl(new StringNodeImpl("body"), bodyValueNode);
-            node.getValue().addChild(bkvn);
-
-            for (PayloadBuilder body : bodies) {
-                bodyValueNode.addChild(body.buildNode());
-            }
-        }
+//
+//        if ( ! annotations.isEmpty() ) {
+//
+//            for (AnnotationBuilder annotation : annotations) {
+//                node.getValue().addChild(annotation.buildNode());
+//            }
+//        }
 
         return node;
-
     }
 
     public OperationBuilder description(String description) {

@@ -28,21 +28,21 @@ public class Main {
                 .version("1.0beta6")
                 .withTypes(
 
-                        TypeDeclarationBuilder.typeDeclaration("Foo").ofType(
+                        DeclaredShapeBuilder.typeDeclaration("Foo").ofType(
                                 TypeBuilder.type("object")
                                         .withFacets(FacetBuilder.facet("required").ofType("boolean"))
                                         .withAnnotations(AnnotationBuilder.annotation("Foo")
                                                 .withProperties(PropertyValueBuilder.property("time", "2022-02-02"), PropertyValueBuilder.propertyOfArray("count", 1,2)))
                         ),
-                        TypeDeclarationBuilder.typeDeclaration("EnumFoo").ofType(TypeBuilder.type().enumValues("UN", "DEUX")),
-                        TypeDeclarationBuilder.typeDeclaration("EnumNum").ofType(TypeBuilder.type("integer").enumValues(1,2)),
+                        DeclaredShapeBuilder.typeDeclaration("EnumFoo").ofType(TypeBuilder.type().enumValues("UN", "DEUX")),
+                        DeclaredShapeBuilder.typeDeclaration("EnumNum").ofType(TypeBuilder.type("integer").enumValues(1,2)),
 
-                        TypeDeclarationBuilder.typeDeclaration("Goo").ofType(TypeBuilder.type("object")),
-                        TypeDeclarationBuilder.typeDeclaration("GooWithExamples").ofType(TypeBuilder.type("object")
+                        DeclaredShapeBuilder.typeDeclaration("Goo").ofType(TypeBuilder.type("object")),
+                        DeclaredShapeBuilder.typeDeclaration("GooWithExamples").ofType(TypeBuilder.type("object")
                                 .withProperty(TypePropertyBuilder.property("count", "integer"),TypePropertyBuilder.property("realType", "Foo"))
                                 .withExamples(ExamplesBuilder.example("one").withPropertyValue(PropertyValueBuilder.property("count", 1)))
                         ),
-                        TypeDeclarationBuilder.typeDeclaration("GooWithExample").ofType(TypeBuilder.type("object")
+                        DeclaredShapeBuilder.typeDeclaration("GooWithExample").ofType(TypeBuilder.type("object")
                                 .withProperty(
                                         TypePropertyBuilder.property("count", "integer"),
                                         TypePropertyBuilder.property("counts", TypeBuilder.arrayOf(TypeBuilder.type("string"))),

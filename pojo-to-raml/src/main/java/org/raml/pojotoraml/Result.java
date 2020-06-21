@@ -1,7 +1,7 @@
 package org.raml.pojotoraml;
 
 import com.google.common.collect.FluentIterable;
-import org.raml.builder.AnyShapeBuilder;
+import org.raml.builder.DeclaredShapeBuilder;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -12,23 +12,23 @@ import java.util.Map;
  */
 public class Result {
 
-    final private AnyShapeBuilder requestedType;
-    final Collection<AnyShapeBuilder> dependentTypes;
+    final private DeclaredShapeBuilder requestedType;
+    final Collection<DeclaredShapeBuilder> dependentTypes;
 
-    public Result(AnyShapeBuilder requestedType, Map<String, AnyShapeBuilder> dependentTypes) {
+    public Result(DeclaredShapeBuilder requestedType, Map<String, DeclaredShapeBuilder> dependentTypes) {
         this.requestedType = requestedType;
         this.dependentTypes = dependentTypes.values();
     }
 
-    public AnyShapeBuilder requestedType() {
+    public DeclaredShapeBuilder requestedType() {
         return requestedType;
     }
 
-    public Collection<AnyShapeBuilder> dependentTypes() {
+    public Collection<DeclaredShapeBuilder> dependentTypes() {
         return dependentTypes;
     }
 
-    public Collection<AnyShapeBuilder> allTypes() {
+    public Collection<DeclaredShapeBuilder> allTypes() {
         if ( requestedType == null ) {
             return Collections.emptyList();
         } else {

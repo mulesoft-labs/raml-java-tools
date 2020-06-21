@@ -7,6 +7,5 @@ package org.raml.builder;
  */
 public interface ModelBuilder<T> {
 
-    ModelBindingConfiguration binding = Util.bindingConfiguration();
     T buildModel();
 }

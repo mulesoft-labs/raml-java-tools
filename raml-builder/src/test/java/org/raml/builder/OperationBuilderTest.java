@@ -1,7 +1,12 @@
 package org.raml.builder;
 
+import amf.client.model.document.Document;
+import amf.client.model.domain.WebApi;
+import amf.client.render.Raml10Renderer;
+import amf.core.AMF;
 import org.junit.Test;
-import org.raml.v2.api.model.v10.api.Api;
+
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
 import static org.raml.builder.RamlDocumentBuilder.document;
@@ -14,9 +19,12 @@ public class OperationBuilderTest {
 
 
     @Test
-    public void simpleMethod() {
+    public void simpleMethod() throws ExecutionException, InterruptedException {
 
-        Api api = document()
+        AMF.init();
+        Class c = WebApi.class;
+
+        Document document = document()
                 .baseUri("http://google.com")
                 .title("doc")
                 .version("one")
@@ -31,13 +39,15 @@ public class OperationBuilderTest {
                 )
                 .buildModel();
 
-        assertEquals("get", api.resources().get(0).methods().get(0).method());
-        assertEquals("foo", api.resources().get(0).methods().get(0).queryParameters().get(0).name());
-        assertEquals("string", api.resources().get(0).methods().get(0).queryParameters().get(0).type());
-        assertEquals("faf", api.resources().get(0).methods().get(0).headers().get(0).name());
-        assertEquals("string", api.resources().get(0).methods().get(0).headers().get(0).type());
-        assertEquals("application/json", api.resources().get(0).methods().get(0).body().get(0).name());
-        assertEquals("any", api.resources().get(0).methods().get(0).body().get(0).type());
-
+        Raml10Renderer rr = new Raml10Renderer();
+        String s = rr.generateString(document).get();
+        WebApi api = (WebApi) document.encodes();
+        assertEquals("get", api.endPoints().get(0).operations().get(0).method().value());
+        assertEquals("foo", api.endPoints().get(0).operations().get(0).request().queryParameters().get(0).name().value());
+        assertEquals("string", api.endPoints().get(0).operations().get(0).request().queryParameters().get(0).schema().name().value());
+        assertEquals("faf", api.endPoints().get(0).operations().get(0).request().headers().get(0).name().value());
+        assertEquals("string", api.endPoints().get(0).operations().get(0).request().headers().get(0).schema().name().value());
+        assertEquals("application/json", api.endPoints().get(0).operations().get(0).request().payloads().get(0).mediaType().value());
+        assertEquals("any", api.endPoints().get(0).operations().get(0).request().payloads().get(0).schema().name().value());
     }
 }

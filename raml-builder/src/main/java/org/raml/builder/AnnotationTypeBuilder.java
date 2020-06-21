@@ -25,18 +25,7 @@ public class AnnotationTypeBuilder extends KeyValueNodeBuilder<AnnotationBuilder
     @Override
     public DomainElement buildNode() {
 
-        KeyValueNode node = super.buildNode();
-
-        ObjectNodeImpl valueNode = new ObjectNodeImpl();
-        KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("properties"), valueNode);
-        node.getValue().addChild(0, kvn);
-
-        for (NodeBuilder property : properties) {
-
-            valueNode.addChild(property.buildNode());
-        }
-
-        return node;
+      return null;
     }
 
     public AnnotationTypeBuilder withProperty(NodeBuilder... properties) {

@@ -56,23 +56,9 @@ public class ExamplesBuilder extends KeyValueNodeBuilder<ExamplesBuilder> implem
 
         Example example = new Example();
         example.withStrict(strict);
-        KeyValueNode node = super.buildNode();
-        node.getValue().addChild(new KeyValueNodeImpl(new StringNodeImpl("strict"), new BooleanNode(strict)));
 
-        if ( ! propertyValues.isEmpty() ) {
+        propertyValues.forEach(ex -> example.withStructuredValue(ex.buildNode()));
 
-            KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("value"), new ObjectNodeImpl());
-            for (PropertyValueBuilder example : propertyValues) {
-                kvn.getValue().addChild(example.buildNode());
-            }
-
-            node.getValue().addChild(kvn);
-        } else {
-
-            KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("value"), new ObjectNodeImpl());
-            node.getValue().addChild(kvn);
-        }
-
-        return node;
+        return example;
     }
 }

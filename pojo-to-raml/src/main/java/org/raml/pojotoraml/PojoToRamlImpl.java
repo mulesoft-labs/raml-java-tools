@@ -2,9 +2,9 @@ package org.raml.pojotoraml;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
-import org.raml.builder.TypeShapeBuilder;
-import org.raml.builder.AnyShapeBuilder;
+import org.raml.builder.DeclaredShapeBuilder;
 import org.raml.builder.PropertyShapeBuilder;
+import org.raml.builder.TypeShapeBuilder;
 import org.raml.pojotoraml.types.RamlType;
 import org.raml.pojotoraml.types.RamlTypeFactory;
 import org.raml.pojotoraml.types.ScalarType;
@@ -35,11 +35,11 @@ public class PojoToRamlImpl implements PojoToRaml {
 
         if ( type.isScalar()) {
 
-            return new Result(null, Collections.<String, AnyShapeBuilder>emptyMap());
+            return new Result(null, Collections.<String, DeclaredShapeBuilder>emptyMap());
         }
 
-        Map<String, AnyShapeBuilder> dependentTypes = new HashMap<>();
-        AnyShapeBuilder builder = handleSingleType(clazz, dependentTypes);
+        Map<String, DeclaredShapeBuilder> dependentTypes = new HashMap<>();
+        DeclaredShapeBuilder builder = handleSingleType(clazz, dependentTypes);
         dependentTypes.remove(builder.id());
         return new Result(builder, dependentTypes);
     }
@@ -85,14 +85,14 @@ public class PojoToRamlImpl implements PojoToRaml {
         }
     }
 
-    private AnyShapeBuilder handleSingleType(Class<?> clazz, Map<String, AnyShapeBuilder> builtTypes) {
+    private DeclaredShapeBuilder handleSingleType(Class<?> clazz, Map<String, DeclaredShapeBuilder> builtTypes) {
 
         ClassParser parser = classParserFactory.createParser(clazz);
 
         RamlType quickType = RamlTypeFactory.forType(clazz, parser, adjusterFactory).or(new RamlTypeSupplier(clazz));
         if ( quickType.isScalar()) {
 
-            return AnyShapeBuilder.typeDeclaration(quickType.getRamlSyntax().id()).ofType(quickType.getRamlSyntax());
+            return DeclaredShapeBuilder.typeDeclaration(quickType.getRamlSyntax().id()).ofType(quickType.getRamlSyntax());
         }
 
         if ( quickType.isEnum()) {
@@ -105,7 +105,7 @@ public class PojoToRamlImpl implements PojoToRaml {
         TypeShapeBuilder builder = buildSuperType(clazz, builtTypes);
         builder = adjusterFactory.createAdjuster(clazz).adjustType(clazz, simpleName, builder);
 
-        AnyShapeBuilder typeDeclaration = AnyShapeBuilder.typeDeclaration(simpleName).ofType(builder);
+        DeclaredShapeBuilder typeDeclaration = DeclaredShapeBuilder.typeDeclaration(simpleName).ofType(builder);
         if ( !ScalarType.isRamlScalarType(simpleName)) {
             builtTypes.put(simpleName, typeDeclaration);
         }
@@ -145,7 +145,7 @@ public class PojoToRamlImpl implements PojoToRaml {
         return typeDeclaration;
     }
 
-    private AnyShapeBuilder handleEnum(final RamlType quickType, final RamlAdjuster adjuster, Map<String, AnyShapeBuilder> builtTypes) {
+    private DeclaredShapeBuilder handleEnum(final RamlType quickType, final RamlAdjuster adjuster, Map<String, DeclaredShapeBuilder> builtTypes) {
 
         Class<? extends Enum> c = (Class<? extends Enum>) quickType.type();
         TypeShapeBuilder typeBuilder = TypeShapeBuilder.enumeratedType().enumValues(
@@ -159,13 +159,13 @@ public class PojoToRamlImpl implements PojoToRaml {
 
 
         adjuster.adjustType(quickType.type(), quickType.getRamlSyntax().id(), typeBuilder);
-        AnyShapeBuilder anyShapeBuilder = AnyShapeBuilder.typeDeclaration(quickType.getRamlSyntax().id()).ofType(typeBuilder);
+        DeclaredShapeBuilder declaredShapeBuilder = DeclaredShapeBuilder.typeDeclaration(quickType.getRamlSyntax().id()).ofType(typeBuilder);
 
-        builtTypes.put(quickType.getRamlSyntax().id(), anyShapeBuilder);
-        return anyShapeBuilder;
+        builtTypes.put(quickType.getRamlSyntax().id(), declaredShapeBuilder);
+        return declaredShapeBuilder;
     }
 
-    private TypeShapeBuilder buildSuperType(Class<?> clazz, Map<String, AnyShapeBuilder> builtTypes) {
+    private TypeShapeBuilder buildSuperType(Class<?> clazz, Map<String, DeclaredShapeBuilder> builtTypes) {
         ClassParser parser = classParserFactory.createParser(clazz);
         Collection<Type> types = parser.parentClasses(clazz);
         ArrayList<String> typeNames = new ArrayList<>();
@@ -213,7 +213,7 @@ public class PojoToRamlImpl implements PojoToRaml {
 
     }
 
-    private static RamlType resolveUnknownTypeInProperty(AdjusterFactory adjusterFactory, Class<?> clazz, TypeShapeBuilder typeBuilder, AnyShapeBuilder anyShapeBuilder, Property property) {
+    private static RamlType resolveUnknownTypeInProperty(AdjusterFactory adjusterFactory, Class<?> clazz, TypeShapeBuilder typeBuilder, DeclaredShapeBuilder declaredShapeBuilder, Property property) {
 
         final TypeShapeBuilder tb = adjusterFactory.createAdjuster(clazz).adjustForUnknownType(property.type());
         if ( tb != null ) {
@@ -221,7 +221,7 @@ public class PojoToRamlImpl implements PojoToRaml {
             return new GeneratedRamlType(clazz, typeBuilder);
         } else {
 
-            adjusterFactory.createAdjuster(clazz).adjustForUnknownTypeInProperty(clazz, typeBuilder, anyShapeBuilder,  property);
+            adjusterFactory.createAdjuster(clazz).adjustForUnknownTypeInProperty(clazz, typeBuilder, declaredShapeBuilder,  property);
             return null;
         }
     }

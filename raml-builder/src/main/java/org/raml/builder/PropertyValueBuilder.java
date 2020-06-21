@@ -6,6 +6,7 @@ import amf.client.model.domain.ObjectNode;
 import amf.client.model.domain.ScalarNode;
 
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 /**
  * Created. There, you have it.
@@ -56,21 +57,31 @@ public class PropertyValueBuilder implements NodeBuilder, SupportsProperties<Pro
 
     public static PropertyValueBuilder propertyOfArray(String name, String... values) {
 
-        ArrayNode arrayNode = new ArrayNode().withName(name);
+        ArrayNode arrayNode = new ArrayNode();
+        arrayNode.withName(name);
+
         Arrays.stream(values).map(s -> new ScalarNode(s, "http://www.w3.org/2001/XMLSchema#string")).forEach(arrayNode::addMember);
         return new PropertyValueBuilder(arrayNode);
     }
 
     public static PropertyValueBuilder propertyOfArray(String name, long... values) {
 
-        ArrayNode arrayNode = new ArrayNode().withName(name);
+        ArrayNode arrayNode = new ArrayNode();
+        arrayNode.withName(name);
         Arrays.stream(values).mapToObj(s -> new ScalarNode(Long.toString(s), "http://www.w3.org/2001/XMLSchema#long")).forEach(arrayNode::addMember);;
         return new PropertyValueBuilder(arrayNode);
     }
 
     public static PropertyValueBuilder propertyOfArray(String name, boolean... values) {
 
-        return new PropertyValueBuilder(name, ValueNodeFactories.create(values));
+        ArrayNode arrayNode = new ArrayNode();
+        arrayNode.withName(name);
+
+        IntStream.range(0, values.length)
+                .mapToObj(idx -> values[idx])
+                .map(x -> Boolean.toString(x))
+                .map(x -> new ScalarNode(x, "http://www.w3.org/2001/XMLSchema#boolean")).forEach(arrayNode::addMember);
+        return new PropertyValueBuilder(arrayNode);
     }
 
     public static PropertyValueBuilder property(String name) {

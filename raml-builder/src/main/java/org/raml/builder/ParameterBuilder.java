@@ -1,10 +1,9 @@
 package org.raml.builder;
 
-import amf.client.model.domain.DomainElement;
-import org.raml.v2.internal.impl.commons.nodes.TypeDeclarationNode;
+import amf.client.model.domain.Parameter;
+import amf.client.model.domain.Shape;
 
-
-
+import java.util.Optional;
 
 
 /**
@@ -39,23 +38,12 @@ public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
     }
 
     @Override
-    protected Node createValueNode() {
-        return new TypeDeclarationNode();
-    }
+    public Parameter buildNode() {
 
-    @Override
-    public DomainElement buildNode() {
-
-        KeyValueNode node = super.buildNode();
-
-        if ( type != null ) {
-
-            node.getValue().addChild(new KeyValueNodeImpl(new StringNodeImpl("type"), type.buildNode()));
-        }
-
-        addProperty(node.getValue(), "displayName", displayName);
-        addProperty(node.getValue(), "description", description);
-        addProperty(node.getValue(), "required", required);
+        Parameter node = new Parameter();
+        Optional.ofNullable(description).ifPresent(node::withDescription);
+        node.withRequired(Optional.ofNullable(required).orElse(false));
+        node.withSchema((Shape) type.buildNode());
 
         return node;
     }

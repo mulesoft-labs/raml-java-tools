@@ -1,23 +1,29 @@
 package org.raml.builder;
 
-import amf.client.model.domain.DomainElement;
+import amf.client.model.domain.EndPoint;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created. There, you have it.
  */
 public class ResourceBuilder extends KeyValueNodeBuilder<ResourceBuilder> implements NodeBuilder {
 
+    private final String name;
     private String displayName;
     private String description;
     private String relativeUri;
 
-    private KeyValueNodeBuilderMap<ResourceBuilder> resourceBuilders = KeyValueNodeBuilderMap.createMap();
-    private KeyValueNodeBuilderMap<OperationBuilder> methodBuilders = KeyValueNodeBuilderMap.createMap();
+    private List<ResourceBuilder> resourceBuilders = new ArrayList<>();
+    private List<OperationBuilder> methodBuilders = new ArrayList<>();
 
     private ResourceBuilder(String name) {
         super(name);
+        this.name = name;
     }
 
     static public ResourceBuilder resource(String name) {
@@ -26,16 +32,15 @@ public class ResourceBuilder extends KeyValueNodeBuilder<ResourceBuilder> implem
     }
 
     @Override
-    public DomainElement buildNode() {
+    public EndPoint buildNode() {
 
-        KeyValueNode resourceNode = super.buildNode();
+        EndPoint resourceNode = new EndPoint();
+        Optional.ofNullable(description).ifPresent(resourceNode::withDescription);
+        Optional.ofNullable(relativeUri).ifPresent(resourceNode::withPath);
+        Optional.ofNullable(name).ifPresent(resourceNode::withName);
 
-        addProperty(resourceNode.getValue(), "displayName", displayName);
-        addProperty(resourceNode.getValue(), "description", description);
-        addProperty(resourceNode.getValue(), "relativeUri", relativeUri);
 
-        resourceBuilders.addToParent(resourceNode.getValue());
-        methodBuilders.addToParent(resourceNode.getValue());
+        resourceNode.withOperations(methodBuilders.stream().map(OperationBuilder::buildNode).collect(Collectors.toList()));
 
         return resourceNode;
     }

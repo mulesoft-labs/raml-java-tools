@@ -1,15 +1,12 @@
 package org.raml.builder;
 
 import amf.client.model.domain.AnyShape;
-import amf.client.model.domain.DomainElement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.raml.builder.NodeBuilders.property;
 
 /**
  * Created. There, you have it.
@@ -48,6 +45,10 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
     static public NodeShapeBuilder inheritingObject(String... types) {
 
         return new NodeShapeBuilder(types);
+    }
+
+    public static TypeShapeBuilder anyType() {
+        return new AnyShapeBuilder();
     }
 
     @Override

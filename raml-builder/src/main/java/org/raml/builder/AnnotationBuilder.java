@@ -22,11 +22,6 @@ public class AnnotationBuilder extends KeyValueNodeBuilder<AnnotationBuilder> im
         return new AnnotationBuilder(name);
     }
 
-    @Override
-    protected StringNodeImpl createKeyNode(String id) {
-        return new StringNodeImpl("(" + id + ")");
-    }
-
 
     public AnnotationBuilder withProperties(PropertyValueBuilder...builders) {
 
@@ -37,11 +32,6 @@ public class AnnotationBuilder extends KeyValueNodeBuilder<AnnotationBuilder> im
     @Override
     public DomainElement buildNode() {
 
-        KeyValueNode k = super.buildNode();
-        for (PropertyValueBuilder property : properties) {
-            k.getValue().addChild(property.buildNode());
-        }
-
-        return k;
+        return null;
     }
 }

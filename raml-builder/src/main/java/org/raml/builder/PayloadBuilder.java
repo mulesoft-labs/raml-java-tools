@@ -1,16 +1,20 @@
 package org.raml.builder;
 
 
+import amf.client.model.domain.Payload;
+import amf.client.model.domain.Shape;
 
 /**
  * Created. There, you have it.
  */
 public class PayloadBuilder extends KeyValueNodeBuilder<PayloadBuilder> implements NodeBuilder {
 
-    private TypeShapeBuilder types = null;
+    private final String name;
+    private TypeShapeBuilder types = TypeShapeBuilder.anyType();
 
     private PayloadBuilder(String name) {
         super(name);
+        this.name = name;
     }
 
     static public PayloadBuilder body(String type) {
@@ -25,13 +29,12 @@ public class PayloadBuilder extends KeyValueNodeBuilder<PayloadBuilder> implemen
     }
 
     @Override
-    protected Node createValueNode() {
-        if ( types != null ) {
+    public Payload buildNode() {
 
-            return types.buildNode();
-        } else {
+        Payload payload = new Payload();
+        payload.withSchema((Shape) types.buildNode());
+        payload.withMediaType(name);
 
-            return super.createValueNode();
-        }
+        return payload;
     }
 }

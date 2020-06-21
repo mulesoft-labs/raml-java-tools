@@ -1,9 +1,9 @@
 package org.raml.pojotoraml;
 
 import org.junit.Test;
+import org.raml.builder.DeclaredShapeBuilder;
 import org.raml.builder.RamlDocumentBuilder;
 import org.raml.builder.TypeShapeBuilder;
-import org.raml.builder.AnyShapeBuilder;
 import org.raml.pojotoraml.field.FieldClassParser;
 import org.raml.pojotoraml.plugins.AdditionalPropertiesAdjuster;
 import org.raml.simpleemitter.Emitter;
@@ -145,7 +145,7 @@ public class PojoToRamlImplTest {
                 .baseUri("http://google.com")
                 .title("hello")
                 .version("1")
-                .withTypes(types.allTypes().toArray(new AnyShapeBuilder[0]));
+                .withTypes(types.allTypes().toArray(new DeclaredShapeBuilder[0]));
 
         Api api = ramlDocumentBuilder.buildModel();
 

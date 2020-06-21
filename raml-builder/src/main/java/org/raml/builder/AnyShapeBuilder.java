@@ -1,37 +1,32 @@
 package org.raml.builder;
 
+import amf.client.model.domain.AnyShape;
+import amf.client.model.domain.DataNode;
+import amf.client.model.domain.ScalarShape;
 
+import java.util.List;
 
 /**
  * Created. There, you have it.
  */
-public class AnyShapeBuilder extends KeyValueNodeBuilder<AnyShapeBuilder> implements NodeBuilder {
+public class AnyShapeBuilder extends TypeShapeBuilder<ScalarShape, AnyShapeBuilder> {
 
-    private TypeShapeBuilder types = null;
+    private List<DataNode> enumValues;
 
-    private AnyShapeBuilder(String name) {
-        super(name);
+    public AnyShapeBuilder() {
     }
 
-    static public AnyShapeBuilder typeDeclaration(String name) {
-
-        return new AnyShapeBuilder(name);
-    }
-
-    public AnyShapeBuilder ofType(TypeShapeBuilder builder) {
-
-        types = builder;
-        return this;
-    }
 
     @Override
-    protected Node createValueNode() {
-        if ( types != null ) {
+    public AnyShape buildNode() {
 
-            return types.buildNode();
-        } else {
+        AnyShape shape = new AnyShape();
+        commonNodeInfo(shape);
+        return shape;
+    }
 
-            return super.createValueNode();
-        }
+    public String id() {
+
+        return "[any]";
     }
 }

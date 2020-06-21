@@ -1,10 +1,12 @@
 package org.raml.builder;
 
-import amf.client.model.domain.DomainElement;
+import amf.client.model.domain.Response;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created. There, you have it.
@@ -39,27 +41,20 @@ public class ResponseBuilder extends KeyValueNodeBuilder<ResponseBuilder> implem
 
 
     @Override
-    public DomainElement buildNode() {
-        KeyValueNode node =  super.buildNode();
+    public Response buildNode() {
+        Response node =  new Response();
 
-        addProperty(node.getValue(), "descrption", description);
+        Optional.ofNullable(description).ifPresent(node::withDescription);
 
-        if ( ! bodies.isEmpty()) {
-            ObjectNodeImpl valueNode = new ObjectNodeImpl();
-            KeyValueNodeImpl bkvn = new KeyValueNodeImpl(new StringNodeImpl("body"), valueNode);
-            node.getValue().addChild(bkvn);
+        node.withPayloads(bodies.stream().map(PayloadBuilder::buildNode).collect(Collectors.toList()));
 
-            for (PayloadBuilder body : bodies) {
-                valueNode.addChild(body.buildNode());
-            }
-        }
 
-        if ( ! annotations.isEmpty() ) {
-
-            for (AnnotationBuilder annotation : annotations) {
-                node.getValue().addChild(annotation.buildNode());
-            }
-        }
+//        if ( ! annotations.isEmpty() ) {
+//
+//            for (AnnotationBuilder annotation : annotations) {
+//                node.getValue().addChild(annotation.buildNode());
+//            }
+//        }
 
         return node;
 

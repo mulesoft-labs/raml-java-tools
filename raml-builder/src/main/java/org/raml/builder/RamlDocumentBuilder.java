@@ -1,30 +1,21 @@
 package org.raml.builder;
 
-import amf.client.model.domain.DomainElement;
-import org.raml.v2.api.model.v10.api.Api;
-import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
-import org.raml.v2.internal.impl.commons.model.DefaultModelElement;
-import org.raml.v2.internal.impl.commons.model.StringType;
-import org.raml.v2.internal.impl.commons.model.factory.TypeDeclarationModelFactory;
-import org.raml.v2.internal.impl.commons.nodes.RamlDocumentNode;
+import amf.client.model.document.Document;
+import amf.client.model.domain.WebApi;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.raml.v2.api.RamlModelBuilder.MODEL_PACKAGE;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created. There, you have it.
  */
-public class RamlDocumentBuilder implements NodeBuilder, ModelBuilder<Api> {
+public class RamlDocumentBuilder implements ModelBuilder<Document> {
 
-    private static final ModelBindingConfiguration binding = createV10Binding();
     private List<NodeBuilder> builders = new ArrayList<>();
 
-    private KeyValueNodeBuilderMap<KeyValueNodeBuilder> annotationTypeBuilders = KeyValueNodeBuilderMap.createMap();
-    private KeyValueNodeBuilderMap<KeyValueNodeBuilder> typeDeclarationBuilders = KeyValueNodeBuilderMap.createMap();
-    private KeyValueNodeBuilderMap<ResourceBuilder> resourceBuilders = KeyValueNodeBuilderMap.createMap();
+   // private KeyValueNodeBuilderMap<KeyValueNodeBuilder> annotationTypeBuilders = KeyValueNodeBuilderMap.createMap();
+    private List<DeclaredShapeBuilder> typeDeclarationBuilders = new ArrayList<>();
+    private List<ResourceBuilder> resourceBuilders = new ArrayList();
     private String baseUri;
     private String title;
     private String version;
@@ -36,39 +27,27 @@ public class RamlDocumentBuilder implements NodeBuilder, ModelBuilder<Api> {
     }
 
     @Override
-    public DomainElement buildNode() {
+    public Document buildModel() {
+        return buildNode();
+    }
 
-        Node documentNode = new RamlDocumentNode();
-        for (NodeBuilder builder : builders) {
-            documentNode.addChild(builder.buildNode());
-        }
+    public Document buildNode() {
 
-        if ( baseUri != null ) {
-            KeyValueNode baseUriNode = new KeyValueNodeImpl(new StringNodeImpl("baseUri"), new StringNodeImpl(baseUri));
-            documentNode.addChild(baseUriNode);
-        }
+        Document doc = new Document();
+        WebApi apiNode = new WebApi();
 
-        if( title != null ) {
-            KeyValueNode titleNode = new KeyValueNodeImpl(new StringNodeImpl("title"), new StringNodeImpl(title));
-            documentNode.addChild(titleNode);
-        }
+       // Optional.ofNullable(baseUri).ifPresent(apiNode::withServer);
+        Optional.ofNullable(version).ifPresent(apiNode::withVersion);
+      //  Optional.ofNullable(title).ifPresent(apiNode::withDocumentationTitle);
+        Optional.ofNullable(mediaType).ifPresent(c -> apiNode.withContentType(Collections.singletonList(c)));
+        Optional.ofNullable(mediaType).ifPresent(c -> apiNode.withAccepts(Collections.singletonList(c)));
+      //  Optional.ofNullable(baseUri).ifPresent(apiNode::withServer);
+        apiNode.withEndPoints(resourceBuilders.stream().map(ResourceBuilder::buildNode).collect(Collectors.toList()));
+        doc.withEncodes(apiNode);
 
-        if ( version != null ) {
-            KeyValueNode version = new KeyValueNodeImpl(new StringNodeImpl("version"), new StringNodeImpl(this.version));
-            documentNode.addChild(version);
-        }
-
-        if ( mediaType != null ) {
-            KeyValueNode mediaType = new KeyValueNodeImpl(new StringNodeImpl("mediaType"), new StringNodeImpl(this.mediaType));
-            documentNode.addChild(mediaType);
-        }
-
-        annotationTypeBuilders.addAllToNamedNode("annotationTypes", documentNode);
-        typeDeclarationBuilders.addAllToNamedNode("types", documentNode);
-        resourceBuilders.addToParent(documentNode);
-
-
-        return documentNode;
+        //annotationTypeBuilders.addAllToNamedNode("annotationTypes", apiNode);
+        doc.withDeclares(typeDeclarationBuilders.stream().map(DeclaredShapeBuilder::buildNode).collect(Collectors.toList()));
+        return doc;
     }
 
     public RamlDocumentBuilder with(NodeBuilder... builders) {
@@ -78,40 +57,18 @@ public class RamlDocumentBuilder implements NodeBuilder, ModelBuilder<Api> {
     }
 
     public RamlDocumentBuilder withAnnotationTypes(AnnotationTypeBuilder... annotationTypeBuilders) {
-        this.annotationTypeBuilders.addAll(annotationTypeBuilders);
+    //    this.annotationTypeBuilders.addAll(annotationTypeBuilders);
         return this;
     }
 
-    public RamlDocumentBuilder withTypes(AnyShapeBuilder... typeBuilders) {
-        this.typeDeclarationBuilders.addAll(typeBuilders);
+    public RamlDocumentBuilder withTypes(DeclaredShapeBuilder... typeBuilders) {
+        this.typeDeclarationBuilders.addAll(Arrays.asList(typeBuilders));
         return this;
     }
 
     public RamlDocumentBuilder withResources(ResourceBuilder... resourceBuilders) {
-        this.resourceBuilders.addAll(resourceBuilders);
+        this.resourceBuilders.addAll(Arrays.asList(resourceBuilders));
         return this;
-    }
-
-    public Api buildModel() {
-
-        NodeModelFactory fac = binding.bindingOf(Api.class);
-        Node node = buildNode();
-        NodeModel model = fac.create(node);
-        //return ModelProxyBuilder.createModel(Api.class, model, binding);
-        return Util.buildModel(binding, node, Api.class);
-    }
-
-    static private ModelBindingConfiguration createV10Binding()
-    {
-        final DefaultModelBindingConfiguration bindingConfiguration = new DefaultModelBindingConfiguration();
-        bindingConfiguration.bindPackage(MODEL_PACKAGE);
-        // Bind all StringTypes to the StringType implementation they are only marker interfaces
-        bindingConfiguration.bind(org.raml.v2.api.model.v10.system.types.StringType.class, StringType.class);
-        bindingConfiguration.bind(org.raml.v2.api.model.v10.system.types.ValueType.class, StringType.class);
-        bindingConfiguration.defaultTo(DefaultModelElement.class);
-        bindingConfiguration.bind(TypeDeclaration.class, new TypeDeclarationModelFactory());
-        bindingConfiguration.reverseBindPackage("org.raml.v2.api.model.v10.datamodel");
-        return bindingConfiguration;
     }
 
     public static RamlDocumentBuilder document() {

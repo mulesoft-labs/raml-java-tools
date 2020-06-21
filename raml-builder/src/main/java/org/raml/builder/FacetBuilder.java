@@ -21,15 +21,13 @@ public class FacetBuilder extends KeyValueNodeBuilder<FacetBuilder> {
 
     public FacetBuilder ofType(String typeName) {
 
-        this.value = ValueNodeFactories.create(typeName);
+      //  this.value = ValueNodeFactories.create(typeName);
         return this;
     }
 
     @Override
     public DomainElement buildNode() {
-        KeyValueNode node = super.buildNode();
-        node.setValue(value.createNode());
-        return node;
+        return null;
     }
 
 }

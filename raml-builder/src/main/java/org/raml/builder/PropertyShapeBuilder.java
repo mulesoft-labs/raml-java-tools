@@ -1,6 +1,7 @@
 package org.raml.builder;
 
 import amf.client.model.domain.PropertyShape;
+import amf.client.model.domain.Shape;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,12 +13,14 @@ import java.util.List;
 public class PropertyShapeBuilder extends KeyValueNodeBuilder<PropertyShapeBuilder> implements AnnotableBuilder<PropertyShapeBuilder> {
 
     private final TypeShapeBuilder type;
+    private final String name;
     private Boolean required;
     private List<AnnotationBuilder> annotations = new ArrayList<>();
 
     public PropertyShapeBuilder(String name, TypeShapeBuilder type) {
 
         super(name);
+        this.name = name;
         this.type = type;
         this.required = true;
     }
@@ -48,17 +51,15 @@ public class PropertyShapeBuilder extends KeyValueNodeBuilder<PropertyShapeBuild
     @Override
     public PropertyShape buildNode() {
 
-        KeyValueNode node = super.buildNode();
-        node.setValue(type.buildNode());
-        if ( ! required ) {
-            addProperty(node.getValue(), "required", required);
-        }
-        if ( ! annotations.isEmpty() ) {
-
-            for (AnnotationBuilder annotation : annotations) {
-                node.getValue().addChild(annotation.buildNode());
-            }
-        }
+        PropertyShape node = new PropertyShape();
+        node.withName(name);
+        node.withRange((Shape) type.buildNode());
+//        if ( ! annotations.isEmpty() ) {
+//
+//            for (AnnotationBuilder annotation : annotations) {
+//                node.getValue().addChild(annotation.buildNode());
+//            }
+//        }
 
         return node;
     }
