@@ -1,6 +1,7 @@
 package org.raml.builder;
 
 import amf.client.model.domain.AnyShape;
+import amf.client.model.domain.Shape;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,12 +54,17 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
     static public EnumShapeBuilder enumeratedType() {
 
         // todo not hello
-        return new EnumShapeBuilder("hello");
+        return new EnumShapeBuilder();
     }
 
     static public NodeShapeBuilder inheritingObject(String... types) {
 
         return new NodeShapeBuilder(types);
+    }
+
+    static public NodeShapeBuilder inheritingObjectFromShapes(Shape... types) {
+
+        return new NodeShapeBuilder(Arrays.stream(types).map(t -> t.name().value()).toArray(String[]::new));
     }
 
     public static TypeShapeBuilder anyType() {

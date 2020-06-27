@@ -1,8 +1,12 @@
 package org.raml.builder;
 
+import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.ScalarShape;
 import org.junit.Test;
+import webapi.Raml10;
 import webapi.WebApiDocument;
+
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -33,19 +37,19 @@ public class TypeBuilderTest {
 
     @Test
     public void simpleType() {
-/*
-        Api api = document()
+        WebApiDocument api = document()
                 .baseUri("http://google.com")
                 .title("doc")
                 .version("one")
                 .mediaType("foo/fun")
                 .withTypes(
-                        AnyShapeBuilder.typeDeclaration("Mom")
-                                .ofType(TypeShapeBuilder.simpleType("boolean")))
+                        DeclaredShapeBuilder.typeDeclaration("Mom")
+                                .ofType(ScalarShapeBuilder.booleanScalar())
+                )
                 .buildModel();
 
-        assertEquals("Mom", api.types().get(0).name());
-        assertEquals("boolean", api.types().get(0).type());*/
+        assertEquals("Mom", ((ScalarShape)api.declares().get(0)).name().value());
+        assertTrue(((ScalarShape)api.declares().get(0)).dataType().value().contains("boolean"));
     }
 
     // the absolutely stupidest type ever.
@@ -70,68 +74,95 @@ public class TypeBuilderTest {
     @Test
     public void enumeratedInteger() {
 
-/*        Api api = document()
+        WebApiDocument api = document()
                 .baseUri("http://google.com")
                 .title("doc")
                 .version("one")
                 .mediaType("foo/fun")
                 .withTypes(
-                        AnyShapeBuilder.typeDeclaration("Mom")
-                                .ofType(TypeShapeBuilder.simpleType("integer").enumValues(1,2,3)))
+                        DeclaredShapeBuilder.typeDeclaration("Mom").ofType(EnumShapeBuilder.enumeratedType().enumValues(1, 2, 3))
+                )
                 .buildModel();
 
-        assertEquals("Mom", api.types().get(0).name());
-        assertEquals("integer", api.types().get(0).type());
-        assertEquals(Arrays.asList(1L,2L,3L), ((IntegerTypeDeclaration)api.types().get(0)).enumValues());*/
+        assertEquals("Mom", ((ScalarShape)api.declares().get(0)).name().value());
+        assertTrue(((ScalarShape)api.declares().get(0)).dataType().value().contains("integer"));
+        assertEquals(3, ((ScalarShape) api.declares().get(0)).values().size());
 
     }
 
     @Test
     public void enumeratedString() {
 
-/*        Api api = document()
+        WebApiDocument api = document()
                 .baseUri("http://google.com")
                 .title("doc")
                 .version("one")
                 .mediaType("foo/fun")
                 .withTypes(
-                        AnyShapeBuilder.typeDeclaration("Mom")
-                                .ofType(TypeShapeBuilder.simpleType("string").enumValues("1", "2", "3")))
+                        DeclaredShapeBuilder.typeDeclaration("Mom").ofType(EnumShapeBuilder.enumeratedType().enumValues("1", "2", "3"))
+                )
                 .buildModel();
 
-        assertEquals("Mom", api.types().get(0).name());
-        assertEquals("string", api.types().get(0).type());
-        assertEquals(Arrays.asList("1","2","3"), ((StringTypeDeclaration)api.types().get(0)).enumValues());*/
+        assertEquals("Mom", ((ScalarShape)api.declares().get(0)).name().value());
+        assertTrue(((ScalarShape)api.declares().get(0)).dataType().value().contains("string"));
+        assertEquals(3, ((ScalarShape) api.declares().get(0)).values().size());
+
     }
 
     @Test
     public void complexType() {
 
-/*
-        Api api = document()
+        WebApiDocument api = document()
                 .baseUri("http://google.com")
                 .title("doc")
                 .version("one")
                 .mediaType("foo/fun")
                 .withTypes(
-                        AnyShapeBuilder.typeDeclaration("Mom")
-                                .ofType(TypeShapeBuilder.simpleType("object")
+                        DeclaredShapeBuilder.typeDeclaration("Mom")
+                                .ofType(NodeShapeBuilder.inheritingObject()
                                         .withProperty(
                                                 PropertyShapeBuilder.property("name", TypeShapeBuilder.simpleType("string")))
                                 )
                 )
                 .buildModel();
 
-        assertEquals("Mom", api.types().get(0).name());
-        assertEquals("object", api.types().get(0).type());
-        assertEquals("name", ((ObjectTypeDeclaration)api.types().get(0)).properties().get(0).name());
-        assertEquals("string", ((ObjectTypeDeclaration)api.types().get(0)).properties().get(0).type());
-*/
+        assertEquals("Mom", ((NodeShape)api.declares().get(0)).name().value());
+        assertEquals(0, (((NodeShape) api.declares().get(0)).inherits().size()));
+        assertEquals("name", ((NodeShape)api.declares().get(0)).properties().get(0).name().value());
+        assertTrue(((NodeShape)api.declares().get(0)).properties().get(0).range().name().value().contains("string"));
     }
 
     @Test
-    public void complexInheritance() {
+    public void complexInheritance() throws ExecutionException, InterruptedException {
 
+        DeclaredShapeBuilder parent = DeclaredShapeBuilder.typeDeclaration("Parent")
+                .ofType(NodeShapeBuilder.inheritingObject()
+                        .withProperty(
+                                PropertyShapeBuilder.property("subName", TypeShapeBuilder.simpleType("string")))
+                );
+
+        WebApiDocument api = document()
+                .baseUri("http://google.com")
+                .title("doc")
+                .version("one")
+                .mediaType("foo/fun")
+                .withTypes(
+                        DeclaredShapeBuilder.typeDeclaration("Mom")
+                                .ofType(NodeShapeBuilder.inheritingObject("Parent")
+                                        .withProperty(
+                                                PropertyShapeBuilder.property("name", TypeShapeBuilder.simpleType("string")))
+                                ),
+                        parent
+
+                )
+                .buildModel();
+
+        System.err.println(Raml10.generateString(api).get());
+
+        assertEquals("Mom", ((NodeShape)api.declares().get(0)).name().value());
+        assertEquals(0, (((NodeShape) api.declares().get(0)).inherits().size()));
+        assertEquals("name", ((NodeShape)api.declares().get(0)).properties().get(0).name().value());
+        assertTrue(((NodeShape)api.declares().get(0)).properties().get(0).range().name().value().contains("string"));
  /*       Api api = document()
                 .baseUri("http://google.com")
                 .title("doc")
