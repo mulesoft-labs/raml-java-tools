@@ -194,7 +194,7 @@ public class PojoToRamlImpl implements PojoToRaml {
         if ( typeNames.isEmpty()) {
             builder = TypeShapeBuilder.inheritingObjectFromShapes();
         } else {
-            builder = TypeShapeBuilder.inheritingObjectFromShapes(typeNames.toArray(new String[0]));
+            builder = TypeShapeBuilder.inheritingObjectFromShapes(/*typeNames.toArray(new String[0])*/);
         }
         return builder;
     }
@@ -222,7 +222,7 @@ public class PojoToRamlImpl implements PojoToRaml {
             return new GeneratedRamlType(clazz, typeBuilder);
         } else {
 
-            adjusterFactory.createAdjuster(clazz).adjustForUnknownTypeInProperty(clazz, typeBuilder, declaredShapeBuilder,  property);
+            //adjusterFactory.createAdjuster(clazz).adjustForUnknownTypeInProperty(clazz, typeBuilder, declaredShapeBuilder,  property);
             return null;
         }
     }

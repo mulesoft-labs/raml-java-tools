@@ -14,7 +14,7 @@ public class ScalarShapeBuilder extends TypeShapeBuilder<ScalarShape, ScalarShap
     }
 
     @Override
-    public ScalarShape buildNodeLocally() {
+    protected ScalarShape buildNodeLocally() {
 
         ScalarShape shape = new ScalarShape();
         shape.withName("string");

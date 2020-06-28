@@ -37,7 +37,7 @@ public class UnionShapeBuilder extends TypeShapeBuilder<UnionShape, UnionShapeBu
 
 
     @Override
-    public UnionShape buildNodeLocally() {
+    protected UnionShape buildNodeLocally() {
 
         return response.get();
     }

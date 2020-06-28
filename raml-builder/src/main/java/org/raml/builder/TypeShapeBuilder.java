@@ -24,7 +24,7 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
     private ExamplesBuilder example;
 
     @Override
-    abstract public N buildNodeLocally();
+    abstract protected N buildNodeLocally();
 
     public static ScalarShapeBuilder stringScalar() {
         return new ScalarShapeBuilder("http://www.w3.org/2001/XMLSchema#string");
@@ -36,6 +36,30 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
 
     public static ScalarShapeBuilder longScalar() {
         return new ScalarShapeBuilder("http://www.w3.org/2001/XMLSchema#long");
+    }
+
+    public static ScalarShapeBuilder dateOnly() {
+        return new ScalarShapeBuilder("http://www.w3.org/2001/XMLSchema#date");
+    }
+
+    public static ScalarShapeBuilder dateTime() {
+        return new ScalarShapeBuilder("http://www.w3.org/2001/XMLSchema#dateTime");
+    }
+
+    public static ScalarShapeBuilder timeOnly() {
+        return new ScalarShapeBuilder("http://www.w3.org/2001/XMLSchema#timeOnly");
+    }
+
+    public static ScalarShapeBuilder dateTimeOnly() {
+        return new ScalarShapeBuilder("http://www.w3.org/2001/XMLSchema#dateTimeOnly");
+    }
+
+    public static FileShapeBuilder file() {
+        return new FileShapeBuilder();
+    }
+
+    public static NilShapeBuilder nil() {
+        return new NilShapeBuilder();
     }
 
     static public TypeShapeBuilder simpleType(String type) {

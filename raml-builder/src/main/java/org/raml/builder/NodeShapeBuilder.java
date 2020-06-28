@@ -37,7 +37,7 @@ public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuild
 
 
     @Override
-    public NodeShape buildNodeLocally() {
+    protected NodeShape buildNodeLocally() {
 
         return response.get();
     }

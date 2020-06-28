@@ -26,26 +26,27 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 public enum ScalarType implements RamlType {
-    NUMBER("number", new ImmutableMap.Builder<Class<?>, String>()
+    NUMBER(TypeShapeBuilder::longScalar, "float", new ImmutableMap.Builder<Class<?>, String>()
             .put(float.class, "float")
             .put(Float.class, "float")
             .put(double.class, "double")
             .put(Double.class, "double")
             .build()),
-    FILE("file",  new ImmutableMap.Builder<Class<?>, String>().build()),
+    FILE(TypeShapeBuilder::file, "file", new ImmutableMap.Builder<Class<?>, String>().build()),
     BOOLEAN(
-            "boolean", new ImmutableMap.Builder<Class<?>, String>().build()),
-    STRING("string",
-            new ImmutableMap.Builder<Class<?>, String>().build()),
-    DATE_ONLY("date-only", new ImmutableMap.Builder<Class<?>, String>().build()),
+            TypeShapeBuilder::booleanScalar, "boolean", new ImmutableMap.Builder<Class<?>, String>().build()),
+    STRING(TypeShapeBuilder::stringScalar,
+            "string", new ImmutableMap.Builder<Class<?>, String>().build()),
+    DATE_ONLY(TypeShapeBuilder::dateOnly, "date-only", new ImmutableMap.Builder<Class<?>, String>().build()),
     TIME_ONLY(
-            "time-only", new ImmutableMap.Builder<Class<?>, String>().build()),
-    DATETIME_ONLY("datetime-only", new ImmutableMap.Builder<Class<?>, String>().build()),
-    DATETIME("datetime",new ImmutableMap.Builder<Class<?>, String>().build()),
+            TypeShapeBuilder::timeOnly, "time-only", new ImmutableMap.Builder<Class<?>, String>().build()),
+    DATETIME_ONLY(TypeShapeBuilder::dateTimeOnly, "datetime-only", new ImmutableMap.Builder<Class<?>, String>().build()),
+    DATETIME(TypeShapeBuilder::dateTime, "datetime", new ImmutableMap.Builder<Class<?>, String>().build()),
     // All "integer" types are mapped to raml's "integer". Not sure if that is correct.
-    INTEGER("integer", new ImmutableMap.Builder<Class<?>, String>()
+    INTEGER(TypeShapeBuilder::longScalar, "integer", new ImmutableMap.Builder<Class<?>, String>()
             .put(int.class, "int32")
             .put(Integer.class, "int32")
             .put(short.class, "int16")
@@ -55,7 +56,7 @@ public enum ScalarType implements RamlType {
             .put(long.class, "int64")
             .put(Long.class, "int64")
             .build()),
-    NIL("nil", new ImmutableMap.Builder<Class<?>, String>().build());
+    NIL(TypeShapeBuilder::nil, "", new ImmutableMap.Builder<Class<?>, String>().build());
 
     private static final Map<Type, ScalarType> JAVA_TO_RAML_TYPES;
 
@@ -86,24 +87,27 @@ public enum ScalarType implements RamlType {
     }
 
     private static final Set<String> SCALAR_TYPES = new HashSet<>();
+    private final String ramlName;
+
     static {
         for (ScalarType scalarType : ScalarType.values()) {
 
-            SCALAR_TYPES.add(scalarType.ramlSyntax);
+            SCALAR_TYPES.add(scalarType.ramlName);
         }
     }
 
-    private final String ramlSyntax;
+    private final Supplier<TypeShapeBuilder<?, ?>> ramlSyntax;
     private final Map<Class<?>, String> formats;
 
-    ScalarType(String ramlSyntax, Map<Class<?>, String> formats) {
+    ScalarType(Supplier<TypeShapeBuilder<?,?>> ramlSyntax, String ramlName, Map<Class<?>, String> formats) {
         this.ramlSyntax = ramlSyntax;
+        this.ramlName = ramlName;
         this.formats = formats;
     }
 
     @Override
     public TypeShapeBuilder getRamlSyntax() {
-        return TypeShapeBuilder.simpleType(ramlSyntax);
+        return ramlSyntax.get();
     }
 
 

@@ -22,14 +22,13 @@ public class ArrayShapeBuilder extends TypeShapeBuilder<ArrayShape, ArrayShapeBu
     }
 
     @Override
-    public ArrayShape buildNodeLocally() {
+    protected ArrayShape buildNodeLocally() {
 
         ArrayShape shape = new ArrayShape();
         commonNodeInfo(shape);
         if (  arrayItems != null  ) {
 
-//            KeyValueNodeImpl kvn = new KeyValueNodeImpl(new StringNodeImpl("items"), arrayItems.buildNode());
-//            node.addChild(kvn);
+            shape.withItems(arrayItems.buildNode());
         }
 
         return shape;
