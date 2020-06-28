@@ -1,10 +1,14 @@
 package org.raml.builder;
 
 import amf.client.model.domain.NodeShape;
+import amf.client.model.domain.Shape;
+import com.google.common.base.Suppliers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -12,14 +16,16 @@ import java.util.stream.Collectors;
  */
 public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuilder> {
 
-    public String[] types;
+    private Shape[] types;
 
     private final List<PropertyShapeBuilder> properties = new ArrayList<>();
 
+    private final Supplier<NodeShape> response;
 
-    public NodeShapeBuilder(String... types) {
+    public NodeShapeBuilder(Shape... types) {
 
         this.types = types;
+        this.response = Suppliers.memoize(this::calculateNodeShape);
     }
 
 
@@ -33,17 +39,18 @@ public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuild
     @Override
     public NodeShape buildNode() {
 
+        return response.get();
+    }
+
+    public NodeShape calculateNodeShape() {
         NodeShape nodeShape = new NodeShape();
         commonNodeInfo(nodeShape);
+        nodeShape.withName("anonymous");
+        nodeShape.withId("id://#" + UUID.randomUUID());
 
-        if ( types != null ) {
-            if (types.length == 1) {
-                nodeShape.withName(types[0]);
-            } else {
-
+        if ( types != null && types.length != 0) {
                 //Not sure....
-                Arrays.stream(types).forEach(nodeShape::withInheritsObject);
-            }
+                nodeShape.withInherits(Arrays.asList(types));
         }
 
         if ( ! properties.isEmpty() ) {
@@ -58,10 +65,10 @@ public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuild
     public String id() {
 
         if (types.length == 1) {
-            return types[0];
+            return "anonymous";
         } else {
 
-            return "[" + String.join(",", types) + "]";
+            return "[" + Arrays.stream(types).map(t -> t.name().value()).collect(Collectors.joining(",")) + "]";
         }
     }
 }

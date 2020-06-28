@@ -1,11 +1,14 @@
 package org.raml.builder;
 
 import amf.client.model.domain.NodeShape;
+import amf.client.model.domain.PropertyShape;
 import amf.client.model.domain.ScalarShape;
 import org.junit.Test;
 import webapi.Raml10;
 import webapi.WebApiDocument;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
@@ -17,6 +20,32 @@ import static org.raml.builder.RamlDocumentBuilder.document;
  */
 public class TypeBuilderTest {
 
+    @Test
+    public void goddamit() throws ExecutionException, InterruptedException {
+
+
+        WebApiDocument api = document()
+                .baseUri("http://google.com")
+                .title("doc")
+                .version("one")
+                .mediaType("foo/fun").buildNode();
+
+        NodeShape parent = new NodeShape();
+        PropertyShape property = new PropertyShape();
+        property.withName("prop1");
+        property.withRange(new ScalarShape().withDataType("http://www.w3.org/2001/XMLSchema#string"));
+        parent.withName("parent");
+        parent.withProperties(Collections.singletonList(property));
+        api.withDeclares(Arrays.asList( new NodeShape().withInherits(Collections.singletonList(parent)).withName("foo"), parent));
+
+//
+//        ValidationReport s = Raml10.validate(api).get();
+//        if (!s.conforms()) {
+//            throw new ModelBuilderException(s);
+//        }
+
+        System.err.println(Raml10.generateString(api).get());
+    }
 
     @Test
     public void justATypeMam() {
@@ -119,7 +148,7 @@ public class TypeBuilderTest {
                 .mediaType("foo/fun")
                 .withTypes(
                         DeclaredShapeBuilder.typeDeclaration("Mom")
-                                .ofType(NodeShapeBuilder.inheritingObject()
+                                .ofType(NodeShapeBuilder.inheritingObjectFromShapes()
                                         .withProperty(
                                                 PropertyShapeBuilder.property("name", TypeShapeBuilder.simpleType("string")))
                                 )
@@ -129,7 +158,7 @@ public class TypeBuilderTest {
         assertEquals("Mom", ((NodeShape)api.declares().get(0)).name().value());
         assertEquals(0, (((NodeShape) api.declares().get(0)).inherits().size()));
         assertEquals("name", ((NodeShape)api.declares().get(0)).properties().get(0).name().value());
-        assertTrue(((NodeShape)api.declares().get(0)).properties().get(0).range().name().value().contains("string"));
+        assertTrue(((NodeShape)api.declares().get(0)).properties().get(0).range().name().value().contains("anonymous"));
     }
 
     @Test
@@ -138,7 +167,7 @@ public class TypeBuilderTest {
         DeclaredShapeBuilder parent = DeclaredShapeBuilder.typeDeclaration("Parent")
                 .ofType(NodeShapeBuilder.inheritingObject()
                         .withProperty(
-                                PropertyShapeBuilder.property("subName", TypeShapeBuilder.simpleType("string")))
+                                PropertyShapeBuilder.property("subName", TypeShapeBuilder.stringScalar()))
                 );
 
         WebApiDocument api = document()
@@ -148,51 +177,53 @@ public class TypeBuilderTest {
                 .mediaType("foo/fun")
                 .withTypes(
                         DeclaredShapeBuilder.typeDeclaration("Mom")
-                                .ofType(NodeShapeBuilder.inheritingObject("Parent")
-                                        .withProperty(
-                                                PropertyShapeBuilder.property("name", TypeShapeBuilder.simpleType("string")))
+                                .ofType(NodeShapeBuilder.inheritingObjectFromShapes(parent.buildNode()).withProperty(PropertyShapeBuilder.property("name", TypeShapeBuilder.stringScalar()))
                                 ),
                         parent
-
-                )
+                        )
                 .buildModel();
 
-        System.err.println(Raml10.generateString(api).get());
 
         assertEquals("Mom", ((NodeShape)api.declares().get(0)).name().value());
-        assertEquals(0, (((NodeShape) api.declares().get(0)).inherits().size()));
+        assertEquals(1, (((NodeShape) api.declares().get(0)).inherits().size()));
         assertEquals("name", ((NodeShape)api.declares().get(0)).properties().get(0).name().value());
         assertTrue(((NodeShape)api.declares().get(0)).properties().get(0).range().name().value().contains("string"));
- /*       Api api = document()
+    }
+
+
+    @Test
+    public void multipleInheritance() {
+
+        DeclaredShapeBuilder parent1 = DeclaredShapeBuilder.typeDeclaration("Parent1")
+                .ofType(NodeShapeBuilder.inheritingObject()
+                        .withProperty(
+                                PropertyShapeBuilder.property("subName", TypeShapeBuilder.stringScalar()))
+                );
+
+        DeclaredShapeBuilder parent2 = DeclaredShapeBuilder.typeDeclaration("Parent2")
+                .ofType(NodeShapeBuilder.inheritingObject()
+                        .withProperty(
+                                PropertyShapeBuilder.property("subName2", TypeShapeBuilder.stringScalar()))
+                );
+
+        WebApiDocument api = document()
                 .baseUri("http://google.com")
                 .title("doc")
                 .version("one")
                 .mediaType("foo/fun")
                 .withTypes(
-                        AnyShapeBuilder.typeDeclaration("Parent")
-                                .ofType(TypeShapeBuilder.simpleType("object")
-                                        .withProperty(
-                                                PropertyShapeBuilder.property("name", TypeShapeBuilder.simpleType("string")))
+                        DeclaredShapeBuilder.typeDeclaration("Mom")
+                                .ofType(NodeShapeBuilder.inheritingObjectFromShapes(parent1.buildNode(), parent2.buildNode()).withProperty(PropertyShapeBuilder.property("name", TypeShapeBuilder.stringScalar()))
                                 ),
-
-                        AnyShapeBuilder.typeDeclaration("Mom")
-                                .ofType(TypeShapeBuilder.simpleType("Parent")
-                                        .withProperty(
-                                                PropertyShapeBuilder.property("subName", TypeShapeBuilder.simpleType("string")))
-                                )
+                        parent1, parent2
                 )
                 .buildModel();
 
-        assertEquals("Mom", api.types().get(1).name());
-        assertEquals("Parent", api.types().get(1).type());
-        assertEquals("name", ((ObjectTypeDeclaration)api.types().get(0)).properties().get(0).name());
-        assertEquals("string", ((ObjectTypeDeclaration)api.types().get(0)).properties().get(0).type());
-        assertEquals("subName", ((ObjectTypeDeclaration)api.types().get(1)).properties().get(1).name());
-        assertEquals("string", ((ObjectTypeDeclaration)api.types().get(1)).properties().get(1).type());*/
-    }
 
-    @Test
-    public void multipleInheritance() {
+        assertEquals("Mom", ((NodeShape)api.declares().get(0)).name().value());
+        assertEquals(1, (((NodeShape) api.declares().get(0)).inherits().size()));
+        assertEquals("name", ((NodeShape)api.declares().get(0)).properties().get(0).name().value());
+        assertTrue(((NodeShape)api.declares().get(0)).properties().get(0).range().name().value().contains("string"));
 
 /*        Api api = document()
                 .baseUri("http://google.com")

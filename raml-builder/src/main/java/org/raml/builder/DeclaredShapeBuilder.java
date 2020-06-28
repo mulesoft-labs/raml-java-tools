@@ -2,6 +2,9 @@ package org.raml.builder;
 
 
 import amf.client.model.domain.AnyShape;
+import com.google.common.base.Suppliers;
+
+import java.util.function.Supplier;
 
 /**
  * Created. There, you have it.
@@ -9,11 +12,21 @@ import amf.client.model.domain.AnyShape;
 public class DeclaredShapeBuilder extends KeyValueNodeBuilder<DeclaredShapeBuilder> implements NodeBuilder {
 
     private final String name;
-    private TypeShapeBuilder<AnyShape, ?> types = null;
+    private TypeShapeBuilder<?, ?> types = null;
+
+    private Supplier<AnyShape> response;
 
     private DeclaredShapeBuilder(String name) {
         super(name);
         this.name = name;
+        this.response = Suppliers.memoize(() -> calculateShape(name));
+    }
+
+    private AnyShape calculateShape(String name) {
+
+        AnyShape shape = types.buildNode();
+        shape.withName(name);
+        return shape;
     }
 
     static public DeclaredShapeBuilder typeDeclaration(String name) {
@@ -21,7 +34,7 @@ public class DeclaredShapeBuilder extends KeyValueNodeBuilder<DeclaredShapeBuild
         return new DeclaredShapeBuilder(name);
     }
 
-    public DeclaredShapeBuilder ofType(TypeShapeBuilder builder) {
+    public DeclaredShapeBuilder ofType(TypeShapeBuilder<?,?> builder) {
 
         types = builder;
         return this;
@@ -30,8 +43,6 @@ public class DeclaredShapeBuilder extends KeyValueNodeBuilder<DeclaredShapeBuild
     @Override
     public AnyShape buildNode() {
 
-        AnyShape shape = types.buildNode();
-        shape.withName(name);
-        return shape;
+        return response.get();
     }
 }

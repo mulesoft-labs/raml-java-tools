@@ -42,7 +42,7 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
 
     static public TypeShapeBuilder simpleType(String type) {
 
-        return new NodeShapeBuilder(type);
+        return new NodeShapeBuilder();
     }
 
     static public ArrayShapeBuilder arrayOf(TypeShapeBuilder builder) {
@@ -59,12 +59,12 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
 
     static public NodeShapeBuilder inheritingObject(String... types) {
 
-        return new NodeShapeBuilder(types);
+        return new NodeShapeBuilder();
     }
 
     static public NodeShapeBuilder inheritingObjectFromShapes(Shape... types) {
 
-        return new NodeShapeBuilder(Arrays.stream(types).map(t -> t.name().value()).toArray(String[]::new));
+        return new NodeShapeBuilder(types);
     }
 
     public static TypeShapeBuilder anyType() {
