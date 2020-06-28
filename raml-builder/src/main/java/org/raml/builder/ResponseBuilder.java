@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * Created. There, you have it.
  */
-public class ResponseBuilder extends DomainElementBuilder<ResponseBuilder> implements NodeBuilder, AnnotableBuilder<ResponseBuilder> {
+public class ResponseBuilder extends DomainElementBuilder<Response, ResponseBuilder> implements AnnotableBuilder<ResponseBuilder> {
 
     private final int code;
     private List<PayloadBuilder> bodies = new ArrayList<>();

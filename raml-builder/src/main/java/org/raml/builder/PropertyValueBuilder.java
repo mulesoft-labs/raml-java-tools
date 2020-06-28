@@ -11,7 +11,7 @@ import java.util.stream.IntStream;
 /**
  * Created. There, you have it.
  */
-public class PropertyValueBuilder extends DomainElementBuilder<PropertyValueBuilder> implements NodeBuilder, SupportsProperties<PropertyValueBuilder> {
+public class PropertyValueBuilder extends DomainElementBuilder<DataNode, PropertyValueBuilder> implements SupportsProperties<PropertyValueBuilder> {
 
 
     private final DataNode node;

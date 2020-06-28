@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * Created. There, you have it.
  */
-public class ResourceBuilder extends DomainElementBuilder<ResourceBuilder> implements NodeBuilder {
+public class ResourceBuilder extends DomainElementBuilder<EndPoint, ResourceBuilder> {
 
     private final String name;
     private String displayName;

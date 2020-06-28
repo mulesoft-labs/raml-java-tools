@@ -2,12 +2,11 @@ package org.raml.builder;
 
 
 import amf.client.model.domain.Payload;
-import amf.client.model.domain.Shape;
 
 /**
  * Created. There, you have it.
  */
-public class PayloadBuilder extends DomainElementBuilder<PayloadBuilder> implements NodeBuilder {
+public class PayloadBuilder extends DomainElementBuilder<Payload, PayloadBuilder>  {
 
     private final String name;
     private TypeShapeBuilder types = TypeShapeBuilder.anyType();
@@ -32,7 +31,7 @@ public class PayloadBuilder extends DomainElementBuilder<PayloadBuilder> impleme
     public Payload buildNode() {
 
         Payload payload = new Payload();
-        payload.withSchema((Shape) types.buildNode());
+        payload.withSchema(types.buildNode());
         payload.withMediaType(name);
 
         return payload;

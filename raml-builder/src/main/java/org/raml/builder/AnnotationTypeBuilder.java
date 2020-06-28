@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created. There, you have it.
  */
-public class AnnotationTypeBuilder extends DomainElementBuilder<AnnotationBuilder> implements NodeBuilder {
+public class AnnotationTypeBuilder extends DomainElementBuilder<DomainElement, AnnotationBuilder> {
 
     private List<NodeBuilder> properties = new ArrayList<>();
 

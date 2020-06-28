@@ -5,8 +5,8 @@ import amf.client.model.domain.DomainElement;
 /**
  * Created. There, you have it.
  */
-public interface NodeBuilder {
+public interface NodeBuilder<T extends DomainElement> {
 
-    DomainElement buildNode();
+    T buildNode();
     String id();
 }

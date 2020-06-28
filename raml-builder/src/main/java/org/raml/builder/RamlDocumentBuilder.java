@@ -22,8 +22,8 @@ public class RamlDocumentBuilder implements ModelBuilder<WebApiDocument> {
     private List<NodeBuilder> builders = new ArrayList<>();
 
     // private KeyValueNodeBuilderMap<KeyValueNodeBuilder> annotationTypeBuilders = KeyValueNodeBuilderMap.createMap();
-    private List<DeclaredShapeBuilder> typeDeclarationBuilders = new ArrayList<>();
-    private List<ResourceBuilder> resourceBuilders = new ArrayList();
+    private final List<DeclaredShapeBuilder<?>> typeDeclarationBuilders = new ArrayList<>();
+    private final List<ResourceBuilder> resourceBuilders = new ArrayList();
     private String baseUri;
     private String title;
     private String version;
@@ -91,7 +91,7 @@ public class RamlDocumentBuilder implements ModelBuilder<WebApiDocument> {
         return this;
     }
 
-    public RamlDocumentBuilder withTypes(DeclaredShapeBuilder... typeBuilders) {
+    public RamlDocumentBuilder withTypes(DeclaredShapeBuilder<?>... typeBuilders) {
         this.typeDeclarationBuilders.addAll(Arrays.asList(typeBuilders));
         return this;
     }

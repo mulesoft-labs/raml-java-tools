@@ -9,12 +9,12 @@ import java.util.function.Supplier;
 /**
  * Created. There, you have it.
  */
-public class DeclaredShapeBuilder extends DomainElementBuilder<DeclaredShapeBuilder> implements NodeBuilder {
+public class DeclaredShapeBuilder<T extends AnyShape> extends DomainElementBuilder<T, DeclaredShapeBuilder<T>> {
 
     private final String name;
-    private TypeShapeBuilder<?, ?> types = null;
+    private TypeShapeBuilder<T, ?> types = null;
 
-    private Supplier<AnyShape> response;
+    private final Supplier<T> response;
 
     private DeclaredShapeBuilder(String name) {
         super();
@@ -22,26 +22,26 @@ public class DeclaredShapeBuilder extends DomainElementBuilder<DeclaredShapeBuil
         this.response = Suppliers.memoize(() -> calculateShape(name));
     }
 
-    private AnyShape calculateShape(String name) {
+    private T calculateShape(String name) {
 
-        AnyShape shape = types.buildNode();
+        T shape = types.buildNode();
         shape.withName(name);
         return shape;
     }
 
-    static public DeclaredShapeBuilder typeDeclaration(String name) {
+    static public<T extends AnyShape> DeclaredShapeBuilder<T> typeDeclaration(String name) {
 
-        return new DeclaredShapeBuilder(name);
+        return new DeclaredShapeBuilder<>(name);
     }
 
-    public DeclaredShapeBuilder ofType(TypeShapeBuilder<?,?> builder) {
+    public DeclaredShapeBuilder<T> ofType(TypeShapeBuilder<T,?> builder) {
 
         types = builder;
         return this;
     }
 
     @Override
-    public AnyShape buildNode() {
+    public T buildNode() {
 
         return response.get();
     }

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * Created. There, you have it.
  */
-public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBuilder<N, ?>> extends DomainElementBuilder<B> implements NodeBuilder, AnnotableBuilder<TypeShapeBuilder> {
+public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBuilder<N, B>> extends DomainElementBuilder<N, B> implements AnnotableBuilder<TypeShapeBuilder<N,B>> {
 
     private List<ExamplesBuilder> examples = new ArrayList<>();
     private List<AnnotationBuilder> annotations = new ArrayList<>();

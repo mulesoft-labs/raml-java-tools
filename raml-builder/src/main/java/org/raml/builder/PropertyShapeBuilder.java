@@ -10,9 +10,9 @@ import java.util.List;
 /**
  * Created. There, you have it.
  */
-public class PropertyShapeBuilder extends DomainElementBuilder<PropertyShapeBuilder> implements AnnotableBuilder<PropertyShapeBuilder> {
+public class PropertyShapeBuilder extends DomainElementBuilder<PropertyShape, PropertyShapeBuilder> implements AnnotableBuilder<PropertyShapeBuilder> {
 
-    private final TypeShapeBuilder type;
+    private final TypeShapeBuilder<?,?> type;
     private final String name;
     private Boolean required;
     private List<AnnotationBuilder> annotations = new ArrayList<>();

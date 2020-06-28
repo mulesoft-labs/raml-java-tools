@@ -6,7 +6,7 @@ import amf.client.model.domain.DomainElement;
 /**
  * Created. There, you have it.
  */
-public class FacetBuilder extends DomainElementBuilder<FacetBuilder> {
+public class FacetBuilder extends DomainElementBuilder<DomainElement, FacetBuilder> {
 
     private ValueNodeFactory value;
 

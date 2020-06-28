@@ -9,7 +9,7 @@ import java.util.Optional;
 /**
  * Created. There, you have it.
  */
-public class ParameterBuilder extends DomainElementBuilder<ParameterBuilder> {
+public class ParameterBuilder extends DomainElementBuilder<Parameter, ParameterBuilder> {
 
     private final String name;
     private final String binding;
