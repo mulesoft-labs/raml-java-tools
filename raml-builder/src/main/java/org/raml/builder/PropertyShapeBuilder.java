@@ -1,7 +1,6 @@
 package org.raml.builder;
 
 import amf.client.model.domain.PropertyShape;
-import amf.client.model.domain.Shape;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,7 +52,8 @@ public class PropertyShapeBuilder extends DomainElementBuilder<PropertyShape, Pr
 
         PropertyShape node = new PropertyShape();
         node.withName(name);
-        node.withRange((Shape) type.buildNode());
+        node.withPath(name);
+        node.withRange(type.buildNode());
 //        if ( ! annotations.isEmpty() ) {
 //
 //            for (AnnotationBuilder annotation : annotations) {

@@ -4,6 +4,7 @@ import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.PropertyShape;
 import amf.client.model.domain.ScalarShape;
 import amf.client.model.domain.UnionShape;
+import amf.client.validate.ValidationReport;
 import org.junit.Test;
 import webapi.Raml10;
 import webapi.WebApiDocument;
@@ -31,21 +32,47 @@ public class TypeBuilderTest {
                 .version("one")
                 .mediaType("foo/fun").buildNode();
 
-        NodeShape parent = new NodeShape();
-        PropertyShape property = new PropertyShape();
-        property.withName("prop1");
-        property.withRange(new ScalarShape().withDataType("http://www.w3.org/2001/XMLSchema#string"));
-        parent.withName("parent");
-        parent.withProperties(Collections.singletonList(property));
-        api.withDeclares(Arrays.asList( new NodeShape().withInherits(Collections.singletonList(parent)).withName("foo"), parent));
+        NodeShape parent = createParent();
 
-//
-//        ValidationReport s = Raml10.validate(api).get();
-//        if (!s.conforms()) {
-//            throw new ModelBuilderException(s);
-//        }
+        NodeShape child = new NodeShape();
+        child.withName("child");
+        child.withId("amf://id#4");
+
+        PropertyShape propertyChild = new PropertyShape();
+        propertyChild.withPath("prop2");
+        propertyChild.withId("amf://id#5");
+        propertyChild.withName("prop2");
+        ScalarShape rangeChild = new ScalarShape().withDataType("http://www.w3.org/2001/XMLSchema#string");
+        propertyChild.withRange(rangeChild);
+        rangeChild.withId("amf://id#6");
+        child.withProperties(Collections.singletonList(propertyChild));
+        child.withInherits(Collections.singletonList(parent));
+
+        api.withDeclares(Arrays.asList(parent, child));
+
+
+        ValidationReport s = Raml10.validate(api).get();
+        if (!s.conforms()) {
+            throw new ModelBuilderException(s);
+        }
 
         System.err.println(Raml10.generateString(api).get());
+    }
+
+    public NodeShape createParent() {
+        NodeShape parent = new NodeShape();
+        parent.withId("amf://id#1");
+
+        PropertyShape property = new PropertyShape();
+        property.withPath("prop1");
+        property.withId("amf://id#2");
+        property.withName("prop1");
+        ScalarShape range = new ScalarShape().withDataType("http://www.w3.org/2001/XMLSchema#string");
+        property.withRange(range);
+        range.withId("amf://id#3");
+        parent.withName("parent");
+        parent.withProperties(Collections.singletonList(property));
+        return parent;
     }
 
     @Test
