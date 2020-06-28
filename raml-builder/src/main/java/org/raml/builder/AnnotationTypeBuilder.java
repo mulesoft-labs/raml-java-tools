@@ -23,7 +23,7 @@ public class AnnotationTypeBuilder extends DomainElementBuilder<DomainElement, A
     }
 
     @Override
-    public DomainElement buildNode() {
+    public DomainElement buildNodeLocally() {
 
       return null;
     }

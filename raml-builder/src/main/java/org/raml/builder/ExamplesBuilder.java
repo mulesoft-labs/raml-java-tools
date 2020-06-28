@@ -52,12 +52,12 @@ public class ExamplesBuilder extends DomainElementBuilder<Example, ExamplesBuild
     }
 
     @Override
-    public Example buildNode() {
+    public Example buildNodeLocally() {
 
         Example example = new Example();
         example.withStrict(strict);
 
-        propertyValues.forEach(ex -> example.withStructuredValue(ex.buildNode()));
+        propertyValues.forEach(ex -> example.withStructuredValue(ex.buildNodeLocally()));
 
         return example;
     }

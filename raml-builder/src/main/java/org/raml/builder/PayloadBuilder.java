@@ -28,10 +28,10 @@ public class PayloadBuilder extends DomainElementBuilder<Payload, PayloadBuilder
     }
 
     @Override
-    public Payload buildNode() {
+    public Payload buildNodeLocally() {
 
         Payload payload = new Payload();
-        payload.withSchema(types.buildNode());
+        payload.withSchema(types.buildNodeLocally());
         payload.withMediaType(name);
 
         return payload;

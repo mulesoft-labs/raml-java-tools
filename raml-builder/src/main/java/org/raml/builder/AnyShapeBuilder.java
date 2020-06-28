@@ -15,7 +15,7 @@ public class AnyShapeBuilder extends TypeShapeBuilder<AnyShape, AnyShapeBuilder>
 
 
     @Override
-    public AnyShape buildNode() {
+    public AnyShape buildNodeLocally() {
 
         AnyShape shape = new AnyShape();
         shape.withName(name);

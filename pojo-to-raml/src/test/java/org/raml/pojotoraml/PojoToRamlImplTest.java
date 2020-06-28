@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.raml.v2.api.model.v10.RamlFragment.Default;
 import static org.raml.v2.internal.impl.commons.RamlVersion.RAML_10;
@@ -134,7 +133,7 @@ public class PojoToRamlImplTest {
         PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), AdjusterFactory.NULL_FACTORY);
         TypeShapeBuilder builder = pojoToRaml.name(Fun.class.getMethod("stringMethod").getGenericReturnType());
 
-        ObjectNode node = builder.buildNode();
+        ObjectNode node = builder.buildNodeLocally();
 
         assertEquals("type: array", node.getChildren().get(0).toString());
     }

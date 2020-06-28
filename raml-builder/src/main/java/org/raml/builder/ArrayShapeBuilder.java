@@ -1,7 +1,6 @@
 package org.raml.builder;
 
 import amf.client.model.domain.ArrayShape;
-import amf.client.model.domain.DomainElement;
 
 /**
  * Created. There, you have it.
@@ -23,7 +22,7 @@ public class ArrayShapeBuilder extends TypeShapeBuilder<ArrayShape, ArrayShapeBu
     }
 
     @Override
-    public ArrayShape buildNode() {
+    public ArrayShape buildNodeLocally() {
 
         ArrayShape shape = new ArrayShape();
         commonNodeInfo(shape);

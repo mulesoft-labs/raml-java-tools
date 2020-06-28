@@ -24,7 +24,7 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
     private ExamplesBuilder example;
 
     @Override
-    abstract public N buildNode();
+    abstract public N buildNodeLocally();
 
     public static ScalarShapeBuilder stringScalar() {
         return new ScalarShapeBuilder("http://www.w3.org/2001/XMLSchema#string");
@@ -105,8 +105,9 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
     }
 
 
-    public void commonNodeInfo(AnyShape node) {
+    protected void commonNodeInfo(N node) {
 
+        super.commonNodeInfo(node);
 
         if ( ! facets.isEmpty() ) {
 
@@ -135,12 +136,12 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
 
         if ( ! examples.isEmpty() ) {
 
-            node.withExamples(examples.stream().map(ExamplesBuilder::buildNode).collect(Collectors.toList()));
+            node.withExamples(examples.stream().map(ExamplesBuilder::buildNodeLocally).collect(Collectors.toList()));
         }
 
         if ( example != null ) {
 
-            node.withExamples(Collections.singletonList(example.buildNode()));
+            node.withExamples(Collections.singletonList(example.buildNodeLocally()));
         }
     }
 

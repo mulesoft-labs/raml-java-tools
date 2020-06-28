@@ -52,13 +52,13 @@ public class ParameterBuilder extends DomainElementBuilder<Parameter, ParameterB
     }
 
     @Override
-    public Parameter buildNode() {
+    public Parameter buildNodeLocally() {
 
         Parameter node = new Parameter().withName(name);
         node.withBinding("query");
         Optional.ofNullable(description).ifPresent(node::withDescription);
         node.withRequired(Optional.ofNullable(required).orElse(false));
-        node.withSchema((Shape) type.buildNode());
+        node.withSchema((Shape) type.buildNodeLocally());
 
         return node;
     }

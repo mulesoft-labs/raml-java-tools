@@ -97,14 +97,14 @@ public class PropertyValueBuilder extends DomainElementBuilder<DataNode, Propert
 
 
     @Override
-    public DataNode buildNode() {
+    public DataNode buildNodeLocally() {
 
         if (value != null) {
             return node;
         } else {
 
             if (subValue != null) {
-                return ((ObjectNode)node).addProperty(name, subValue.buildNode());
+                return ((ObjectNode)node).addProperty(name, subValue.buildNodeLocally());
             } else {
 
                 return new ObjectNode().withName(name);

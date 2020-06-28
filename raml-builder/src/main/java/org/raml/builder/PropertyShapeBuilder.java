@@ -48,12 +48,12 @@ public class PropertyShapeBuilder extends DomainElementBuilder<PropertyShape, Pr
     }
 
     @Override
-    public PropertyShape buildNode() {
+    public PropertyShape buildNodeLocally() {
 
         PropertyShape node = new PropertyShape();
         node.withName(name);
         node.withPath(name);
-        node.withRange(type.buildNode());
+        node.withRange(type.buildNodeLocally());
 //        if ( ! annotations.isEmpty() ) {
 //
 //            for (AnnotationBuilder annotation : annotations) {

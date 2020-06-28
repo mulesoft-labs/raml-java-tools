@@ -37,7 +37,7 @@ public class UnionShapeBuilder extends TypeShapeBuilder<UnionShape, UnionShapeBu
 
 
     @Override
-    public UnionShape buildNode() {
+    public UnionShape buildNodeLocally() {
 
         return response.get();
     }
@@ -50,7 +50,7 @@ public class UnionShapeBuilder extends TypeShapeBuilder<UnionShape, UnionShapeBu
 
         if ( types != null && types.length != 0) {
                 //Not sure....
-                unionShape.withInherits(Arrays.asList(types));
+                unionShape.withAnyOf(Arrays.asList(types));
         }
 
         return unionShape;

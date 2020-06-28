@@ -37,7 +37,7 @@ public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuild
 
 
     @Override
-    public NodeShape buildNode() {
+    public NodeShape buildNodeLocally() {
 
         return response.get();
     }
@@ -55,7 +55,7 @@ public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuild
 
         if ( ! properties.isEmpty() ) {
 
-            nodeShape.withProperties(properties.stream().map(PropertyShapeBuilder::buildNode).collect(Collectors.toList()));
+            nodeShape.withProperties(properties.stream().map(PropertyShapeBuilder::buildNodeLocally).collect(Collectors.toList()));
         }
 
         return nodeShape;

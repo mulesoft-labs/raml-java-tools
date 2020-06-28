@@ -65,18 +65,18 @@ public class OperationBuilder extends DomainElementBuilder<Operation, OperationB
     }
 
     @Override
-    public Operation buildNode() {
+    public Operation buildNodeLocally() {
 
         Operation node =  new Operation();
         node.withMethod(name);
         Optional.ofNullable(description).ifPresent(node::withDescription);
-        node.withResponses(responses.stream().map(ResponseBuilder::buildNode).collect(Collectors.toList()));
+        node.withResponses(responses.stream().map(ResponseBuilder::buildNodeLocally).collect(Collectors.toList()));
 
         Request request = new Request();
         node.withRequest(request);
-        request.withQueryParameters(queryParameters.stream().map(ParameterBuilder::buildNode).collect(Collectors.toList()));
-        request.withHeaders(headerParameters.stream().map(ParameterBuilder::buildNode).collect(Collectors.toList()));
-        request.withPayloads(bodies.stream().map(PayloadBuilder::buildNode).collect(Collectors.toList()));
+        request.withQueryParameters(queryParameters.stream().map(ParameterBuilder::buildNodeLocally).collect(Collectors.toList()));
+        request.withHeaders(headerParameters.stream().map(ParameterBuilder::buildNodeLocally).collect(Collectors.toList()));
+        request.withPayloads(bodies.stream().map(PayloadBuilder::buildNodeLocally).collect(Collectors.toList()));
 
 
 //

@@ -52,7 +52,7 @@ public class EnumShapeBuilder extends TypeShapeBuilder<ScalarShape, EnumShapeBui
 
 
     @Override
-    public ScalarShape buildNode() {
+    public ScalarShape buildNodeLocally() {
 
         ScalarShape shape = new ScalarShape();
         shape.withDataType(type); // todo fix me!
