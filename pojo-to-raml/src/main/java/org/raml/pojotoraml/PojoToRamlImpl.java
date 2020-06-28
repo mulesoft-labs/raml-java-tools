@@ -3,6 +3,7 @@ package org.raml.pojotoraml;
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 import org.raml.builder.DeclaredShapeBuilder;
+import org.raml.builder.NodeShapeBuilder;
 import org.raml.builder.PropertyShapeBuilder;
 import org.raml.builder.TypeShapeBuilder;
 import org.raml.pojotoraml.types.RamlType;
@@ -102,7 +103,7 @@ public class PojoToRamlImpl implements PojoToRaml {
 
         final String simpleName = adjusterFactory.createAdjuster(clazz).adjustTypeName(clazz, clazz.getSimpleName());
 
-        TypeShapeBuilder builder = buildSuperType(clazz, builtTypes);
+        NodeShapeBuilder builder = buildSuperType(clazz, builtTypes);
         builder = adjusterFactory.createAdjuster(clazz).adjustType(clazz, simpleName, builder);
 
         DeclaredShapeBuilder typeDeclaration = DeclaredShapeBuilder.typeDeclaration(simpleName).ofType(builder);
@@ -165,7 +166,7 @@ public class PojoToRamlImpl implements PojoToRaml {
         return declaredShapeBuilder;
     }
 
-    private TypeShapeBuilder buildSuperType(Class<?> clazz, Map<String, DeclaredShapeBuilder> builtTypes) {
+    private NodeShapeBuilder buildSuperType(Class<?> clazz, Map<String, DeclaredShapeBuilder> builtTypes) {
         ClassParser parser = classParserFactory.createParser(clazz);
         Collection<Type> types = parser.parentClasses(clazz);
         ArrayList<String> typeNames = new ArrayList<>();
@@ -189,11 +190,11 @@ public class PojoToRamlImpl implements PojoToRaml {
             }
         }
 
-        TypeShapeBuilder builder;
+        NodeShapeBuilder builder;
         if ( typeNames.isEmpty()) {
-            builder = TypeShapeBuilder.simpleType("object");
+            builder = TypeShapeBuilder.inheritingObjectFromShapes();
         } else {
-            builder = TypeShapeBuilder.inheritingObject(typeNames.toArray(new String[0]));
+            builder = TypeShapeBuilder.inheritingObjectFromShapes(typeNames.toArray(new String[0]));
         }
         return builder;
     }

@@ -1,6 +1,7 @@
 package org.raml.pojotoraml;
 
 import org.raml.builder.DeclaredShapeBuilder;
+import org.raml.builder.NodeShapeBuilder;
 import org.raml.builder.PropertyShapeBuilder;
 import org.raml.builder.TypeShapeBuilder;
 
@@ -22,7 +23,7 @@ public interface RamlAdjuster {
         }
 
         @Override
-        public TypeShapeBuilder adjustType(Type type, String typeName, TypeShapeBuilder builder) {
+        public <T extends TypeShapeBuilder>T adjustType(Type type, String typeName, T builder) {
             return builder;
         }
 
@@ -47,7 +48,7 @@ public interface RamlAdjuster {
         }
 
         @Override
-        public void adjustForUnknownTypeInProperty(Type type, TypeShapeBuilder typeBuilder, DeclaredShapeBuilder builder, Property property) {
+        public void adjustForUnknownTypeInProperty(Type type, NodeShapeBuilder typeBuilder, DeclaredShapeBuilder builder, Property property) {
 
             throw new IllegalArgumentException("cannot parse property of type " + type + " for property " + property.name() + " of type " + property.type());
 
@@ -73,8 +74,8 @@ public interface RamlAdjuster {
         }
 
         @Override
-        public TypeShapeBuilder adjustType(Type type, String typeName, TypeShapeBuilder builder) {
-            TypeShapeBuilder val = builder;
+        public<T extends TypeShapeBuilder> T adjustType(Type type, String typeName, T builder) {
+            T val = builder;
             for (RamlAdjuster adjuster : adjusters) {
                 val = adjuster.adjustType(type, typeName, val);
             }
@@ -118,7 +119,7 @@ public interface RamlAdjuster {
         }
 
         @Override
-        public void adjustForUnknownTypeInProperty(Type type, TypeShapeBuilder typeBuilder, DeclaredShapeBuilder declaredShapeBuilder, Property property) {
+        public void adjustForUnknownTypeInProperty(Type type, NodeShapeBuilder typeBuilder, DeclaredShapeBuilder declaredShapeBuilder, Property property) {
             for (RamlAdjuster adjuster : adjusters) {
                  adjuster.adjustForUnknownTypeInProperty(type, typeBuilder, declaredShapeBuilder, property);
             }
@@ -140,7 +141,7 @@ public interface RamlAdjuster {
      * @param builder a suggested builder. You can add to it and return this builder, or build a new one.
      * @return
      */
-    TypeShapeBuilder adjustType(Type type, String typeName, TypeShapeBuilder builder);
+    <T extends TypeShapeBuilder>T adjustType(Type type, String typeName, T builder);
 
     /**
      * Allows you to change the name when used as a reference.  In most cases, it should match what comes out of
@@ -182,6 +183,6 @@ public interface RamlAdjuster {
      * @param typeBuilder
      * @return
      */
-    void adjustForUnknownTypeInProperty(Type type, TypeShapeBuilder typeBuilder, DeclaredShapeBuilder builder, Property property);
+    void adjustForUnknownTypeInProperty(Type type, NodeShapeBuilder typeBuilder, DeclaredShapeBuilder builder, Property property);
 
 }

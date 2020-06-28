@@ -1,6 +1,7 @@
 package org.raml.pojotoraml.plugins;
 
 import org.raml.builder.DeclaredShapeBuilder;
+import org.raml.builder.NodeShapeBuilder;
 import org.raml.builder.PropertyShapeBuilder;
 import org.raml.builder.TypeShapeBuilder;
 import org.raml.pojotoraml.Property;
@@ -33,7 +34,7 @@ public class AdditionalPropertiesAdjuster extends RamlAdjuster.Helper {
     }
 
     @Override
-    public void adjustForUnknownTypeInProperty(Type type, TypeShapeBuilder typeBuilder, DeclaredShapeBuilder builder, Property property) {
+    public void adjustForUnknownTypeInProperty(Type type, NodeShapeBuilder typeBuilder, DeclaredShapeBuilder builder, Property property) {
 
         if (property.type() instanceof ParameterizedType) {
 
