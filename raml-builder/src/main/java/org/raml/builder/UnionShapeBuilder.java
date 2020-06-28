@@ -1,7 +1,7 @@
 package org.raml.builder;
 
-import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.Shape;
+import amf.client.model.domain.UnionShape;
 import com.google.common.base.Suppliers;
 
 import java.util.ArrayList;
@@ -13,23 +13,23 @@ import java.util.stream.Collectors;
 /**
  * Created. There, you have it.
  */
-public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuilder> {
+public class UnionShapeBuilder extends TypeShapeBuilder<UnionShape, UnionShapeBuilder> {
 
 
     private Shape[] types;
 
     private final List<PropertyShapeBuilder> properties = new ArrayList<>();
 
-    private final Supplier<NodeShape> response;
+    private final Supplier<UnionShape> response;
 
-    public NodeShapeBuilder(Shape... types) {
+    public UnionShapeBuilder(Shape... types) {
 
         this.types = types;
         this.response = Suppliers.memoize(this::calculateNodeShape);
     }
 
 
-    public NodeShapeBuilder withProperty(PropertyShapeBuilder... properties) {
+    public UnionShapeBuilder withProperty(PropertyShapeBuilder... properties) {
 
         this.properties.addAll(Arrays.asList(properties));
         return this;
@@ -37,28 +37,23 @@ public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuild
 
 
     @Override
-    public NodeShape buildNode() {
+    public UnionShape buildNode() {
 
         return response.get();
     }
 
-    public NodeShape calculateNodeShape() {
-        NodeShape nodeShape = new NodeShape();
-        commonNodeInfo(nodeShape);
-        nodeShape.withName("anonymous");
-     //   nodeShape.withId("amf://id#" + (currentid ++));
+    public UnionShape calculateNodeShape() {
+        UnionShape unionShape = new UnionShape();
+        commonNodeInfo(unionShape);
+        unionShape.withName("anonymous");
+     //   unionShape.withId("amf://id#" + (currentid ++));
 
         if ( types != null && types.length != 0) {
                 //Not sure....
-                nodeShape.withInherits(Arrays.asList(types));
+                unionShape.withInherits(Arrays.asList(types));
         }
 
-        if ( ! properties.isEmpty() ) {
-
-            nodeShape.withProperties(properties.stream().map(PropertyShapeBuilder::buildNode).collect(Collectors.toList()));
-        }
-
-        return nodeShape;
+        return unionShape;
     }
 
 

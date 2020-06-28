@@ -3,6 +3,7 @@ package org.raml.builder;
 import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.PropertyShape;
 import amf.client.model.domain.ScalarShape;
+import amf.client.model.domain.UnionShape;
 import org.junit.Test;
 import webapi.Raml10;
 import webapi.WebApiDocument;
@@ -165,7 +166,7 @@ public class TypeBuilderTest {
     public void complexInheritance() throws ExecutionException, InterruptedException {
 
         DeclaredShapeBuilder parent = DeclaredShapeBuilder.typeDeclaration("Parent")
-                .ofType(NodeShapeBuilder.inheritingObject()
+                .ofType(NodeShapeBuilder.inheritingObjectFromShapes()
                         .withProperty(
                                 PropertyShapeBuilder.property("subName", TypeShapeBuilder.stringScalar()))
                 );
@@ -195,13 +196,13 @@ public class TypeBuilderTest {
     public void multipleInheritance() {
 
         DeclaredShapeBuilder parent1 = DeclaredShapeBuilder.typeDeclaration("Parent1")
-                .ofType(NodeShapeBuilder.inheritingObject()
+                .ofType(NodeShapeBuilder.inheritingObjectFromShapes()
                         .withProperty(
                                 PropertyShapeBuilder.property("subName", TypeShapeBuilder.stringScalar()))
                 );
 
         DeclaredShapeBuilder parent2 = DeclaredShapeBuilder.typeDeclaration("Parent2")
-                .ofType(NodeShapeBuilder.inheritingObject()
+                .ofType(NodeShapeBuilder.inheritingObjectFromShapes()
                         .withProperty(
                                 PropertyShapeBuilder.property("subName2", TypeShapeBuilder.stringScalar()))
                 );
@@ -220,101 +221,69 @@ public class TypeBuilderTest {
                 .buildModel();
 
 
-        assertEquals("Mom", ((NodeShape)api.declares().get(0)).name().value());
-        assertEquals(1, (((NodeShape) api.declares().get(0)).inherits().size()));
-        assertEquals("name", ((NodeShape)api.declares().get(0)).properties().get(0).name().value());
-        assertTrue(((NodeShape)api.declares().get(0)).properties().get(0).range().name().value().contains("string"));
+        assertEquals("Mom", ((NodeShape) api.declares().get(0)).name().value());
+        assertEquals(2, (((NodeShape) api.declares().get(0)).inherits().size()));
+        assertTrue(((NodeShape) api.declares().get(0)).properties().get(0).range().name().value().contains("string"));
+        assertEquals("name", ((NodeShape) api.declares().get(0)).properties().get(0).name().value());
+        assertEquals("subName", ((NodeShape) ((NodeShape) api.declares().get(0)).inherits().get(0)).properties().get(0).name().value());
+        assertEquals("subName2", ((NodeShape) ((NodeShape) api.declares().get(0)).inherits().get(1)).properties().get(0).name().value());
 
-/*        Api api = document()
-                .baseUri("http://google.com")
-                .title("doc")
-                .version("one")
-                .mediaType("foo/fun")
-                .withTypes(
-                        AnyShapeBuilder.typeDeclaration("Parent1")
-                                .ofType(TypeShapeBuilder.simpleType("object")
-                                        .withProperty(
-                                                PropertyShapeBuilder.property("name", TypeShapeBuilder.simpleType("string")))
-                                ),
-                        AnyShapeBuilder.typeDeclaration("Parent2")
-                                .ofType(TypeShapeBuilder.simpleType("object")
-                                        .withProperty(
-                                                PropertyShapeBuilder.property("name2", TypeShapeBuilder.simpleType("string")))
-                                ),
-
-
-                        AnyShapeBuilder.typeDeclaration("Mom")
-                                .ofType(TypeShapeBuilder.inheritingObject("Parent1", "Parent2")
-                                        .withProperty(
-                                                PropertyShapeBuilder.property("subName", TypeShapeBuilder.simpleType("string")))
-                                )
-                )
-                .buildModel();
-
-        assertEquals("Mom", api.types().get(2).name());
-        assertEquals("Parent1", api.types().get(2).parentTypes().get(0).name());
-        assertEquals("Parent2", api.types().get(2).parentTypes().get(1).name());
-        assertEquals("subName", ((ObjectTypeDeclaration)api.types().get(2)).properties().get(2).name());
-        assertEquals("string", ((ObjectTypeDeclaration)api.types().get(2)).properties().get(2).type());*/
     }
 
     // Should you try the same test with a text file, you get the same result.  'sweird.
     @Test
     public void unionType() {
 
-/*
-        Api api = document()
+        WebApiDocument api = document()
                 .baseUri("http://google.com")
                 .title("doc")
                 .version("one")
                 .mediaType("foo/fun")
                 .withTypes(
-                        AnyShapeBuilder.typeDeclaration("Mom")
-                                .ofType(TypeShapeBuilder.simpleType("string | integer")
-                        )
+                        DeclaredShapeBuilder.typeDeclaration("Mom")
+                                .ofType(TypeShapeBuilder.unionShapeOf(TypeShapeBuilder.stringScalar().buildNode(), TypeShapeBuilder.longScalar().buildNode()).withProperty(PropertyShapeBuilder.property("name", TypeShapeBuilder.stringScalar()))
+                                )
                 )
                 .buildModel();
 
-        assertEquals("Mom", api.types().get(0).name());
-        assertEquals("string | integer", api.types().get(0).type());
-        assertEquals("string | integer", ((UnionTypeDeclaration)api.types().get(0)).of().get(0).name());
-        assertEquals("string | integer", ((UnionTypeDeclaration)api.types().get(0)).of().get(1).name());
-*/
+
+        assertEquals("Mom", ((UnionShape) api.declares().get(0)).name().value());
+        assertTrue(((ScalarShape)((UnionShape)api.declares().get(0)).inherits().get(0)).dataType().value().contains("string"));
+        assertTrue(((ScalarShape)((UnionShape)api.declares().get(0)).inherits().get(1)).dataType().value().contains("long"));
     }
 
     // unions of declared types, they work ok.
     @Test
     public void complexUnions() {
 
- /*       Api api = document()
+
+        DeclaredShapeBuilder parent1 = DeclaredShapeBuilder.typeDeclaration("Parent1")
+                .ofType(NodeShapeBuilder.inheritingObjectFromShapes()
+                        .withProperty(
+                                PropertyShapeBuilder.property("subName", TypeShapeBuilder.stringScalar()))
+                );
+
+        DeclaredShapeBuilder parent2 = DeclaredShapeBuilder.typeDeclaration("Parent2")
+                .ofType(NodeShapeBuilder.inheritingObjectFromShapes()
+                        .withProperty(
+                                PropertyShapeBuilder.property("subName2", TypeShapeBuilder.stringScalar()))
+                );
+
+        WebApiDocument api = document()
                 .baseUri("http://google.com")
                 .title("doc")
                 .version("one")
                 .mediaType("foo/fun")
                 .withTypes(
-                        AnyShapeBuilder.typeDeclaration("Parent1")
-                                .ofType(TypeShapeBuilder.simpleType("object")
-                                        .withProperty(
-                                                PropertyShapeBuilder.property("name", TypeShapeBuilder.simpleType("string")))
-                                ),
-                        AnyShapeBuilder.typeDeclaration("Parent2")
-                                .ofType(TypeShapeBuilder.simpleType("object")
-                                        .withProperty(
-                                                PropertyShapeBuilder.property("name2", TypeShapeBuilder.simpleType("string")))
-                                ),
-
-
-                        AnyShapeBuilder.typeDeclaration("Mom")
-                                .ofType(TypeShapeBuilder.simpleType("Parent1 | Parent2")
-                                        .withProperty(
-                                                PropertyShapeBuilder.property("subName", TypeShapeBuilder.simpleType("string")))
+                        DeclaredShapeBuilder.typeDeclaration("Mom")
+                                .ofType(TypeShapeBuilder.unionShapeOf(parent1.buildNode(), parent2.buildNode()).withProperty(PropertyShapeBuilder.property("name", TypeShapeBuilder.stringScalar()))
                                 )
                 )
                 .buildModel();
 
-        assertEquals("Mom", api.types().get(2).name());
-        assertEquals("Parent1", ((UnionTypeDeclaration)api.types().get(2)).of().get(0).name());
-        assertEquals("Parent2", ((UnionTypeDeclaration)api.types().get(2)).of().get(1).name());*/
+        assertEquals("Mom", ((UnionShape) api.declares().get(0)).name().value());
+        assertEquals("Parent1", ((UnionShape)api.declares().get(0)).inherits().get(0).name().value());
+        assertEquals("Parent2", ((UnionShape)api.declares().get(0)).inherits().get(1).name().value());
     }
 
 

@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
  */
 public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBuilder<N, ?>> extends SomeShapeBuilder<TypeShapeBuilder> implements NodeBuilder, AnnotableBuilder<TypeShapeBuilder> {
 
+    protected static int currentid = 0;
+
     private List<ExamplesBuilder> examples = new ArrayList<>();
     private List<AnnotationBuilder> annotations = new ArrayList<>();
     private List<FacetBuilder> facets = new ArrayList<>();
@@ -57,14 +59,15 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
         return new EnumShapeBuilder();
     }
 
-    static public NodeShapeBuilder inheritingObject(String... types) {
-
-        return new NodeShapeBuilder();
-    }
 
     static public NodeShapeBuilder inheritingObjectFromShapes(Shape... types) {
 
         return new NodeShapeBuilder(types);
+    }
+
+    static public UnionShapeBuilder unionShapeOf(Shape... types) {
+
+        return new UnionShapeBuilder(types);
     }
 
     public static TypeShapeBuilder anyType() {
