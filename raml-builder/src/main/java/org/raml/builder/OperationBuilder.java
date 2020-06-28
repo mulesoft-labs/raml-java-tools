@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * Created. There, you have it.
  */
-public class OperationBuilder extends KeyValueNodeBuilder<OperationBuilder> implements AnnotableBuilder<OperationBuilder>/*, ModelBuilder<Method>*/ {
+public class OperationBuilder extends DomainElementBuilder<OperationBuilder> implements AnnotableBuilder<OperationBuilder>/*, ModelBuilder<Method>*/ {
 
     private final String name;
     private List<ResponseBuilder> responses = new ArrayList<>();
@@ -24,7 +24,7 @@ public class OperationBuilder extends KeyValueNodeBuilder<OperationBuilder> impl
 
 
     private OperationBuilder(String name) {
-        super(name);
+        super();
         this.name = name;
     }
 

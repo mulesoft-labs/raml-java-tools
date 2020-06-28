@@ -6,12 +6,12 @@ import amf.client.model.domain.DomainElement;
 /**
  * Created. There, you have it.
  */
-public class FacetBuilder extends KeyValueNodeBuilder<FacetBuilder> {
+public class FacetBuilder extends DomainElementBuilder<FacetBuilder> {
 
     private ValueNodeFactory value;
 
     public FacetBuilder(String name) {
-        super(name);
+        super();
     }
 
     public static FacetBuilder facet(String name) {

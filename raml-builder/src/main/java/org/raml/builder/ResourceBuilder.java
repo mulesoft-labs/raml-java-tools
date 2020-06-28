@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * Created. There, you have it.
  */
-public class ResourceBuilder extends KeyValueNodeBuilder<ResourceBuilder> implements NodeBuilder {
+public class ResourceBuilder extends DomainElementBuilder<ResourceBuilder> implements NodeBuilder {
 
     private final String name;
     private String displayName;
@@ -22,7 +22,7 @@ public class ResourceBuilder extends KeyValueNodeBuilder<ResourceBuilder> implem
     private List<OperationBuilder> methodBuilders = new ArrayList<>();
 
     private ResourceBuilder(String name) {
-        super(name);
+        super();
         this.name = name;
     }
 

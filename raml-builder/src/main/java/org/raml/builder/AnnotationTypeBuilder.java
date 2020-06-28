@@ -9,12 +9,12 @@ import java.util.List;
 /**
  * Created. There, you have it.
  */
-public class AnnotationTypeBuilder extends KeyValueNodeBuilder<AnnotationBuilder> implements NodeBuilder {
+public class AnnotationTypeBuilder extends DomainElementBuilder<AnnotationBuilder> implements NodeBuilder {
 
     private List<NodeBuilder> properties = new ArrayList<>();
 
     private AnnotationTypeBuilder(String name) {
-        super(name);
+        super();
     }
 
     static public AnnotationTypeBuilder annotationType(String name) {

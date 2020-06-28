@@ -9,13 +9,13 @@ import java.util.List;
 /**
  * Created. There, you have it.
  */
-public class ExamplesBuilder extends KeyValueNodeBuilder<ExamplesBuilder> implements SupportsProperties<ExamplesBuilder> {
+public class ExamplesBuilder extends DomainElementBuilder<ExamplesBuilder> implements SupportsProperties<ExamplesBuilder> {
 
     private boolean strict = true;
     private List<PropertyValueBuilder> propertyValues = new ArrayList<>();
 
     private ExamplesBuilder(String name) {
-        super(name);
+        super();
     }
 
     static public ExamplesBuilder example(String name) {

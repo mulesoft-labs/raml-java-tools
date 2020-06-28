@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 /**
  * Created. There, you have it.
  */
-public class DeclaredShapeBuilder extends KeyValueNodeBuilder<DeclaredShapeBuilder> implements NodeBuilder {
+public class DeclaredShapeBuilder extends DomainElementBuilder<DeclaredShapeBuilder> implements NodeBuilder {
 
     private final String name;
     private TypeShapeBuilder<?, ?> types = null;
@@ -17,7 +17,7 @@ public class DeclaredShapeBuilder extends KeyValueNodeBuilder<DeclaredShapeBuild
     private Supplier<AnyShape> response;
 
     private DeclaredShapeBuilder(String name) {
-        super(name);
+        super();
         this.name = name;
         this.response = Suppliers.memoize(() -> calculateShape(name));
     }

@@ -8,4 +8,5 @@ import amf.client.model.domain.DomainElement;
 public interface NodeBuilder {
 
     DomainElement buildNode();
+    String id();
 }

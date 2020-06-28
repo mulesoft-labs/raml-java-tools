@@ -9,7 +9,7 @@ import java.util.Optional;
 /**
  * Created. There, you have it.
  */
-public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
+public class ParameterBuilder extends DomainElementBuilder<ParameterBuilder> {
 
     private final String name;
     private final String binding;
@@ -19,7 +19,7 @@ public class ParameterBuilder extends KeyValueNodeBuilder<ParameterBuilder> {
     private Boolean required;
 
     private ParameterBuilder(String name, String binding  ) {
-        super(name);
+        super();
         this.name = name;
         this.binding = binding;
     }

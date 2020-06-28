@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created. There, you have it.
  */
-public class PropertyShapeBuilder extends KeyValueNodeBuilder<PropertyShapeBuilder> implements AnnotableBuilder<PropertyShapeBuilder> {
+public class PropertyShapeBuilder extends DomainElementBuilder<PropertyShapeBuilder> implements AnnotableBuilder<PropertyShapeBuilder> {
 
     private final TypeShapeBuilder type;
     private final String name;
@@ -19,7 +19,7 @@ public class PropertyShapeBuilder extends KeyValueNodeBuilder<PropertyShapeBuild
 
     public PropertyShapeBuilder(String name, TypeShapeBuilder type) {
 
-        super(name);
+        super();
         this.name = name;
         this.type = type;
         this.required = true;

@@ -7,22 +7,19 @@ import java.util.List;
 /**
  * Created. There, you have it.
  */
-abstract public class KeyValueNodeBuilder<B extends KeyValueNodeBuilder> implements NodeBuilder {
+abstract public class DomainElementBuilder<B extends DomainElementBuilder> implements NodeBuilder {
 
-    final private String id;
+    private static int currentId =0 ;
+    final private String id = "amf://id#" + Integer.toString(currentId ++);
     private List<NodeBuilder> builders = new ArrayList<>();
-
-    protected KeyValueNodeBuilder(String name) {
-        this.id = name;
-    }
-
-    protected KeyValueNodeBuilder(Long value) {
-        this.id = value.toString();
-    }
 
     public B with(NodeBuilder... builders) {
 
         this.builders.addAll(Arrays.asList(builders));
         return (B) this;
+    }
+
+    public String id() {
+        return id;
     }
 }

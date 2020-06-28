@@ -11,14 +11,16 @@ import java.util.stream.Collectors;
 /**
  * Created. There, you have it.
  */
-public class ResponseBuilder extends KeyValueNodeBuilder<ResponseBuilder> implements NodeBuilder, AnnotableBuilder<ResponseBuilder> {
+public class ResponseBuilder extends DomainElementBuilder<ResponseBuilder> implements NodeBuilder, AnnotableBuilder<ResponseBuilder> {
 
+    private final int code;
     private List<PayloadBuilder> bodies = new ArrayList<>();
     private List<AnnotationBuilder> annotations = new ArrayList<>();
     private String description;
 
     private ResponseBuilder(int code) {
-        super((long) code);
+        super();
+        this.code = code;
     }
 
     static public ResponseBuilder response(int code) {
@@ -43,7 +45,7 @@ public class ResponseBuilder extends KeyValueNodeBuilder<ResponseBuilder> implem
     @Override
     public Response buildNode() {
         Response node =  new Response();
-
+        node.withStatusCode(Integer.toString(code));
         Optional.ofNullable(description).ifPresent(node::withDescription);
 
         node.withPayloads(bodies.stream().map(PayloadBuilder::buildNode).collect(Collectors.toList()));

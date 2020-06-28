@@ -12,9 +12,7 @@ import java.util.stream.Collectors;
 /**
  * Created. There, you have it.
  */
-public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBuilder<N, ?>> extends SomeShapeBuilder<TypeShapeBuilder> implements NodeBuilder, AnnotableBuilder<TypeShapeBuilder> {
-
-    protected static int currentid = 0;
+public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBuilder<N, ?>> extends DomainElementBuilder<B> implements NodeBuilder, AnnotableBuilder<TypeShapeBuilder> {
 
     private List<ExamplesBuilder> examples = new ArrayList<>();
     private List<AnnotationBuilder> annotations = new ArrayList<>();
@@ -24,8 +22,6 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
     private String description;
 
     private ExamplesBuilder example;
-
-    private TypeShapeBuilder arrayItems;
 
     @Override
     abstract public N buildNode();

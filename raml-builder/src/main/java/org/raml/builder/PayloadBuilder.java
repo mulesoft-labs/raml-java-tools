@@ -7,13 +7,13 @@ import amf.client.model.domain.Shape;
 /**
  * Created. There, you have it.
  */
-public class PayloadBuilder extends KeyValueNodeBuilder<PayloadBuilder> implements NodeBuilder {
+public class PayloadBuilder extends DomainElementBuilder<PayloadBuilder> implements NodeBuilder {
 
     private final String name;
     private TypeShapeBuilder types = TypeShapeBuilder.anyType();
 
     private PayloadBuilder(String name) {
-        super(name);
+        super();
         this.name = name;
     }
 
