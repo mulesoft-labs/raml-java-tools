@@ -23,8 +23,4 @@ public class AnyShapeBuilder extends TypeShapeBuilder<AnyShape, AnyShapeBuilder>
         return shape;
     }
 
-    public String id() {
-
-        return "[any]";
-    }
 }

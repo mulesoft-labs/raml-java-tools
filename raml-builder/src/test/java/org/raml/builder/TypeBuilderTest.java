@@ -178,7 +178,7 @@ public class TypeBuilderTest {
                         DeclaredShapeBuilder.typeDeclaration("Mom")
                                 .ofType(NodeShapeBuilder.inheritingObjectFromShapes()
                                         .withProperty(
-                                                PropertyShapeBuilder.property("name", TypeShapeBuilder.simpleType("string")))
+                                                PropertyShapeBuilder.property("name", TypeShapeBuilder.stringScalar()))
                                 )
                 )
                 .buildModel();
@@ -186,7 +186,7 @@ public class TypeBuilderTest {
         assertEquals("Mom", ((NodeShape)api.declares().get(0)).name().value());
         assertEquals(0, (((NodeShape) api.declares().get(0)).inherits().size()));
         assertEquals("name", ((NodeShape)api.declares().get(0)).properties().get(0).name().value());
-        assertTrue(((NodeShape)api.declares().get(0)).properties().get(0).range().name().value().contains("anonymous"));
+        assertTrue(((NodeShape)api.declares().get(0)).properties().get(0).range().name().value().contains("string"));
     }
 
     //@Test

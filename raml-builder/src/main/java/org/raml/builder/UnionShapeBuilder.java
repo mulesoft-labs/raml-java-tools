@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  * Created. There, you have it.
@@ -54,16 +53,5 @@ public class UnionShapeBuilder extends TypeShapeBuilder<UnionShape, UnionShapeBu
         }
 
         return unionShape;
-    }
-
-
-    public String id() {
-
-        if (types.length == 1) {
-            return "anonymous";
-        } else {
-
-            return "[" + Arrays.stream(types).map(t -> t.name().value()).collect(Collectors.joining(",")) + "]";
-        }
     }
 }

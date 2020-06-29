@@ -14,7 +14,6 @@ import javax.annotation.Nullable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created. There, you have it.
@@ -156,7 +155,7 @@ public class PojoToRamlImpl implements PojoToRaml {
                     public String apply(@Nullable Enum o) {
                         return adjuster.adjustEnumValue(quickType.type(), o.name());
                     }
-                }).collect(Collectors.toList()).toArray(new String[0]));
+                }).toArray(String[]::new));
 
 
         adjuster.adjustType(quickType.type(), quickType.getRamlSyntax().id(), typeBuilder);
@@ -194,6 +193,7 @@ public class PojoToRamlImpl implements PojoToRaml {
         if ( typeNames.isEmpty()) {
             builder = TypeShapeBuilder.inheritingObjectFromShapes();
         } else {
+            //JP
             builder = TypeShapeBuilder.inheritingObjectFromShapes(/*typeNames.toArray(new String[0])*/);
         }
         return builder;
@@ -222,6 +222,7 @@ public class PojoToRamlImpl implements PojoToRaml {
             return new GeneratedRamlType(clazz, typeBuilder);
         } else {
 
+            // JP
             //adjusterFactory.createAdjuster(clazz).adjustForUnknownTypeInProperty(clazz, typeBuilder, declaredShapeBuilder,  property);
             return null;
         }

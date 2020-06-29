@@ -23,11 +23,11 @@ public class PropertyShapeBuilder extends DomainElementBuilder<PropertyShape, Pr
         this.type = type;
         this.required = true;
     }
-
-    public static PropertyShapeBuilder property(String name, String type) {
-
-        return new PropertyShapeBuilder(name, TypeShapeBuilder.simpleType(type));
-    }
+//
+//    public static PropertyShapeBuilder property(String name, String type) {
+//
+//        return new PropertyShapeBuilder(name, TypeShapeBuilder.simpleType(type));
+//    }
 
     public static PropertyShapeBuilder property(String name, TypeShapeBuilder type) {
 

@@ -39,11 +39,11 @@ public class ParameterBuilder extends DomainElementBuilder<Parameter, ParameterB
         return new ParameterBuilder(name, "header");
     }
 
-    public ParameterBuilder ofType(String name) {
-
-        this.type = TypeShapeBuilder.simpleType(name);
-        return this;
-    }
+//    public ParameterBuilder ofType(String name) {
+//
+//        this.type = TypeShapeBuilder.simpleType(name);
+//        return this;
+//    }
 
     public ParameterBuilder ofType(TypeShapeBuilder name) {
 

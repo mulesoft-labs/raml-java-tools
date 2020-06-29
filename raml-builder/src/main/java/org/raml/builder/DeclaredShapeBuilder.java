@@ -40,6 +40,11 @@ public class DeclaredShapeBuilder<T extends AnyShape> extends DomainElementBuild
         return this;
     }
 
+    public TypeShapeBuilder<?,?> asTypeShapeBuilder() {
+
+        return types.withName(name);
+    }
+
     @Override
     public AnyShape buildNodeLocally() {
 

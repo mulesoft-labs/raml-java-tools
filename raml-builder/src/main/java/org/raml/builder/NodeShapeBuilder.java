@@ -61,14 +61,4 @@ public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuild
         return nodeShape;
     }
 
-
-    public String id() {
-
-        if (types.length == 1) {
-            return "anonymous";
-        } else {
-
-            return "[" + Arrays.stream(types).map(t -> t.name().value()).collect(Collectors.joining(",")) + "]";
-        }
-    }
 }

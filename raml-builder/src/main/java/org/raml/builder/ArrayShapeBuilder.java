@@ -16,11 +16,6 @@ public class ArrayShapeBuilder extends TypeShapeBuilder<ArrayShape, ArrayShapeBu
         this.arrayItems = builder;
     }
 
-    public String id() {
-
-        return "[" + type + "]";
-    }
-
     @Override
     protected ArrayShape buildNodeLocally() {
 

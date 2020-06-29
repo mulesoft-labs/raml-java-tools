@@ -23,7 +23,7 @@ public class EnumRamlType implements RamlType{
 
     @Override
     public TypeShapeBuilder getRamlSyntax() {
-        return TypeShapeBuilder.simpleType(actualRamlName);
+        return TypeShapeBuilder.enumeratedType(actualRamlName);
     }
 
     @Override

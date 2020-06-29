@@ -61,9 +61,4 @@ public class EnumShapeBuilder extends TypeShapeBuilder<ScalarShape, EnumShapeBui
 
         return shape;
     }
-
-    public String id() {
-
-        return "[enum]";
-    }
 }

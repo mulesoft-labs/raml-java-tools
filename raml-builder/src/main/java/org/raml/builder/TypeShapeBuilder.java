@@ -3,10 +3,7 @@ package org.raml.builder;
 import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.Shape;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -22,6 +19,7 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
     private String description;
 
     private ExamplesBuilder example;
+    private String name;
 
     @Override
     abstract protected N buildNodeLocally();
@@ -62,10 +60,10 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
         return new NilShapeBuilder();
     }
 
-    static public TypeShapeBuilder simpleType(String type) {
-
-        return new NodeShapeBuilder();
-    }
+//    static public TypeShapeBuilder simpleType(String type) {
+//
+//        return new NodeShapeBuilder();
+//    }
 
     static public ArrayShapeBuilder arrayOf(TypeShapeBuilder builder) {
 
@@ -133,6 +131,8 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
 
         super.commonNodeInfo(node);
 
+        Optional.ofNullable(name).ifPresent(node::withName);
+
         if ( ! facets.isEmpty() ) {
 
 
@@ -171,5 +171,10 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
 
     public TypeShapeBuilder withFormat(PropertyValueBuilder format) {
         return null;
+    }
+
+    public B withName(String name) {
+        this.name = name;
+        return (B) this;
     }
 }
