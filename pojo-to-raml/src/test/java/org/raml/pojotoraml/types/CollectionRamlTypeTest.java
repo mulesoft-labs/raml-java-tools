@@ -16,7 +16,7 @@ public class CollectionRamlTypeTest {
 
         assertTrue(collectionRamlType.isScalar());
         assertEquals(boolean.class, collectionRamlType.type());
-        assertEquals("array", collectionRamlType.getRamlSyntax().id());
+        assertEquals("array", collectionRamlType.getRamlSyntax(null).id());
     }
 
     @Test
@@ -26,7 +26,7 @@ public class CollectionRamlTypeTest {
 
         assertFalse(collectionRamlType.isScalar());
         assertEquals(Fun.class, collectionRamlType.type());
-        assertEquals("array", collectionRamlType.getRamlSyntax().id());
+        assertEquals("array", collectionRamlType.getRamlSyntax(null).id());
     }
 
 }

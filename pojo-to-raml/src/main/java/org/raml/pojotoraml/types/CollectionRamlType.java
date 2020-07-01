@@ -1,6 +1,8 @@
 package org.raml.pojotoraml.types;
 
+import org.raml.builder.DeclaredShapeBuilder;
 import org.raml.builder.TypeShapeBuilder;
+import org.raml.pojotoraml.RamlAdjuster;
 
 /**
  * Created. There, you have it.
@@ -15,8 +17,8 @@ public class CollectionRamlType  implements RamlType{
     }
 
     @Override
-    public TypeShapeBuilder getRamlSyntax() {
-        return TypeShapeBuilder.arrayOf(type.getRamlSyntax());
+    public DeclaredShapeBuilder<?> getRamlSyntax(RamlAdjuster builder) {
+        return DeclaredShapeBuilder.typeDeclaration("whoopiearray").ofType(TypeShapeBuilder.arrayOf(type.getRamlSyntax(null).asTypeShapeBuilder()));
     }
 
     @Override

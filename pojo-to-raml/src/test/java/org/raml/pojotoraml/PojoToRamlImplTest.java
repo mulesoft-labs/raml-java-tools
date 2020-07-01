@@ -2,6 +2,7 @@ package org.raml.pojotoraml;
 
 import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.ArrayShape;
+import amf.client.model.domain.ScalarNode;
 import amf.client.model.domain.ScalarShape;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,8 +16,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created. There, you have it.
@@ -119,8 +119,8 @@ public class PojoToRamlImplTest {
         List<AnyShape> buildTypes = api.declares().stream().map(x -> (AnyShape)x).collect(Collectors.toList());
 
         assertEquals(1, buildTypes.size());
-        assertEquals("SimpleEnum", buildTypes.get(0).name());
-       // assertArrayEquals(new String[] {"ONE", "TWO"}, ((ScalarShape) buildTypes.get(0)).dataType().toArray(new String[0]));
+        assertEquals("SimpleEnum", buildTypes.get(0).name().value());
+        assertArrayEquals(new String[] {"ONE", "TWO"}, buildTypes.get(0).values().stream().map(v -> ((ScalarNode)v).value().value()).toArray(String[]::new));
     }
 
     @Test

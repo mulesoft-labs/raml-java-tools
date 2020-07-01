@@ -17,8 +17,9 @@ package org.raml.pojotoraml.types;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
-import org.raml.builder.PropertyValueBuilder;
+import org.raml.builder.DeclaredShapeBuilder;
 import org.raml.builder.TypeShapeBuilder;
+import org.raml.pojotoraml.RamlAdjuster;
 
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -29,24 +30,24 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 public enum ScalarType implements RamlType {
-    NUMBER(TypeShapeBuilder::longScalar, "float", new ImmutableMap.Builder<Class<?>, String>()
+    NUMBER(() -> DeclaredShapeBuilder.anonymousType().ofType(TypeShapeBuilder.longScalar()), "float", new ImmutableMap.Builder<Class<?>, String>()
             .put(float.class, "float")
             .put(Float.class, "float")
             .put(double.class, "double")
             .put(Double.class, "double")
             .build()),
-    FILE(TypeShapeBuilder::file, "file", new ImmutableMap.Builder<Class<?>, String>().build()),
+    FILE(() -> DeclaredShapeBuilder.anonymousType().ofType(TypeShapeBuilder.file()), "file", new ImmutableMap.Builder<Class<?>, String>().build()),
     BOOLEAN(
-            TypeShapeBuilder::booleanScalar, "boolean", new ImmutableMap.Builder<Class<?>, String>().build()),
-    STRING(TypeShapeBuilder::stringScalar,
+            () -> DeclaredShapeBuilder.anonymousType().ofType(TypeShapeBuilder.booleanScalar()), "boolean", new ImmutableMap.Builder<Class<?>, String>().build()),
+    STRING(() -> DeclaredShapeBuilder.anonymousType().ofType(TypeShapeBuilder.stringScalar()),
             "string", new ImmutableMap.Builder<Class<?>, String>().build()),
-    DATE_ONLY(TypeShapeBuilder::dateOnly, "date-only", new ImmutableMap.Builder<Class<?>, String>().build()),
+    DATE_ONLY(() -> DeclaredShapeBuilder.anonymousType().ofType(TypeShapeBuilder.dateOnly()), "date-only", new ImmutableMap.Builder<Class<?>, String>().build()),
     TIME_ONLY(
-            TypeShapeBuilder::timeOnly, "time-only", new ImmutableMap.Builder<Class<?>, String>().build()),
-    DATETIME_ONLY(TypeShapeBuilder::dateTimeOnly, "datetime-only", new ImmutableMap.Builder<Class<?>, String>().build()),
-    DATETIME(TypeShapeBuilder::dateTime, "datetime", new ImmutableMap.Builder<Class<?>, String>().build()),
+            () -> DeclaredShapeBuilder.anonymousType().ofType(TypeShapeBuilder.timeOnly()), "time-only", new ImmutableMap.Builder<Class<?>, String>().build()),
+    DATETIME_ONLY(() -> DeclaredShapeBuilder.anonymousType().ofType(TypeShapeBuilder.dateTimeOnly()), "datetime-only", new ImmutableMap.Builder<Class<?>, String>().build()),
+    DATETIME(() -> DeclaredShapeBuilder.anonymousType().ofType(TypeShapeBuilder.dateTime()), "datetime", new ImmutableMap.Builder<Class<?>, String>().build()),
     // All "integer" types are mapped to raml's "integer". Not sure if that is correct.
-    INTEGER(TypeShapeBuilder::longScalar, "integer", new ImmutableMap.Builder<Class<?>, String>()
+    INTEGER(() -> DeclaredShapeBuilder.anonymousType().ofType(TypeShapeBuilder.longScalar()), "integer", new ImmutableMap.Builder<Class<?>, String>()
             .put(int.class, "int32")
             .put(Integer.class, "int32")
             .put(short.class, "int16")
@@ -56,7 +57,7 @@ public enum ScalarType implements RamlType {
             .put(long.class, "int64")
             .put(Long.class, "int64")
             .build()),
-    NIL(TypeShapeBuilder::nil, "", new ImmutableMap.Builder<Class<?>, String>().build());
+    NIL(() -> DeclaredShapeBuilder.anonymousType().ofType(TypeShapeBuilder.nil()), "", new ImmutableMap.Builder<Class<?>, String>().build());
 
     private static final Map<Type, ScalarType> JAVA_TO_RAML_TYPES;
 
@@ -96,17 +97,17 @@ public enum ScalarType implements RamlType {
         }
     }
 
-    private final Supplier<TypeShapeBuilder<?, ?>> ramlSyntax;
+    private final Supplier<DeclaredShapeBuilder<?>> ramlSyntax;
     private final Map<Class<?>, String> formats;
 
-    ScalarType(Supplier<TypeShapeBuilder<?,?>> ramlSyntax, String ramlName, Map<Class<?>, String> formats) {
+    ScalarType(Supplier<DeclaredShapeBuilder<?>> ramlSyntax, String ramlName, Map<Class<?>, String> formats) {
         this.ramlSyntax = ramlSyntax;
         this.ramlName = ramlName;
         this.formats = formats;
     }
 
     @Override
-    public TypeShapeBuilder getRamlSyntax() {
+    public DeclaredShapeBuilder<?> getRamlSyntax(RamlAdjuster builder) {
         return ramlSyntax.get();
     }
 
@@ -136,13 +137,13 @@ public enum ScalarType implements RamlType {
 
         RamlType wrappedType = new RamlType() {
             @Override
-            public TypeShapeBuilder getRamlSyntax() {
+            public DeclaredShapeBuilder<?> getRamlSyntax(RamlAdjuster builder) {
 
                 String format = foundType.formats.get(type);
                 if ( format == null ) {
-                    return foundType.getRamlSyntax();
+                    return foundType.getRamlSyntax(builder);
                 } else {
-                    return foundType.getRamlSyntax().withFormat(PropertyValueBuilder.property("format", format));
+                    return foundType.getRamlSyntax(builder); // JP .withFormat(PropertyValueBuilder.property("format", format));
                 }
             }
 
@@ -164,6 +165,7 @@ public enum ScalarType implements RamlType {
 
         return Optional.of(wrappedType);
     }
+
 
     public static boolean isRamlScalarType(String type) {
 

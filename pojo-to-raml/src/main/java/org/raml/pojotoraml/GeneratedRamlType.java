@@ -1,5 +1,6 @@
 package org.raml.pojotoraml;
 
+import org.raml.builder.DeclaredShapeBuilder;
 import org.raml.builder.TypeShapeBuilder;
 import org.raml.pojotoraml.types.RamlType;
 
@@ -16,8 +17,8 @@ class GeneratedRamlType implements RamlType {
     }
 
     @Override
-    public TypeShapeBuilder getRamlSyntax() {
-        return tb;
+    public DeclaredShapeBuilder<?> getRamlSyntax(RamlAdjuster builder) {
+        return DeclaredShapeBuilder.typeDeclaration("generated").ofType(tb);
     }
 
     @Override

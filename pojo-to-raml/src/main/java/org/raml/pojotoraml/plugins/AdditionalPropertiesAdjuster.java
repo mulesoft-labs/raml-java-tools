@@ -2,7 +2,6 @@ package org.raml.pojotoraml.plugins;
 
 import org.raml.builder.DeclaredShapeBuilder;
 import org.raml.builder.NodeShapeBuilder;
-import org.raml.builder.PropertyShapeBuilder;
 import org.raml.builder.TypeShapeBuilder;
 import org.raml.pojotoraml.Property;
 import org.raml.pojotoraml.RamlAdjuster;
@@ -43,7 +42,7 @@ public class AdditionalPropertiesAdjuster extends RamlAdjuster.Helper {
                     parameterizedType.getActualTypeArguments().length == 2 &&
                     parameterizedType.getActualTypeArguments()[0].equals(String.class)) {
 
-                typeBuilder.withProperty(PropertyShapeBuilder.property("//", "string"));
+           // JP     typeBuilder.withProperty(PropertyShapeBuilder.property("//", "string"));
                 return;
             }
         }

@@ -15,7 +15,7 @@ public class ComposedRamlTypeTest {
     public void simpleTest() {
 
         ComposedRamlType type = ComposedRamlType.forClass(Fun.class, "real");
-        assertEquals("real", type.getRamlSyntax().id());
+        assertEquals("real", type.getRamlSyntax(null).id());
         assertFalse(type.isScalar());
         assertEquals(Fun.class, type.type());
     }
