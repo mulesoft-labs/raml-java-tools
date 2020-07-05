@@ -211,8 +211,7 @@ public class PojoToRamlImpl implements PojoToRaml {
             return new GeneratedRamlType(clazz, typeBuilder);
         } else {
 
-            // JP
-            //adjusterFactory.createAdjuster(clazz).adjustForUnknownTypeInProperty(clazz, typeBuilder, declaredShapeBuilder,  property);
+            adjusterFactory.createAdjuster(clazz).adjustForUnknownTypeInProperty(clazz, (NodeShapeBuilder)typeBuilder, declaredShapeBuilder,  property);
             return null;
         }
     }

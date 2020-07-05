@@ -50,9 +50,8 @@ public class PojoToRamlImplTest {
 
         assertEquals("SubFun", buildTypes.get(2).name().value());
 
-        assertEquals(2, ((NodeShape)buildTypes.get(2)).properties().size());
         assertEquals(9, ((NodeShape)buildTypes.get(0)).properties().size());
-
+        assertEquals(1, ((NodeShape)buildTypes.get(2)).properties().size());
     }
 
     @Test
