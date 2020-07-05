@@ -50,12 +50,20 @@ public class DeclaredShapeBuilder<T extends AnyShape> extends DomainElementBuild
 
         Optional.ofNullable(name).ifPresent(n -> types.withName(n));
 
-        return types.withName(name);
+        return types;
     }
 
     @Override
     public AnyShape buildNodeLocally() {
 
         return response.get();
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public boolean isAnonymous() {
+        return name == null;
     }
 }

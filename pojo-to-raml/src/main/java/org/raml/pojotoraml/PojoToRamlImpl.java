@@ -12,7 +12,9 @@ import org.raml.pojotoraml.types.ScalarType;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Created. There, you have it.
@@ -34,13 +36,13 @@ public class PojoToRamlImpl implements PojoToRaml {
 
         if ( type.isScalar()) {
 
-            return new Result(null, Collections.<String, DeclaredShapeBuilder>emptyMap());
+            return new Result(null, Collections.emptyMap());
         }
 
-        Map<String, DeclaredShapeBuilder> dependentTypes = new HashMap<>();
-        DeclaredShapeBuilder builder = handleSingleType(clazz, dependentTypes);
-        dependentTypes.remove(builder.id());
-        return new Result(builder, dependentTypes);
+        SeenTypes dependentTypes = new SeenTypes();
+        DeclaredShapeBuilder<?> builder = handleSingleType(clazz, dependentTypes);
+        dependentTypes.remove(builder);
+        return new Result(builder, dependentTypes.namedAsMap());
     }
 
     @Override
@@ -57,7 +59,7 @@ public class PojoToRamlImpl implements PojoToRaml {
         }
 
         final String simpleName = adjuster.adjustTypeName(clazz, clazz.getSimpleName());
-        //JP
+        //JP inheritance.
         return DeclaredShapeBuilder.typeDeclaration(simpleName).ofType(TypeShapeBuilder.inheritingObjectFromShapes()).asTypeShapeBuilder();
     }
 
@@ -85,7 +87,7 @@ public class PojoToRamlImpl implements PojoToRaml {
         }
     }
 
-    private DeclaredShapeBuilder handleSingleType(Class<?> clazz, Map<String, DeclaredShapeBuilder> builtTypes) {
+    private DeclaredShapeBuilder handleSingleType(Class<?> clazz, SeenTypes builtTypes) {
 
         ClassParser parser = classParserFactory.createParser(clazz);
 
@@ -107,7 +109,7 @@ public class PojoToRamlImpl implements PojoToRaml {
 
         DeclaredShapeBuilder typeDeclaration = DeclaredShapeBuilder.typeDeclaration(simpleName).ofType(builder);
         if ( !ScalarType.isRamlScalarType(simpleName)) {
-            builtTypes.put(typeDeclaration.id(), typeDeclaration);
+            builtTypes.storeType(typeDeclaration);
         }
 
         for (Property property : parser.properties(clazz)) {
@@ -132,7 +134,7 @@ public class PojoToRamlImpl implements PojoToRaml {
             } else {
 
                 final String subSimpleName = adjusterFactory.createAdjuster(clazz).adjustTypeName(clazz, ramlType.type().getSimpleName());
-                if ( ! builtTypes.containsKey(subSimpleName)) {
+                if ( ! builtTypes.hasName(subSimpleName)) {
 
                     handleSingleType(ramlType.type(), builtTypes);
                 }
@@ -145,16 +147,16 @@ public class PojoToRamlImpl implements PojoToRaml {
         return typeDeclaration;
     }
 
-    private DeclaredShapeBuilder handleEnum(final RamlType quickType, final RamlAdjuster adjuster, Map<String, DeclaredShapeBuilder> builtTypes) {
+    private DeclaredShapeBuilder handleEnum(final RamlType quickType, final RamlAdjuster adjuster, SeenTypes builtTypes) {
 
         quickType.getRamlSyntax(adjuster);
         DeclaredShapeBuilder declaredShapeBuilder = quickType.getRamlSyntax(adjusterFactory.createAdjuster(quickType.type()));
 
-        builtTypes.put(declaredShapeBuilder.id(), declaredShapeBuilder);
+        builtTypes.storeType(declaredShapeBuilder);
         return declaredShapeBuilder;
     }
 
-    private NodeShapeBuilder buildSuperType(Class<?> clazz, Map<String, DeclaredShapeBuilder> builtTypes) {
+    private NodeShapeBuilder buildSuperType(Class<?> clazz, SeenTypes builtTypes) {
         ClassParser parser = classParserFactory.createParser(clazz);
         Collection<Type> types = parser.parentClasses(clazz);
         ArrayList<String> typeNames = new ArrayList<>();
@@ -169,7 +171,7 @@ public class PojoToRamlImpl implements PojoToRaml {
                 RamlType ramlType = RamlTypeFactory.forType(supertype, parser, adjusterFactory).or(new RamlTypeSupplier(clazz));
 
                 final String subSimpleName = adjusterFactory.createAdjuster(ramlType.type()).adjustTypeName(ramlType.type(), ramlType.type().getSimpleName());
-                if (!builtTypes.containsKey(subSimpleName)) {
+                if (!builtTypes.hasName(subSimpleName)) {
 
                     handleSingleType(ramlType.type(), builtTypes);
                 }
