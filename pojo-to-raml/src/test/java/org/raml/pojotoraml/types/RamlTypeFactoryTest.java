@@ -30,7 +30,7 @@ public class RamlTypeFactoryTest  extends UnitTest {
     @Test
     public void forScalars() throws Exception {
 
-        RamlType type = RamlTypeFactory.forType(Fun.class.getDeclaredField("one").getGenericType(), null, null).orNull();
+        RamlType type = RamlTypeFactory.forType(Fun.class.getDeclaredField("one").getGenericType(), null, null).orElse(null);
         assertEquals("string", type.getRamlSyntax(null).id());
     }
 
@@ -39,7 +39,7 @@ public class RamlTypeFactoryTest  extends UnitTest {
 
         when(adjusterFactory.createAdjuster(SubFun.class)).thenReturn(adjuster);
         when(adjuster.adjustTypeName(SubFun.class, "SubFun")).thenReturn("foo");
-        RamlType type = RamlTypeFactory.forType(Fun.class.getDeclaredField("sub").getGenericType(), classParser, adjusterFactory).orNull();
+        RamlType type = RamlTypeFactory.forType(Fun.class.getDeclaredField("sub").getGenericType(), classParser, adjusterFactory).orElse(null);
         assertTrue(type instanceof ComposedRamlType);
         assertEquals("foo", type.getRamlSyntax(null).id());
     }
@@ -47,7 +47,7 @@ public class RamlTypeFactoryTest  extends UnitTest {
     @Test
     public void forCollectionsOfScalars() throws Exception {
 
-        RamlType type = RamlTypeFactory.forType(Fun.class.getDeclaredField("listOfStrings").getGenericType(), null, null).orNull();
+        RamlType type = RamlTypeFactory.forType(Fun.class.getDeclaredField("listOfStrings").getGenericType(), null, null).orElse(null);
         assertTrue(type instanceof CollectionRamlType);
         assertEquals("array", type.getRamlSyntax(null).id());
     }
@@ -57,7 +57,7 @@ public class RamlTypeFactoryTest  extends UnitTest {
 
         when(adjusterFactory.createAdjuster(Fun.class)).thenReturn(RamlAdjuster.NULL_ADJUSTER);
 
-        RamlType type = RamlTypeFactory.forType(Fun.class.getDeclaredField("arrayOfInts").getGenericType(), null, adjusterFactory).orNull();
+        RamlType type = RamlTypeFactory.forType(Fun.class.getDeclaredField("arrayOfInts").getGenericType(), null, adjusterFactory).orElse(null);
         assertTrue(type instanceof CollectionRamlType);
         assertEquals("array", type.getRamlSyntax(null).id());
     }
@@ -67,7 +67,7 @@ public class RamlTypeFactoryTest  extends UnitTest {
 
         when(adjusterFactory.createAdjuster(SubFun.class)).thenReturn(RamlAdjuster.NULL_ADJUSTER);
         when(adjuster.adjustTypeName(SubFun.class, "SubFun")).thenReturn("foo");
-        RamlType type = RamlTypeFactory.forType(Fun.class.getDeclaredField("listOfSubs").getGenericType(), classParser, adjusterFactory).orNull();
+        RamlType type = RamlTypeFactory.forType(Fun.class.getDeclaredField("listOfSubs").getGenericType(), classParser, adjusterFactory).orElse(null);
         assertTrue(type instanceof CollectionRamlType);
         assertEquals("array", type.getRamlSyntax(null).id());
     }
@@ -76,7 +76,7 @@ public class RamlTypeFactoryTest  extends UnitTest {
     public void forArrayOfComposed() throws Exception {
 
         when(adjusterFactory.createAdjuster(SubFun.class)).thenReturn(RamlAdjuster.NULL_ADJUSTER);
-        RamlType type = RamlTypeFactory.forType(Fun.class.getDeclaredField("arrayOfSubs").getGenericType(), null, adjusterFactory).orNull();
+        RamlType type = RamlTypeFactory.forType(Fun.class.getDeclaredField("arrayOfSubs").getGenericType(), null, adjusterFactory).orElse(null);
         assertTrue(type instanceof CollectionRamlType);
         assertEquals("array", type.getRamlSyntax(null).id());
     }

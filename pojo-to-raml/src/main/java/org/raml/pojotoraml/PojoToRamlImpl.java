@@ -1,6 +1,6 @@
 package org.raml.pojotoraml;
 
-import com.google.common.base.Optional;
+import amf.client.model.domain.AnyShape;
 import com.google.common.base.Supplier;
 import org.raml.builder.DeclaredShapeBuilder;
 import org.raml.builder.NodeShapeBuilder;
@@ -12,9 +12,7 @@ import org.raml.pojotoraml.types.ScalarType;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 /**
  * Created. There, you have it.
@@ -32,7 +30,7 @@ public class PojoToRamlImpl implements PojoToRaml {
     @Override
     public Result classToRaml(final Class<?> clazz) {
 
-        RamlType type = RamlTypeFactory.forType(clazz, classParserFactory.createParser(clazz), adjusterFactory).or(new RamlTypeSupplier(clazz));
+        RamlType type = RamlTypeFactory.forType(clazz, classParserFactory.createParser(clazz), adjusterFactory).orElseGet(new RamlTypeSupplier(clazz));
 
         if ( type.isScalar()) {
 
@@ -51,7 +49,7 @@ public class PojoToRamlImpl implements PojoToRaml {
         RamlAdjuster adjuster = this.adjusterFactory.createAdjuster(clazz);
 
         ClassParser parser = classParserFactory.createParser(clazz);
-        RamlType type = RamlTypeFactory.forType(clazz, parser, adjusterFactory).or(new RamlTypeSupplier(clazz));
+        RamlType type = RamlTypeFactory.forType(clazz, parser, adjusterFactory).orElseGet(new RamlTypeSupplier(clazz));
 
         if ( type.isScalar()) {
 
@@ -91,7 +89,7 @@ public class PojoToRamlImpl implements PojoToRaml {
 
         ClassParser parser = classParserFactory.createParser(clazz);
 
-        RamlType quickType = RamlTypeFactory.forType(clazz, parser, adjusterFactory).or(new RamlTypeSupplier(clazz));
+        RamlType quickType = RamlTypeFactory.forType(clazz, parser, adjusterFactory).orElseGet(new RamlTypeSupplier(clazz));
         if ( quickType.isScalar()) {
 
             return DeclaredShapeBuilder.typeDeclaration(quickType.getRamlSyntax(adjusterFactory.createAdjuster(clazz)).id()).ofType(quickType.getRamlSyntax(adjusterFactory.createAdjuster(clazz)).asTypeShapeBuilder());
@@ -168,7 +166,7 @@ public class PojoToRamlImpl implements PojoToRaml {
                     continue;
                 }
 
-                RamlType ramlType = RamlTypeFactory.forType(supertype, parser, adjusterFactory).or(new RamlTypeSupplier(clazz));
+                RamlType ramlType = RamlTypeFactory.forType(supertype, parser, adjusterFactory).orElseGet(new RamlTypeSupplier(clazz));
 
                 final String subSimpleName = adjusterFactory.createAdjuster(ramlType.type()).adjustTypeName(ramlType.type(), ramlType.type().getSimpleName());
                 if (!builtTypes.hasName(subSimpleName)) {
@@ -184,8 +182,8 @@ public class PojoToRamlImpl implements PojoToRaml {
         if ( typeNames.isEmpty()) {
             builder = TypeShapeBuilder.inheritingObjectFromShapes();
         } else {
-            //JP
-            builder = TypeShapeBuilder.inheritingObjectFromShapes(/*typeNames.toArray(new String[0])*/);
+            List<DeclaredShapeBuilder<?>> shapes = builtTypes.findNamed(typeNames);
+            builder = TypeShapeBuilder.inheritingObjectFromShapes(shapes.stream().map(x -> x.buildNode()).toArray(AnyShape[]::new));
         }
         return builder;
     }

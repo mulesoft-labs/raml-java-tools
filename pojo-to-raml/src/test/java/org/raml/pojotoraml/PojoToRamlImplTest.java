@@ -11,6 +11,9 @@ import org.raml.pojotoraml.plugins.AdditionalPropertiesAdjuster;
 import webapi.WebApiDocument;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,12 +37,7 @@ public class PojoToRamlImplTest {
     @Test
     public void simpleStuff() throws Exception {
 
-        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), new AdjusterFactory() {
-            @Override
-            public RamlAdjuster createAdjuster(Class<?> clazz) {
-                return new AdditionalPropertiesAdjuster();
-            }
-        });
+        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), clazz -> new AdditionalPropertiesAdjuster());
         Result types =  pojoToRaml.classToRaml(Fun.class);
 
         WebApiDocument api = createApi(types);
@@ -49,26 +47,32 @@ public class PojoToRamlImplTest {
         assertEquals(3, buildTypes.size());
         assertEquals("Fun", buildTypes.get(0).name().value());
         assertEquals("SimpleEnum", buildTypes.get(1).name().value());
-        assertEquals(9, ((NodeShape)buildTypes.get(0)).properties().size());
 
         assertEquals("SubFun", buildTypes.get(2).name().value());
-        assertEquals(1, ((NodeShape)buildTypes.get(2)).properties().size());
+
+        assertEquals(2, ((NodeShape)buildTypes.get(2)).properties().size());
+        assertEquals(9, ((NodeShape)buildTypes.get(0)).properties().size());
+
     }
-/*
+
     @Test
     public void withInheritance() throws Exception {
 
         PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), AdjusterFactory.NULL_FACTORY);
         Result types =  pojoToRaml.classToRaml(Inheriting.class);
 
-        Api api = createApi(types);
+        WebApiDocument api = createApi(types);
 
-        List<TypeDeclaration> buildTypes = api.types();
+        List<AnyShape> buildTypes = api.declares().stream().map(x -> (AnyShape)x).collect(Collectors.toList());
 
         assertEquals(2, buildTypes.size());
-        assertEquals("Inheriting", buildTypes.get(0).name());
-        assertEquals("Inherited", buildTypes.get(1).name());
+        assertEquals("Inheriting", buildTypes.get(0).name().value());
+        assertEquals("Inherited", buildTypes.get(1).name().value());
+
+        assertEquals(2, ((NodeShape)buildTypes.get(0)).properties().size());
+
     }
+
 
     @Test
     public void withMultipleInheritance() throws Exception {
@@ -81,16 +85,16 @@ public class PojoToRamlImplTest {
         }, AdjusterFactory.NULL_FACTORY);
         Result types =  pojoToRaml.classToRaml(MultipleInheriting.class);
 
-        Api api = createApi(types);
+        WebApiDocument api = createApi(types);
 
-        List<TypeDeclaration> buildTypes = api.types();
+        List<AnyShape> buildTypes = api.declares().stream().map(x -> (AnyShape)x).collect(Collectors.toList());
 
         assertEquals(3, buildTypes.size());
-        assertEquals("MultipleInheriting", buildTypes.get(0).name());
-        assertEquals("AnotherInherited", buildTypes.get(1).name());
-        assertEquals("FirstInherited", buildTypes.get(2).name());
+        assertEquals("MultipleInheriting", buildTypes.get(0).name().value());
+        assertEquals("AnotherInherited", buildTypes.get(1).name().value());
+        assertEquals("FirstInherited", buildTypes.get(2).name().value());
     }
-*/
+
     @Test
     public void scalarType() throws Exception {
 

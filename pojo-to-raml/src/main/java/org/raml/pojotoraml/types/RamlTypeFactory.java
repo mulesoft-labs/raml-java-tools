@@ -15,7 +15,7 @@ import java.util.Collection;
  */
 public class RamlTypeFactory {
 
-    public static Optional<RamlType> forType(Type type, final ClassParser parser, final AdjusterFactory adjusterFactory) {
+    public static java.util.Optional<RamlType> forType(Type type, final ClassParser parser, final AdjusterFactory adjusterFactory) {
 
         if ( type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
@@ -29,7 +29,7 @@ public class RamlTypeFactory {
                 final Class<?> cls = (Class<?>) parameterizedType.getActualTypeArguments()[0];
                 Optional<RamlType> ramlType =  ScalarType.fromType(cls);
 
-                return Optional.<RamlType>of(CollectionRamlType.of(ramlType.or(new Supplier<RamlType>() {
+                return java.util.Optional.<RamlType>of(CollectionRamlType.of(ramlType.or(new Supplier<RamlType>() {
                     @Override
                     public RamlType get() {
 
@@ -45,7 +45,7 @@ public class RamlTypeFactory {
             final Class<?> cls = (Class<?>) type;
             Optional<RamlType> ramlType =  ScalarType.fromType(cls.getComponentType());
 
-            return Optional.<RamlType>of(CollectionRamlType.of(ramlType.or(new Supplier<RamlType>() {
+            return java.util.Optional.<RamlType>of(CollectionRamlType.of(ramlType.or(new Supplier<RamlType>() {
                 @Override
                 public RamlType get() {
 
@@ -59,7 +59,7 @@ public class RamlTypeFactory {
 
             final Class<?> cls = (Class<?>) type;
             RamlAdjuster adjuster = adjusterFactory.createAdjuster(cls);
-            return Optional.<RamlType>of(EnumRamlType.forClass(cls, adjuster.adjustTypeName(cls, cls.getSimpleName())));
+            return java.util.Optional.<RamlType>of(EnumRamlType.forClass(cls, adjuster.adjustTypeName(cls, cls.getSimpleName())));
         }
 
         if ( type instanceof Class ) {
@@ -67,7 +67,7 @@ public class RamlTypeFactory {
 
             Optional<RamlType> ramlType =  ScalarType.fromType(cls);
 
-            return Optional.of(ramlType.or(new Supplier<RamlType>() {
+            return java.util.Optional.of(ramlType.or(new Supplier<RamlType>() {
                 @Override
                 public RamlType get() {
                     RamlAdjuster adjuster = adjusterFactory.createAdjuster(cls);
@@ -76,6 +76,6 @@ public class RamlTypeFactory {
             }));
         }
 
-        return Optional.absent();
+        return java.util.Optional.empty();
     }
 }

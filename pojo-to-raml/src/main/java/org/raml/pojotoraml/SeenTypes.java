@@ -2,9 +2,7 @@ package org.raml.pojotoraml;
 
 import org.raml.builder.DeclaredShapeBuilder;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created. There, you have it.
@@ -43,5 +41,12 @@ public class SeenTypes {
 
     public Map<String, DeclaredShapeBuilder<?>> namedAsMap() {
         return seenByName;
+    }
+
+    public List<DeclaredShapeBuilder<?>> findNamed(ArrayList<String> typeNames) {
+        List<DeclaredShapeBuilder<?>> found = new ArrayList<>();
+
+        typeNames.forEach(n -> Optional.ofNullable(seenByName.get(n)).ifPresent(found::add) );
+        return found;
     }
 }
