@@ -18,7 +18,7 @@ public class CollectionRamlType  implements RamlType{
 
     @Override
     public DeclaredShapeBuilder<?> getRamlSyntax(RamlAdjuster builder) {
-        return DeclaredShapeBuilder.typeDeclaration("whoopiearray").ofType(TypeShapeBuilder.arrayOf(type.getRamlSyntax(null).asTypeShapeBuilder()));
+        return DeclaredShapeBuilder.typeDeclaration("array").ofType(TypeShapeBuilder.arrayOf(type.getRamlSyntax(null).asTypeShapeBuilder()));
     }
 
     @Override

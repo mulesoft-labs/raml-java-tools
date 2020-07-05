@@ -25,7 +25,7 @@ public class ComposedRamlType implements RamlType{
 
     @Override
     public DeclaredShapeBuilder<?> getRamlSyntax(RamlAdjuster builder) {
-        return DeclaredShapeBuilder.typeDeclaration("whoopie").ofType(TypeShapeBuilder.inheritingObjectFromShapes());
+        return DeclaredShapeBuilder.typeDeclaration(actualRamlName).ofType(TypeShapeBuilder.inheritingObjectFromShapes());
     }
 
     @Override
