@@ -107,7 +107,7 @@ public class PojoToRamlImpl implements PojoToRaml {
 
         DeclaredShapeBuilder typeDeclaration = DeclaredShapeBuilder.typeDeclaration(simpleName).ofType(builder);
         if ( !ScalarType.isRamlScalarType(simpleName)) {
-            builtTypes.put(simpleName, typeDeclaration);
+            builtTypes.put(typeDeclaration.id(), typeDeclaration);
         }
 
         for (Property property : parser.properties(clazz)) {

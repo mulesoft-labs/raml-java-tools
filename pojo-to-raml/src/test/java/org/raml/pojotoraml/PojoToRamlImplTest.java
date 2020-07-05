@@ -1,15 +1,13 @@
 package org.raml.pojotoraml;
 
-import amf.client.model.domain.AnyShape;
-import amf.client.model.domain.ArrayShape;
-import amf.client.model.domain.ScalarNode;
-import amf.client.model.domain.ScalarShape;
+import amf.client.model.domain.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.raml.builder.DeclaredShapeBuilder;
 import org.raml.builder.RamlDocumentBuilder;
 import org.raml.builder.TypeShapeBuilder;
 import org.raml.pojotoraml.field.FieldClassParser;
+import org.raml.pojotoraml.plugins.AdditionalPropertiesAdjuster;
 import webapi.WebApiDocument;
 
 import java.io.IOException;
@@ -32,7 +30,8 @@ public class PojoToRamlImplTest {
                 .version("1");
         WebApiDocument d = ramlDocumentBuilder.buildModel();
     }
- /*   @Test
+
+    @Test
     public void simpleStuff() throws Exception {
 
         PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), new AdjusterFactory() {
@@ -45,17 +44,17 @@ public class PojoToRamlImplTest {
 
         WebApiDocument api = createApi(types);
 
-        List<TypeDeclaration> buildTypes = api.types();
+        List<AnyShape> buildTypes = api.declares().stream().map(x -> (AnyShape)x).collect(Collectors.toList());
 
         assertEquals(3, buildTypes.size());
-        assertEquals("Fun", buildTypes.get(0).name());
-        assertEquals("SimpleEnum", buildTypes.get(1).name());
-        assertEquals(9, ((ObjectTypeDeclaration)buildTypes.get(0)).properties().size());
+        assertEquals("Fun", buildTypes.get(0).name().value());
+        assertEquals("SimpleEnum", buildTypes.get(1).name().value());
+        assertEquals(9, ((NodeShape)buildTypes.get(0)).properties().size());
 
-        assertEquals("SubFun", buildTypes.get(2).name());
-        assertEquals(1, ((ObjectTypeDeclaration)buildTypes.get(2)).properties().size());
+        assertEquals("SubFun", buildTypes.get(2).name().value());
+        assertEquals(1, ((NodeShape)buildTypes.get(2)).properties().size());
     }
-
+/*
     @Test
     public void withInheritance() throws Exception {
 
@@ -91,23 +90,20 @@ public class PojoToRamlImplTest {
         assertEquals("AnotherInherited", buildTypes.get(1).name());
         assertEquals("FirstInherited", buildTypes.get(2).name());
     }
-
+*/
     @Test
     public void scalarType() throws Exception {
 
         PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), AdjusterFactory.NULL_FACTORY);
         Result types =  pojoToRaml.classToRaml(String.class);
 
-        Api api = createApi(types);
+        WebApiDocument api = createApi(types);
 
-        List<TypeDeclaration> buildTypes = api.types();
+        List<AnyShape> buildTypes = api.declares().stream().map(x -> (AnyShape)x).collect(Collectors.toList());
 
         assertEquals(0, buildTypes.size());
-
-        Emitter emitter = new Emitter();
-        emitter.emit(api);
     }
-*/
+
     @Test
     public void enumeration() throws Exception {
 
