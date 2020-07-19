@@ -93,6 +93,7 @@
         <module>raml-parser-tools</module>
         <module>pojo-to-raml</module>
         <module>raml-to-pojo</module>
+        <module>raml-simple-emitter</module>
         <module>raml-to-pojo-maven-example</module>
         <module>raml-to-pojo-maven-plugin</module>
 

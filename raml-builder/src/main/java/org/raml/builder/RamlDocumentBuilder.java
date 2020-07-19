@@ -45,8 +45,6 @@ public class RamlDocumentBuilder implements ModelBuilder<WebApiDocument> {
                 throw new ModelBuilderException(s);
             }
 
-            System.err.println(Raml10.generateString(document).get());
-
             return document;
         } catch (ModelBuilderException e) {
             throw e;
