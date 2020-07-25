@@ -13,6 +13,7 @@ import webapi.WebApiDocument;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -143,7 +144,7 @@ public class PojoToRamlImplTest {
                 .baseUri("http://google.com")
                 .title("hello")
                 .version("1")
-                .withTypes(types.allTypes().toArray(new DeclaredShapeBuilder[0]));
+                .withTypes(() -> new ArrayList<>(types.allTypes()));
 
         WebApiDocument api = ramlDocumentBuilder.buildModel();
         try {

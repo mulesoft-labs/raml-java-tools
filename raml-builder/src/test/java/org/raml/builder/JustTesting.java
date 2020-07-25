@@ -41,11 +41,16 @@ public class JustTesting {
                                     .withProperty(PropertyShapeBuilder.property("fun", TypeShapeBuilder.stringScalar()))
                     );
 
-                    DeclaredShapeBuilder<AnyShape> newFunk = DeclaredShapeBuilder.typeDeclaration("Owner").ofType(
+                    DeclaredShapeBuilder<AnyShape> funk2 = DeclaredShapeBuilder.typeDeclaration("Funk2").ofType(
                             TypeShapeBuilder.inheritingObjectFromShapes()
+                                    .withProperty(PropertyShapeBuilder.property("lala", TypeShapeBuilder.stringScalar()))
+                    );
+
+                    DeclaredShapeBuilder<AnyShape> newFunk = DeclaredShapeBuilder.typeDeclaration("Owner").ofType(
+                            TypeShapeBuilder.inheritingObjectFromShapes(funk2.asTypeShapeBuilder().buildNode())
                                     .withProperty(PropertyShapeBuilder.property("owned", funk.asTypeShapeBuilder()))
                     );
-                    return Arrays.asList(funk, newFunk);
+                    return Arrays.asList(funk, funk2, newFunk);
                 });
 
 

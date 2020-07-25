@@ -1,7 +1,6 @@
 package org.raml.builder;
 
 import amf.client.model.domain.NodeShape;
-import amf.client.model.domain.PropertyShape;
 import amf.client.model.domain.Shape;
 import com.google.common.base.Suppliers;
 
@@ -29,6 +28,14 @@ public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuild
         this.response = Suppliers.memoize(this::calculateNodeShape);
     }
 
+    private static NodeShape doInheritance(Shape t) {
+        NodeShape nodeShape = new NodeShape();
+        nodeShape.withLinkTarget(t);
+        nodeShape.withLinkLabel(t.name().value());
+
+        return nodeShape;
+    }
+
 
     public NodeShapeBuilder withProperty(PropertyShapeBuilder... properties) {
 
@@ -51,7 +58,7 @@ public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuild
 
         if ( types != null && types.length != 0) {
                 //Not sure....
-                nodeShape.withInherits(Arrays.asList(types));
+                nodeShape.withInherits(Arrays.stream(types).map(NodeShapeBuilder::doInheritance).collect(Collectors.toList()));
         }
 
         if ( ! properties.isEmpty() ) {

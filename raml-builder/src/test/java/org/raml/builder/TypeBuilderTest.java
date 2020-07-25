@@ -88,8 +88,8 @@ public class TypeBuilderTest {
                 )
                 .buildModel();
 
-        assertEquals("Mom", ((ScalarShape)api.declares().get(0)).name().value());
-        assertTrue(((ScalarShape)api.declares().get(0)).dataType().value().contains("string"));
+        assertEquals("Mom", ((ScalarShape) api.declares().get(0)).name().value());
+        assertTrue(((ScalarShape) api.declares().get(0)).dataType().value().contains("string"));
     }
 
     @Test
@@ -105,8 +105,8 @@ public class TypeBuilderTest {
                 )
                 .buildModel();
 
-        assertEquals("Mom", ((ScalarShape)api.declares().get(0)).name().value());
-        assertTrue(((ScalarShape)api.declares().get(0)).dataType().value().contains("boolean"));
+        assertEquals("Mom", ((ScalarShape) api.declares().get(0)).name().value());
+        assertTrue(((ScalarShape) api.declares().get(0)).dataType().value().contains("boolean"));
     }
 
     // the absolutely stupidest type ever.
@@ -123,8 +123,8 @@ public class TypeBuilderTest {
                 )
                 .buildModel();
 
-        assertEquals("Mom", ((ScalarShape)api.declares().get(0)).name().value());
-        assertTrue(((ScalarShape)api.declares().get(0)).dataType().value().contains("boolean"));
+        assertEquals("Mom", ((ScalarShape) api.declares().get(0)).name().value());
+        assertTrue(((ScalarShape) api.declares().get(0)).dataType().value().contains("boolean"));
         assertEquals(2, ((ScalarShape) api.declares().get(0)).values().size());
     }
 
@@ -141,8 +141,8 @@ public class TypeBuilderTest {
                 )
                 .buildModel();
 
-        assertEquals("Mom", ((ScalarShape)api.declares().get(0)).name().value());
-        assertTrue(((ScalarShape)api.declares().get(0)).dataType().value().contains("integer"));
+        assertEquals("Mom", ((ScalarShape) api.declares().get(0)).name().value());
+        assertTrue(((ScalarShape) api.declares().get(0)).dataType().value().contains("integer"));
         assertEquals(3, ((ScalarShape) api.declares().get(0)).values().size());
 
     }
@@ -160,8 +160,8 @@ public class TypeBuilderTest {
                 )
                 .buildModel();
 
-        assertEquals("Mom", ((ScalarShape)api.declares().get(0)).name().value());
-        assertTrue(((ScalarShape)api.declares().get(0)).dataType().value().contains("string"));
+        assertEquals("Mom", ((ScalarShape) api.declares().get(0)).name().value());
+        assertTrue(((ScalarShape) api.declares().get(0)).dataType().value().contains("string"));
         assertEquals(3, ((ScalarShape) api.declares().get(0)).values().size());
 
     }
@@ -183,10 +183,10 @@ public class TypeBuilderTest {
                 )
                 .buildModel();
 
-        assertEquals("Mom", ((NodeShape)api.declares().get(0)).name().value());
+        assertEquals("Mom", ((NodeShape) api.declares().get(0)).name().value());
         assertEquals(0, (((NodeShape) api.declares().get(0)).inherits().size()));
-        assertEquals("name", ((NodeShape)api.declares().get(0)).properties().get(0).name().value());
-        assertTrue(((NodeShape)api.declares().get(0)).properties().get(0).range().name().value().contains("string"));
+        assertEquals("name", ((NodeShape) api.declares().get(0)).properties().get(0).name().value());
+        assertTrue(((NodeShape) api.declares().get(0)).properties().get(0).range().name().value().contains("string"));
     }
 
     //@Test
@@ -212,49 +212,53 @@ public class TypeBuilderTest {
                 .buildModel();
 
 
-        assertEquals("Mom", ((NodeShape)api.declares().get(0)).name().value());
+        assertEquals("Mom", ((NodeShape) api.declares().get(0)).name().value());
         assertEquals(1, (((NodeShape) api.declares().get(0)).inherits().size()));
-        assertEquals(1, ((NodeShape)api.declares().get(0)).properties().size());
-        assertEquals("name", ((NodeShape)api.declares().get(0)).properties().get(0).name().value());
-        assertTrue(((NodeShape)api.declares().get(0)).properties().get(0).range().name().value().contains("string"));
+        assertEquals(1, ((NodeShape) api.declares().get(0)).properties().size());
+        assertEquals("name", ((NodeShape) api.declares().get(0)).properties().get(0).name().value());
+        assertTrue(((NodeShape) api.declares().get(0)).properties().get(0).range().name().value().contains("string"));
     }
 
 
     @Test
-    public void multipleInheritance() {
+    public void multipleInheritance() throws ExecutionException, InterruptedException {
 
-        DeclaredShapeBuilder<?> parent1 = DeclaredShapeBuilder.typeDeclaration("Parent1")
-                .ofType(NodeShapeBuilder.inheritingObjectFromShapes()
-                        .withProperty(
-                                PropertyShapeBuilder.property("subName", TypeShapeBuilder.stringScalar()))
-                );
-
-        DeclaredShapeBuilder<?> parent2 = DeclaredShapeBuilder.typeDeclaration("Parent2")
-                .ofType(NodeShapeBuilder.inheritingObjectFromShapes()
-                        .withProperty(
-                                PropertyShapeBuilder.property("subName2", TypeShapeBuilder.stringScalar()))
-                );
 
         WebApiDocument api = document()
                 .baseUri("http://google.com")
                 .title("doc")
                 .version("one")
                 .mediaType("foo/fun")
-                .withTypes(
-                        DeclaredShapeBuilder.typeDeclaration("Mom")
-                                .ofType(NodeShapeBuilder.inheritingObjectFromShapes(parent1.buildNode(), parent2.buildNode()).withProperty(PropertyShapeBuilder.property("name", TypeShapeBuilder.stringScalar()))
-                                )
+                .withTypes(() -> {
+                            DeclaredShapeBuilder<?> parent1 = DeclaredShapeBuilder.typeDeclaration("Parent1")
+                                    .ofType(NodeShapeBuilder.inheritingObjectFromShapes()
+                                            .withProperty(
+                                                    PropertyShapeBuilder.property("subName", TypeShapeBuilder.stringScalar()))
+                                    );
+
+                            DeclaredShapeBuilder<?> parent2 = DeclaredShapeBuilder.typeDeclaration("Parent2")
+                                    .ofType(NodeShapeBuilder.inheritingObjectFromShapes()
+                                            .withProperty(
+                                                    PropertyShapeBuilder.property("subName2", TypeShapeBuilder.stringScalar()))
+                                    );
+
+                            return Arrays.asList(parent1, parent2, DeclaredShapeBuilder.typeDeclaration("Mom")
+                                    .ofType(NodeShapeBuilder.inheritingObjectFromShapes(parent1.buildNode(), parent2.buildNode()).withProperty(PropertyShapeBuilder.property("name", TypeShapeBuilder.stringScalar()))
+                                    ));
+                        }
+
                 )
                 .buildModel();
 
+        System.err.println(Raml10.generateString(api).get());
 
-        assertEquals("Mom", ((NodeShape) api.declares().get(0)).name().value());
-        assertEquals(0, (((NodeShape) api.declares().get(0)).inherits().size()));
-        assertTrue(((NodeShape) api.declares().get(0)).properties().get(0).range().name().value().contains("string"));
-        assertEquals("name", ((NodeShape) api.declares().get(0)).properties().get(1).name().value());
-        assertEquals("subName", ((NodeShape) ((NodeShape) api.declares().get(0))).properties().get(2).name().value());
-        assertEquals("subName2", ((NodeShape) ((NodeShape) api.declares().get(0))).properties().get(0).name().value());
+        assertEquals("Parent1", ((NodeShape) api.declares().get(0)).name().value());
+        assertEquals("Parent2", ((NodeShape) api.declares().get(1)).name().value());
+        assertEquals("Mom", ((NodeShape) api.declares().get(2)).name().value());
 
+        assertEquals(2, (((NodeShape) api.declares().get(2)).inherits().size()));
+        assertTrue(((NodeShape) api.declares().get(2)).properties().get(0).range().name().value().contains("string"));
+        assertEquals("name", ((NodeShape) api.declares().get(2)).properties().get(0).name().value());
     }
 
     // Should you try the same test with a text file, you get the same result.  'sweird.
@@ -278,8 +282,8 @@ public class TypeBuilderTest {
 
 
         assertEquals("Mom", ((UnionShape) api.declares().get(0)).name().value());
-        assertTrue(((ScalarShape)((UnionShape)api.declares().get(0)).anyOf().get(0)).dataType().value().contains("string"));
-        assertTrue(((ScalarShape)((UnionShape)api.declares().get(0)).anyOf().get(1)).dataType().value().contains("long"));
+        assertTrue(((ScalarShape) ((UnionShape) api.declares().get(0)).anyOf().get(0)).dataType().value().contains("string"));
+        assertTrue(((ScalarShape) ((UnionShape) api.declares().get(0)).anyOf().get(1)).dataType().value().contains("long"));
     }
 
     // unions of declared types, they work ok.
@@ -312,8 +316,8 @@ public class TypeBuilderTest {
                 .buildModel();
 
         assertEquals("Mom", ((UnionShape) api.declares().get(0)).name().value());
-        assertEquals("Parent1", ((UnionShape)api.declares().get(0)).anyOf().get(0).name().value());
-        assertEquals("Parent2", ((UnionShape)api.declares().get(0)).anyOf().get(1).name().value());
+        assertEquals("Parent1", ((UnionShape) api.declares().get(0)).anyOf().get(0).name().value());
+        assertEquals("Parent2", ((UnionShape) api.declares().get(0)).anyOf().get(1).name().value());
     }
 
 
