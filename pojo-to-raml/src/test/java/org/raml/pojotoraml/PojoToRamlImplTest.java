@@ -8,6 +8,7 @@ import org.raml.builder.RamlDocumentBuilder;
 import org.raml.builder.TypeShapeBuilder;
 import org.raml.pojotoraml.field.FieldClassParser;
 import org.raml.pojotoraml.plugins.AdditionalPropertiesAdjuster;
+import webapi.Raml10;
 import webapi.WebApiDocument;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -64,11 +66,11 @@ public class PojoToRamlImplTest {
 
         List<AnyShape> buildTypes = api.declares().stream().map(x -> (AnyShape)x).collect(Collectors.toList());
 
-        assertEquals(2, buildTypes.size());
+        assertEquals(3, buildTypes.size());
         assertEquals("Inheriting", buildTypes.get(0).name().value());
         assertEquals("Inherited", buildTypes.get(1).name().value());
 
-        assertEquals(2, ((NodeShape)buildTypes.get(0)).properties().size());
+        assertEquals(3, ((NodeShape)buildTypes.get(0)).properties().size());
 
     }
 
@@ -144,7 +146,13 @@ public class PojoToRamlImplTest {
                 .withTypes(types.allTypes().toArray(new DeclaredShapeBuilder[0]));
 
         WebApiDocument api = ramlDocumentBuilder.buildModel();
-
+        try {
+            System.err.println(Raml10.generateString(api).get());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
         return api;
     }
 }

@@ -49,4 +49,8 @@ public class SeenTypes {
         typeNames.forEach(n -> Optional.ofNullable(seenByName.get(n)).ifPresent(found::add) );
         return found;
     }
+
+    public DeclaredShapeBuilder<?> byName(String subSimpleName) {
+        return seenByName.get(subSimpleName);
+    }
 }

@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 public class DeclaredShapeBuilder<T extends AnyShape> extends DomainElementBuilder<AnyShape, DeclaredShapeBuilder<T>> {
 
     private final String name;
-    private TypeShapeBuilder<?, ?> types = null;
+    private TypeShapeBuilder<?, ?> type = null;
 
     private final Supplier<AnyShape> response;
 
@@ -25,7 +25,7 @@ public class DeclaredShapeBuilder<T extends AnyShape> extends DomainElementBuild
 
     private AnyShape calculateShape(String name) {
 
-        AnyShape shape = types.buildNodeLocally();
+        AnyShape shape = type.buildNodeLocally();
         Optional.ofNullable(name).ifPresent(n -> shape.withName(name));
         return shape;
     }
@@ -42,15 +42,15 @@ public class DeclaredShapeBuilder<T extends AnyShape> extends DomainElementBuild
 
     public DeclaredShapeBuilder<T> ofType(TypeShapeBuilder<?,?> builder) {
 
-        types = builder;
+        type = builder;
         return this;
     }
 
     public TypeShapeBuilder<?,?> asTypeShapeBuilder() {
 
-        Optional.ofNullable(name).ifPresent(n -> types.withName(n));
+        Optional.ofNullable(name).ifPresent(n -> type.withName(n));
 
-        return types;
+        return type;
     }
 
     @Override

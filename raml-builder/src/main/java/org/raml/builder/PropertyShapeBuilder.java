@@ -1,5 +1,7 @@
 package org.raml.builder;
 
+import amf.client.model.domain.AnyShape;
+import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.PropertyShape;
 
 import java.util.ArrayList;
@@ -34,6 +36,11 @@ public class PropertyShapeBuilder extends DomainElementBuilder<PropertyShape, Pr
         return new PropertyShapeBuilder(name, type);
     }
 
+    public static PropertyShapeBuilder property(String name, String typeName) {
+
+        return new PropertyShapeBuilder(name, null);
+    }
+
     public PropertyShapeBuilder required(boolean required) {
 
         this.required = required;
@@ -53,7 +60,12 @@ public class PropertyShapeBuilder extends DomainElementBuilder<PropertyShape, Pr
         PropertyShape node = new PropertyShape();
         node.withName(name);
         node.withPath(name);
-        node.withRange(type.buildNodeLocally());
+        AnyShape range = type.buildNode();
+        AnyShape referenceType = new NodeShape();
+        referenceType.withLinkLabel(range.name().value());
+        referenceType.withLinkTarget(range);
+        node.withRange(referenceType);
+
 //        if ( ! annotations.isEmpty() ) {
 //
 //            for (AnnotationBuilder annotation : annotations) {

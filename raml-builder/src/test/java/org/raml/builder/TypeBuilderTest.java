@@ -207,9 +207,8 @@ public class TypeBuilderTest {
                 .withTypes(
                         DeclaredShapeBuilder.typeDeclaration("Mom")
                                 .ofType(NodeShapeBuilder.inheritingObjectFromShapes(parent.buildNode()).withProperty(PropertyShapeBuilder.property("name", TypeShapeBuilder.stringScalar()))
-                                ),
-                        parent
-                        )
+                                )
+                )
                 .buildModel();
 
 
@@ -244,8 +243,7 @@ public class TypeBuilderTest {
                 .withTypes(
                         DeclaredShapeBuilder.typeDeclaration("Mom")
                                 .ofType(NodeShapeBuilder.inheritingObjectFromShapes(parent1.buildNode(), parent2.buildNode()).withProperty(PropertyShapeBuilder.property("name", TypeShapeBuilder.stringScalar()))
-                                ),
-                        parent1, parent2
+                                )
                 )
                 .buildModel();
 

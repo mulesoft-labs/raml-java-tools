@@ -1,6 +1,7 @@
 package org.raml.builder;
 
 import amf.client.model.domain.NodeShape;
+import amf.client.model.domain.PropertyShape;
 import amf.client.model.domain.Shape;
 import com.google.common.base.Suppliers;
 
@@ -55,7 +56,7 @@ public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuild
 
         if ( ! properties.isEmpty() ) {
 
-            nodeShape.withProperties(properties.stream().map(PropertyShapeBuilder::buildNodeLocally).collect(Collectors.toList()));
+            nodeShape.withProperties(properties.stream().map(PropertyShapeBuilder::buildNode).collect(Collectors.toList()));
         }
 
         return nodeShape;

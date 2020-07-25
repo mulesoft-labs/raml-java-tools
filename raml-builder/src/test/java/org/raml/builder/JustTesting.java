@@ -1,14 +1,15 @@
-package org.raml.ramltopojo;
+package org.raml.builder;
 
 import amf.client.model.StrField;
-import amf.client.model.domain.DomainElement;
-import amf.client.model.domain.NodeShape;
-import amf.client.model.domain.WebApi;
+import amf.client.model.domain.*;
 import webapi.Raml10;
 import webapi.WebApiDocument;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import static org.raml.builder.RamlDocumentBuilder.document;
 
 /**
  * Created. There, you have it.
@@ -31,22 +32,24 @@ public class JustTesting {
 
     // Example of parsing RAML 1.0 file
     public static void main(String[] args) throws InterruptedException, ExecutionException {
-        String inp ="#%RAML 1.0\n" +
-                "\n" +
-                "title: ACME Banking HTTP API\n" +
-                "version: 1.0";
 
-        // Parse the string
-        WebApiDocument doc = (WebApiDocument) Raml10.parse(inp).get();
+        RamlDocumentBuilder api = document()
+                .title("doc")
+                .withTypes(() -> {
+                    DeclaredShapeBuilder<AnyShape> funk = DeclaredShapeBuilder.typeDeclaration("Funk").ofType(
+                            TypeShapeBuilder.inheritingObjectFromShapes()
+                                    .withProperty(PropertyShapeBuilder.property("fun", TypeShapeBuilder.stringScalar()))
+                    );
 
-        // Get parsed model API instance
-        WebApi api = (WebApi) doc.encodes();
+                    DeclaredShapeBuilder<AnyShape> newFunk = DeclaredShapeBuilder.typeDeclaration("Owner").ofType(
+                            TypeShapeBuilder.inheritingObjectFromShapes()
+                                    .withProperty(PropertyShapeBuilder.property("owned", funk.asTypeShapeBuilder()))
+                    );
+                    return Arrays.asList(funk, newFunk);
+                });
 
-        // Set API version
-        api.withVersion("3.7");
 
-        // Set API description
-        api.withDescription("Very nice api");
+        WebApiDocument doc = api.buildModel();
 
         // Generate RAML 1.0 string from updated model and log it
         String output = Raml10.generateString(doc).get();

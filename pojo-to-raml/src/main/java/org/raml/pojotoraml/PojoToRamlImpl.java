@@ -136,7 +136,8 @@ public class PojoToRamlImpl implements PojoToRaml {
 
                     handleSingleType(ramlType.type(), builtTypes);
                 }
-                PropertyShapeBuilder propertyShapeBuilder = PropertyShapeBuilder.property(property.name(), ramlType.getRamlSyntax(adjusterFactory.createAdjuster(clazz)).asTypeShapeBuilder());
+                DeclaredShapeBuilder<?> t = builtTypes.byName(subSimpleName);
+                PropertyShapeBuilder propertyShapeBuilder = PropertyShapeBuilder.property(property.name(), t.asTypeShapeBuilder());
 
                 builder.withProperty(adjusterFactory.createAdjuster(ramlType.type()).adjustComposedProperty(typeDeclaration, property, propertyShapeBuilder));
             }
