@@ -23,7 +23,7 @@ public class RamlDocumentBuilder implements ModelBuilder<WebApiDocument> {
     private List<NodeBuilder> builders = new ArrayList<>();
 
     // private KeyValueNodeBuilderMap<KeyValueNodeBuilder> annotationTypeBuilders = KeyValueNodeBuilderMap.createMap();
-    private Supplier<List<DeclaredShapeBuilder<?>>> typeDeclarationBuilders = Collections::emptyList;
+    private List<Supplier<List<DeclaredShapeBuilder<?>>>> typeDeclarationBuilders = new ArrayList<>();
     private final List<ResourceBuilder> resourceBuilders = new ArrayList();
     private String baseUri;
     private String title;
@@ -76,7 +76,7 @@ public class RamlDocumentBuilder implements ModelBuilder<WebApiDocument> {
         apiNode.withEndPoints(resourceBuilders.stream().map(ResourceBuilder::buildNodeLocally).collect(Collectors.toList()));
 
         //annotationTypeBuilders.addAllToNamedNode("annotationTypes", apiNode);
-        doc.withDeclares(typeDeclarationBuilders.get().stream().map(DeclaredShapeBuilder::buildNodeLocally).collect(Collectors.toList()));
+        doc.withDeclares(typeDeclarationBuilders.stream().map(Supplier::get).flatMap(Collection::stream).map(DeclaredShapeBuilder::buildNode).collect(Collectors.toList()));
 
         return doc;
     }
@@ -93,13 +93,12 @@ public class RamlDocumentBuilder implements ModelBuilder<WebApiDocument> {
     }
 
     public RamlDocumentBuilder withTypes(Supplier<List<DeclaredShapeBuilder<?>>> supplier) {
-        this.typeDeclarationBuilders = supplier;
+        typeDeclarationBuilders.add(supplier);
         return this;
     }
 
-    public RamlDocumentBuilder withTypes(DeclaredShapeBuilder<?>... types) {
-        this.typeDeclarationBuilders = () -> Arrays.asList(types);
-
+    public RamlDocumentBuilder withTypes(List<Supplier<List<DeclaredShapeBuilder<?>>>> supplier) {
+        this.typeDeclarationBuilders.addAll(supplier);
         return this;
     }
 

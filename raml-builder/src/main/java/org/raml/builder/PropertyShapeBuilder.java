@@ -1,7 +1,6 @@
 package org.raml.builder;
 
 import amf.client.model.domain.AnyShape;
-import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.PropertyShape;
 
 import java.util.ArrayList;
@@ -61,7 +60,7 @@ public class PropertyShapeBuilder extends DomainElementBuilder<PropertyShape, Pr
         node.withName(name);
         node.withPath(name);
         AnyShape range = type.buildNode();
-        AnyShape referenceType = new NodeShape();
+        AnyShape referenceType = new AnyShape();
         referenceType.withName(range.name().value());
         referenceType.withLinkLabel(range.name().value());
         referenceType.withLinkTarget(range);

@@ -1,5 +1,6 @@
 package org.raml.builder;
 
+import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.Shape;
 import amf.client.model.domain.UnionShape;
 import com.google.common.base.Suppliers;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Created. There, you have it.
@@ -41,6 +43,15 @@ public class UnionShapeBuilder extends TypeShapeBuilder<UnionShape, UnionShapeBu
         return response.get();
     }
 
+    private static AnyShape doUnion(Shape t) {
+        AnyShape nodeShape = new AnyShape();
+        nodeShape.withLinkTarget(t);
+        nodeShape.withName(t.name().value());
+        nodeShape.withLinkLabel(t.name().value());
+
+        return nodeShape;
+    }
+
     public UnionShape calculateNodeShape() {
         UnionShape unionShape = new UnionShape();
         commonNodeInfo(unionShape);
@@ -49,7 +60,7 @@ public class UnionShapeBuilder extends TypeShapeBuilder<UnionShape, UnionShapeBu
 
         if ( types != null && types.length != 0) {
                 //Not sure....
-                unionShape.withAnyOf(Arrays.asList(types));
+            unionShape.withAnyOf(Arrays.stream(types).map(UnionShapeBuilder::doUnion).collect(Collectors.toList()));
         }
 
         return unionShape;

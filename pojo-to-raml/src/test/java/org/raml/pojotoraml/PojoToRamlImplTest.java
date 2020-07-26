@@ -3,7 +3,6 @@ package org.raml.pojotoraml;
 import amf.client.model.domain.*;
 import org.junit.Before;
 import org.junit.Test;
-import org.raml.builder.DeclaredShapeBuilder;
 import org.raml.builder.RamlDocumentBuilder;
 import org.raml.builder.TypeShapeBuilder;
 import org.raml.pojotoraml.field.FieldClassParser;
@@ -67,11 +66,11 @@ public class PojoToRamlImplTest {
 
         List<AnyShape> buildTypes = api.declares().stream().map(x -> (AnyShape)x).collect(Collectors.toList());
 
-        assertEquals(3, buildTypes.size());
+        assertEquals(2, buildTypes.size());
         assertEquals("Inheriting", buildTypes.get(0).name().value());
         assertEquals("Inherited", buildTypes.get(1).name().value());
 
-        assertEquals(3, ((NodeShape)buildTypes.get(0)).properties().size());
+        assertEquals(1, ((NodeShape)buildTypes.get(0)).properties().size());
 
     }
 
