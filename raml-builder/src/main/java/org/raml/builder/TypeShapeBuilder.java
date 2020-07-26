@@ -88,7 +88,7 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
         return new UnionShapeBuilder(types);
     }
 
-    public static TypeShapeBuilder anyType() {
+    public static TypeShapeBuilder<AnyShape, AnyShapeBuilder> anyType() {
         return new AnyShapeBuilder("any");
     }
 
@@ -160,12 +160,12 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
 
         if ( ! examples.isEmpty() ) {
 
-            node.withExamples(examples.stream().map(ExamplesBuilder::buildNodeLocally).collect(Collectors.toList()));
+            node.withExamples(examples.stream().map(ExamplesBuilder::buildNode).collect(Collectors.toList()));
         }
 
         if ( example != null ) {
 
-            node.withExamples(Collections.singletonList(example.buildNodeLocally()));
+            node.withExamples(Collections.singletonList(example.buildNode()));
         }
     }
 

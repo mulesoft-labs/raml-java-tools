@@ -9,7 +9,7 @@ import amf.client.model.domain.Payload;
 public class PayloadBuilder extends DomainElementBuilder<Payload, PayloadBuilder>  {
 
     private final String name;
-    private TypeShapeBuilder types = TypeShapeBuilder.anyType();
+    private TypeShapeBuilder<?,?> types = TypeShapeBuilder.anyType();
 
     private PayloadBuilder(String name) {
         super();
@@ -21,17 +21,17 @@ public class PayloadBuilder extends DomainElementBuilder<Payload, PayloadBuilder
         return new PayloadBuilder(type);
     }
 
-    public PayloadBuilder ofType(TypeShapeBuilder builder) {
+    public PayloadBuilder ofType(TypeShapeBuilder<?,?> builder) {
 
         types = builder;
         return this;
     }
 
     @Override
-    public Payload buildNodeLocally() {
+    protected Payload buildNodeLocally() {
 
         Payload payload = new Payload();
-        payload.withSchema(types.buildNodeLocally());
+        payload.withSchema(types.buildNode());
         payload.withMediaType(name);
 
         return payload;

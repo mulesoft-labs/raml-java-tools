@@ -25,7 +25,7 @@ public class DeclaredShapeBuilder<T extends AnyShape> extends DomainElementBuild
 
     private AnyShape calculateShape(String name) {
 
-        AnyShape shape = type.buildNodeLocally();
+        AnyShape shape = type.buildNode();
         Optional.ofNullable(name).ifPresent(n -> shape.withName(name));
         return shape;
     }
@@ -54,7 +54,7 @@ public class DeclaredShapeBuilder<T extends AnyShape> extends DomainElementBuild
     }
 
     @Override
-    public AnyShape buildNodeLocally() {
+    protected AnyShape buildNodeLocally() {
 
         return response.get();
     }

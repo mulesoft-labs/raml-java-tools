@@ -32,7 +32,7 @@ public class ResourceBuilder extends DomainElementBuilder<EndPoint, ResourceBuil
     }
 
     @Override
-    public EndPoint buildNodeLocally() {
+    protected EndPoint buildNodeLocally() {
 
         EndPoint resourceNode = new EndPoint();
 
@@ -41,7 +41,7 @@ public class ResourceBuilder extends DomainElementBuilder<EndPoint, ResourceBuil
         Optional.ofNullable(name).ifPresent(resourceNode::withName);
         Optional.ofNullable(name).ifPresent(resourceNode::withPath);
 
-        resourceNode.withOperations(methodBuilders.stream().map(OperationBuilder::buildNodeLocally).collect(Collectors.toList()));
+        resourceNode.withOperations(methodBuilders.stream().map(OperationBuilder::buildNode).collect(Collectors.toList()));
 
         return resourceNode;
     }

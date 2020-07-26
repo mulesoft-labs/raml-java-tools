@@ -54,7 +54,7 @@ public class PropertyShapeBuilder extends DomainElementBuilder<PropertyShape, Pr
     }
 
     @Override
-    public PropertyShape buildNodeLocally() {
+    protected PropertyShape buildNodeLocally() {
 
         PropertyShape node = new PropertyShape();
         node.withName(name);

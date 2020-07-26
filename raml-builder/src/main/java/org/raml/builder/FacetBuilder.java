@@ -26,7 +26,7 @@ public class FacetBuilder extends DomainElementBuilder<DomainElement, FacetBuild
     }
 
     @Override
-    public DomainElement buildNodeLocally() {
+    protected DomainElement buildNodeLocally() {
         return null;
     }
 

@@ -43,12 +43,12 @@ public class ResponseBuilder extends DomainElementBuilder<Response, ResponseBuil
 
 
     @Override
-    public Response buildNodeLocally() {
+    protected Response buildNodeLocally() {
         Response node =  new Response();
         node.withStatusCode(Integer.toString(code));
         Optional.ofNullable(description).ifPresent(node::withDescription);
 
-        node.withPayloads(bodies.stream().map(PayloadBuilder::buildNodeLocally).collect(Collectors.toList()));
+        node.withPayloads(bodies.stream().map(PayloadBuilder::buildNode).collect(Collectors.toList()));
 
 
 //        if ( ! annotations.isEmpty() ) {

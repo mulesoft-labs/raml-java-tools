@@ -73,7 +73,7 @@ public class RamlDocumentBuilder implements ModelBuilder<WebApiDocument> {
         // Not sure where this goes....
         // Optional.ofNullable(baseUri).ifPresent(apiNode::withServer);
 
-        apiNode.withEndPoints(resourceBuilders.stream().map(ResourceBuilder::buildNodeLocally).collect(Collectors.toList()));
+        apiNode.withEndPoints(resourceBuilders.stream().map(ResourceBuilder::buildNode).collect(Collectors.toList()));
 
         //annotationTypeBuilders.addAllToNamedNode("annotationTypes", apiNode);
         doc.withDeclares(typeDeclarationBuilders.stream().map(Supplier::get).flatMap(Collection::stream).map(DeclaredShapeBuilder::buildNode).collect(Collectors.toList()));
