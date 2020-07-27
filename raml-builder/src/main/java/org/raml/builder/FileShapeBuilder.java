@@ -11,4 +11,10 @@ public class FileShapeBuilder extends TypeShapeBuilder<FileShape, FileShapeBuild
     protected FileShape buildNodeLocally() {
         return new FileShape();
     }
+
+    @Override
+    public FileShape buildReferenceShape() {
+
+        return new FileShape();
+    }
 }

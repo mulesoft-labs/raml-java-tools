@@ -2,12 +2,10 @@ package org.raml.builder;
 
 import amf.client.model.domain.NodeShape;
 import amf.client.model.domain.Shape;
-import com.google.common.base.Suppliers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -20,12 +18,9 @@ public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuild
 
     private final List<PropertyShapeBuilder> properties = new ArrayList<>();
 
-    private final Supplier<NodeShape> response;
-
     public NodeShapeBuilder(Shape... types) {
 
         this.types = types;
-        this.response = Suppliers.memoize(this::calculateNodeShape);
     }
 
     private static NodeShape doInheritance(Shape t) {
@@ -47,10 +42,6 @@ public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuild
     @Override
     protected NodeShape buildNodeLocally() {
 
-        return response.get();
-    }
-
-    public NodeShape calculateNodeShape() {
         NodeShape nodeShape = new NodeShape();
         commonNodeInfo(nodeShape);
         nodeShape.withName("anonymous");
@@ -68,4 +59,8 @@ public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuild
         return nodeShape;
     }
 
+    @Override
+    protected NodeShape buildReferenceShape() {
+        return new NodeShape();
+    }
 }

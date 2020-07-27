@@ -23,4 +23,9 @@ public class ScalarShapeBuilder extends TypeShapeBuilder<ScalarShape, ScalarShap
 
         return shape;
     }
+
+    @Override
+    protected ScalarShape buildReferenceShape() {
+        return new ScalarShape();
+    }
 }

@@ -60,11 +60,13 @@ public class PropertyShapeBuilder extends DomainElementBuilder<PropertyShape, Pr
         node.withName(name);
         node.withPath(name);
         AnyShape range = type.buildNode();
-        AnyShape referenceType = new AnyShape();
-        referenceType.withName(range.name().value());
-        referenceType.withLinkLabel(range.name().value());
-        referenceType.withLinkTarget(range);
-        node.withRange(referenceType);
+        AnyShape referenceShape = type.buildReference();
+//
+//        AnyShape referenceType = new AnyShape();
+//        referenceType.withName(range.name().value());
+//        referenceType.withLinkLabel(range.name().value());
+//        referenceType.withLinkTarget(range);
+        node.withRange(referenceShape);
 
 //        if ( ! annotations.isEmpty() ) {
 //

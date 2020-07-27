@@ -11,4 +11,9 @@ public class NilShapeBuilder extends TypeShapeBuilder<NilShape, NilShapeBuilder>
     protected NilShape buildNodeLocally() {
         return new NilShape();
     }
+
+    @Override
+    protected NilShape buildReferenceShape() {
+        return new NilShape();
+    }
 }

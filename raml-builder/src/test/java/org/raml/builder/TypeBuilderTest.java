@@ -176,7 +176,7 @@ public class TypeBuilderTest {
     }
 
     @Test
-    public void complexType() {
+    public void complexType() throws ExecutionException, InterruptedException {
 
         WebApiDocument api = document()
                 .baseUri("http://google.com")
@@ -184,21 +184,38 @@ public class TypeBuilderTest {
                 .version("one")
                 .mediaType("foo/fun")
                 .withTypes(
-                        () -> Collections.singletonList(
+                        () -> {
+                            DeclaredShapeBuilder sonny = DeclaredShapeBuilder.typeDeclaration("Child")
+                                    .ofType(NodeShapeBuilder.inheritingObjectFromShapes()
+                                            .withProperty(
+                                                    PropertyShapeBuilder.property("something", TypeShapeBuilder.stringScalar()))
+                                    );
 
-                                DeclaredShapeBuilder.typeDeclaration("Mom")
-                                .ofType(NodeShapeBuilder.inheritingObjectFromShapes()
-                                        .withProperty(
-                                                PropertyShapeBuilder.property("name", TypeShapeBuilder.stringScalar()))
-                                )
-                        )
+                            return Arrays.asList(
+
+
+                                    sonny,
+                                    DeclaredShapeBuilder.typeDeclaration("Mom")
+                                            .ofType(NodeShapeBuilder.inheritingObjectFromShapes()
+                                                    .withProperty(
+                                                            PropertyShapeBuilder.property("name", TypeShapeBuilder.stringScalar()),
+                                                            PropertyShapeBuilder.property("sonny", sonny.asTypeShapeBuilder()))
+                                            )
+
+                            );
+                        }
+
                 )
                 .buildModel();
 
-        assertEquals("Mom", ((NodeShape) api.declares().get(0)).name().value());
-        assertEquals(0, (((NodeShape) api.declares().get(0)).inherits().size()));
-        assertEquals("name", ((NodeShape) api.declares().get(0)).properties().get(0).name().value());
-        assertTrue(((NodeShape) api.declares().get(0)).properties().get(0).range().name().value().contains("string"));
+        System.err.println(Raml10.generateString(api).get());
+
+        assertEquals("Mom", ((NodeShape) api.declares().get(1)).name().value());
+        assertEquals(0, (((NodeShape) api.declares().get(1)).inherits().size()));
+        assertEquals("name", ((NodeShape) api.declares().get(1)).properties().get(0).name().value());
+        assertTrue(((NodeShape) api.declares().get(1)).properties().get(0).range().name().value().contains("string"));
+        assertEquals("sonny", ((NodeShape) api.declares().get(1)).properties().get(1).name().value());
+        assertTrue(((NodeShape) api.declares().get(1)).properties().get(1).range().name().value().contains("Child"));
     }
 
     //@Test

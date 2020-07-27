@@ -2,6 +2,8 @@ package org.raml.builder;
 
 import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.Shape;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -11,6 +13,7 @@ import java.util.stream.Collectors;
  */
 public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBuilder<N, B>> extends DomainElementBuilder<N, B> implements AnnotableBuilder<TypeShapeBuilder<N,B>> {
 
+    private final Supplier<N> response;
     private List<ExamplesBuilder> examples = new ArrayList<>();
     private List<AnnotationBuilder> annotations = new ArrayList<>();
     private List<FacetBuilder> facets = new ArrayList<>();
@@ -20,6 +23,16 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
 
     private ExamplesBuilder example;
     private String name;
+
+    public TypeShapeBuilder() {
+
+        this.response = Suppliers.memoize(this::buildNodeLocally);
+    }
+
+    @Override
+    public N buildNode() {
+        return response.get();
+    }
 
     @Override
     abstract protected N buildNodeLocally();
@@ -177,4 +190,30 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
         this.name = name;
         return (B) this;
     }
+
+    public N buildReference() {
+
+        AnyShape range = this.buildNode();
+        N referenceType = buildReferenceShape();
+
+        referenceType.withName(range.name().value());
+        referenceType.withLinkLabel(range.name().value());
+        referenceType.withLinkTarget(range);
+
+      /*  if ( name != null ) {
+            N referenceShape = buildReferenceShape();
+            referenceShape.withName(name);
+            referenceShape.withLinkLabel(name);
+            referenceShape.withLinkTarget(this.buildNode());
+            return referenceShape;
+        } else {
+
+            return null;
+        }*/
+
+        return referenceType;
+    }
+
+    protected abstract N buildReferenceShape();
+
 }

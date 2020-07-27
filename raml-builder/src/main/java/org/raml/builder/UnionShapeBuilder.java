@@ -65,4 +65,9 @@ public class UnionShapeBuilder extends TypeShapeBuilder<UnionShape, UnionShapeBu
 
         return unionShape;
     }
+
+    @Override
+    protected UnionShape buildReferenceShape() {
+        return new UnionShape();
+    }
 }

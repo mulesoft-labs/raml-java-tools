@@ -61,4 +61,9 @@ public class EnumShapeBuilder extends TypeShapeBuilder<ScalarShape, EnumShapeBui
 
         return shape;
     }
+
+    @Override
+    protected ScalarShape buildReferenceShape() {
+        return new ScalarShape();
+    }
 }

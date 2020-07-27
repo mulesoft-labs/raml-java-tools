@@ -28,4 +28,9 @@ public class ArrayShapeBuilder extends TypeShapeBuilder<ArrayShape, ArrayShapeBu
 
         return shape;
     }
+
+    @Override
+    protected ArrayShape buildReferenceShape() {
+        return new ArrayShape();
+    }
 }

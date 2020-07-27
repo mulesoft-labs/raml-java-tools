@@ -23,4 +23,8 @@ public class AnyShapeBuilder extends TypeShapeBuilder<AnyShape, AnyShapeBuilder>
         return shape;
     }
 
+    @Override
+    protected AnyShape buildReferenceShape() {
+        return new AnyShape();
+    }
 }
