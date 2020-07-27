@@ -1,7 +1,6 @@
 package org.raml.builder;
 
 import amf.client.model.domain.AnyShape;
-import amf.client.model.domain.Shape;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 
@@ -38,31 +37,31 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
     abstract protected N buildNodeLocally();
 
     public static ScalarShapeBuilder stringScalar() {
-        return new ScalarShapeBuilder("http://www.w3.org/2001/XMLSchema#string");
+        return new ScalarShapeBuilder("string", "http://www.w3.org/2001/XMLSchema#string");
     }
 
     public static ScalarShapeBuilder booleanScalar() {
-        return new ScalarShapeBuilder("http://www.w3.org/2001/XMLSchema#boolean");
+        return new ScalarShapeBuilder("boolean", "http://www.w3.org/2001/XMLSchema#boolean");
     }
 
     public static ScalarShapeBuilder longScalar() {
-        return new ScalarShapeBuilder("http://www.w3.org/2001/XMLSchema#long");
+        return new ScalarShapeBuilder("integer", "http://www.w3.org/2001/XMLSchema#long");
     }
 
     public static ScalarShapeBuilder dateOnly() {
-        return new ScalarShapeBuilder("http://www.w3.org/2001/XMLSchema#date");
+        return new ScalarShapeBuilder("date-only", "http://www.w3.org/2001/XMLSchema#date");
     }
 
     public static ScalarShapeBuilder dateTime() {
-        return new ScalarShapeBuilder("http://www.w3.org/2001/XMLSchema#dateTime");
+        return new ScalarShapeBuilder("datetime", "http://www.w3.org/2001/XMLSchema#dateTime");
     }
 
     public static ScalarShapeBuilder timeOnly() {
-        return new ScalarShapeBuilder("http://www.w3.org/2001/XMLSchema#timeOnly");
+        return new ScalarShapeBuilder("time-only", "http://www.w3.org/2001/XMLSchema#timeOnly");
     }
 
     public static ScalarShapeBuilder dateTimeOnly() {
-        return new ScalarShapeBuilder("http://www.w3.org/2001/XMLSchema#dateTimeOnly");
+        return new ScalarShapeBuilder("datetime-only", "http://www.w3.org/2001/XMLSchema#dateTimeOnly");
     }
 
     public static FileShapeBuilder file() {
@@ -96,7 +95,7 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
         return new NodeShapeBuilder(types);
     }
 
-    static public UnionShapeBuilder unionShapeOf(Shape... types) {
+    static public UnionShapeBuilder unionShapeOf(TypeShapeBuilder<?,?>... types) {
 
         return new UnionShapeBuilder(types);
     }
@@ -199,17 +198,6 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
         referenceType.withName(range.name().value());
         referenceType.withLinkLabel(range.name().value());
         referenceType.withLinkTarget(range);
-
-      /*  if ( name != null ) {
-            N referenceShape = buildReferenceShape();
-            referenceShape.withName(name);
-            referenceShape.withLinkLabel(name);
-            referenceShape.withLinkTarget(this.buildNode());
-            return referenceShape;
-        } else {
-
-            return null;
-        }*/
 
         return referenceType;
     }

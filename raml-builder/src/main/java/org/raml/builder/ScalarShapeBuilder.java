@@ -7,9 +7,11 @@ import amf.client.model.domain.ScalarShape;
  */
 public class ScalarShapeBuilder extends TypeShapeBuilder<ScalarShape, ScalarShapeBuilder> {
 
+    private final String typeName;
     private final String scalarShape;
 
-    public ScalarShapeBuilder(String scalarShape) {
+    public ScalarShapeBuilder(String typeName, String scalarShape) {
+        this.typeName = typeName;
         this.scalarShape = scalarShape;
     }
 
@@ -17,9 +19,10 @@ public class ScalarShapeBuilder extends TypeShapeBuilder<ScalarShape, ScalarShap
     protected ScalarShape buildNodeLocally() {
 
         ScalarShape shape = new ScalarShape();
-        shape.withName("string");
+        shape.withName(typeName);
         commonNodeInfo(shape);
         shape.withDataType(scalarShape);
+        shape.withFormat("foo");
 
         return shape;
     }

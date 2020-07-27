@@ -15,6 +15,8 @@ public class FileShapeBuilder extends TypeShapeBuilder<FileShape, FileShapeBuild
     @Override
     public FileShape buildReferenceShape() {
 
-        return new FileShape();
+        FileShape shape = new FileShape();
+        shape.withName("file");
+        return shape;
     }
 }

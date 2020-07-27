@@ -199,7 +199,9 @@ public class TypeBuilderTest {
                                             .ofType(NodeShapeBuilder.inheritingObjectFromShapes()
                                                     .withProperty(
                                                             PropertyShapeBuilder.property("name", TypeShapeBuilder.stringScalar()),
-                                                            PropertyShapeBuilder.property("sonny", sonny.asTypeShapeBuilder()))
+                                                            PropertyShapeBuilder.property("sonny", sonny.asTypeShapeBuilder()),
+                                                            PropertyShapeBuilder.property("fun", TypeShapeBuilder.dateOnly())
+                                                            )
                                             )
 
                             );
@@ -311,8 +313,8 @@ public class TypeBuilderTest {
 
                                 DeclaredShapeBuilder.typeDeclaration("Mom")
                                 .ofType(TypeShapeBuilder.unionShapeOf(
-                                        TypeShapeBuilder.stringScalar().buildNode(),
-                                        TypeShapeBuilder.longScalar().buildNode()
+                                        TypeShapeBuilder.stringScalar(),
+                                        TypeShapeBuilder.dateOnly()
                                         )
                                )
                         )
@@ -352,7 +354,7 @@ public class TypeBuilderTest {
                             return Arrays.asList(
                                     parent1, parent2,
                                     DeclaredShapeBuilder.typeDeclaration("Mom")
-                                            .ofType(TypeShapeBuilder.unionShapeOf(parent1.buildNode(), parent2.buildNode()).withProperty(PropertyShapeBuilder.property("name", TypeShapeBuilder.stringScalar()))
+                                            .ofType(TypeShapeBuilder.unionShapeOf(parent1.asTypeShapeBuilder(), parent2.asTypeShapeBuilder()).withProperty(PropertyShapeBuilder.property("name", TypeShapeBuilder.stringScalar()))
                                             )
                             );
                         }
