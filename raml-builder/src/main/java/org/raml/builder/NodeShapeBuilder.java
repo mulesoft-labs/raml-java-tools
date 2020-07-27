@@ -1,7 +1,7 @@
 package org.raml.builder;
 
+import amf.client.model.domain.AnyShape;
 import amf.client.model.domain.NodeShape;
-import amf.client.model.domain.Shape;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,21 +14,21 @@ import java.util.stream.Collectors;
 public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuilder> {
 
 
-    private Shape[] types;
+    private List<TypeShapeBuilder<?,?>> types;
 
     private final List<PropertyShapeBuilder> properties = new ArrayList<>();
 
-    public NodeShapeBuilder(Shape... types) {
+    public NodeShapeBuilder(TypeShapeBuilder<?,?>... types) {
 
-        this.types = types;
+        this.types = Arrays.asList(types);
     }
 
-    private static NodeShape doInheritance(Shape t) {
-        NodeShape nodeShape = new NodeShape();
-        nodeShape.withLinkTarget(t);
-        nodeShape.withLinkLabel(t.name().value());
+    private static AnyShape doInheritance(TypeShapeBuilder<?,?> t) {
+        AnyShape anyShape = t.buildReference();
+        anyShape.withLinkTarget(t.buildNode());
+        anyShape.withLinkLabel(t.buildNode().name().value());
 
-        return nodeShape;
+        return anyShape;
     }
 
 
@@ -46,9 +46,9 @@ public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuild
         commonNodeInfo(nodeShape);
         nodeShape.withName("anonymous");
 
-        if ( types != null && types.length != 0) {
+        if ( types != null && types.size() != 0) {
                 //Not sure....
-                nodeShape.withInherits(Arrays.stream(types).map(NodeShapeBuilder::doInheritance).collect(Collectors.toList()));
+                nodeShape.withInherits(types.stream().map(NodeShapeBuilder::doInheritance).collect(Collectors.toList()));
         }
 
         if ( ! properties.isEmpty() ) {

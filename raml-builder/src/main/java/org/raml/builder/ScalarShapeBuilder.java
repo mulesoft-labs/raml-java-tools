@@ -26,6 +26,8 @@ public class ScalarShapeBuilder extends TypeShapeBuilder<ScalarShape, ScalarShap
 
     @Override
     protected ScalarShape buildReferenceShape() {
-        return new ScalarShape();
+        ScalarShape ss =  new ScalarShape();
+        ss.withDataType(this.buildNode().dataType().value());
+        return ss;
     }
 }

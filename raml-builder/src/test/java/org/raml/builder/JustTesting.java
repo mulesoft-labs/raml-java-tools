@@ -1,7 +1,10 @@
 package org.raml.builder;
 
 import amf.client.model.StrField;
-import amf.client.model.domain.*;
+import amf.client.model.domain.AnyShape;
+import amf.client.model.domain.DomainElement;
+import amf.client.model.domain.NodeShape;
+import amf.client.model.domain.WebApi;
 import webapi.Raml10;
 import webapi.WebApiDocument;
 
@@ -47,7 +50,7 @@ public class JustTesting {
                     );
 
                     DeclaredShapeBuilder<AnyShape> newFunk = DeclaredShapeBuilder.typeDeclaration("Owner").ofType(
-                            TypeShapeBuilder.inheritingObjectFromShapes(funk2.asTypeShapeBuilder().buildNode())
+                            TypeShapeBuilder.inheritingObjectFromShapes(funk2.asTypeShapeBuilder())
                                     .withProperty(PropertyShapeBuilder.property("owned", funk.asTypeShapeBuilder()))
                     );
                     return Arrays.asList(funk, funk2, newFunk);

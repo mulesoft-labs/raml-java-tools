@@ -91,7 +91,7 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
     }
 
 
-    static public NodeShapeBuilder inheritingObjectFromShapes(Shape... types) {
+    static public NodeShapeBuilder inheritingObjectFromShapes(TypeShapeBuilder<?,?>... types) {
 
         return new NodeShapeBuilder(types);
     }

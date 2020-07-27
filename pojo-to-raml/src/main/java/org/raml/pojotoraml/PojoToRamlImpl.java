@@ -1,6 +1,5 @@
 package org.raml.pojotoraml;
 
-import amf.client.model.domain.AnyShape;
 import com.google.common.base.Supplier;
 import org.raml.builder.DeclaredShapeBuilder;
 import org.raml.builder.NodeShapeBuilder;
@@ -184,7 +183,7 @@ public class PojoToRamlImpl implements PojoToRaml {
             builder = TypeShapeBuilder.inheritingObjectFromShapes();
         } else {
             List<DeclaredShapeBuilder<?>> shapes = builtTypes.findNamed(typeNames);
-            builder = TypeShapeBuilder.inheritingObjectFromShapes(shapes.stream().map(x -> x.buildNode()).toArray(AnyShape[]::new));
+            builder = TypeShapeBuilder.inheritingObjectFromShapes(shapes.stream().map(x -> x.asTypeShapeBuilder()).toArray(TypeShapeBuilder[]::new));
         }
         return builder;
     }

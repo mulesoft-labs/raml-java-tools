@@ -240,7 +240,7 @@ public class TypeBuilderTest {
                             return Arrays.asList(
                                     parent,
                                     DeclaredShapeBuilder.typeDeclaration("Mom")
-                                            .ofType(NodeShapeBuilder.inheritingObjectFromShapes(parent.buildNode()).withProperty(PropertyShapeBuilder.property("name", TypeShapeBuilder.stringScalar()))
+                                            .ofType(NodeShapeBuilder.inheritingObjectFromShapes(parent.asTypeShapeBuilder()).withProperty(PropertyShapeBuilder.property("name", TypeShapeBuilder.stringScalar()))
                                             )
                             );
                         }
@@ -279,7 +279,7 @@ public class TypeBuilderTest {
                                     );
 
                             return Arrays.asList(parent1, parent2, DeclaredShapeBuilder.typeDeclaration("Mom")
-                                    .ofType(NodeShapeBuilder.inheritingObjectFromShapes(parent1.buildNode(), parent2.buildNode()).withProperty(PropertyShapeBuilder.property("name", TypeShapeBuilder.stringScalar()))
+                                    .ofType(NodeShapeBuilder.inheritingObjectFromShapes(parent1.asTypeShapeBuilder(), parent2.asTypeShapeBuilder()).withProperty(PropertyShapeBuilder.property("name", TypeShapeBuilder.stringScalar()))
                                     ));
                         }
 
@@ -299,7 +299,7 @@ public class TypeBuilderTest {
 
     // Should you try the same test with a text file, you get the same result.  'sweird.
     @Test
-    public void unionType() {
+    public void unionType() throws ExecutionException, InterruptedException {
 
         WebApiDocument api = document()
                 .baseUri("http://google.com")
@@ -319,6 +319,7 @@ public class TypeBuilderTest {
                 )
                 .buildModel();
 
+        System.err.println(Raml10.generateString(api).get());
 
         assertEquals("Mom", ((UnionShape) api.declares().get(0)).name().value());
     // JP    assertTrue(((ScalarShape) ((UnionShape) api.declares().get(0)).anyOf().get(0)).dataType().value().contains("string"));
@@ -345,7 +346,7 @@ public class TypeBuilderTest {
                             DeclaredShapeBuilder<?> parent2 = DeclaredShapeBuilder.typeDeclaration("Parent2")
                                     .ofType(NodeShapeBuilder.inheritingObjectFromShapes()
                                             .withProperty(
-                                                    PropertyShapeBuilder.property("subName2", TypeShapeBuilder.stringScalar()))
+                                                    PropertyShapeBuilder.property("subName2", TypeShapeBuilder.longScalar()))
                                     );
 
                             return Arrays.asList(
