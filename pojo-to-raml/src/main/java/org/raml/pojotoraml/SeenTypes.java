@@ -2,6 +2,7 @@ package org.raml.pojotoraml;
 
 import org.raml.builder.DeclaredShapeBuilder;
 
+import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -9,15 +10,15 @@ import java.util.*;
  */
 public class SeenTypes {
     private final Map<String, DeclaredShapeBuilder<?>> seenByName = new HashMap<>();
-    private final Map<String, DeclaredShapeBuilder<?>> seenById = new HashMap<>();
+    private final Map<Type, DeclaredShapeBuilder<?>> seenById = new HashMap<>();
 
-    public void storeType(DeclaredShapeBuilder<?> builder) {
+    public void storeType(Type type, DeclaredShapeBuilder<?> builder) {
 
         if ( ! builder.isAnonymous() ) {
             seenByName.put(builder.name(), builder);
         }
 
-        seenById.put(builder.id(), builder);
+        seenById.put(type, builder);
     }
 
     public void remove(DeclaredShapeBuilder<?> builder) {
@@ -52,5 +53,13 @@ public class SeenTypes {
 
     public DeclaredShapeBuilder<?> byName(String subSimpleName) {
         return seenByName.get(subSimpleName);
+    }
+
+    public boolean hasType(Type clazz) {
+        return seenById.containsKey(clazz);
+    }
+
+    public DeclaredShapeBuilder<?> byType(Type clazz) {
+        return seenById.get(clazz);
     }
 }

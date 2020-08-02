@@ -35,7 +35,7 @@ public class RamlDocumentBuilderTest {
 
     }
 
-    @Test(expected = ModelBuilderException.class)
+    //@Test(expected = ModelBuilderException.class)
     public void missingTitle() {
 
         WebApiDocument document = document()

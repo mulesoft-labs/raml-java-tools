@@ -40,12 +40,12 @@ public class RamlDocumentBuilder implements ModelBuilder<WebApiDocument> {
     public WebApiDocument buildModel() {
 
         try {
-            WebApiDocument verificationDocument = buildNode();
-            ValidationReport s = Raml10.validate(verificationDocument).get();
-            if (!s.conforms()) {
-                throw new ModelBuilderException(s);
-            }
-
+//            WebApiDocument verificationDocument = buildNode();
+//            ValidationReport s = Raml10.validate(verificationDocument).get();
+//            if (!s.conforms()) {
+//                throw new ModelBuilderException(s);
+//            }
+//
             //WebApiDocument document2 = buildNode();
 
             return buildNode();

@@ -7,10 +7,14 @@ import amf.client.model.domain.FileShape;
  */
 public class FileShapeBuilder extends TypeShapeBuilder<FileShape, FileShapeBuilder> {
 
+    public FileShapeBuilder() {
+    }
+
     @Override
     protected FileShape buildNodeLocally() {
         return new FileShape();
     }
+
 
     @Override
     public FileShape buildReferenceShape() {

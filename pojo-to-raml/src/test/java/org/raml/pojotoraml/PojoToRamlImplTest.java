@@ -57,6 +57,16 @@ public class PojoToRamlImplTest {
     }
 
     @Test
+    public void classesAreRemembered() throws Exception {
+
+        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), clazz -> new AdditionalPropertiesAdjuster());
+        Result types =  pojoToRaml.classToRaml(Fun.class);
+        Result typesAgain =  pojoToRaml.classToRaml(Fun.class);
+
+        assertEquals(typesAgain.requestedType().asTypeShapeBuilder().id(), types.requestedType().asTypeShapeBuilder().id());
+    }
+
+    @Test
     public void withInheritance() throws Exception {
 
         PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), AdjusterFactory.NULL_FACTORY);

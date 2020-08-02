@@ -39,7 +39,7 @@ public class UnionShapeBuilder extends TypeShapeBuilder<UnionShape, UnionShapeBu
     public UnionShape buildNodeLocally() {
         UnionShape unionShape = new UnionShape();
         commonNodeInfo(unionShape);
-        unionShape.withName("anonymous");
+      //  unionShape.withName("anonymous");
      //   unionShape.withId("amf://id#" + (currentid ++));
 
         if ( types != null && types.size() != 0) {

@@ -1,7 +1,6 @@
 package org.raml.pojotoraml;
 
 import com.google.common.base.Supplier;
-import org.apache.commons.lang3.reflect.TypeUtils;
 import org.raml.builder.DeclaredShapeBuilder;
 import org.raml.builder.NodeShapeBuilder;
 import org.raml.builder.PropertyShapeBuilder;
@@ -23,6 +22,8 @@ public class PojoToRamlImpl implements PojoToRaml {
     private final ClassParserFactory classParserFactory;
     private final AdjusterFactory adjusterFactory;
 
+    private final SeenTypes dependentTypes = new SeenTypes();
+
     public PojoToRamlImpl(ClassParserFactory parser, AdjusterFactory adjusterFactory) {
         this.classParserFactory = parser;
         this.adjusterFactory = adjusterFactory;
@@ -38,7 +39,6 @@ public class PojoToRamlImpl implements PojoToRaml {
             return new Result(null, Collections.emptyMap());
         }
 
-        SeenTypes dependentTypes = new SeenTypes();
         DeclaredShapeBuilder<?> builder = handleSingleType(clazz, dependentTypes);
         dependentTypes.remove(builder);
         return new Result(builder, dependentTypes.namedAsMap());
@@ -57,11 +57,18 @@ public class PojoToRamlImpl implements PojoToRaml {
         }
 
         final String simpleName = adjuster.adjustTypeName(clazz, clazz.getSimpleName());
-        return DeclaredShapeBuilder.typeDeclaration(simpleName).ofType(type.getRamlSyntax(adjuster).asTypeShapeBuilder()).asTypeShapeBuilder();
+        DeclaredShapeBuilder<?> ramlSyntax = type.getRamlSyntax(adjuster);
+        dependentTypes.storeType(type.type(), ramlSyntax);
+        return DeclaredShapeBuilder.typeDeclaration(simpleName).ofType(ramlSyntax.asTypeShapeBuilder()).asTypeShapeBuilder();
     }
 
     @Override
     public TypeShapeBuilder<?, ?> typeShapeBuilder(Type type) {
+
+
+        if ( dependentTypes.hasType(type)) {
+            return dependentTypes.byType(type).asTypeShapeBuilder();
+        }
 
         if ( type instanceof Class) {
             return name((Class<?>)type);
@@ -86,6 +93,10 @@ public class PojoToRamlImpl implements PojoToRaml {
 
     private DeclaredShapeBuilder handleSingleType(Type clazz, SeenTypes builtTypes) {
 
+        if ( builtTypes.hasType(clazz)) {
+            return builtTypes.byType(clazz);
+        }
+
         ClassParser parser = classParserFactory.createParser(clazz);
 
         RamlType quickType = RamlTypeFactory.forType(clazz, parser, adjusterFactory).orElseGet(new RamlTypeSupplier(clazz));
@@ -106,7 +117,7 @@ public class PojoToRamlImpl implements PojoToRaml {
 
         DeclaredShapeBuilder typeDeclaration = DeclaredShapeBuilder.typeDeclaration(simpleName).ofType(builder);
         if ( !ScalarType.isRamlScalarType(simpleName)) {
-            builtTypes.storeType(typeDeclaration);
+            builtTypes.storeType(clazz, typeDeclaration);
         }
 
         for (Property property : parser.properties(clazz)) {
@@ -148,7 +159,7 @@ public class PojoToRamlImpl implements PojoToRaml {
         quickType.getRamlSyntax(adjuster);
         DeclaredShapeBuilder declaredShapeBuilder = quickType.getRamlSyntax(adjusterFactory.createAdjuster(quickType.type()));
 
-        builtTypes.storeType(declaredShapeBuilder);
+        builtTypes.storeType(quickType.type(), declaredShapeBuilder);
         return declaredShapeBuilder;
     }
 

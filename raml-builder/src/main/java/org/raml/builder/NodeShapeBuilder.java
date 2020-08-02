@@ -45,7 +45,7 @@ public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuild
 
         NodeShape nodeShape = new NodeShape();
         commonNodeInfo(nodeShape);
-        nodeShape.withName("anonymous");
+        //nodeShape.withName("anonymous");
 
         if ( types != null && types.size() != 0) {
                 //Not sure....

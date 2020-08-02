@@ -22,7 +22,7 @@ public class ScalarShapeBuilder extends TypeShapeBuilder<ScalarShape, ScalarShap
         shape.withName(typeName);
         commonNodeInfo(shape);
         shape.withDataType(scalarShape);
-        shape.withFormat("foo");
+        //shape.withFormat("foo");
 
         return shape;
     }
