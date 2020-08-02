@@ -16,12 +16,12 @@ public interface ClassParser {
      * @return
      * @param sourceClass the class being parsed
      */
-    List<Property> properties(Class<?> sourceClass);
+    List<Property> properties(Type sourceClass);
 
     /**
      * Returns a a non-null list of supertypes (that will become RAML super types) of the parsed class.
      * @return
      * @param sourceClass the class being parsed
      */
-    Collection<Type> parentClasses(Class<?> sourceClass);
+    Collection<Type> parentClasses(Type sourceClass);
 }

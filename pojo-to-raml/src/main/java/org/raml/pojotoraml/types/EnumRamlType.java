@@ -5,6 +5,7 @@ import org.raml.builder.TypeShapeBuilder;
 import org.raml.pojotoraml.RamlAdjuster;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 
 /**

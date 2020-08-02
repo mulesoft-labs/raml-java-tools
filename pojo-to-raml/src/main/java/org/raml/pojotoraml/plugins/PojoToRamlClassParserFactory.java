@@ -19,6 +19,7 @@ import org.raml.pojotoraml.ClassParser;
 import org.raml.pojotoraml.ClassParserFactory;
 import org.raml.pojotoraml.field.FieldClassParser;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -45,9 +46,14 @@ public class PojoToRamlClassParserFactory implements ClassParserFactory {
   }
 
   @Override
-  public ClassParser createParser(final Class<?> clazz) {
+  public ClassParser createParser(final Type clazz) {
 
-    RamlGenerator generator = clazz.getAnnotation(RamlGenerator.class);
+    if ( !( clazz instanceof Class )) {
+
+      return new FieldClassParser();
+    }
+
+    RamlGenerator generator = ((Class<?>)clazz).getAnnotation(RamlGenerator.class);
 
     ClassParser parser = null;
     if (generator != null) {

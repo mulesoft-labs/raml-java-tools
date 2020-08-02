@@ -20,6 +20,7 @@ import org.raml.builder.PropertyShapeBuilder;
 import org.raml.pojotoraml.Property;
 import org.raml.pojotoraml.RamlAdjuster;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -35,7 +36,7 @@ public class ChangeToString extends RamlAdjuster.Helper {
 
 
   @Override
-  public String adjustTypeName(Class<?> type, String name) {
+  public String adjustTypeName(Type type, String name) {
 
     return arguments.get(0);
   }

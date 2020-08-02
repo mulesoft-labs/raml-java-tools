@@ -123,7 +123,7 @@ public enum ScalarType implements RamlType {
     }
 
     @Override
-    public Class<?> type() {
+    public Type type() {
         return null;
     }
 
@@ -158,7 +158,7 @@ public enum ScalarType implements RamlType {
             }
 
             @Override
-            public Class<?> type() {
+            public Type type() {
                 return (Class<?>) type;
             }
         };

@@ -28,7 +28,7 @@ public interface RamlAdjuster {
         }
 
         @Override
-        public String adjustTypeName(Class<?> aClass, String name) {
+        public String adjustTypeName(Type aClass, String name) {
             return name;
         }
 
@@ -83,7 +83,7 @@ public interface RamlAdjuster {
         }
 
         @Override
-        public String adjustTypeName(Class<?> aClass, String name) {
+        public String adjustTypeName(Type aClass, String name) {
             String val = name;
             for (RamlAdjuster adjuster : adjusters) {
                 val = adjuster.adjustTypeName(aClass, val);
@@ -150,7 +150,7 @@ public interface RamlAdjuster {
      * @param name a suggested type name.  You may return it or change it.  It may not be null.
      * @return
      */
-    String adjustTypeName(Class<?> aClass, String name);
+    String adjustTypeName(Type aClass, String name);
 
     /**
      * You may change the property definition for a given scalar type.

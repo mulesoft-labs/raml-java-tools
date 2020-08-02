@@ -9,6 +9,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -17,8 +18,13 @@ import java.util.List;
 public class FieldClassParser implements ClassParser {
 
     @Override
-    public List<Property> properties(Class<?> sourceClass) {
+    public List<Property> properties(Type sourceType) {
 
+        if ( ! (sourceType instanceof Class) ) {
+            return Collections.emptyList();
+        }
+
+        Class<?> sourceClass = (Class<?>) sourceType;
         List<Property> props = new ArrayList<>();
         for (final Field field : sourceClass.getDeclaredFields()) {
 
@@ -31,7 +37,13 @@ public class FieldClassParser implements ClassParser {
     }
 
     @Override
-    public Collection<Type> parentClasses(Class<?> sourceClass) {
+    public Collection<Type> parentClasses(Type sourceType) {
+
+        if ( ! (sourceType instanceof Class) ) {
+            return Collections.emptyList();
+        }
+
+        Class<?> sourceClass = (Class<?>) sourceType;
 
         ArrayList<Type> type = new ArrayList<>();
         if ( sourceClass.getSuperclass() != Object.class && sourceClass.getSuperclass() != null ) {
@@ -42,11 +54,6 @@ public class FieldClassParser implements ClassParser {
 
 
     public static ClassParserFactory factory() {
-        return new ClassParserFactory() {
-            @Override
-            public ClassParser createParser(Class<?> clazz) {
-                return new FieldClassParser();
-            }
-        };
+        return clazz -> new FieldClassParser();
     }
 }

@@ -93,8 +93,8 @@ public class PojoToRamlImplTest {
 
         PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(clazz -> new FieldClassParser() {
             @Override
-            public Collection<Type> parentClasses(Class<?> sourceClass) {
-                return Arrays.stream(clazz.getInterfaces()).collect(Collectors.toList());
+            public Collection<Type> parentClasses(Type sourceClass) {
+                return Arrays.stream(((Class<?>)clazz).getInterfaces()).collect(Collectors.toList());
             }
         }, AdjusterFactory.NULL_FACTORY);
         Result types =  pojoToRaml.classToRaml(MultipleInheriting.class);

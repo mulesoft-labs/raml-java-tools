@@ -9,6 +9,6 @@ import java.lang.reflect.Type;
  */
 public interface PojoToRaml {
 
-    Result classToRaml(Class<?> clazz);
+    Result classToRaml(Type clazz);
     TypeShapeBuilder<?, ?> typeShapeBuilder(Type type);
 }

@@ -14,12 +14,12 @@ import java.util.List;
 public class NullClassParser implements ClassParser {
 
     @Override
-    public List<Property> properties(Class<?> sourceClass) {
+    public List<Property> properties(Type sourceClass) {
         return Collections.emptyList();
     }
 
     @Override
-    public Collection<Type> parentClasses(Class<?> sourceClass) {
+    public Collection<Type> parentClasses(Type sourceClass) {
         return Collections.emptyList();
     }
 }

@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -39,15 +40,20 @@ public class PojoToRamlExtensionFactory {
 
     private final Package topPackage;
 
-  private static final Logger logger = LoggerFactory.getLogger(PojoToRamlExtensionFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(PojoToRamlExtensionFactory.class);
 
     public PojoToRamlExtensionFactory(Package topPackage) {
         this.topPackage = topPackage;
     }
 
-    public RamlAdjuster createAdjusters(final Class<?> clazz, final RamlAdjuster... ramlAdjusters) {
+    public RamlAdjuster createAdjusters(final Type clazz, final RamlAdjuster... ramlAdjusters) {
 
-        RamlGenerator generator = clazz.getAnnotation(RamlGenerator.class);
+        if (!(clazz instanceof Class)) {
+
+            return new RamlAdjuster.Composite(Arrays.asList(ramlAdjusters));
+        }
+
+        RamlGenerator generator = ((Class<?>) clazz).getAnnotation(RamlGenerator.class);
         if (generator != null) {
             return new RamlAdjuster.Composite(
                     Streams.concat(Arrays.stream(generator.plugins())
@@ -56,33 +62,37 @@ public class PojoToRamlExtensionFactory {
                                     Arrays.asList(ramlGeneratorPlugin.parameters()), RamlAdjuster.class))), Arrays.stream(ramlAdjusters)).collect(Collectors.toList()));
         } else {
 
-            if (topPackage != null) {
-        RamlGenerators generators = annotationFor(topPackage, RamlGenerators.class);
-        logger.debug("{} RamlGenerators: {} '{}'\n", "******* ", generators, " *******");
-                // get the generator for the class.
-                java.util.Optional<RamlGenerator> ramlAdjusterOptional =
-                        Arrays.stream(generators.value()).filter(ramlGeneratorForClass -> ramlGeneratorForClass.forClass().equals(clazz))
-                                .findFirst()
-                                .map(RamlGeneratorForClass::generator);
-
-                java.util.Optional<RamlAdjuster> finalAdjuster = ramlAdjusterOptional.map(new Function<RamlGenerator, RamlAdjuster>() {
-
-                    @Nullable
-                    @Override
-                    public RamlAdjuster apply(RamlGenerator ramlGenerator) {
-                        return new RamlAdjuster.Composite(Streams.concat(
-                                Arrays.stream(ramlGenerator.plugins())
-                                        .map(ramlGeneratorPlugin -> new RamlAdjuster.Composite(pluginManager.getClassesForName(ramlGeneratorPlugin.plugin(),
-                                                Arrays.asList(ramlGeneratorPlugin.parameters()), RamlAdjuster.class))), Arrays.stream(ramlAdjusters)).collect(Collectors.toList()));
-                    }
-                });
-
-                return finalAdjuster.orElseGet(() -> new RamlAdjuster.Composite(Arrays.asList(ramlAdjusters)));
-            } else {
-
-                return new RamlAdjuster.Composite(Arrays.asList(ramlAdjusters));
-            }
+            return withNoLocalAnnotation(clazz, ramlAdjusters);
         }
 
+    }
+
+    private RamlAdjuster withNoLocalAnnotation(Type clazz, RamlAdjuster[] ramlAdjusters) {
+        if (topPackage != null) {
+            RamlGenerators generators = annotationFor(topPackage, RamlGenerators.class);
+            logger.debug("{} RamlGenerators: {} '{}'\n", "******* ", generators, " *******");
+            // get the generator for the class.
+            java.util.Optional<RamlGenerator> ramlAdjusterOptional =
+                    Arrays.stream(generators.value()).filter(ramlGeneratorForClass -> ramlGeneratorForClass.forClass().equals(clazz))
+                            .findFirst()
+                            .map(RamlGeneratorForClass::generator);
+
+            java.util.Optional<RamlAdjuster> finalAdjuster = ramlAdjusterOptional.map(new Function<RamlGenerator, RamlAdjuster>() {
+
+                @Nullable
+                @Override
+                public RamlAdjuster apply(RamlGenerator ramlGenerator) {
+                    return new RamlAdjuster.Composite(Streams.concat(
+                            Arrays.stream(ramlGenerator.plugins())
+                                    .map(ramlGeneratorPlugin -> new RamlAdjuster.Composite(pluginManager.getClassesForName(ramlGeneratorPlugin.plugin(),
+                                            Arrays.asList(ramlGeneratorPlugin.parameters()), RamlAdjuster.class))), Arrays.stream(ramlAdjusters)).collect(Collectors.toList()));
+                }
+            });
+
+            return finalAdjuster.orElseGet(() -> new RamlAdjuster.Composite(Arrays.asList(ramlAdjusters)));
+        } else {
+
+            return new RamlAdjuster.Composite(Arrays.asList(ramlAdjusters));
+        }
     }
 }

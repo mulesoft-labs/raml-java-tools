@@ -4,14 +4,16 @@ import org.raml.builder.DeclaredShapeBuilder;
 import org.raml.builder.TypeShapeBuilder;
 import org.raml.pojotoraml.types.RamlType;
 
+import java.lang.reflect.Type;
+
 /**
  * Created. There, you have it.
  */
 class GeneratedRamlType implements RamlType {
-    private final Class<?> clazz;
+    private final Type clazz;
     private final TypeShapeBuilder tb;
 
-    public GeneratedRamlType(Class<?> clazz, TypeShapeBuilder tb) {
+    public GeneratedRamlType(Type clazz, TypeShapeBuilder tb) {
         this.clazz = clazz;
         this.tb = tb;
     }
@@ -32,7 +34,7 @@ class GeneratedRamlType implements RamlType {
     }
 
     @Override
-    public Class<?> type() {
+    public Type type() {
         return clazz;
     }
 }

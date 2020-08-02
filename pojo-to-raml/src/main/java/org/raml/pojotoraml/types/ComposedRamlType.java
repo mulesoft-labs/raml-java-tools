@@ -4,6 +4,8 @@ import org.raml.builder.DeclaredShapeBuilder;
 import org.raml.builder.TypeShapeBuilder;
 import org.raml.pojotoraml.RamlAdjuster;
 
+import java.lang.reflect.Type;
+
 /**
  * Created. There, you have it.
  */
@@ -39,7 +41,7 @@ public class ComposedRamlType implements RamlType{
     }
 
     @Override
-    public Class<?> type() {
+    public Type type() {
         return cls;
     }
 }
