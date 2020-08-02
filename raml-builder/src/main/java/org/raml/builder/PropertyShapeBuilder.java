@@ -56,10 +56,10 @@ public class PropertyShapeBuilder extends DomainElementBuilder<PropertyShape, Pr
     @Override
     protected PropertyShape buildNodeLocally() {
 
+        System.err.println("building property " + name);
         PropertyShape node = new PropertyShape();
         node.withName(name);
         node.withPath(name);
-        AnyShape range = type.buildNode();
         AnyShape referenceShape = type.buildReference();
 //
 //        AnyShape referenceType = new AnyShape();

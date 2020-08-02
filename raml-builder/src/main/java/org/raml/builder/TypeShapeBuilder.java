@@ -204,4 +204,7 @@ public abstract class TypeShapeBuilder<N extends AnyShape, B extends TypeShapeBu
 
     protected abstract N buildReferenceShape();
 
+    protected String currentName() {
+        return name;
+    }
 }

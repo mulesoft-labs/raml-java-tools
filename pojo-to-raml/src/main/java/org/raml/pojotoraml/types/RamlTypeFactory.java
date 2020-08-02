@@ -45,13 +45,10 @@ public class RamlTypeFactory {
             final Class<?> cls = (Class<?>) type;
             Optional<RamlType> ramlType =  ScalarType.fromType(cls.getComponentType());
 
-            return java.util.Optional.<RamlType>of(CollectionRamlType.of(ramlType.or(new Supplier<RamlType>() {
-                @Override
-                public RamlType get() {
+            return java.util.Optional.of(CollectionRamlType.of(ramlType.or(() -> {
 
-                    RamlAdjuster adjuster = adjusterFactory.createAdjuster(cls.getComponentType());
-                    return ComposedRamlType.forClass(cls.getComponentType(), adjuster.adjustTypeName(cls.getComponentType(), cls.getComponentType().getSimpleName()));
-                }
+                RamlAdjuster adjuster = adjusterFactory.createAdjuster(cls.getComponentType());
+                return ComposedRamlType.forClass(cls.getComponentType(), adjuster.adjustTypeName(cls.getComponentType(), cls.getComponentType().getSimpleName()));
             })));
 
         }

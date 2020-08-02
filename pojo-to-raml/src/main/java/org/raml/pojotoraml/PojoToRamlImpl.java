@@ -42,8 +42,7 @@ public class PojoToRamlImpl implements PojoToRaml {
         return new Result(builder, dependentTypes.namedAsMap());
     }
 
-    @Override
-    public TypeShapeBuilder name(Class<?> clazz) {
+    private TypeShapeBuilder name(Class<?> clazz) {
 
         RamlAdjuster adjuster = this.adjusterFactory.createAdjuster(clazz);
 
@@ -56,12 +55,11 @@ public class PojoToRamlImpl implements PojoToRaml {
         }
 
         final String simpleName = adjuster.adjustTypeName(clazz, clazz.getSimpleName());
-        //JP inheritance.
-        return DeclaredShapeBuilder.typeDeclaration(simpleName).ofType(TypeShapeBuilder.inheritingObjectFromShapes()).asTypeShapeBuilder();
+        return DeclaredShapeBuilder.typeDeclaration(simpleName).ofType(type.getRamlSyntax(adjuster).asTypeShapeBuilder()).asTypeShapeBuilder();
     }
 
     @Override
-    public TypeShapeBuilder name(Type type) {
+    public TypeShapeBuilder<?, ?> typeShapeBuilder(Type type) {
 
         if ( type instanceof Class) {
             return name((Class<?>)type);
@@ -69,10 +67,10 @@ public class PojoToRamlImpl implements PojoToRaml {
             if ( type instanceof ParameterizedType ) {
 
                 ParameterizedType pt = (ParameterizedType) type;
-                if ( pt.getRawType() instanceof Class && Collection.class.isAssignableFrom((Class)pt.getRawType()) &&  pt.getActualTypeArguments().length == 1) {
+                if ( pt.getRawType() instanceof Class && Collection.class.isAssignableFrom((Class<?>)pt.getRawType()) &&  pt.getActualTypeArguments().length == 1) {
 
                     Class<?> cls = (Class<?>) pt.getActualTypeArguments()[0];
-                    TypeShapeBuilder builder = name(cls);
+                    TypeShapeBuilder<?,?> builder = name(cls);
                     return TypeShapeBuilder.arrayOf(builder);
                 } else {
                     throw new IllegalArgumentException("can't parse type " + pt);
@@ -135,9 +133,7 @@ public class PojoToRamlImpl implements PojoToRaml {
 
                     handleSingleType(ramlType.type(), builtTypes);
                 }
-                DeclaredShapeBuilder<?> t = builtTypes.byName(subSimpleName);
-                PropertyShapeBuilder propertyShapeBuilder = PropertyShapeBuilder.property(property.name(), t.asTypeShapeBuilder());
-
+                PropertyShapeBuilder propertyShapeBuilder = PropertyShapeBuilder.property(property.name(), ramlType.getRamlSyntax(RamlAdjuster.NULL_ADJUSTER).asTypeShapeBuilder());
                 builder.withProperty(adjusterFactory.createAdjuster(ramlType.type()).adjustComposedProperty(typeDeclaration, property, propertyShapeBuilder));
             }
         }

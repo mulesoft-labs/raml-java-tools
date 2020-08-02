@@ -74,6 +74,19 @@ public class PojoToRamlImplTest {
 
     }
 
+    //@Test
+    public void withUnknown() throws Exception {
+
+        PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), AdjusterFactory.NULL_FACTORY);
+        Result types =  pojoToRaml.classToRaml(Unknown.class);
+
+        WebApiDocument api = createApi(types);
+
+        List<AnyShape> buildTypes = api.declares().stream().map(x -> (AnyShape)x).collect(Collectors.toList());
+
+        assertEquals(1, buildTypes.size());
+    }
+
 
     @Test
     public void withMultipleInheritance() throws Exception {
@@ -130,7 +143,7 @@ public class PojoToRamlImplTest {
 
 
         PojoToRamlImpl pojoToRaml = new PojoToRamlImpl(FieldClassParser.factory(), AdjusterFactory.NULL_FACTORY);
-        TypeShapeBuilder builder = pojoToRaml.name(Fun.class.getMethod("stringMethod").getGenericReturnType());
+        TypeShapeBuilder builder = pojoToRaml.typeShapeBuilder(Fun.class.getMethod("stringMethod").getGenericReturnType());
 
         ArrayShape node = (ArrayShape) builder.buildNode();
 

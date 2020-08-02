@@ -81,11 +81,6 @@ public class RamlDocumentBuilder implements ModelBuilder<WebApiDocument> {
         return doc;
     }
 
-    public RamlDocumentBuilder with(NodeBuilder... builders) {
-
-        this.builders.addAll(Arrays.asList(builders));
-        return this;
-    }
 
     public RamlDocumentBuilder withAnnotationTypes(AnnotationTypeBuilder... annotationTypeBuilders) {
         //    this.annotationTypeBuilders.addAll(annotationTypeBuilders);

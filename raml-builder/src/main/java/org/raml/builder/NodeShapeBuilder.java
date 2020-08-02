@@ -23,7 +23,8 @@ public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuild
         this.types = Arrays.asList(types);
     }
 
-    private static AnyShape doInheritance(TypeShapeBuilder<?,?> t) {
+    private AnyShape doInheritance(TypeShapeBuilder<?,?> t) {
+        System.err.println("inheriting " + t.currentName());
         AnyShape anyShape = t.buildReference();
         anyShape.withLinkTarget(t.buildNode());
         anyShape.withLinkLabel(t.buildNode().name().value());
@@ -48,7 +49,7 @@ public class NodeShapeBuilder extends TypeShapeBuilder<NodeShape, NodeShapeBuild
 
         if ( types != null && types.size() != 0) {
                 //Not sure....
-                nodeShape.withInherits(types.stream().map(NodeShapeBuilder::doInheritance).collect(Collectors.toList()));
+                nodeShape.withInherits(types.stream().map(this::doInheritance).collect(Collectors.toList()));
         }
 
         if ( ! properties.isEmpty() ) {
