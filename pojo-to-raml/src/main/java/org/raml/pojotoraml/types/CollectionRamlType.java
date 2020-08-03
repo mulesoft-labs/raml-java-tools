@@ -20,7 +20,7 @@ public class CollectionRamlType  implements RamlType{
 
     @Override
     public DeclaredShapeBuilder<?> getRamlSyntax(RamlAdjuster builder) {
-        return DeclaredShapeBuilder.typeDeclaration("array").ofType(TypeShapeBuilder.arrayOf(type.getRamlSyntax(null).asTypeShapeBuilder()));
+        return DeclaredShapeBuilder.anonymousType().ofType(TypeShapeBuilder.arrayOf(type.getRamlSyntax(null).asTypeShapeBuilder()));
     }
 
     @Override

@@ -58,7 +58,12 @@ public class ParameterBuilder extends DomainElementBuilder<Parameter, ParameterB
         node.withBinding("query");
         Optional.ofNullable(description).ifPresent(node::withDescription);
         node.withRequired(Optional.ofNullable(required).orElse(false));
-        node.withSchema((Shape) type.buildNode());
+        if (type.currentName() != null ) {
+            node.withSchema(type.buildReference());
+
+        } else {
+            node.withSchema(type.buildNode());
+        }
 
         return node;
     }

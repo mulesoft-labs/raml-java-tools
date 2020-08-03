@@ -70,25 +70,7 @@ public class PojoToRamlImpl implements PojoToRaml {
             return dependentTypes.byType(type).asTypeShapeBuilder();
         }
 
-        if ( type instanceof Class) {
-            return name((Class<?>)type);
-        } else {
-            if ( type instanceof ParameterizedType ) {
-
-                ParameterizedType pt = (ParameterizedType) type;
-                if ( pt.getRawType() instanceof Class && Collection.class.isAssignableFrom((Class<?>)pt.getRawType()) &&  pt.getActualTypeArguments().length == 1) {
-
-                    Class<?> cls = (Class<?>) pt.getActualTypeArguments()[0];
-                    TypeShapeBuilder<?,?> builder = name(cls);
-                    return TypeShapeBuilder.arrayOf(builder);
-                } else {
-                    throw new IllegalArgumentException("can't parse type " + pt);
-                }
-            } else {
-
-                throw new IllegalArgumentException("can't parse type " + type);
-            }
-        }
+        return handleSingleType(type, dependentTypes).asTypeShapeBuilder();
     }
 
     private DeclaredShapeBuilder handleSingleType(Type clazz, SeenTypes builtTypes) {
@@ -102,7 +84,7 @@ public class PojoToRamlImpl implements PojoToRaml {
         RamlType quickType = RamlTypeFactory.forType(clazz, parser, adjusterFactory).orElseGet(new RamlTypeSupplier(clazz));
         if ( quickType.isScalar()) {
 
-            return DeclaredShapeBuilder.typeDeclaration(quickType.getRamlSyntax(adjusterFactory.createAdjuster(clazz)).id()).ofType(quickType.getRamlSyntax(adjusterFactory.createAdjuster(clazz)).asTypeShapeBuilder());
+            return DeclaredShapeBuilder.anonymousType().ofType(quickType.getRamlSyntax(adjusterFactory.createAdjuster(clazz)).asTypeShapeBuilder());
         }
 
         if ( quickType.isEnum()) {
