@@ -30,9 +30,9 @@ import static org.raml.pojotoraml.util.AnnotationFinder.annotationFor;
  */
 public class PojoToRamlClassParserFactory implements ClassParserFactory {
 
-  private final Package topPackage;
+  private final String topPackage;
 
-  public PojoToRamlClassParserFactory(Package topPackage) {
+  public PojoToRamlClassParserFactory(String topPackage) {
     this.topPackage = topPackage;
   }
 
@@ -65,7 +65,7 @@ public class PojoToRamlClassParserFactory implements ClassParserFactory {
 
     if (parser == null && topPackage != null) {
 
-      RamlGenerators generators = annotationFor(topPackage, RamlGenerators.class);
+      RamlGenerators generators = annotationFor(Package.getPackage(topPackage), RamlGenerators.class);
       Optional<ClassParser> classParserOptional =
           Arrays.stream(generators.value()).filter(ramlGeneratorForClass -> ramlGeneratorForClass.forClass().equals(clazz))
                   .findFirst()

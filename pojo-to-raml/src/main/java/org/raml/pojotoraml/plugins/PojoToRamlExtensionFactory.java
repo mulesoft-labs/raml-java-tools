@@ -38,11 +38,11 @@ public class PojoToRamlExtensionFactory {
 
     private static PluginManager pluginManager = PluginManager.createPluginManager("META-INF/pojotoraml-plugin.properties");
 
-    private final Package topPackage;
+    private final String topPackage;
 
     private static final Logger logger = LoggerFactory.getLogger(PojoToRamlExtensionFactory.class);
 
-    public PojoToRamlExtensionFactory(Package topPackage) {
+    public PojoToRamlExtensionFactory(String topPackage) {
         this.topPackage = topPackage;
     }
 
@@ -69,7 +69,7 @@ public class PojoToRamlExtensionFactory {
 
     private RamlAdjuster withNoLocalAnnotation(Type clazz, RamlAdjuster[] ramlAdjusters) {
         if (topPackage != null) {
-            RamlGenerators generators = annotationFor(topPackage, RamlGenerators.class);
+            RamlGenerators generators = annotationFor(Package.getPackage(topPackage), RamlGenerators.class);
             logger.debug("{} RamlGenerators: {} '{}'\n", "******* ", generators, " *******");
             // get the generator for the class.
             java.util.Optional<RamlGenerator> ramlAdjusterOptional =
