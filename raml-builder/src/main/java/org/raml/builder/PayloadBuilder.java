@@ -31,7 +31,12 @@ public class PayloadBuilder extends DomainElementBuilder<Payload, PayloadBuilder
     protected Payload buildNodeLocally() {
 
         Payload payload = new Payload();
-        payload.withSchema(types.buildNode());
+        if ( types.currentName() == null ) {
+            payload.withSchema(types.buildNode());
+        } else {
+            payload.withSchema(types.buildReference());
+        }
+
         payload.withMediaType(name);
 
         return payload;
