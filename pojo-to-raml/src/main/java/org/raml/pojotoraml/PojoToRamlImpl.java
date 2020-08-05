@@ -92,13 +92,17 @@ public class PojoToRamlImpl implements PojoToRaml {
             return handleEnum(quickType, adjusterFactory.createAdjuster(clazz), builtTypes);
         }
 
+        if ( quickType.isCollection()) {
+            return quickType.getRamlSyntax(this::typeShapeBuilder);
+        }
+
         final String simpleName = adjusterFactory.createAdjuster(clazz).adjustTypeName(clazz, TypeConversionUtils.typeToSimpleName(clazz));
 
         NodeShapeBuilder builder = buildSuperType(clazz, builtTypes);
         builder = adjusterFactory.createAdjuster(clazz).adjustType(clazz, simpleName, builder);
 
         DeclaredShapeBuilder typeDeclaration = DeclaredShapeBuilder.typeDeclaration(simpleName).ofType(builder);
-        if ( !ScalarType.isRamlScalarType(simpleName)) {
+        if ( !ScalarType.isRamlScalarType(simpleName) && ! quickType.isCollection()) {
             builtTypes.storeType(clazz, typeDeclaration);
         }
 

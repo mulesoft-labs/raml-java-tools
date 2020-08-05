@@ -3,6 +3,8 @@ package org.raml.pojotoraml.types;
 import amf.client.model.domain.ArrayShape;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.raml.builder.NodeShapeBuilder;
+import org.raml.builder.TypeShapeBuilder;
 import org.raml.pojotoraml.AdjusterFactory;
 import org.raml.pojotoraml.ClassParser;
 import org.raml.pojotoraml.Fun;
@@ -50,7 +52,7 @@ public class RamlTypeFactoryTest  extends UnitTest {
 
         RamlType type = RamlTypeFactory.forType(Fun.class.getDeclaredField("listOfStrings").getGenericType(), null, null).orElse(null);
         assertTrue(type instanceof CollectionRamlType);
-        assertTrue(type.getRamlSyntax(null).asTypeShapeBuilder().buildNode() instanceof ArrayShape);
+        assertTrue(type.getRamlSyntax((c) -> TypeShapeBuilder.booleanScalar()).asTypeShapeBuilder().buildNode() instanceof ArrayShape);
     }
 
     @Test
@@ -60,7 +62,7 @@ public class RamlTypeFactoryTest  extends UnitTest {
 
         RamlType type = RamlTypeFactory.forType(Fun.class.getDeclaredField("arrayOfInts").getGenericType(), null, adjusterFactory).orElse(null);
         assertTrue(type instanceof CollectionRamlType);
-        assertTrue(type.getRamlSyntax(null).asTypeShapeBuilder().buildNode() instanceof ArrayShape);
+        assertTrue(type.getRamlSyntax((c) -> TypeShapeBuilder.booleanScalar()).asTypeShapeBuilder().buildNode() instanceof ArrayShape);
     }
 
     @Test
@@ -70,7 +72,7 @@ public class RamlTypeFactoryTest  extends UnitTest {
         when(adjuster.adjustTypeName(SubFun.class, "SubFun")).thenReturn("foo");
         RamlType type = RamlTypeFactory.forType(Fun.class.getDeclaredField("listOfSubs").getGenericType(), classParser, adjusterFactory).orElse(null);
         assertTrue(type instanceof CollectionRamlType);
-        assertTrue(type.getRamlSyntax(null).asTypeShapeBuilder().buildNode() instanceof ArrayShape);
+        assertTrue(type.getRamlSyntax((c) -> NodeShapeBuilder.inheritingObjectFromShapes()).asTypeShapeBuilder().buildNode() instanceof ArrayShape);
     }
 
     @Test
@@ -79,7 +81,7 @@ public class RamlTypeFactoryTest  extends UnitTest {
         when(adjusterFactory.createAdjuster(SubFun.class)).thenReturn(RamlAdjuster.NULL_ADJUSTER);
         RamlType type = RamlTypeFactory.forType(Fun.class.getDeclaredField("arrayOfSubs").getGenericType(), null, adjusterFactory).orElse(null);
         assertTrue(type instanceof CollectionRamlType);
-        assertTrue(type.getRamlSyntax(null).asTypeShapeBuilder().buildNode() instanceof ArrayShape);
+        assertTrue(type.getRamlSyntax((c) -> NodeShapeBuilder.inheritingObjectFromShapes()).asTypeShapeBuilder().buildNode() instanceof ArrayShape);
     }
 
 }
