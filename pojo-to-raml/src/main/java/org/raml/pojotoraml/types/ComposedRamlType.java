@@ -2,9 +2,9 @@ package org.raml.pojotoraml.types;
 
 import org.raml.builder.DeclaredShapeBuilder;
 import org.raml.builder.TypeShapeBuilder;
-import org.raml.pojotoraml.RamlAdjuster;
 
 import java.lang.reflect.Type;
+import java.util.function.Function;
 
 /**
  * Created. There, you have it.
@@ -26,7 +26,7 @@ public class ComposedRamlType implements RamlType{
     }
 
     @Override
-    public DeclaredShapeBuilder<?> getRamlSyntax(RamlAdjuster builder) {
+    public DeclaredShapeBuilder<?> getRamlSyntax(Function<Type, TypeShapeBuilder<?, ?>> builder) {
         return DeclaredShapeBuilder.typeDeclaration(actualRamlName).ofType(TypeShapeBuilder.inheritingObjectFromShapes());
     }
 
@@ -37,6 +37,11 @@ public class ComposedRamlType implements RamlType{
 
     @Override
     public boolean isEnum() {
+        return false;
+    }
+
+    @Override
+    public boolean isCollection() {
         return false;
     }
 

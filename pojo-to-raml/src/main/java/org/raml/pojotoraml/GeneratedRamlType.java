@@ -5,6 +5,7 @@ import org.raml.builder.TypeShapeBuilder;
 import org.raml.pojotoraml.types.RamlType;
 
 import java.lang.reflect.Type;
+import java.util.function.Function;
 
 /**
  * Created. There, you have it.
@@ -19,7 +20,7 @@ class GeneratedRamlType implements RamlType {
     }
 
     @Override
-    public DeclaredShapeBuilder<?> getRamlSyntax(RamlAdjuster builder) {
+    public DeclaredShapeBuilder<?> getRamlSyntax(Function<Type, TypeShapeBuilder<?, ?>> builder) {
         return DeclaredShapeBuilder.typeDeclaration("generated").ofType(tb);
     }
 
@@ -30,6 +31,11 @@ class GeneratedRamlType implements RamlType {
 
     @Override
     public boolean isEnum() {
+        return false;
+    }
+
+    @Override
+    public boolean isCollection() {
         return false;
     }
 

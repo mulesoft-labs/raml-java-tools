@@ -23,8 +23,11 @@ public class ArrayShapeBuilder extends TypeShapeBuilder<ArrayShape, ArrayShapeBu
         commonNodeInfo(shape);
         if (  arrayItems != null  ) {
 
-            System.err.println("array of " + arrayItems.currentName());
-            shape.withItems(arrayItems.buildNode());
+            if ( arrayItems.currentName() != null ) {
+                shape.withItems(arrayItems.buildReference());
+            } else {
+                shape.withItems(arrayItems.buildNode());
+            }
         }
 
         return shape;

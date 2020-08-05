@@ -53,11 +53,11 @@ public class PojoToRamlImpl implements PojoToRaml {
 
         if ( type.isScalar()) {
 
-            return type.getRamlSyntax(adjuster).asTypeShapeBuilder();
+            return type.getRamlSyntax(this::typeShapeBuilder).asTypeShapeBuilder();
         }
 
         final String simpleName = adjuster.adjustTypeName(clazz, clazz.getSimpleName());
-        DeclaredShapeBuilder<?> ramlSyntax = type.getRamlSyntax(adjuster);
+        DeclaredShapeBuilder<?> ramlSyntax = type.getRamlSyntax(this::typeShapeBuilder);
         dependentTypes.storeType(type.type(), ramlSyntax);
         return DeclaredShapeBuilder.typeDeclaration(simpleName).ofType(ramlSyntax.asTypeShapeBuilder()).asTypeShapeBuilder();
     }
@@ -84,7 +84,7 @@ public class PojoToRamlImpl implements PojoToRaml {
         RamlType quickType = RamlTypeFactory.forType(clazz, parser, adjusterFactory).orElseGet(new RamlTypeSupplier(clazz));
         if ( quickType.isScalar()) {
 
-            return DeclaredShapeBuilder.anonymousType().ofType(quickType.getRamlSyntax(adjusterFactory.createAdjuster(clazz)).asTypeShapeBuilder());
+            return DeclaredShapeBuilder.anonymousType().ofType(quickType.getRamlSyntax(this::typeShapeBuilder).asTypeShapeBuilder());
         }
 
         if ( quickType.isEnum()) {
@@ -111,7 +111,7 @@ public class PojoToRamlImpl implements PojoToRaml {
                 RamlType type = resolveUnknownTypeInProperty(adjusterFactory, clazz, builder, typeDeclaration, property);
                 if ( type != null) {
 
-                    builder.withProperty(PropertyShapeBuilder.property(property.name(), type.getRamlSyntax(adjusterFactory.createAdjuster(type.type())).asTypeShapeBuilder()));
+                    builder.withProperty(PropertyShapeBuilder.property(property.name(), type.getRamlSyntax(this::typeShapeBuilder).asTypeShapeBuilder()));
                 }
 
                 continue;
@@ -119,7 +119,10 @@ public class PojoToRamlImpl implements PojoToRaml {
 
             RamlType ramlType = ramlTypeOptional.get();
             if ( ramlType.isScalar() ) {
-                PropertyShapeBuilder propertyShapeBuilder = PropertyShapeBuilder.property(property.name(), ramlType.getRamlSyntax(adjusterFactory.createAdjuster(clazz)).asTypeShapeBuilder());
+                PropertyShapeBuilder propertyShapeBuilder = PropertyShapeBuilder.property(property.name(), ramlType.getRamlSyntax(this::typeShapeBuilder).asTypeShapeBuilder());
+                builder.withProperty(adjusterFactory.createAdjuster(ramlType.type()).adjustScalarProperty(typeDeclaration, property, propertyShapeBuilder));
+            } else if (ramlType.isCollection() ) {
+                PropertyShapeBuilder propertyShapeBuilder = PropertyShapeBuilder.property(property.name(), ramlType.getRamlSyntax(this::typeShapeBuilder).asTypeShapeBuilder());
                 builder.withProperty(adjusterFactory.createAdjuster(ramlType.type()).adjustScalarProperty(typeDeclaration, property, propertyShapeBuilder));
             } else {
 
@@ -128,7 +131,7 @@ public class PojoToRamlImpl implements PojoToRaml {
 
                     handleSingleType(ramlType.type(), builtTypes);
                 }
-                PropertyShapeBuilder propertyShapeBuilder = PropertyShapeBuilder.property(property.name(), ramlType.getRamlSyntax(RamlAdjuster.NULL_ADJUSTER).asTypeShapeBuilder());
+                PropertyShapeBuilder propertyShapeBuilder = PropertyShapeBuilder.property(property.name(), ramlType.getRamlSyntax(this::typeShapeBuilder).asTypeShapeBuilder());
                 builder.withProperty(adjusterFactory.createAdjuster(ramlType.type()).adjustComposedProperty(typeDeclaration, property, propertyShapeBuilder));
             }
         }
@@ -138,8 +141,7 @@ public class PojoToRamlImpl implements PojoToRaml {
 
     private DeclaredShapeBuilder handleEnum(final RamlType quickType, final RamlAdjuster adjuster, SeenTypes builtTypes) {
 
-        quickType.getRamlSyntax(adjuster);
-        DeclaredShapeBuilder declaredShapeBuilder = quickType.getRamlSyntax(adjusterFactory.createAdjuster(quickType.type()));
+        DeclaredShapeBuilder declaredShapeBuilder = quickType.getRamlSyntax(this::typeShapeBuilder);
 
         builtTypes.storeType(quickType.type(), declaredShapeBuilder);
         return declaredShapeBuilder;

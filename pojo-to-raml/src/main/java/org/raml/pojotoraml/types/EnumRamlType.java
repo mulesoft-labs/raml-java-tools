@@ -2,11 +2,10 @@ package org.raml.pojotoraml.types;
 
 import org.raml.builder.DeclaredShapeBuilder;
 import org.raml.builder.TypeShapeBuilder;
-import org.raml.pojotoraml.RamlAdjuster;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.function.Function;
 
 /**
  * Created. There, you have it.
@@ -28,20 +27,14 @@ public class EnumRamlType implements RamlType{
     }
 
     @Override
-    public DeclaredShapeBuilder<?> getRamlSyntax(RamlAdjuster adjuster) {
+    public DeclaredShapeBuilder<?> getRamlSyntax(Function<Type, TypeShapeBuilder<?, ?>> adjuster) {
 
         Class<? extends Enum> c = (Class<? extends Enum>) this.type();
         TypeShapeBuilder typeBuilder = TypeShapeBuilder.enumeratedType().enumValues(
-                Arrays.stream(c.getEnumConstants()).map(new java.util.function.Function<Enum, String>() {
-                    @Nullable
-                    @Override
-                    public String apply(@Nullable Enum o) {
-                        return adjuster.adjustEnumValue(EnumRamlType.this.type(), o.name());
-                    }
-                }).toArray(String[]::new));
+                Arrays.stream(c.getEnumConstants()).map(Enum::name).toArray(String[]::new));
 
 
-        adjuster.adjustType(this.type(), actualRamlName, typeBuilder);
+        //adjuster.adjustType(this.type(), actualRamlName, typeBuilder);
         DeclaredShapeBuilder declaredShapeBuilder = DeclaredShapeBuilder.typeDeclaration(actualRamlName).ofType(typeBuilder);
 
         return declaredShapeBuilder;
@@ -55,6 +48,11 @@ public class EnumRamlType implements RamlType{
     @Override
     public boolean isEnum() {
         return true;
+    }
+
+    @Override
+    public boolean isCollection() {
+        return false;
     }
 
     @Override

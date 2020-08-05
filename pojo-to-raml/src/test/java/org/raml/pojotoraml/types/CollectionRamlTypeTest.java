@@ -1,7 +1,11 @@
 package org.raml.pojotoraml.types;
 
+import amf.client.model.domain.ArrayShape;
+import amf.core.parser.ArrayNode;
 import org.junit.Test;
+import org.raml.builder.TypeShapeBuilder;
 import org.raml.pojotoraml.Fun;
+import org.raml.ramltopojo.RamlToPojoImpl;
 
 import static org.junit.Assert.*;
 
@@ -16,7 +20,7 @@ public class CollectionRamlTypeTest {
 
         assertTrue(collectionRamlType.isScalar());
         assertEquals(boolean.class, collectionRamlType.type());
-        assertEquals("array", collectionRamlType.getRamlSyntax(null).name());
+        assertTrue( collectionRamlType.getRamlSyntax((t) -> TypeShapeBuilder.booleanScalar() ).asTypeShapeBuilder().buildNode() instanceof ArrayShape);
     }
 
     @Test
@@ -26,7 +30,7 @@ public class CollectionRamlTypeTest {
 
         assertFalse(collectionRamlType.isScalar());
         assertEquals(Fun.class, collectionRamlType.type());
-        assertEquals("array", collectionRamlType.getRamlSyntax(null).name());
+        assertTrue( collectionRamlType.getRamlSyntax((t) -> TypeShapeBuilder.inheritingObjectFromShapes() ).asTypeShapeBuilder().buildNode() instanceof ArrayShape);
     }
 
 }

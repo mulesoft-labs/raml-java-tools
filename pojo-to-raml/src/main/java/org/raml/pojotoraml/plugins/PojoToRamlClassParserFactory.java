@@ -65,7 +65,12 @@ public class PojoToRamlClassParserFactory implements ClassParserFactory {
 
     if (parser == null && topPackage != null) {
 
-      RamlGenerators generators = annotationFor(Package.getPackage(topPackage), RamlGenerators.class);
+      Package pack = Package.getPackage(topPackage);
+      if ( pack == null ) {
+        return new FieldClassParser();
+      }
+
+      RamlGenerators generators = annotationFor(pack, RamlGenerators.class);
       Optional<ClassParser> classParserOptional =
           Arrays.stream(generators.value()).filter(ramlGeneratorForClass -> ramlGeneratorForClass.forClass().equals(clazz))
                   .findFirst()

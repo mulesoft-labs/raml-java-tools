@@ -19,7 +19,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import org.raml.builder.DeclaredShapeBuilder;
 import org.raml.builder.TypeShapeBuilder;
-import org.raml.pojotoraml.RamlAdjuster;
 
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -27,6 +26,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public enum ScalarType implements RamlType {
@@ -107,7 +107,7 @@ public enum ScalarType implements RamlType {
     }
 
     @Override
-    public DeclaredShapeBuilder<?> getRamlSyntax(RamlAdjuster builder) {
+    public DeclaredShapeBuilder<?> getRamlSyntax(Function<Type, TypeShapeBuilder<?, ?>> builder) {
         return ramlSyntax.get();
     }
 
@@ -127,6 +127,11 @@ public enum ScalarType implements RamlType {
         return null;
     }
 
+    @Override
+    public boolean isCollection() {
+        return false;
+    }
+
 
     public static Optional<RamlType> fromType(final Type type) {
 
@@ -137,7 +142,7 @@ public enum ScalarType implements RamlType {
 
         RamlType wrappedType = new RamlType() {
             @Override
-            public DeclaredShapeBuilder<?> getRamlSyntax(RamlAdjuster builder) {
+            public DeclaredShapeBuilder<?> getRamlSyntax(Function<Type, TypeShapeBuilder<?, ?>> builder) {
 
                 String format = foundType.formats.get(type);
                 if ( format == null ) {
@@ -160,6 +165,11 @@ public enum ScalarType implements RamlType {
             @Override
             public Type type() {
                 return (Class<?>) type;
+            }
+
+            @Override
+            public boolean isCollection() {
+                return false;
             }
         };
 
