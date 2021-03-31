@@ -167,10 +167,6 @@ public class ObjectTypeHandler implements TypeHandler {
         TypeSpec.Builder typeSpec = TypeSpec
                 .interfaceBuilder(interf)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-        typeSpec = generationContext.pluginsForObjects(objectTypeDeclaration).classCreated(objectPluginContext, objectTypeDeclaration, typeSpec, EventType.INTERFACE);
-        if ( typeSpec == null ) {
-            return null;
-        }
 
         Optional<String> discriminator = Optional.fromNullable(objectTypeDeclaration.discriminator());
 
@@ -205,12 +201,13 @@ public class ObjectTypeHandler implements TypeHandler {
                 if (propertyDeclaration instanceof UnionTypeDeclaration) {
 
                     // Inline union naming: string | nil => StringNilUnion
-                    CreationResult cr = TypeDeclarationType.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),
-                        Names.typeName(propertyDeclaration.type(), "union"), propertyDeclaration, generationContext).get();
-                    result.withInternalType(propertyDeclaration.name(), cr);
-                    tn = cr.getJavaName(EventType.INTERFACE);
-
-                    typeSpec.addType(cr.getInterface().toBuilder().addModifiers(Modifier.PUBLIC, Modifier.STATIC).build());
+                    Optional<CreationResult> cr = TypeDeclarationType.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),
+                        Names.typeName(propertyDeclaration.type(), "union"), propertyDeclaration, generationContext);
+                    if (cr.isPresent()) {
+	                    result.withInternalType(propertyDeclaration.name(), cr.get());
+	                    tn = cr.get().getJavaName(EventType.INTERFACE);
+	                    typeSpec.addType(cr.get().getInterface().toBuilder().addModifiers(Modifier.PUBLIC, Modifier.STATIC).build());
+                    }
 
                 } else {
 
@@ -261,6 +258,11 @@ public class ObjectTypeHandler implements TypeHandler {
         if ( objectTypeDeclaration.additionalProperties()) {
 
             handleAdditionalPropertiesInterface(objectPluginContext, result, generationContext, typeSpec);
+        }
+        
+        typeSpec = generationContext.pluginsForObjects(objectTypeDeclaration).classCreated(objectPluginContext, objectTypeDeclaration, typeSpec, EventType.INTERFACE);
+        if ( typeSpec == null ) {
+            return null;
         }
 
         return typeSpec.build();
