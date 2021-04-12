@@ -20,6 +20,7 @@ import org.raml.ramltopojo.GenerationException;
 import org.raml.ramltopojo.Names;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
+import org.raml.ramltopojo.union.UnionTypeHandler;
 import org.raml.ramltopojo.union.UnionTypesHelper;
 import org.raml.v2.api.model.v10.datamodel.*;
 
@@ -374,17 +375,9 @@ public class JacksonUnionExtension extends UnionTypeHandlerPlugin.Helper {
 
     private String prettyName(TypeDeclaration type, UnionPluginContext unionPluginContext) {
         if (type.type() == null) {
-            return type instanceof NullTypeDeclaration ? "nil" : shorten(unionPluginContext.findType(type.name(), type).box());
+            return type instanceof NullTypeDeclaration ? "nil" : UnionTypeHandler.shorten(unionPluginContext.findType(type.name(), type).box());
         } else {
             return type.name();
         }
-    }
-
-    private String shorten(TypeName typeName) {
-        if (!(typeName instanceof ClassName)) {
-            throw new GenerationException(typeName + toString() + " cannot be shortened reasonably");
-        } else {
-            return ((ClassName) typeName).simpleName();
-        }
-    }
+    } 
 }

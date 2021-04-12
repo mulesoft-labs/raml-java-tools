@@ -129,10 +129,10 @@ public class ObjectTypeHandlerTest extends UnitTest {
         assertThat(r.getInterface(), is(allOf(
                 name(equalTo("Foo")),
                 methods(contains(
-                        allOf(methodName(equalTo("getNames")), returnType(equalTo(ParameterizedTypeName.get(List.class, String.class)))),
-                        allOf(methodName(equalTo("setNames")), parameters(contains(type(equalTo(ParameterizedTypeName.get(List.class, String.class)))))),
-                        allOf(methodName(equalTo("getAges")), returnType(equalTo(ParameterizedTypeName.get(List.class, Integer.class)))),
-                        allOf(methodName(equalTo("setAges")), parameters(contains(type(equalTo(ParameterizedTypeName.get(List.class, Integer.class))))))
+                        allOf(methodName(equalTo("getNames")), returnType(equalTo(ArrayTypeName.of( String.class)))),
+                        allOf(methodName(equalTo("setNames")), parameters(contains(type(equalTo(ArrayTypeName.of(String.class)))))),
+                        allOf(methodName(equalTo("getAges")), returnType(equalTo(ArrayTypeName.of(Integer.class)))),
+                        allOf(methodName(equalTo("setAges")), parameters(contains(type(equalTo(ArrayTypeName.of(Integer.class))))))
                 ))
         )));
 
@@ -140,14 +140,14 @@ public class ObjectTypeHandlerTest extends UnitTest {
         assertThat(r.getImplementation().get(), is(allOf(
                 name(equalTo("FooImpl")),
                 fields(contains(
-                        allOf(fieldName(equalTo("names")), fieldType(equalTo(ParameterizedTypeName.get(List.class, String.class)))),
-                        allOf(fieldName(equalTo("ages")), fieldType(equalTo(ParameterizedTypeName.get(List.class, Integer.class))))
+                        allOf(fieldName(equalTo("names")), fieldType(equalTo(ArrayTypeName.of(String.class)))),
+                        allOf(fieldName(equalTo("ages")), fieldType(equalTo(ArrayTypeName.of(Integer.class))))
                 )),
                 methods(contains(
-                        allOf(methodName(equalTo("getNames")), returnType(equalTo(ParameterizedTypeName.get(List.class, String.class)))),
-                        allOf(methodName(equalTo("setNames")), parameters(contains(type(equalTo(ParameterizedTypeName.get(List.class, String.class)))))),
-                        allOf(methodName(equalTo("getAges")), returnType(equalTo(ParameterizedTypeName.get(List.class, Integer.class)))),
-                        allOf(methodName(equalTo("setAges")), parameters(contains(type(equalTo(ParameterizedTypeName.get(List.class, Integer.class))))))
+                        allOf(methodName(equalTo("getNames")), returnType(equalTo(ArrayTypeName.of(String.class)))),
+                        allOf(methodName(equalTo("setNames")), parameters(contains(type(equalTo(ArrayTypeName.of(String.class)))))),
+                        allOf(methodName(equalTo("getAges")), returnType(equalTo(ArrayTypeName.of(Integer.class)))),
+                        allOf(methodName(equalTo("setAges")), parameters(contains(type(equalTo(ArrayTypeName.of(Integer.class))))))
                 ))
         )));
     }
@@ -474,10 +474,10 @@ public class ObjectTypeHandlerTest extends UnitTest {
         assertThat(r.internalType("unionOfPrimitives").getInterface(), is(allOf(
 
                 name(
-                        is(equalTo("StringIntegerUnion"))
+                        is(equalTo("UnionOfPrimitivesUnion"))
                 ),
                 methods(containsInAnyOrder(
-                        allOf(methodName(equalTo("getUnionType")), returnType(equalTo(ClassName.get("bar.pack", "Foo.StringIntegerUnion.UnionType")))),
+                        allOf(methodName(equalTo("getUnionType")), returnType(equalTo(ClassName.get("bar.pack", "Foo.UnionOfPrimitivesUnion.UnionType")))),
                         allOf(methodName(equalTo("isString")), returnType(equalTo(ClassName.get(Boolean.class).unbox()))),
                         allOf(methodName(equalTo("getString")), returnType(equalTo(ClassName.get(String.class)))),
                         allOf(methodName(equalTo("isInteger")), returnType(equalTo(ClassName.get(Boolean.class).unbox()))),
@@ -489,10 +489,10 @@ public class ObjectTypeHandlerTest extends UnitTest {
         assertThat(r.internalType("unionOfOthers").getInterface(), is(allOf(
 
                 name(
-                        is(equalTo("OneTwoUnion"))
+                        is(equalTo("UnionOfOthersUnion"))
                 ),
                 methods(contains(
-                        allOf(methodName(equalTo("getUnionType")), returnType(equalTo(ClassName.get("bar.pack", "Foo.OneTwoUnion.UnionType")))),
+                        allOf(methodName(equalTo("getUnionType")), returnType(equalTo(ClassName.get("bar.pack", "Foo.UnionOfOthersUnion.UnionType")))),
                         allOf(methodName(equalTo("isOne")), returnType(equalTo(ClassName.get(Boolean.class).unbox()))),
                         allOf(methodName(equalTo("getOne")), returnType(equalTo(ClassName.get("pojo.pack", "One")))),
                         allOf(methodName(equalTo("isTwo")), returnType(equalTo(ClassName.get(Boolean.class).unbox()))),

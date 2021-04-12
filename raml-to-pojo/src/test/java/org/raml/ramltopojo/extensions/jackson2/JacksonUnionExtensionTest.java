@@ -39,16 +39,16 @@ public class JacksonUnionExtensionTest {
             r.internalType("prop").getInterface(),
             is(
                 allOf(
-                    name(is(equalTo("BaaEmailBooleanIntegerNilUnion"))),
+                    name(is(equalTo("PropUnion"))),
                     annotations(
                         containsInAnyOrder(
                             allOf(
                                 annotationType(equalTo(ClassName.get(JsonSerialize.class))),
-                                member("using", contains(codeBlockContents(equalTo("BaaEmailBooleanIntegerNilUnion.Serializer.class"))))
+                                member("using", contains(codeBlockContents(equalTo("PropUnion.Serializer.class"))))
                             ),
                             allOf(
                                 annotationType(equalTo(ClassName.get(JsonDeserialize.class))),
-                                member("using", contains(codeBlockContents(equalTo("BaaEmailBooleanIntegerNilUnion.Deserializer.class"))))
+                                member("using", contains(codeBlockContents(equalTo("PropUnion.Deserializer.class"))))
                             )
                         )
                     ),

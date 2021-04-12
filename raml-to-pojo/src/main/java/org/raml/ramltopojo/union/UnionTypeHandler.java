@@ -6,7 +6,6 @@ import org.raml.ramltopojo.*;
 import org.raml.ramltopojo.extensions.UnionPluginContext;
 import org.raml.ramltopojo.extensions.UnionPluginContextImpl;
 import org.raml.ramltopojo.extensions.UnionTypeHandlerPlugin;
-import org.raml.v2.api.model.v10.datamodel.ArrayTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.NullTypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 import org.raml.v2.api.model.v10.datamodel.UnionTypeDeclaration;
@@ -215,9 +214,9 @@ public class UnionTypeHandler implements TypeHandler {
 
         for (TypeDeclaration unitedType : union.of()) {
 
-            if (unitedType instanceof ArrayTypeDeclaration) {
-                throw new GenerationException("ramltopojo currently does not support arrays in unions");
-            }
+//            if (unitedType instanceof ArrayTypeDeclaration) {
+//                throw new GenerationException("ramltopojo currently does not support arrays in unions");
+//            }
 
             TypeName typeName = unitedType instanceof NullTypeDeclaration ? NULL_CLASS: findType(unitedType.name(), unitedType, generationContext).box();
             String prettyName = prettyName(unitedType, generationContext);
@@ -265,12 +264,14 @@ public class UnionTypeHandler implements TypeHandler {
         }
     }
 
-    private String shorten(TypeName typeName) {
-        if (!(typeName instanceof ClassName)) {
-            throw new GenerationException(typeName + toString() + " cannot be shortened reasonably");
-        } else {
-            return ((ClassName) typeName).simpleName();
-        }
+    public static String shorten(TypeName typeName) {
+    		if (typeName instanceof ClassName) {
+    			return ((ClassName) typeName).simpleName();
+    		}
+    		if (typeName instanceof ArrayTypeName) {
+    			return String.format("%s%s", shorten(((ArrayTypeName) typeName).componentType), "Array");
+    		}
+    		throw new GenerationException(typeName.toString() + " cannot be shortened reasonably");
     }
 
     private TypeName findType(String typeName, TypeDeclaration type, GenerationContext generationContext) {

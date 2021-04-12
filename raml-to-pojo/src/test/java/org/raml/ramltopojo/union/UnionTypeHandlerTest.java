@@ -115,13 +115,15 @@ public class UnionTypeHandlerTest {
         )));
     }
 
-    // @Test(expected = GenerationException.class)
+    @Test
     public void arrayUnion() throws Exception {
-
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("union-array-type.raml"), ".");
         UnionTypeHandler handler = new UnionTypeHandler("foo", findTypes("foo", api.types()));
 
-        handler.create(new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack",Collections.<String>emptyList()), null);
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api,TypeFetchers.fromTypes(), "bar.pack", Collections.emptyList());
+        CreationResult r = handler.create(generationContext, new CreationResult(generationContext.defaultPackage(),ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
+        System.err.println(r.getInterface().toString());
+        System.err.println(r.getImplementation().toString());
     }
 
     @Test
@@ -130,7 +132,7 @@ public class UnionTypeHandlerTest {
         Api api = RamlLoader.load(this.getClass().getResourceAsStream("union-nil-type.raml"), ".");
         UnionTypeHandler handler = new UnionTypeHandler("foo", findTypes("foo", api.types()));
 
-        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api,TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());
+        GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api,TypeFetchers.fromTypes(), "bar.pack", Collections.emptyList());
         CreationResult r = handler.create(generationContext, new CreationResult(generationContext.defaultPackage(),ClassName.get("bar.pack", "Foo"), ClassName.get("bar.pack", "FooImpl"))).get();
 
         assertThat(r.getInterface(), is(allOf(name(equalTo("Foo")), methods(containsInAnyOrder(
@@ -170,6 +172,17 @@ public class UnionTypeHandlerTest {
             System.err.println(x.getImplementation().toString());
         });
     }
+    
+    @Test
+    public void unionHierarchy() throws Exception {
+      Api api = RamlLoader.load(this.getClass().getResourceAsStream("union-hierarchy.raml"), ".");
+      RamlToPojo ramlToPojo = new RamlToPojoBuilder(api).fetchTypes(TypeFetchers.fromAnywhere()).findTypes(TypeFinders.everyWhere()).build(Arrays.asList("core.jackson2"));
+      ramlToPojo.buildPojos().creationResults().stream().forEach(x -> {
+	        System.err.println(x.getInterface().toString());
+	        System.err.println(x.getImplementation().toString());
+	    });
+    }
+    
 
     private static UnionTypeDeclaration findTypes(final String name, List<TypeDeclaration> types) {
         return (UnionTypeDeclaration) FluentIterable.from(types).firstMatch(new Predicate<TypeDeclaration>() {

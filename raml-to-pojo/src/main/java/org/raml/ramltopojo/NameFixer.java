@@ -61,6 +61,19 @@ public interface NameFixer {
       return name.toUpperCase();
     }
   };
+  
+  NameFixer UNDERSCORE_UPPER = new NameFixer() {
+
+		@Override
+		public String fixFirst(String name) {
+			return name.toUpperCase();
+		}
+
+		@Override
+		public String fixOthers(String name) {
+			return String.format("_%s", name.toUpperCase());
+		}
+  };
 
   String fixFirst(String name);
 

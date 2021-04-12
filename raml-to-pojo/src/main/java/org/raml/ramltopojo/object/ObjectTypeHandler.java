@@ -94,15 +94,18 @@ public class ObjectTypeHandler implements TypeHandler {
 
             TypeName tn;
             if ( TypeDeclarationType.isNewInlineType(propertyDeclaration) ){
-
+            	
+            		
                 CreationResult cr = result.internalType(propertyDeclaration.name());
-                if (cr.getImplementation().isPresent()) {
-
-                    // we need a special handling for property unions, they need to be added as inline types
-                    if (propertyDeclaration instanceof UnionTypeDeclaration) {
-                        TypeSpec.Builder innerTypeSpecImpl = cr.getImplementation().get().toBuilder();
-                        typeSpec.addType(innerTypeSpecImpl.addModifiers(Modifier.PUBLIC, Modifier.STATIC).build());
-                    }
+                
+                // we need a special handling for property unions, s
+                if (propertyDeclaration instanceof UnionTypeDeclaration) {
+                	if (cr == null) {
+                			cr = findParentPropertyCreationResult(propertyDeclaration.name(), generationContext).get();
+                	} else if (cr.getImplementation().isPresent()) {
+                			TypeSpec.Builder innerTypeSpecImpl = cr.getImplementation().get().toBuilder();
+                			typeSpec.addType(innerTypeSpecImpl.addModifiers(Modifier.PUBLIC, Modifier.STATIC).build());
+                	}
                 }
                 tn = cr.getJavaName(EventType.INTERFACE);
 
@@ -167,10 +170,6 @@ public class ObjectTypeHandler implements TypeHandler {
         TypeSpec.Builder typeSpec = TypeSpec
                 .interfaceBuilder(interf)
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-        typeSpec = generationContext.pluginsForObjects(objectTypeDeclaration).classCreated(objectPluginContext, objectTypeDeclaration, typeSpec, EventType.INTERFACE);
-        if ( typeSpec == null ) {
-            return null;
-        }
 
         Optional<String> discriminator = Optional.fromNullable(objectTypeDeclaration.discriminator());
 
@@ -204,14 +203,21 @@ public class ObjectTypeHandler implements TypeHandler {
                 // we need a special handling for property unions, they need to be added as inline types
                 if (propertyDeclaration instanceof UnionTypeDeclaration) {
 
-                    // Inline union naming: string | nil => StringNilUnion
-                    CreationResult cr = TypeDeclarationType.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),
-                        Names.typeName(propertyDeclaration.type(), "union"), propertyDeclaration, generationContext).get();
-                    result.withInternalType(propertyDeclaration.name(), cr);
-                    tn = cr.getJavaName(EventType.INTERFACE);
-
-                    typeSpec.addType(cr.getInterface().toBuilder().addModifiers(Modifier.PUBLIC, Modifier.STATIC).build());
-
+                		// check if we find this property in any parent
+                		Optional<CreationResult> ppCr = findParentPropertyCreationResult(propertyDeclaration.name(), generationContext);
+                		if (ppCr.isPresent()) {
+              				tn = ppCr.get().getJavaName(EventType.INTERFACE);
+                		} else {
+                      // Otherwise create it, Inline union naming: propName => PropNameUnion
+                      Optional<CreationResult> cr = TypeDeclarationType.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),
+                          Names.typeName(propertyDeclaration.name(), "union"), propertyDeclaration, generationContext);
+                      if (cr.isPresent()) {
+  	                    result.withInternalType(propertyDeclaration.name(), cr.get());
+  	                    tn = cr.get().getJavaName(EventType.INTERFACE);
+  	                    typeSpec.addType(cr.get().getInterface().toBuilder().addModifiers(Modifier.PUBLIC, Modifier.STATIC).build());
+                      }
+                		}
+                		
                 } else {
 
                     Optional<CreationResult> cr = TypeDeclarationType.createInlineType(interf, result.getJavaName(EventType.IMPLEMENTATION),
@@ -261,6 +267,11 @@ public class ObjectTypeHandler implements TypeHandler {
         if ( objectTypeDeclaration.additionalProperties()) {
 
             handleAdditionalPropertiesInterface(objectPluginContext, result, generationContext, typeSpec);
+        }
+        
+        typeSpec = generationContext.pluginsForObjects(objectTypeDeclaration).classCreated(objectPluginContext, objectTypeDeclaration, typeSpec, EventType.INTERFACE);
+        if ( typeSpec == null ) {
+            return null;
         }
 
         return typeSpec.build();
@@ -421,6 +432,39 @@ public class ObjectTypeHandler implements TypeHandler {
                 .addModifiers(Modifier.PUBLIC);
     }
 
+    private Optional<CreationResult> findParentPropertyCreationResult(String propertyName, GenerationContext generationContext) {
+  		Optional<ObjectTypeDeclaration> parent = findPropertyInParents(objectTypeDeclaration, propertyName);
+  		if (parent.isPresent()) {
+  			CreationResult parentCr = generationContext.findCreatedType(parent.get().name(), parent.get());
+  			if (parentCr != null) {
+  				return Optional.fromNullable(parentCr.getInternalTypeForProperty(propertyName));
+  			}
+  		}
+  		return Optional.absent();
+    }
+    
+    private Optional<ObjectTypeDeclaration> findPropertyInParents(final ObjectTypeDeclaration type, final String propertyName) {
+    	for (TypeDeclaration typeDeclaration : type.parentTypes()) {
+        if (typeDeclaration instanceof ObjectTypeDeclaration && !typeDeclaration.name().equals("object")) {
+            final ObjectTypeDeclaration parent = (ObjectTypeDeclaration) typeDeclaration;
+            
+            // check parents properties
+            for (TypeDeclaration property : parent.properties()) {
+            	if (property.name().equals(propertyName)) {
+            		return Optional.of(parent);
+            	}
+            }
+            
+            // check parents parent
+            final Optional<ObjectTypeDeclaration> parentsParent = findPropertyInParents(parent, propertyName);
+            if (parentsParent.isPresent()) {
+            	return parentsParent;
+            }
+        }
+   	 	}
+    	return Optional.absent();
+    }
+    
     private TypeName findType(String typeName, TypeDeclaration type, GenerationContext generationContext, EventType eventType) {
 
         return TypeDeclarationType.calculateTypeName(typeName, type, generationContext,eventType );

@@ -13,14 +13,8 @@ types:
       properties:
           someArray:
             type: integer[]
-            (ramltopojo.types):
-               plugins:
-                 - name: core.asArray
           anotherArray:
             type: dates[]
-            (ramltopojo.types):
-              plugins:
-                - name: core.asArray
     dates:
       (ramltopojo.types):
         plugins:
@@ -136,14 +130,22 @@ types:
           - name: core.wildcardcollection
             arguments: [java.lang.Object]
       properties:
-        elements: listElementParent[]
+        elements: 
+          type: listElementParent[]
+          (ramltopojo.types):
+            plugins:
+              - name: core.asList
         names: string[]
         id: integer
 
     listHolderChild:
       type: listHolderParent
       properties:
-        elements: listElementChild[]
+        elements: 
+          type: listElementChild[]
+          (ramltopojo.types):
+            plugins:
+              - name: core.asList
 
     nametypes:
       type: string

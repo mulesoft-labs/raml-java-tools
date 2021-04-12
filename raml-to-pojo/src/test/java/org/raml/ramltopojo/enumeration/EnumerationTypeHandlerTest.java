@@ -61,6 +61,16 @@ public class EnumerationTypeHandlerTest extends UnitTest {
 
         System.err.println(result.getInterface().toString());
     }
+    
+    @Test
+    public void checkUpper() {
+      when(stringDeclaration.name()).thenReturn("Days");
+      when(stringDeclaration.enumValues()).thenReturn(Arrays.asList("THIS_ONE", "THAT_ONE"));
+      EnumerationTypeHandler handler = new EnumerationTypeHandler("days", stringDeclaration);
+      GenerationContextImpl generationContext = new GenerationContextImpl(PluginManager.NULL, api, TypeFetchers.fromTypes(), "bar.pack", Collections.<String>emptyList());
+      CreationResult result = handler.create(generationContext, new CreationResult("bar.pack", ClassName.get("bar.pack", "Days"), null)).get();
+
+    }
 
     @Test
     public void createInteger() throws Exception {
