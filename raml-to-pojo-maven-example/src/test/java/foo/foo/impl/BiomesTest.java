@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.Arrays;
 
 import static org.junit.Assert.assertTrue;
 
@@ -21,7 +20,7 @@ public class BiomesTest {
 
         JungleImpl jungle = new JungleImpl();
         jungle.setName("borneo");
-        jungle.setAnimals(Arrays.<JungleAnimal>asList(new JungleAnimalImpl(), new JungleAnimalImpl()));
+        jungle.setAnimals(new JungleAnimal[] {new JungleAnimalImpl(), new JungleAnimalImpl()});
 
         BiomeImpl biome = new BiomeImpl(jungle);
 

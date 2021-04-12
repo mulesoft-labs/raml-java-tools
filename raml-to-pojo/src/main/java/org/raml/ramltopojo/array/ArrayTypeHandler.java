@@ -1,6 +1,7 @@
 package org.raml.ramltopojo.array;
 
 import com.google.common.base.Optional;
+import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
@@ -14,7 +15,6 @@ import org.raml.v2.api.model.v10.datamodel.TypeDeclaration;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created. There, you have it.
@@ -59,7 +59,7 @@ public class ArrayTypeHandler implements TypeHandler {
             return generationContext.pluginsForReferences(
                     Utils.allParents(typeDeclaration, new ArrayList<TypeDeclaration>()).toArray(new TypeDeclaration[0]))
                     .typeName(new ReferencePluginContext() {
-                    }, typeDeclaration, ParameterizedTypeName.get(ClassName.get(List.class), TypeDeclarationType.calculateTypeName(itemTypeName, typeDeclaration.items(), generationContext, type).box()));
+                    }, typeDeclaration, ArrayTypeName.of(TypeDeclarationType.calculateTypeName(itemTypeName, typeDeclaration.items(), generationContext, type).box()));
         } else {
 
             // so we are an array declared in the types: section.
