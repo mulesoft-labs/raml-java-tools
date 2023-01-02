@@ -16,6 +16,7 @@
 package org.raml.ramltopojo;
 
 import com.google.common.base.CaseFormat;
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Joiner;
 import org.raml.v2.api.model.v08.bodies.BodyLike;
 import org.raml.v2.api.model.v10.bodies.Response;
@@ -181,8 +182,10 @@ public class Names {
       if (s.isEmpty()) {
         continue;
       }
-
-      String friendlyName = firstOrOthers(format, i, s);
+      
+      // resolve all upper case
+      String r = CharMatcher.JAVA_UPPER_CASE.matchesAllOf(s) ? s.toLowerCase() : s;
+      String friendlyName = firstOrOthers(format, i, r);
 
       if (isDigits(left(friendlyName, 1))) {
 
